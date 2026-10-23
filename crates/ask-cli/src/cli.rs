@@ -199,8 +199,8 @@ pub enum SkillsCommands {
         fix: bool,
     },
 
-    /// Reconcile catalog index and target environment symlinks.
-    #[command(about = "Reconcile catalog index and target environment symlinks")]
+    /// Install current skills and remove obsolete catalog-owned installations.
+    #[command(about = "Install current skills and remove obsolete catalog-owned installations")]
     Sync {
         /// Simulate synchronization actions without writing changes to disk.
         #[arg(

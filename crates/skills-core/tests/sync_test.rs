@@ -265,6 +265,207 @@ fn test_dry_run_guarantee_zero_disk_mutations() {
 }
 
 #[test]
+fn test_sync_prunes_registered_rename_and_is_idempotent() {
+    for mode in [InstallMode::Copy, InstallMode::Symlink] {
+        if mode == InstallMode::Symlink && !cfg!(unix) {
+            continue;
+        }
+        let h = TestHarness::new();
+        let old = create_mock_skill(&h.catalog_dir, "spacetimedb", "1.0.0", "Old name");
+        let installer = Installer::new();
+        installer
+            .install(
+                &old,
+                &h.target,
+                &InstallOptions {
+                    mode,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        let renamed = h.catalog_dir.join("spacetime");
+        fs::rename(old, &renamed).unwrap();
+        create_mock_skill(&h.catalog_dir, "spacetime", "1.0.0", "New name");
+
+        let syncer = SkillSyncer::new(&h.catalog_dir)
+            .with_target(h.target.clone())
+            .with_prune_orphans(true);
+        let summary = syncer.sync().unwrap();
+        assert_eq!(summary.installed, 1);
+        assert_eq!(summary.deleted, 1);
+        assert!(h.agent_dir.join("spacetimedb").symlink_metadata().is_err());
+        assert!(h.agent_dir.join("spacetime/SKILL.md").is_file());
+        let registry = installer.read_registry(&h.target).unwrap();
+        assert!(registry.get("spacetimedb").is_none());
+        assert!(registry.get("spacetime").is_some());
+        let repeated = syncer.sync().unwrap();
+        assert_eq!(repeated.installed, 0);
+        assert_eq!(repeated.deleted, 0);
+        assert_eq!(repeated.no_ops, 1);
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn test_sync_prunes_unregistered_catalog_links() {
+    for (relative, dangling) in [(false, true), (true, true), (false, false)] {
+        let h = TestHarness::new();
+        let current = create_mock_skill(&h.catalog_dir, "spacetime", "1.0.0", "Current");
+        let destination = if relative {
+            PathBuf::from("../catalog/spacetimedb")
+        } else if dangling {
+            h.catalog_dir.join("spacetimedb")
+        } else {
+            current
+        };
+        std::os::unix::fs::symlink(&destination, h.agent_dir.join("spacetimedb")).unwrap();
+
+        let summary = SkillSyncer::new(&h.catalog_dir)
+            .with_target(h.target.clone())
+            .with_prune_orphans(true)
+            .sync()
+            .unwrap();
+        assert_eq!(summary.installed, 1);
+        assert_eq!(summary.deleted, 1);
+        assert!(h.agent_dir.join("spacetimedb").symlink_metadata().is_err());
+        assert!(h.agent_dir.join("spacetime/SKILL.md").is_file());
+    }
+}
+
+#[test]
+fn test_sync_preserves_manual_skills_and_other_catalog_installations() {
+    for mode in [InstallMode::Copy, InstallMode::Symlink] {
+        if mode == InstallMode::Symlink && !cfg!(unix) {
+            continue;
+        }
+        let h = TestHarness::new();
+        let manual = create_mock_skill(&h.agent_dir, "test1", "1.0.0", "Manual skill");
+        let manual_before = fs::read(manual.join("SKILL.md")).unwrap();
+        let external = create_mock_skill(
+            &h.temp.path().join("other-catalog"),
+            "external",
+            "1.0.0",
+            "External",
+        );
+        let installer = Installer::new();
+        installer
+            .install(
+                &external,
+                &h.target,
+                &InstallOptions {
+                    mode,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+
+        let summary = SkillSyncer::new(&h.catalog_dir)
+            .with_target(h.target.clone())
+            .with_prune_orphans(true)
+            .sync()
+            .unwrap();
+        assert_eq!(summary.deleted, 0);
+        assert_eq!(fs::read(manual.join("SKILL.md")).unwrap(), manual_before);
+        assert!(h.agent_dir.join("external/SKILL.md").is_file());
+        assert!(
+            installer
+                .read_registry(&h.target)
+                .unwrap()
+                .get("external")
+                .is_some()
+        );
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn test_sync_preserves_unrelated_and_redirected_links() {
+    let h = TestHarness::new();
+    let old = create_mock_skill(&h.catalog_dir, "old-skill", "1.0.0", "Old");
+    Installer::new()
+        .install(&old, &h.target, &InstallOptions::default())
+        .unwrap();
+    fs::remove_dir_all(old).unwrap();
+    let outside = h.temp.path().join("outside");
+    std::os::unix::fs::symlink(&outside, h.catalog_dir.join("redirect")).unwrap();
+    for (name, destination) in [
+        ("old-skill", outside.clone()),
+        ("external-link", outside.clone()),
+        ("escaped-link", h.catalog_dir.join("../outside")),
+        ("nested-link", h.catalog_dir.join("redirect")),
+    ] {
+        let link = h.agent_dir.join(name);
+        if link.symlink_metadata().is_ok() {
+            fs::remove_file(&link).unwrap();
+        }
+        std::os::unix::fs::symlink(destination, link).unwrap();
+    }
+    let summary = SkillSyncer::new(&h.catalog_dir)
+        .with_target(h.target.clone())
+        .with_prune_orphans(true)
+        .sync()
+        .unwrap();
+    assert_eq!(summary.deleted, 0);
+    for name in ["old-skill", "external-link", "escaped-link", "nested-link"] {
+        assert!(
+            h.agent_dir
+                .join(name)
+                .symlink_metadata()
+                .unwrap()
+                .is_symlink()
+        );
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn test_sync_preserves_manual_replacement_of_registered_symlink() {
+    let h = TestHarness::new();
+    let old = create_mock_skill(&h.catalog_dir, "old-skill", "1.0.0", "Old");
+    Installer::new()
+        .install(&old, &h.target, &InstallOptions::default())
+        .unwrap();
+    fs::remove_dir_all(old).unwrap();
+    fs::remove_file(h.agent_dir.join("old-skill")).unwrap();
+    let manual = create_mock_skill(&h.agent_dir, "old-skill", "1.0.0", "Manual replacement");
+    let before = fs::read(manual.join("SKILL.md")).unwrap();
+    let summary = SkillSyncer::new(&h.catalog_dir)
+        .with_target(h.target.clone())
+        .with_prune_orphans(true)
+        .sync()
+        .unwrap();
+    assert_eq!(summary.deleted, 0);
+    assert_eq!(fs::read(manual.join("SKILL.md")).unwrap(), before);
+}
+
+#[cfg(unix)]
+#[test]
+fn test_sync_orphan_dry_run_and_disabled_pruning_preserve_links() {
+    let h = TestHarness::new();
+    let old = create_mock_skill(&h.catalog_dir, "old-skill", "1.0.0", "Old");
+    let installer = Installer::new();
+    installer
+        .install(&old, &h.target, &InstallOptions::default())
+        .unwrap();
+    fs::remove_dir_all(old).unwrap();
+    std::os::unix::fs::symlink(h.catalog_dir.join("legacy"), h.agent_dir.join("legacy")).unwrap();
+    let registry_path = installer.resolve_registry_path(&h.target).unwrap();
+    let registry_before = fs::read(&registry_path).unwrap();
+    let syncer = SkillSyncer::new(&h.catalog_dir).with_target(h.target.clone());
+    assert_eq!(syncer.sync().unwrap().deleted, 0);
+    let summary = syncer
+        .with_prune_orphans(true)
+        .with_dry_run(true)
+        .sync()
+        .unwrap();
+    assert_eq!(summary.deleted, 2);
+    assert!(summary.dry_run);
+    assert_eq!(fs::read(registry_path).unwrap(), registry_before);
+    assert!(h.agent_dir.join("old-skill").symlink_metadata().is_ok());
+    assert!(h.agent_dir.join("legacy").symlink_metadata().is_ok());
+}
+
+#[test]
 fn test_execute_plan_installs_and_updates() {
     let h = TestHarness::new();
     let skill_a = create_mock_skill(&h.catalog_dir, "skill-a", "1.0.0", "Body A");

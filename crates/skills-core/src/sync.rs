@@ -18,7 +18,7 @@ use crate::error::SkillError;
 use crate::installer::{
     InstallMode, InstallOptions, InstalledSkill, Installer, InstallerError, IntegrityStatus,
     PathValidator, TargetEnvironment, UninstallOptions, collect_file_entries, compute_dir_checksum,
-    default_exclude_patterns, is_excluded, timestamp_now_iso,
+    default_exclude_patterns, is_excluded, normalize_path, timestamp_now_iso,
 };
 use crate::models::SkillFrontmatter;
 use crate::parser::SkillParser;
@@ -396,14 +396,69 @@ pub struct SkillSyncer {
     /// Conflict resolution policy.
     pub conflict_strategy: ConflictStrategy,
 
-    /// If true, removes installed skills that no longer exist in the local catalog.
+    /// If true, removes obsolete installations owned by this catalog or its prune sources.
     pub prune_orphans: bool,
+
+    /// Additional source catalogs whose obsolete installations may be pruned.
+    pub prune_sources: Vec<PathBuf>,
 
     /// If true, executes analysis only without modifying disk state or acquiring locks.
     pub dry_run: bool,
 
     /// Glob patterns and filenames excluded during checksum computation and file transfers.
     pub exclude_patterns: Vec<String>,
+}
+
+fn resolve_source_path(source: &Path) -> Option<PathBuf> {
+    // Renames can remove the leaf directory; resolve its surviving ancestors instead.
+    for ancestor in source.ancestors() {
+        match ancestor.canonicalize() {
+            Ok(resolved) => {
+                return Some(normalize_path(
+                    &resolved.join(source.strip_prefix(ancestor).ok()?),
+                ));
+            }
+            Err(error)
+                if error.kind() != std::io::ErrorKind::NotFound
+                    || ancestor.symlink_metadata().is_ok() =>
+            {
+                return None;
+            }
+            Err(_) => {}
+        }
+    }
+    None
+}
+
+fn source_is_owned(source: &Path, owned_sources: &[PathBuf]) -> bool {
+    resolve_source_path(source).is_some_and(|resolved| {
+        owned_sources
+            .iter()
+            .any(|catalog| resolved != *catalog && resolved.starts_with(catalog))
+    })
+}
+
+fn owns_orphan(
+    skill_id: &str,
+    installed: &InstalledSkill,
+    skills_dir: &Path,
+    owned_sources: &[PathBuf],
+) -> bool {
+    let target = skills_dir.join(skill_id);
+    match target.symlink_metadata() {
+        Ok(metadata) if metadata.is_symlink() => fs::read_link(target)
+            .ok()
+            .is_some_and(|source| source_is_owned(&skills_dir.join(source), owned_sources)),
+        Ok(metadata) => {
+            metadata.is_dir()
+                && installed.mode == InstallMode::Copy
+                && source_is_owned(&installed.source_path, owned_sources)
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            source_is_owned(&installed.source_path, owned_sources)
+        }
+        _ => false,
+    }
 }
 
 impl SkillSyncer {
@@ -417,6 +472,7 @@ impl SkillSyncer {
             mode: InstallMode::Auto,
             conflict_strategy: ConflictStrategy::PromptUser,
             prune_orphans: false,
+            prune_sources: Vec::new(),
             dry_run: false,
             exclude_patterns: default_exclude_patterns(),
         }
@@ -447,6 +503,13 @@ impl SkillSyncer {
     #[must_use]
     pub fn with_prune_orphans(mut self, prune: bool) -> Self {
         self.prune_orphans = prune;
+        self
+    }
+
+    /// Includes an additional source catalog, such as the repository archive, in cleanup ownership.
+    #[must_use]
+    pub fn with_prune_source(mut self, source: impl Into<PathBuf>) -> Self {
+        self.prune_sources.push(source.into());
         self
     }
 
@@ -554,6 +617,10 @@ impl SkillSyncer {
     #[allow(clippy::too_many_lines)]
     pub fn create_plan(&self) -> Result<SyncPlan, SyncError> {
         let catalog_skills = self.discover_catalog_skills()?;
+        let owned_sources: Vec<PathBuf> = std::iter::once(&self.catalog_dir)
+            .chain(&self.prune_sources)
+            .filter_map(|source| resolve_source_path(source))
+            .collect();
         let mut sorted_catalog_skills: Vec<(&String, &PathBuf)> = catalog_skills.iter().collect();
         sorted_catalog_skills.sort_by_key(|(id, _)| *id);
 
@@ -719,7 +786,9 @@ impl SkillSyncer {
 
             for (installed_id, installed_skill) in sorted_registry_skills {
                 if !catalog_skills.contains_key(installed_id) {
-                    if self.prune_orphans {
+                    if self.prune_orphans
+                        && owns_orphan(installed_id, installed_skill, &skills_dir, &owned_sources)
+                    {
                         actions.push(SyncAction {
                             skill_id: installed_id.clone(),
                             target_env: target.clone(),
@@ -740,7 +809,57 @@ impl SkillSyncer {
                             target_version: Some(installed_skill.version.clone()),
                             source_checksum: None,
                             target_checksum: Some(installed_skill.checksum.clone()),
-                            reason: "Orphan skill in target retained (prune_orphans = false)"
+                            reason: if self.prune_orphans {
+                                "Orphan retained: installation is not owned by this catalog"
+                                    .to_string()
+                            } else {
+                                "Orphan skill in target retained (prune_orphans = false)"
+                                    .to_string()
+                            },
+                        });
+                    }
+                }
+            }
+
+            if self.prune_orphans && skills_dir.is_dir() {
+                let mut entries = fs::read_dir(&skills_dir)
+                    .and_then(|entries| entries.collect::<std::io::Result<Vec<_>>>())
+                    .map_err(|source| SyncError::Io {
+                        path: skills_dir.clone(),
+                        source,
+                    })?;
+                entries.sort_by_key(std::fs::DirEntry::file_name);
+                for entry in entries {
+                    let Some(skill_id) = entry.file_name().to_str().map(str::to_owned) else {
+                        continue;
+                    };
+                    if catalog_skills.contains_key(&skill_id)
+                        || registry.skills.contains_key(&skill_id)
+                        || PathValidator::validate_skill_id(&skill_id).is_err()
+                    {
+                        continue;
+                    }
+                    let path = entry.path();
+                    let metadata = entry.file_type().map_err(|source| SyncError::Io {
+                        path: path.clone(),
+                        source,
+                    })?;
+                    if !metadata.is_symlink() {
+                        continue;
+                    }
+                    let source =
+                        fs::read_link(&path).map_err(|source| SyncError::Io { path, source })?;
+                    let source = skills_dir.join(source);
+                    if source_is_owned(&source, &owned_sources) {
+                        actions.push(SyncAction {
+                            skill_id,
+                            target_env: target.clone(),
+                            kind: SyncActionKind::Delete,
+                            source_version: None,
+                            target_version: None,
+                            source_checksum: None,
+                            target_checksum: None,
+                            reason: "Unregistered symlink points to an obsolete catalog skill"
                                 .to_string(),
                         });
                     }

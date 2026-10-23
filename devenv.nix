@@ -115,6 +115,10 @@ in
       ".devenv/"
       "^.vscode/"
       "^node_modules/"
+      "^dashboard/content/"
+      "^dashboard/public/"
+      "^dashboard/static/build/"
+      "^dashboard/static/pagefind/"
       "/resources/"
       "^\\.cache/"
       "CHANGELOG.md"
@@ -145,7 +149,6 @@ in
         enable = true;
         excludes = [
           "skills(-archive)?/tooling/opencode-acp/.*\\.md$"
-          "dashboard/content/.*\\.md$"
           "^README\\.md$"
           "^agents/AGENTS\\.md$"
           "^skills\\.sh\\.json$"
@@ -161,7 +164,7 @@ in
         enable = true;
         name = "Dashboard Lint";
         entry = "cargo run -p ask-cli -- dashboard lint";
-        files = "^(skills/.*\\.md$|dashboard/content/)";
+        always_run = true;
         pass_filenames = false;
         require_serial = true;
       };
@@ -175,7 +178,6 @@ in
       markdownlint = {
         enable = true;
         excludes = [
-          "dashboard/content/.*\\.md$"
           "^README\\.md$"
           "^agents/AGENTS\\.md$"
         ];
@@ -224,7 +226,6 @@ in
         enable = true;
         excludes = [
           "\\.html$"
-          "dashboard/content/.*\\.md$"
           "README\\.md$"
           "^agents/AGENTS\\.md$"
           "^skills\\.sh\\.json$"

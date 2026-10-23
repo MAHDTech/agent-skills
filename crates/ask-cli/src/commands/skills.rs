@@ -16,7 +16,7 @@ use skills_core::installer::{InstallOptions, Installer, TargetEnvironment, Unins
 use skills_core::lint::SkillLinter;
 use skills_core::models::LintSeverity;
 use skills_core::parser::SkillParser;
-use skills_core::sync::{ConflictStrategy, SkillSyncer, SyncAction, SyncActionKind};
+use skills_core::sync::{ConflictStrategy, SkillSyncer, SyncActionKind};
 
 /// Dispatches catalog operations to skills-core domain engines.
 pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError> {
@@ -484,40 +484,11 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
         let syncer = SkillSyncer::new(catalog_dir)
             .with_targets(TargetEnvironment::all_standard())
             .with_conflict_strategy(ConflictStrategy::LocalWins)
+            .with_prune_orphans(true)
+            .with_prune_source(root.join("skills-archive"))
             .with_dry_run(dry_run);
 
-        let mut plan = syncer.create_plan().map_err(SkillError::from)?;
-        let mut archived_names = repository_skill_names(&root, true)?;
-        let live_names = repository_skill_names(&root, false)?;
-        archived_names.retain(|name| !live_names.contains(name));
-        archived_names.sort();
-        for target in &syncer.targets {
-            let target_dir = syncer
-                .installer
-                .resolve_target_dir(target)
-                .map_err(SkillError::from)?;
-            for name in &archived_names {
-                if let Some(action) = plan
-                    .actions
-                    .iter_mut()
-                    .find(|action| action.skill_id == *name && action.target_env == *target)
-                {
-                    action.kind = SyncActionKind::Delete;
-                    action.reason = "Skill archived in authoritative repository".to_string();
-                } else if target_dir.join(name).symlink_metadata().is_ok() {
-                    plan.actions.push(SyncAction {
-                        skill_id: name.clone(),
-                        target_env: target.clone(),
-                        kind: SyncActionKind::Delete,
-                        source_version: None,
-                        target_version: None,
-                        source_checksum: None,
-                        target_checksum: None,
-                        reason: "Skill archived in authoritative repository".to_string(),
-                    });
-                }
-            }
-        }
+        let plan = syncer.create_plan().map_err(SkillError::from)?;
 
         println!("Synchronization Plan (actions: {}):", plan.actions.len());
         println!(

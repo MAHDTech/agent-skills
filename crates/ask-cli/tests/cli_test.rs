@@ -720,7 +720,7 @@ fn test_action_bulk_install_uninstall_isolated() {
             let installed = action != "uninstall";
             assert_eq!(target.join("first/SKILL.md").exists(), installed);
             assert_eq!(target.join("second/SKILL.md").exists(), installed);
-            assert_eq!(target.join("retired").exists(), action == "install");
+            assert_eq!(target.join("retired").exists(), action != "uninstall");
             if installed {
                 assert_eq!(
                     std::fs::read(target.join("first/SKILL.md")).unwrap(),
@@ -731,6 +731,134 @@ fn test_action_bulk_install_uninstall_isolated() {
         }
     }
     assert!(repo.join("skills/engineering/first/SKILL.md").exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
+    use skills_core::{InstallMode, InstallOptions, Installer, TargetEnvironment};
+
+    let temp = tempfile::tempdir().unwrap();
+    let repo = temp.path().join("repo");
+    let old = repo.join("skills/engineering/spacetimedb");
+    let current = repo.join("skills/engineering/spacetime");
+    let external = temp.path().join("other-catalog/external");
+    let archived = repo.join("skills-archive/engineering/retired-link");
+    for (path, name) in [
+        (&old, "spacetimedb"),
+        (&external, "external"),
+        (&archived, "retired-link"),
+        (
+            &repo.join("skills-archive/engineering/retired-manual"),
+            "retired-manual",
+        ),
+    ] {
+        std::fs::create_dir_all(path).unwrap();
+        std::fs::write(
+            path.join("SKILL.md"),
+            format!("---\nname: {name}\ndescription: Test skill\n---\n"),
+        )
+        .unwrap();
+    }
+    let task_home = temp.path().join("home");
+    let task_config = task_home.join(".config");
+    let targets = [
+        task_home.join(".agents/skills"),
+        task_home.join(".cursor/skills"),
+        if cfg!(target_os = "macos") {
+            task_home.join("Library/Application Support/Claude/skills")
+        } else {
+            task_config.join("claude/skills")
+        },
+    ];
+    let installer = Installer::new();
+    for target in &targets {
+        let env = TargetEnvironment::Custom(target.clone());
+        for (source, mode) in [(&old, InstallMode::Symlink), (&external, InstallMode::Copy)] {
+            installer
+                .install(
+                    source,
+                    &env,
+                    &InstallOptions {
+                        mode,
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+        }
+        std::os::unix::fs::symlink(&old, target.join("legacy")).unwrap();
+        std::os::unix::fs::symlink(&archived, target.join("retired-link")).unwrap();
+        for name in ["test1", "retired-manual"] {
+            std::fs::create_dir_all(target.join(name)).unwrap();
+            std::fs::write(target.join(name).join("SKILL.md"), "Manual skill\n").unwrap();
+        }
+    }
+    std::fs::rename(&old, &current).unwrap();
+    std::fs::write(
+        current.join("SKILL.md"),
+        "---\nname: spacetime\ndescription: Renamed skill\n---\n",
+    )
+    .unwrap();
+
+    let run_sync = |args: &[&str]| {
+        let mut command = Command::cargo_bin("ask").unwrap();
+        command
+            .current_dir(&repo)
+            .env("HOME", &task_home)
+            .env("XDG_CONFIG_HOME", &task_config)
+            .env("AGENT_SKILLS_HOME", &repo)
+            .env("SKILLS_SKIP_DASHBOARD", "1")
+            .env("SKILLS_NO_STAGE", "1")
+            .env_remove("CI")
+            .env_remove("PRE_COMMIT")
+            .env_remove("SKILLS_REPO_ONLY")
+            .args(args);
+        command
+    };
+    run_sync(&["skills", "sync", "--dry-run"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "3 installed, 0 updated, 9 deleted",
+        ));
+    for target in &targets {
+        assert!(target.join("spacetimedb").symlink_metadata().is_ok());
+        assert!(target.join("spacetime").symlink_metadata().is_err());
+    }
+    run_sync(&["skills", "--action", "sync"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "3 installed, 0 updated, 9 deleted",
+        ));
+    for target in &targets {
+        for name in ["spacetimedb", "legacy", "retired-link"] {
+            assert!(target.join(name).symlink_metadata().is_err());
+        }
+        assert_eq!(
+            std::fs::read_link(target.join("spacetime")).unwrap(),
+            current
+        );
+        for name in ["test1", "retired-manual"] {
+            assert_eq!(
+                std::fs::read_to_string(target.join(name).join("SKILL.md")).unwrap(),
+                "Manual skill\n"
+            );
+        }
+        assert!(target.join("external/SKILL.md").is_file());
+        let registry = installer
+            .read_registry(&TargetEnvironment::Custom(target.clone()))
+            .unwrap();
+        assert!(registry.get("spacetimedb").is_none());
+        assert!(registry.get("spacetime").is_some());
+        assert!(registry.get("external").is_some());
+    }
+    run_sync(&["skills", "sync"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "0 installed, 0 updated, 0 deleted",
+        ));
 }
 
 #[test]
