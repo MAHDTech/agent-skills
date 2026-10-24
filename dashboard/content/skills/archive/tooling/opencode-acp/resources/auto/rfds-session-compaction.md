@@ -114,7 +114,7 @@ optional fields, then apply the notification.
 
 `CompactionStatus` is open in both protocol versions from its
 introduction and follows the
-[v2 enum-extension rules](/rfds/v2/enum-variant-extension). Values beginning
+[v2 enum-extension rules](https://agentclientprotocol.com/rfds/v2/enum-variant-extension.md). Values beginning
 with `_` are reserved for implementation-specific extensions, while other
 unknown values are reserved for future ACP statuses. Clients preserve an
 unknown string and present an opaque generic state without inferring lifecycle
@@ -148,7 +148,7 @@ The update has three optional, nullable patch fields:
 For each patch field, omission leaves the stored value unchanged, `null`
 clears it, and a concrete value replaces it. In v2, a concrete `_meta` object
 instead patches the stored metadata by top-level key, as defined by
-[v2 Metadata Patches](/rfds/v2/meta-patches). On a first-seen ID, omission and
+[v2 Metadata Patches](https://agentclientprotocol.com/rfds/v2/meta-patches.md). On a first-seen ID, omission and
 `null` both start with no value. For `summary`, both `null` and `[]` clear the
 current content.
 
@@ -238,8 +238,8 @@ The initial Preview protocol implementation landed in
 ### Stabilization preparation
 
 The completion change includes compaction in stable and draft schemas and
-protocol guides. See the [v1 guide](/protocol/v1/prompt-turn#session-compaction)
-and [v2 guide](/protocol/v2/prompt-lifecycle#session-compaction).
+protocol guides. See the [v1 guide](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#session-compaction)
+and [v2 guide](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#session-compaction).
 
 It makes compaction available unconditionally and removes the
 `unstable_session_compaction` Cargo feature. Existing consumers must remove
@@ -248,7 +248,7 @@ capability requirement are unchanged from Preview.
 Protocol v2 as a whole remains opt-in through `unstable_protocol_v2`;
 completing this RFD does not stabilize protocol v2.
 
-The schema crate [does not provide cross-version conversion](/rfds/v2/overview).
+The schema crate [does not provide cross-version conversion](https://agentclientprotocol.com/rfds/v2/overview).
 SDKs supporting both versions should use explicit versioned implementations or
 purpose-specific runtime adapters rather than schema-level conversion helpers.
 
@@ -361,7 +361,7 @@ correlate events heuristically rather than updating one ID-addressed entity.
   coverage, and clarified receive-order timeline placement and summary patch
   semantics independent of compaction status.
 * 2026-10-13: In v2, a concrete `_meta` object patches stored metadata by key,
-  per [v2 Metadata Patches](/rfds/v2/meta-patches). v1 still replaces the whole
+  per [v2 Metadata Patches](https://agentclientprotocol.com/rfds/v2/meta-patches.md). v1 still replaces the whole
   object.
 
 

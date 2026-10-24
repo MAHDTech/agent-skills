@@ -19,11 +19,11 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 **Published:** September 17, 2026
 
-The [Tool Call Name RFD](/rfds/tool-call-name) has moved to Completed,
+The [Tool Call Name RFD](https://agentclientprotocol.com/rfds/tool-call-name.md) has moved to Completed,
 stabilizing the optional `name` field on tool calls.
 
-For protocol details, see [v1 Tool Calls](/protocol/v1/tool-calls) and
-[v2 Tool Calls](/protocol/v2/tool-calls).
+For protocol details, see [v1 Tool Calls](https://agentclientprotocol.com/protocol/v1/tool-calls.md) and
+[v2 Tool Calls](https://agentclientprotocol.com/protocol/v2/tool-calls.md).
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

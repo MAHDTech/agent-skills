@@ -15,9 +15,7 @@ skill_name = "acp"
 
 > How all Agent Client Protocol connections begin
 
-The Initialization phase allows [Clients](/protocol/v2/overview#client) and [Agents](/protocol/v2/overview#agent) to negotiate protocol versions, capabilities, and authentication methods.
-
-<br />
+The Initialization phase allows [Clients](https://agentclientprotocol.com/protocol/v2/overview.md#client) and [Agents](https://agentclientprotocol.com/protocol/v2/overview.md#agent) to negotiate protocol versions, capabilities, and authentication methods.
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -30,8 +28,6 @@ sequenceDiagram
     Agent-->>Client: initialize response
     Note over Client,Agent: Ready for session setup
 ```
-
-<br />
 
 Before a Session can be created, Clients **MUST** initialize the connection by calling the `initialize` method with:
 
@@ -139,13 +135,13 @@ only apply within a supported surface.
 
 Capabilities may specify the availability of protocol methods, notifications, or a subset of their parameters. They may also signal behaviors of the Agent or Client implementation.
 
-Receivers **MUST** ignore unknown capability fields at every nesting level, as described in [Unknown Object Fields](/protocol/v2/extensibility#unknown-object-fields). Unknown fields do not advertise support for any capability the receiver understands.
+Receivers **MUST** ignore unknown capability fields at every nesting level, as described in [Unknown Object Fields](https://agentclientprotocol.com/protocol/v2/extensibility.md#unknown-object-fields). Unknown fields do not advertise support for any capability the receiver understands.
 
-Implementations can also [advertise custom capabilities](/protocol/v2/extensibility#advertising-custom-capabilities) using the `_meta` field to indicate support for protocol extensions.
+Implementations can also [advertise custom capabilities](https://agentclientprotocol.com/protocol/v2/extensibility.md#advertising-custom-capabilities) using the `_meta` field to indicate support for protocol extensions.
 
 Experimental features follow their own documented negotiation requirements, not
 a connection-wide unstable-schema flag. See [Experimental Features and
-Negotiation](/protocol/v2/extensibility#experimental-features-and-negotiation)
+Negotiation](https://agentclientprotocol.com/protocol/v2/extensibility.md#experimental-features-and-negotiation)
 for the distinction between capability-gated operations and capability-free
 informational additions.
 
@@ -157,47 +153,47 @@ Omitted fields mean unsupported. Extension-specific capabilities belong in
 
 #### Terminal Authentication
 
-<ParamField path="auth.terminal" type="TerminalAuthCapabilities Object">
-  The Client can reproduce the configured Agent invocation in an interactive
-  terminal. Omitted or `null` means unsupported. Supplying `{}` means the Agent
-  may advertise `type: "terminal"` authentication methods.
-</ParamField>
+**auth.terminal** `TerminalAuthCapabilities Object`
 
-<Card icon="terminal" horizontal href="/protocol/v2/authentication">
-  Learn more about Terminal Authentication
-</Card>
+The Client can reproduce the configured Agent invocation in an interactive
+terminal. Omitted or `null` means unsupported. Supplying `{}` means the Agent
+may advertise `type: "terminal"` authentication methods.
+
+> Learn more about Terminal Authentication
+>
+> [Open](https://agentclientprotocol.com/protocol/v2/authentication.md)
 
 #### Elicitation
 
-<ParamField path="elicitation" type="ElicitationCapabilities Object">
-  The Client advertises its supported `elicitation/create` modes. Omitted or
-  `null` means no modes are advertised. A present object advertises each mode
-  only through its corresponding non-null `form` or `url` field. Empty and
-  all-null objects are valid but advertise no supported modes. Unlike MCP, ACP
-  does not treat `{}` as form support.
-</ParamField>
+**elicitation** `ElicitationCapabilities Object`
 
-<Card icon="message-question" horizontal href="/protocol/v2/elicitation">
-  Learn more about Elicitation
-</Card>
+The Client advertises its supported `elicitation/create` modes. Omitted or
+`null` means no modes are advertised. A present object advertises each mode
+only through its corresponding non-null `form` or `url` field. Empty and
+all-null objects are valid but advertise no supported modes. Unlike MCP, ACP
+does not treat `{}` as form support.
+
+> Learn more about Elicitation
+>
+> [Open](https://agentclientprotocol.com/protocol/v2/elicitation.md)
 
 ### Agent Capabilities
 
 The Agent **SHOULD** specify whether it supports the following capabilities:
 
-<ResponseField name="session" type="SessionCapabilities Object">
-  The Agent supports the `session/*` method surface. Omitted or `null` means the
-  Agent does not support session methods. Supplying `{}` means the Agent
-  supports the baseline session methods: `session/new`, `session/list`,
-  `session/resume`, `session/close`, `session/prompt`, `session/cancel`, and
-  `session/update`.
-</ResponseField>
+**session** `SessionCapabilities Object`
 
-<ResponseField name="auth" type="AgentAuthCapabilities Object">
-  Authentication-related extensions supported by the Agent. This field is
-  orthogonal to `authMethods` and does not advertise the availability of
-  `auth/login` or `auth/logout`.
-</ResponseField>
+The Agent supports the `session/*` method surface. Omitted or `null` means the
+Agent does not support session methods. Supplying `{}` means the Agent
+supports the baseline session methods: `session/new`, `session/list`,
+`session/resume`, `session/close`, `session/prompt`, `session/cancel`, and
+`session/update`.
+
+**auth** `AgentAuthCapabilities Object`
+
+Authentication-related extensions supported by the Agent. This field is
+orthogonal to `authMethods` and does not advertise the availability of
+`auth/login` or `auth/logout`.
 
 #### Session Capabilities
 
@@ -209,95 +205,95 @@ Optionally, Agents **MAY** support prompt extensions, MCP server transports, and
 additional session methods such as `session/delete` by specifying nested
 capabilities.
 
-<ResponseField name="prompt" type="PromptCapabilities Object">
-  Object indicating the different types of [content](/protocol/v2/content) that
-  may be included in `session/prompt` requests. Omitted or `null` means the
-  Agent does not advertise any prompt extensions beyond the baseline text and
-  resource-link content required by `session/prompt`.
-</ResponseField>
+**prompt** `PromptCapabilities Object`
 
-<ResponseField name="mcp" type="McpCapabilities Object">
-  Object indicating the MCP server transports that may be included in session
-  lifecycle requests. Omitted or `null` both mean the Agent does not advertise
-  MCP server transport support for sessions.
-</ResponseField>
+Object indicating the different types of [content](https://agentclientprotocol.com/protocol/v2/content.md) that
+may be included in `session/prompt` requests. Omitted or `null` means the
+Agent does not advertise any prompt extensions beyond the baseline text and
+resource-link content required by `session/prompt`.
 
-<ResponseField name="delete" type="SessionDeleteCapabilities Object">
-  The [`session/delete`](/protocol/v2/session-delete) method is available.
-  Omitted or `null` both mean the Agent does not advertise support. Supplying an
-  empty object means the Agent supports deleting sessions from `session/list`.
-</ResponseField>
+**mcp** `McpCapabilities Object`
 
-<ResponseField name="additionalDirectories" type="SessionAdditionalDirectoriesCapabilities Object">
-  The Agent supports `additionalDirectories` on supported session lifecycle
-  requests. Omitted or `null` both mean the Agent does not advertise support.
-  Supplying `{}` means the Agent supports additional workspace roots.
-</ResponseField>
+Object indicating the MCP server transports that may be included in session
+lifecycle requests. Omitted or `null` both mean the Agent does not advertise
+MCP server transport support for sessions.
+
+**delete** `SessionDeleteCapabilities Object`
+
+The [`session/delete`](https://agentclientprotocol.com/protocol/v2/session-delete) method is available.
+Omitted or `null` both mean the Agent does not advertise support. Supplying an
+empty object means the Agent supports deleting sessions from `session/list`.
+
+**additionalDirectories** `SessionAdditionalDirectoriesCapabilities Object`
+
+The Agent supports `additionalDirectories` on supported session lifecycle
+requests. Omitted or `null` both mean the Agent does not advertise support.
+Supplying `{}` means the Agent supports additional workspace roots.
 
 #### Session Prompt Capabilities
 
 As a baseline, Agents that advertise `session` **MUST** support `ContentBlock::Text` and `ContentBlock::ResourceLink` in `session/prompt` requests.
 
-Optionally, they **MAY** support richer types of [content](/protocol/v2/content) by specifying the following capabilities:
+Optionally, they **MAY** support richer types of [content](https://agentclientprotocol.com/protocol/v2/content.md) by specifying the following capabilities:
 
-<ResponseField name="image" type="PromptImageCapabilities Object">
-  The prompt may include `ContentBlock::Image`. Omitted or `null` means the
-  Agent does not advertise support. Supplying `{}` means the Agent supports
-  image content in prompts.
-</ResponseField>
+**image** `PromptImageCapabilities Object`
 
-<ResponseField name="audio" type="PromptAudioCapabilities Object">
-  The prompt may include `ContentBlock::Audio`. Omitted or `null` means the
-  Agent does not advertise support. Supplying `{}` means the Agent supports
-  audio content in prompts.
-</ResponseField>
+The prompt may include `ContentBlock::Image`. Omitted or `null` means the
+Agent does not advertise support. Supplying `{}` means the Agent supports
+image content in prompts.
 
-<ResponseField name="embeddedContext" type="PromptEmbeddedContextCapabilities Object">
-  The prompt may include `ContentBlock::Resource`. Omitted or `null` means the
-  Agent does not advertise support. Supplying `{}` means the Agent supports
-  embedded context in prompts.
-</ResponseField>
+**audio** `PromptAudioCapabilities Object`
+
+The prompt may include `ContentBlock::Audio`. Omitted or `null` means the
+Agent does not advertise support. Supplying `{}` means the Agent supports
+audio content in prompts.
+
+**embeddedContext** `PromptEmbeddedContextCapabilities Object`
+
+The prompt may include `ContentBlock::Resource`. Omitted or `null` means the
+Agent does not advertise support. Supplying `{}` means the Agent supports
+embedded context in prompts.
 
 #### Session MCP Capabilities
 
-<ResponseField name="stdio" type="McpStdioCapabilities Object">
-  The Agent supports connecting to MCP servers over stdio. Omitted or `null`
-  means the Agent does not advertise support. Supplying `{}` means the Agent
-  supports stdio MCP server transports.
-</ResponseField>
+**stdio** `McpStdioCapabilities Object`
 
-<ResponseField name="http" type="McpHttpCapabilities Object">
-  The Agent supports connecting to MCP servers over HTTP. Omitted or `null`
-  means the Agent does not advertise support. Supplying `{}` means the Agent
-  supports HTTP MCP server transports.
-</ResponseField>
+The Agent supports connecting to MCP servers over stdio. Omitted or `null`
+means the Agent does not advertise support. Supplying `{}` means the Agent
+supports stdio MCP server transports.
 
-<Card icon="shield-check" horizontal href="/protocol/v2/authentication">
-  Learn more about Authentication
-</Card>
+**http** `McpHttpCapabilities Object`
+
+The Agent supports connecting to MCP servers over HTTP. Omitted or `null`
+means the Agent does not advertise support. Supplying `{}` means the Agent
+supports HTTP MCP server transports.
+
+> Learn more about Authentication
+>
+> [Open](https://agentclientprotocol.com/protocol/v2/authentication.md)
 
 ## Implementation Information
 
 Both Clients and Agents **MUST** provide information about their implementation in the `info` field. It takes the following three fields:
 
-<ParamField path="name" type="string">
-  Intended for programmatic or logical use, but can be used as a display name
-  fallback if title isn’t present.
-</ParamField>
+**name** `string`
 
-<ParamField path="title" type="string">
-  Intended for UI and end-user contexts — optimized to be human-readable and
-  easily understood. If not provided, the name should be used for display.
-</ParamField>
+Intended for programmatic or logical use, but can be used as a display name
+fallback if title isn’t present.
 
-<ParamField path="version" type="string">
-  Version of the implementation. Can be displayed to the user or used for
-  debugging or metrics purposes.
-</ParamField>
+**title** `string`
+
+Intended for UI and end-user contexts — optimized to be human-readable and
+easily understood. If not provided, the name should be used for display.
+
+**version** `string`
+
+Version of the implementation. Can be displayed to the user or used for
+debugging or metrics purposes.
 
 ***
 
-Once the connection is initialized, you're ready to [create a session](/protocol/v2/session-setup) and begin the conversation with the Agent.
+Once the connection is initialized, you're ready to [create a session](https://agentclientprotocol.com/protocol/v2/session-setup.md) and begin the conversation with the Agent.
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

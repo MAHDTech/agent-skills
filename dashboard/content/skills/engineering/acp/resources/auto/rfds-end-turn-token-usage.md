@@ -22,7 +22,7 @@ skill_name = "acp"
 
 Explore a standard way for agents to report token usage when a prompt turn ends.
 
-This RFD is intentionally kept in Draft while token accounting semantics are still being refined. Session-level context window size and cumulative cost are covered separately in the [Session Context Size and Cost RFD](/rfds/session-usage).
+This RFD is intentionally kept in Draft while token accounting semantics are still being refined. Session-level context window size and cumulative cost are covered separately in the [Session Context Size and Cost RFD](https://agentclientprotocol.com/rfds/session-usage.md).
 
 ## Status quo
 

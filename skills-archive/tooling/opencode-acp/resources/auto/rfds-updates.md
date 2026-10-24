@@ -6,518 +6,518 @@
 
 > Lifecycle updates for ACP Requests for Dialog
 
-This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP announcements, see [Updates](/updates).
-
-<Update label="October 12, 2026" tags={["Draft"]}>
-  ## Client-Provided System Prompt RFD moves to Draft stage
-
-  The RFD for letting Clients provide session-scoped system prompt instructions in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](/rfds/client-system-prompt) for more information and provide feedback on the delivery modes and session lifecycle semantics.
-</Update>
-
-<Update label="October 9, 2026" tags={["Completed"]}>
-  ## Session Notices RFD moves to Completed
-
-  The Session Notices RFD has been stabilized and is now included in the
-  protocol schemas and guides for ACP v1 and v2.
-  See the [v1 guide](/protocol/v1/prompt-turn#session-notices),
-  the [v2 guide](/protocol/v2/prompt-lifecycle#session-notices), and the
-  [RFD](/rfds/session-notices) for delivery, presentation, and replay semantics.
-</Update>
-
-<Update label="October 6, 2026" tags={["Completed"]}>
-  ## Session Compaction RFD moves to Completed
-
-  The Session Compaction RFD has been stabilized and is now included in the
-  protocol schemas and guides for ACP v1 and v2. V1 delivery and replay still require the Client's
-  `session.compaction` capability; v2 does not require a capability.
-  See the [v1 guide](/protocol/v1/prompt-turn#session-compaction),
-  the [v2 guide](/protocol/v2/prompt-lifecycle#session-compaction), and the
-  [RFD](/rfds/session-compaction) for patch, ordering, and replay semantics.
-</Update>
-
-<Update label="September 30, 2026" tags={["Removed"]}>
-  ## Next Edit Suggestions RFD removed
-
-  The Next Edit Suggestions (NES) RFD and its unstable implementation have been
-  removed from ACP v1 and v2. This includes NES methods and capabilities,
-  associated document-event notifications, and position-encoding negotiation.
-</Update>
-
-<Update label="September 30, 2026" tags={["To be removed"]}>
-  ## Next Edit Suggestions RFD moves to To be removed
-
-  The Next Edit Suggestions (NES) RFD moved to "To be removed" because the
-  proposal was no longer being pursued. Its draft implementation was scheduled
-  for removal. See the [removal update](#next-edit-suggestions-rfd-removed) for
-  the subsequent cleanup.
-</Update>
-
-<Update label="September 24, 2026" tags={["Preview"]}>
-  ## Session Notices RFD moves to Preview stage
-
-  The Session Notices RFD has moved to Preview. Agents can send live user-facing
-  notices without adding conversation history, with Client-controlled
-  presentation and dismissal. The protocol implementation covers ACP v1 and v2;
-  v1 implementations have landed in Zed and the Claude Agent and Codex adapters.
-  The feature remains unstable. Please review the [RFD](/rfds/session-notices)
-  and provide Agent/Client interoperability feedback before stabilization.
-</Update>
-
-<Update label="September 23, 2026" tags={["Preview"]}>
-  ## Session Compaction RFD moves to Preview stage
-
-  The Session Compaction RFD has moved to Preview. Agents can report
-  ID-addressed context compaction lifecycle updates and optionally stream or
-  provide retained summaries in ACP v1 and v2. The feature remains unstable.
-  Please review the [RFD](/rfds/session-compaction), especially the
-  [Preview validation targets](/rfds/session-compaction#preview-validation), and
-  provide Agent/Client implementation feedback before the feature is stabilized.
-</Update>
-
-<Update label="September 17, 2026" tags={["Completed"]}>
-  ## Tool Call Name RFD moves to Completed
-
-  The Tool Call Name RFD has been stabilized and is now part of the protocol.
-  Agents can report an optional programmatic tool `name` alongside each
-  human-readable tool-call title in ACP v1 and v2. The field is informational
-  metadata and does not grant capabilities or authorization. Please review the
-  [v1 tool-call documentation](/protocol/v1/tool-calls), the
-  [v2 tool-call documentation](/protocol/v2/tool-calls), and the
-  [RFD](/rfds/tool-call-name) for the version-specific update semantics.
-</Update>
+This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP announcements, see [Updates](https://agentclientprotocol.com/updates.md).
 
-<Update label="September 14, 2026" tags={["Preview"]}>
-  ## Tool Call Name RFD moves to Preview stage
+**October 12, 2026**
 
-  The RFD for adding an optional programmatic `name` to tool calls in ACP v1 and v2 has moved to Preview stage. Please review the [RFD](/rfds/tool-call-name) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+## Client-Provided System Prompt RFD moves to Draft stage
 
-<Update label="August 20, 2026" tags={["Completed"]}>
-  ## Terminal Authentication RFD moves to Completed
+The RFD for letting Clients provide session-scoped system prompt instructions in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/client-system-prompt.md) for more information and provide feedback on the delivery modes and session lifecycle semantics.
 
-  The Terminal Authentication RFD has been stabilized and is now part of the
-  protocol. Clients can advertise terminal authentication support, run an Agent's
-  configured interactive login flow, and reconnect after it succeeds. The v1 and
-  v2 wire shapes are now included in the stable schemas and SDK types. Please
-  review the [authentication documentation](/protocol/v1/authentication) and the
-  [RFD](/rfds/auth-methods) for the version-specific capability and lifecycle
-  semantics.
-</Update>
+**October 9, 2026**
 
-<Update label="August 5, 2026" tags={["Draft"]}>
-  ## Session Notices RFD moves to Draft stage
+## Session Notices RFD moves to Completed
 
-  The RFD for fire-and-forget, Client-presented session notices in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](/rfds/session-notices) for more information and provide feedback on the event and presentation semantics.
-</Update>
+The Session Notices RFD has been stabilized and is now included in the
+protocol schemas and guides for ACP v1 and v2.
+See the [v1 guide](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#session-notices),
+the [v2 guide](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#session-notices), and the
+[RFD](https://agentclientprotocol.com/rfds/session-notices.md) for delivery, presentation, and replay semantics.
 
-<Update label="August 5, 2026" tags={["Draft"]}>
-  ## Session Compaction RFD moves to Draft stage
+**October 6, 2026**
 
-  The RFD for reporting ID-addressed context compaction lifecycle and optional retained summaries in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](/rfds/session-compaction) for more information and provide feedback while the entity and replay semantics are refined.
-</Update>
+## Session Compaction RFD moves to Completed
 
-<Update label="July 27, 2026" tags={["Preview"]}>
-  ## Terminal Authentication RFD moves to Preview
+The Session Compaction RFD has been stabilized and is now included in the
+protocol schemas and guides for ACP v1 and v2. V1 delivery and replay still require the Client's
+`session.compaction` capability; v2 does not require a capability.
+See the [v1 guide](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#session-compaction),
+the [v2 guide](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#session-compaction), and the
+[RFD](https://agentclientprotocol.com/rfds/session-compaction.md) for patch, ordering, and replay semantics.
 
-  The Terminal Authentication RFD has moved to Preview. Clients can run an
-  Agent's interactive login flow in a terminal and reconnect after it succeeds.
-  The proposal now focuses on terminal authentication. The experimental `env_var`
-  method has been removed as an explicit SDK and schema variant. Please review
-  the [RFD](/rfds/auth-methods) for the version-specific wire shapes and lifecycle
-  semantics.
-</Update>
+**September 30, 2026**
 
-<Update label="July 24, 2026" tags={["Completed"]}>
-  ## Elicitation RFD moves to Completed
+## Next Edit Suggestions RFD removed
 
-  The RFD for structured user input through `elicitation/create` has been
-  stabilized and is now part of the protocol. Agents can request form-based
-  structured input or URL-based out-of-band interactions, and Clients advertise
-  each mode they support explicitly. Please review the
-  [documentation](/protocol/v1/elicitation) for more information.
-</Update>
+The Next Edit Suggestions (NES) RFD and its unstable implementation have been
+removed from ACP v1 and v2. This includes NES methods and capabilities,
+associated document-event notifications, and position-encoding negotiation.
 
-<Update label="July 21, 2026" tags={["Draft"]}>
-  ## auth/status RFD moves to Draft stage
+**September 30, 2026**
 
-  The RFD for allowing clients to query an agent's current authentication state has moved to Draft stage. Please review the [RFD](/rfds/get-auth-state) for more information and provide feedback as work on the implementation begins.
-</Update>
+## Next Edit Suggestions RFD moves to To be removed
 
-<Update label="July 21, 2026" tags={["Draft"]}>
-  ## Tool Call Name RFD moves to Draft stage
+The Next Edit Suggestions (NES) RFD moved to "To be removed" because the
+proposal was no longer being pursued. Its draft implementation was scheduled
+for removal. See the [removal update](#next-edit-suggestions-rfd-removed) for
+the subsequent cleanup.
 
-  The RFD for adding an optional programmatic `name` to tool calls in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](/rfds/tool-call-name) for more information and provide feedback while the draft implementation is exercised.
-</Update>
+**September 24, 2026**
 
-<Update label="July 9, 2026" tags={["Preview"]}>
-  ## Elicitation RFD moves to Preview stage
+## Session Notices RFD moves to Preview stage
 
-  The RFD for structured user input through `elicitation/create` has been moved to Preview stage. Please review the [RFD](/rfds/elicitation) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+The Session Notices RFD has moved to Preview. Agents can send live user-facing
+notices without adding conversation history, with Client-controlled
+presentation and dismissal. The protocol implementation covers ACP v1 and v2;
+v1 implementations have landed in Zed and the Claude Agent and Codex adapters.
+The feature remains unstable. Please review the [RFD](https://agentclientprotocol.com/rfds/session-notices.md)
+and provide Agent/Client interoperability feedback before stabilization.
 
-<Update label="July 6, 2026" tags={["Completed"]}>
-  ## Boolean Config Option RFD moves to Completed
+**September 23, 2026**
 
-  The RFD for boolean session configuration options has been stabilized and is now part of the protocol. Agents can expose simple on/off toggles with `type: "boolean"` config options, and Clients opt in on v1 by advertising the `session.configOptions.boolean` capability. Please review the [documentation](/protocol/v1/session-config-options#boolean-config-options) for more information.
-</Update>
+## Session Compaction RFD moves to Preview stage
 
-<Update label="July 2, 2026" tags={["Removed"]}>
-  ## Agent Telemetry Export RFD removed
+The Session Compaction RFD has moved to Preview. Agents can report
+ID-addressed context compaction lifecycle updates and optionally stream or
+provide retained summaries in ACP v1 and v2. The feature remains unstable.
+Please review the [RFD](https://agentclientprotocol.com/rfds/session-compaction.md), especially the
+[Preview validation targets](https://agentclientprotocol.com/rfds/session-compaction.md#preview-validation), and
+provide Agent/Client implementation feedback before the feature is stabilized.
 
-  The Agent Telemetry Export RFD has been removed. Its design relied on clients injecting OpenTelemetry environment variables when launching agent subprocesses, which doesn't translate to the new remote transports where agents aren't launched by the client. Since the approach required no changes to the protocol itself, clients and agents that want this setup can adopt standard [OpenTelemetry SDK environment variable configuration](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/) directly.
-</Update>
+**September 17, 2026**
 
-<Update label="July 2, 2026" tags={["Active"]}>
-  ## Active RFD stage added
+## Tool Call Name RFD moves to Completed
 
-  The RFD lifecycle now includes an Active stage between Draft and Preview. Active RFDs are the proposals that core maintainers or a working group are currently spending bandwidth on.
-</Update>
+The Tool Call Name RFD has been stabilized and is now part of the protocol.
+Agents can report an optional programmatic tool `name` alongside each
+human-readable tool-call title in ACP v1 and v2. The field is informational
+metadata and does not grant capabilities or authorization. Please review the
+[v1 tool-call documentation](https://agentclientprotocol.com/protocol/v1/tool-calls.md), the
+[v2 tool-call documentation](https://agentclientprotocol.com/protocol/v2/tool-calls.md), and the
+[RFD](https://agentclientprotocol.com/rfds/tool-call-name.md) for the version-specific update semantics.
 
-<Update label="June 30, 2026" tags={["Preview"]}>
-  ## Boolean Config Option RFD moves to Preview stage
+**September 14, 2026**
 
-  The RFD for adding boolean session configuration options has been moved to Preview stage. Please review the [RFD](/rfds/boolean-config-option) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+## Tool Call Name RFD moves to Preview stage
 
-<Update label="June 29, 2026" tags={["Completed"]}>
-  ## Request Cancellation RFD moves to Completed
+The RFD for adding an optional programmatic `name` to tool calls in ACP v1 and v2 has moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/tool-call-name.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-  The RFD for `$/cancel_request` protocol-level request cancellation has been stabilized and is now part of the protocol. Either side can send this notification to request cancellation of an outstanding JSON-RPC request by ID. Please review the [documentation](/protocol/v1/cancellation) for more information.
-</Update>
+**August 20, 2026**
 
-<Update label="June 25, 2026" tags={["Completed"]}>
-  ## Rust SDK based on SACP RFD moves to Completed
+## Terminal Authentication RFD moves to Completed
 
-  The RFD for basing the Rust SDK on SACP has been completed with the 1.0 SDK releases. The Rust SDK is available as [`agent-client-protocol` v1.0.0](https://crates.io/crates/agent-client-protocol/1.0.0), and the TypeScript SDK reached the same milestone with [`@agentclientprotocol/sdk` v1.0.0](https://www.npmjs.com/package/@agentclientprotocol/sdk/v/1.0.0), showing that the SDK design goals apply beyond Rust.
-</Update>
+The Terminal Authentication RFD has been stabilized and is now part of the
+protocol. Clients can advertise terminal authentication support, run an Agent's
+configured interactive login flow, and reconnect after it succeeds. The v1 and
+v2 wire shapes are now included in the stable schemas and SDK types. Please
+review the [authentication documentation](https://agentclientprotocol.com/protocol/v1/authentication.md) and the
+[RFD](https://agentclientprotocol.com/rfds/auth-methods.md) for the version-specific capability and lifecycle
+semantics.
 
-<Update label="June 24, 2026" tags={["Completed"]}>
-  ## model\_config Category RFD moves to Completed
+**August 5, 2026**
 
-  The RFD for the `model_config` session configuration option category has been stabilized and is now a part of the protocol. Agents can use `model_config` for model-related parameters such as context size or speed/quality trade-offs. Please review the [documentation](/protocol/v1/session-config-options#option-categories) for more information.
-</Update>
+## Session Notices RFD moves to Draft stage
 
-<Update label="June 24, 2026" tags={["Preview"]}>
-  ## Request Cancellation RFD moves to Preview stage
+The RFD for fire-and-forget, Client-presented session notices in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-notices.md) for more information and provide feedback on the event and presentation semantics.
 
-  The RFD for adding `$/cancel_request` protocol-level request cancellation has been moved to Preview stage. Please review the [RFD](/rfds/request-cancellation) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+**August 5, 2026**
 
-<Update label="June 22, 2026" tags={["Preview"]}>
-  ## model\_config Category RFD moves to Preview stage
+## Session Compaction RFD moves to Draft stage
 
-  The RFD for the `model_config` session configuration option category has been moved to Preview stage. Please review the [RFD](/rfds/model-config-category) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+The RFD for reporting ID-addressed context compaction lifecycle and optional retained summaries in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-compaction.md) for more information and provide feedback while the entity and replay semantics are refined.
 
-<Update label="June 5, 2026" tags={["Completed"]}>
-  ## Message ID RFD moves to Completed
+**July 27, 2026**
 
-  The RFD for adding agent-generated `messageId` fields to streamed message chunks has been stabilized and is now part of the protocol. In v1, message IDs are optional on message chunks for compatibility; in v2, they are required. Please review the [documentation](/protocol/v1/prompt-turn#message-ids) for more information.
-</Update>
+## Terminal Authentication RFD moves to Preview
 
-<Update label="June 5, 2026" tags={["Completed"]}>
-  ## Session Context Size and Cost RFD moves to Completed
+The Terminal Authentication RFD has moved to Preview. Clients can run an
+Agent's interactive login flow in a terminal and reconnect after it succeeds.
+The proposal now focuses on terminal authentication. The experimental `env_var`
+method has been removed as an explicit SDK and schema variant. Please review
+the [RFD](https://agentclientprotocol.com/rfds/auth-methods.md) for the version-specific wire shapes and lifecycle
+semantics.
 
-  The RFD for `usage_update` session notifications has been stabilized and is now a part of the protocol. Agents can report session-level context window size and optional cumulative cost through `session/update`. Please review the [documentation](/protocol/v1/prompt-turn#session-usage-updates) for more information.
-</Update>
+**July 24, 2026**
 
-<Update label="June 5, 2026" tags={["Completed"]}>
-  ## session/delete RFD moves to Completed
+## Elicitation RFD moves to Completed
 
-  The RFD for allowing clients to delete a given session has been stabilized and is now a part of the protocol. Please review the [documentation](/protocol/v1/session-delete) for more information.
-</Update>
+The RFD for structured user input through `elicitation/create` has been
+stabilized and is now part of the protocol. Agents can request form-based
+structured input or URL-based out-of-band interactions, and Clients advertise
+each mode they support explicitly. Please review the
+[documentation](https://agentclientprotocol.com/protocol/v1/elicitation.md) for more information.
 
-<Update label="June 3, 2026" tags={["Completed"]}>
-  ## \_meta Propagation RFD moves to Completed
+**July 21, 2026**
 
-  The RFD for documenting `_meta` propagation conventions for correlation metadata has been completed and is now part of the protocol documentation. Please review the [documentation](/protocol/v1/extensibility#the-_meta-field) for more information.
-</Update>
+## auth/status RFD moves to Draft stage
 
-<Update label="June 3, 2026" tags={["Preview"]}>
-  ## Message ID RFD moves to Preview stage for v1
+The RFD for allowing clients to query an agent's current authentication state has moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/get-auth-state.md) for more information and provide feedback as work on the implementation begins.
 
-  The v1 portion of the RFD for adding message IDs to streamed message chunks has been moved to Preview stage. Please review the [RFD](/rfds/message-id) for more information on the current proposal and provide feedback before the v1 behavior is stabilized.
-</Update>
+**July 21, 2026**
 
-<Update label="June 3, 2026" tags={["Preview"]}>
-  ## Session Usage RFD moves to Preview stage
+## Tool Call Name RFD moves to Draft stage
 
-  The RFD for adding `usage_update` session notifications for context window size and cumulative session cost has been moved to Preview stage. Please review the [RFD](/rfds/session-usage) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+The RFD for adding an optional programmatic `name` to tool calls in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/tool-call-name.md) for more information and provide feedback while the draft implementation is exercised.
 
-<Update label="June 2, 2026" tags={["Draft"]}>
-  ## v2 Plan Variants RFD moves to Draft stage
+**July 9, 2026**
 
-  The RFD for making item-based `plan_update` the default v2 plan shape has been moved to Draft stage. Please review the [RFD](/rfds/v2/plan-variants) for more information on replacing the old v1 `plan` update in v2 while the broader Plan Operations RFD continues.
-</Update>
+## Elicitation RFD moves to Preview stage
 
-<Update label="June 2, 2026" tags={["Draft"]}>
-  ## End-Turn Token Usage RFD moves to Draft stage
+The RFD for structured user input through `elicitation/create` has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/elicitation.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-  The end-turn token usage portions of the original Session Usage RFD have been split into a separate Draft RFD for further design work. Please review the [RFD](/rfds/end-turn-token-usage) for more information on the current proposal and provide feedback.
-</Update>
+**July 6, 2026**
 
-<Update label="June 2, 2026" tags={["Preview"]}>
-  ## session/delete RFD moves to Preview stage
+## Boolean Config Option RFD moves to Completed
 
-  The RFD for allowing clients to delete a given session has been moved to Preview stage. Please review the [RFD](/rfds/session-delete) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+The RFD for boolean session configuration options has been stabilized and is now part of the protocol. Agents can expose simple on/off toggles with `type: "boolean"` config options, and Clients opt in on v1 by advertising the `session.configOptions.boolean` capability. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/session-config-options.md#boolean-config-options) for more information.
 
-<Update label="June 1, 2026" tags={["Removed"]}>
-  ## Unstable Session Model API removed
+**July 2, 2026**
 
-  The never-stabilized `session/set_model` API and related session model response fields have been removed from the protocol artifacts. Agents should continue to expose model selection through [Session Config Options](/rfds/session-config-options).
-</Update>
+## Agent Telemetry Export RFD removed
 
-<Update label="June 1, 2026" tags={["Completed"]}>
-  ## Additional Directories RFD moves to Completed
+The Agent Telemetry Export RFD has been removed. Its design relied on clients injecting OpenTelemetry environment variables when launching agent subprocesses, which doesn't translate to the new remote transports where agents aren't launched by the client. Since the approach required no changes to the protocol itself, clients and agents that want this setup can adopt standard [OpenTelemetry SDK environment variable configuration](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/) directly.
 
-  The RFD for allowing clients to specify additional workspace roots for session lifecycle requests has been stabilized and is now a part of the protocol. Please review the [documentation](/protocol/v1/session-setup#additional-workspace-roots) for more information.
-</Update>
+**July 2, 2026**
 
-<Update label="May 27, 2026" tags={["Draft"]}>
-  ## v2 Enum Variant Extension RFD moves to Draft stage
+## Active RFD stage added
 
-  The RFD for reserving `_`-prefixed enum variants for extensions while preserving non-underscore variants for future ACP versions has been moved to Draft stage. Please review the [RFD](/rfds/v2/enum-variant-extension) for more information on the current proposal and provide feedback as work on v2 continues.
-</Update>
+The RFD lifecycle now includes an Active stage between Draft and Preview. Active RFDs are the proposals that core maintainers or a working group are currently spending bandwidth on.
 
-<Update label="May 27, 2026" tags={["Draft"]}>
-  ## Plan Operations Support RFD moves to Draft stage
+**June 30, 2026**
 
-  The RFD for adding `plan_update` and `plan_removed` session update types has been moved to Draft stage. Please review the [RFD](/rfds/plan-operations) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+## Boolean Config Option RFD moves to Preview stage
 
-<Update label="May 22, 2026" tags={["Completed"]}>
-  ## Logout Method RFD moves to Completed
+The RFD for adding boolean session configuration options has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/boolean-config-option.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-  The RFD for the `logout` method has been stabilized and is now a part of the protocol. Please review the [documentation](/protocol/v1/authentication#logging-out) for more information.
-</Update>
+**June 29, 2026**
 
-<Update label="May 21, 2026" tags={["Preview"]}>
-  ## Additional Directories RFD moves to Preview stage
+## Request Cancellation RFD moves to Completed
 
-  The RFD for allowing clients to specify additional workspace roots for session lifecycle requests has been moved to Preview stage. Please review the [RFD](/rfds/additional-directories) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+The RFD for `$/cancel_request` protocol-level request cancellation has been stabilized and is now part of the protocol. Either side can send this notification to request cancellation of an outstanding JSON-RPC request by ID. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/cancellation.md) for more information.
 
-<Update label="May 17, 2026" tags={["Preview"]}>
-  ## Logout Method RFD moves to Preview stage
+**June 25, 2026**
 
-  The RFD for adding a `logout` method to the protocol has been moved to Preview stage. Please review the [RFD](/rfds/logout-method) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+## Rust SDK based on SACP RFD moves to Completed
 
-<Update label="May 12, 2026" tags={["Preview"]}>
-  ## Rust SDK based on SACP RFD moves to Preview stage
+The RFD for basing the Rust SDK on SACP has been completed with the 1.0 SDK releases. The Rust SDK is available as [`agent-client-protocol` v1.0.0](https://crates.io/crates/agent-client-protocol/1.0.0), and the TypeScript SDK reached the same milestone with [`@agentclientprotocol/sdk` v1.0.0](https://www.npmjs.com/package/@agentclientprotocol/sdk/v/1.0.0), showing that the SDK design goals apply beyond Rust.
 
-  The RFD for basing the Rust SDK on SACP has been moved to Preview stage now that the initial crate import has been upstreamed to [agentclientprotocol/rust-sdk](https://github.com/agentclientprotocol/rust-sdk). Please review the [RFD](/rfds/rust-sdk-v1) for more information on the current proposal and provide feedback before the SDK is stabilized as 1.0.
-</Update>
+**June 24, 2026**
 
-<Update label="May 7, 2026" tags={["Draft"]}>
-  ## model\_config Category RFD moves to Draft
+## model\_config Category RFD moves to Completed
 
-  The RFD for the `model_config` category been moved to Draft stage. Please review the [RFD](/rfds/model-config-category) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+The RFD for the `model_config` session configuration option category has been stabilized and is now a part of the protocol. Agents can use `model_config` for model-related parameters such as context size or speed/quality trade-offs. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/session-config-options.md#option-categories) for more information.
 
-<Update label="April 23, 2026" tags={["Draft"]}>
-  ## v2 Prompting RFD moves to Draft
+**June 24, 2026**
 
-  The RFD for how the prompt lifecycle will work in v2 of the protocol been moved to Draft stage. Please review the [RFD](/rfds/v2/prompt) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+## Request Cancellation RFD moves to Preview stage
 
-<Update label="April 23, 2026" tags={["Completed"]}>
-  ## session/close RFD moves to Completed
+The RFD for adding `$/cancel_request` protocol-level request cancellation has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/request-cancellation.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-  The RFD for the `session/close` method has been stabilized and is now a part of the protocol. Please review the [documentation](/protocol/v1/session-setup#closing-active-sessions) for more information.
-</Update>
+**June 22, 2026**
 
-<Update label="April 22, 2026" tags={["Completed"]}>
-  ## session/resume RFD moves to Completed
+## model\_config Category RFD moves to Preview stage
 
-  The RFD for the `session/resume` method has been stabilized and is now a part of the protocol. Please review the [documentation](/protocol/v1/session-setup#resuming-sessions) for more information.
-</Update>
+The RFD for the `model_config` session configuration option category has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/model-config-category.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-<Update label="April 22, 2026" tags={["Draft"]}>
-  ## Streamable HTTP & WebSocket Transport RFD moves to Draft stage
+**June 5, 2026**
 
-  The RFD for standardizing a remote ACP transport based on MCP Streamable HTTP with a WebSocket upgrade has been moved to Draft stage. Please review the [RFD](/rfds/streamable-http-websocket-transport) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+## Message ID RFD moves to Completed
 
-<Update label="April 14, 2026" tags={["Preview"]}>
-  ## session/resume RFD moves to Preview stage
+The RFD for adding agent-generated `messageId` fields to streamed message chunks has been stabilized and is now part of the protocol. In v1, message IDs are optional on message chunks for compatibility; in v2, they are required. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#message-ids) for more information.
 
-  The RFD for adding a `session/resume` method to the protocol has been moved to Preview stage. Please review the [RFD](/rfds/session-resume) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+**June 5, 2026**
 
-<Update label="April 14, 2026" tags={["Preview"]}>
-  ## session/close RFD moves to Preview stage
+## Session Context Size and Cost RFD moves to Completed
 
-  The RFD for allowing agents to close a given session has been moved to Preview stage. Please review the [RFD](/rfds/session-close) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+The RFD for `usage_update` session notifications has been stabilized and is now a part of the protocol. Agents can report session-level context window size and optional cumulative cost through `session/update`. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#session-usage-updates) for more information.
 
-<Update label="March 27, 2026" tags={["Draft"]}>
-  ## Custom LLM Endpoint RFD moves to Draft stage
+**June 5, 2026**
 
-  The RFD for allowing clients to specify custom provider configuration has been moved to Draft stage. Please review the [RFD](/rfds/custom-llm-endpoint) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+## session/delete RFD moves to Completed
 
-<Update label="March 24, 2026" tags={["Draft"]}>
-  ## Additional Directories RFD moves to Draft stage
+The RFD for allowing clients to delete a given session has been stabilized and is now a part of the protocol. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/session-delete.md) for more information.
 
-  The RFD for allowing clients to specify additional directories for the agent to access has been moved to Draft stage. Please review the [RFD](/rfds/additional-directories) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+**June 3, 2026**
 
-<Update label="March 9, 2026" tags={["Completed"]}>
-  ## ACP Registry RFD moves to Completed
+## \_meta Propagation RFD moves to Completed
 
-  The RFD for the initial version of the ACP Registry has been completed. Please review the [documentation](/get-started/registry) for more information.
+The RFD for documenting `_meta` propagation conventions for correlation metadata has been completed and is now part of the protocol documentation. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/extensibility.md#the-_meta-field) for more information.
 
-  ## session\_info\_update Notification RFD moves to Completed
+**June 3, 2026**
 
-  The RFD for the session\_info\_update notification has been stabilized and is now a part of the protocol. Please review the [documentation](/protocol/v1/session-list#updating-session-metadata) for more information.
+## Message ID RFD moves to Preview stage for v1
 
-  ## session/list RFD moves to Completed
+The v1 portion of the RFD for adding message IDs to streamed message chunks has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/message-id.md) for more information on the current proposal and provide feedback before the v1 behavior is stabilized.
 
-  The RFD for the session/list method has been stabilized and is now a part of the protocol. Please review the [documentation](/protocol/v1/session-list) for more information.
-</Update>
+**June 3, 2026**
 
-<Update label="February 24, 2026" tags={["Draft"]}>
-  ## Next Edit Suggestions RFD moves to Draft stage
+## Session Usage RFD moves to Preview stage
 
-  The RFD for allowing agents to provide next edit suggestions moved to Draft stage. It was subsequently removed; see the [removal update](#next-edit-suggestions-rfd-removed).
+The RFD for adding `usage_update` session notifications for context window size and cumulative session cost has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-usage.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-  ## session/close RFD moves to Draft stage
+**June 2, 2026**
 
-  The RFD for allowing agents to close a given session has been moved to Draft stage. Please review the [RFD](/rfds/session-close) for more information on the current proposal and provide feedback as work on the implementation begins.
+## v2 Plan Variants RFD moves to Draft stage
 
-  ## Elicitation RFD moves to Draft stage
+The RFD for making item-based `plan_update` the default v2 plan shape has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/v2/plan-variants.md) for more information on replacing the old v1 `plan` update in v2 while the broader Plan Operations RFD continues.
 
-  The RFD for allowing agents to elicit user input has been moved to Draft stage. Please review the [RFD](/rfds/elicitation) for more information on the current proposal and provide feedback as work on the implementation begins.
+**June 2, 2026**
 
-  ## Boolean Config Option RFD moves to Draft stage
+## End-Turn Token Usage RFD moves to Draft stage
 
-  The RFD for adding boolean config options to the protocol has been moved to Draft stage. Please review the [RFD](/rfds/boolean-config-option) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+The end-turn token usage portions of the original Session Usage RFD have been split into a separate Draft RFD for further design work. Please review the [RFD](https://agentclientprotocol.com/rfds/end-turn-token-usage.md) for more information on the current proposal and provide feedback.
 
-<Update label="February 20, 2026" tags={["Draft"]}>
-  ## Delete in Diff RFD moves to Draft stage
+**June 2, 2026**
 
-  The RFD for indicating whether a diff resulted in a file deletion has been moved to Draft stage. Please review the [RFD](/rfds/diff-delete) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+## session/delete RFD moves to Preview stage
 
-<Update label="February 18, 2026" tags={["Draft"]}>
-  ## Message ID RFD moves to Draft stage
+The RFD for allowing clients to delete a given session has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-delete.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-  The RFD for adding message ids to the protocol has been moved to Draft stage. Please review the [RFD](/rfds/message-id) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+**June 1, 2026**
 
-<Update label="February 18, 2026" tags={["Preview"]}>
-  ## session/list RFD moves to Preview stage
+## Unstable Session Model API removed
 
-  The RFD for the session/list method has been moved to Preview stage. Please review the [RFD](/rfds/session-list) for more information on the current proposal and provide feedback before the feature is stabilized.
+The never-stabilized `session/set_model` API and related session model response fields have been removed from the protocol artifacts. Agents should continue to expose model selection through [Session Config Options](https://agentclientprotocol.com/rfds/session-config-options.md).
 
-  ## session\_info\_update RFD moves to Preview stage
+**June 1, 2026**
 
-  The RFD for the session\_info\_update notification has been moved to Preview stage. Please review the [RFD](/rfds/session-info-update) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+## Additional Directories RFD moves to Completed
 
-<Update label="February 10, 2026" tags={["Preview"]}>
-  ## ACP Registry RFD moves to Preview stage
+The RFD for allowing clients to specify additional workspace roots for session lifecycle requests has been stabilized and is now a part of the protocol. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/session-setup.md#additional-workspace-roots) for more information.
 
-  The RFD for the ACP Registry has been moved to Preview stage. Please review the [RFD](/rfds/acp-agent-registry) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+**May 27, 2026**
 
-<Update label="February 4, 2026" tags={["Completed"]}>
-  ## Session Config Options RFD moves to Completed
+## v2 Enum Variant Extension RFD moves to Draft stage
 
-  The RFD for adding more generic Session Config Options to the protocol has been stabilized and is now a part of the protocol. Please review the [documentation](/protocol/v1/session-config-options) for more information.
-</Update>
+The RFD for reserving `_`-prefixed enum variants for extensions while preserving non-underscore variants for future ACP versions has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/v2/enum-variant-extension.md) for more information on the current proposal and provide feedback as work on v2 continues.
 
-<Update label="February 4, 2026" tags={["Draft"]}>
-  ## session/delete moves to Draft stage
+**May 27, 2026**
 
-  The RFD for allowing clients to delete a given session has been moved to Draft stage. Please review the [RFD](/rfds/session-delete) for more information on the current proposal and provide feedback as work on the implementation begins.
+## Plan Operations Support RFD moves to Draft stage
 
-  ## Logout method moves to Draft stage
+The RFD for adding `plan_update` and `plan_removed` session update types has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/plan-operations.md) for more information on the current proposal and provide feedback as work on the implementation begins.
 
-  The RFD for allowing clients to logout from an agent connection has been moved to Draft stage. Please review the [RFD](/rfds/logout-method) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+**May 22, 2026**
 
-<Update label="January 15, 2026" tags={["Draft"]}>
-  ## Rust SDK based on SACP RFD moves to Draft stage
+## Logout Method RFD moves to Completed
 
-  The RFD for basing the Rust SDK on SACP has been moved to Draft stage. Please review the [RFD](/rfds/rust-sdk-v1) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+The RFD for the `logout` method has been stabilized and is now a part of the protocol. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/authentication.md#logging-out) for more information.
 
-<Update label="January 15, 2026" tags={["Preview"]}>
-  ## Session Config Options RFD moves to Preview stage
+**May 21, 2026**
 
-  The RFD for adding more generic Session Config Options to the protocol has been moved to Preview stage. Please review the [RFD](/rfds/session-config-options) for more information on the current proposal and provide feedback before the feature is stabilized.
-</Update>
+## Additional Directories RFD moves to Preview stage
 
-<Update label="January 14, 2026" tags={["Draft"]}>
-  ## Authentication Methods RFD moves to Draft stage
+The RFD for allowing clients to specify additional workspace roots for session lifecycle requests has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/additional-directories.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-  The RFD for creating additional types of authentication methods has been moved to Draft stage. Please review the [RFD](/rfds/auth-methods) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+**May 17, 2026**
 
-<Update label="January 1, 2026" tags={["Draft"]}>
-  ## Agent Registry RFD moves to Draft stage
+## Logout Method RFD moves to Preview stage
 
-  The RFD for creating an Agent Registry has been moved to Draft stage. Please review the [RFD](/rfds/acp-agent-registry) for more information on the current proposal and provide feedback as work on the implementation begins.
+The RFD for adding a `logout` method to the protocol has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/logout-method.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-  ## Session Usage RFD moves to Draft stage
+**May 12, 2026**
 
-  The RFD for adding a new usage\_update variant on the session/update notification and usage field on prompt responses in the protocol has been moved to Draft stage. Please review the [RFD](/rfds/session-usage) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+## Rust SDK based on SACP RFD moves to Preview stage
 
-<Update label="December 31, 2025" tags={["Draft"]}>
-  ## Proxy Chains RFD moves to Draft stage
+The RFD for basing the Rust SDK on SACP has been moved to Preview stage now that the initial crate import has been upstreamed to [agentclientprotocol/rust-sdk](https://github.com/agentclientprotocol/rust-sdk). Please review the [RFD](https://agentclientprotocol.com/rfds/rust-sdk-v1.md) for more information on the current proposal and provide feedback before the SDK is stabilized as 1.0.
 
-  The RFD for adding proxy chain functionality in the protocol has been moved to Draft stage. Please review the [RFD](/rfds/proxy-chains) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+**May 7, 2026**
 
-<Update label="December 11, 2025" tags={["Draft"]}>
-  ## Agent Telemetry Export RFD moves to Draft stage
+## model\_config Category RFD moves to Draft
 
-  The RFD for providing more guidance on how agents should export telemetry has been moved to Draft stage. (This RFD was later removed — see the July 2, 2026 update.)
-</Update>
+The RFD for the `model_config` category been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/model-config-category.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-<Update label="December 3, 2025" tags={["Draft"]}>
-  ## session\_info\_update notification RFD moves to Draft stage
+**April 23, 2026**
 
-  The RFD for adding a new session\_info\_update variant on the session/update notification in the protocol has been moved to Draft stage. Please review the [RFD](/rfds/session-info-update) for more information on the current proposal and provide feedback as work on the implementation begins.
+## v2 Prompting RFD moves to Draft
 
-  ## \_meta Propagation RFD moves to Draft stage
+The RFD for how the prompt lifecycle will work in v2 of the protocol been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/v2/prompt.md) for more information on the current proposal and provide feedback before the feature is stabilized.
 
-  The RFD for providing more guidance on how the \_meta parameter should be used within the protocol has been moved to Draft stage. Please review the [RFD](/rfds/meta-propagation) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+**April 23, 2026**
 
-<Update label="November 26, 2025" tags={["Draft"]}>
-  ## session/resume RFD moves to Draft stage
+## session/close RFD moves to Completed
 
-  The RFD for adding a session/resume method to the protocol has been moved to Draft stage. Please review the [RFD](/rfds/session-resume) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+The RFD for the `session/close` method has been stabilized and is now a part of the protocol. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/session-setup.md#closing-active-sessions) for more information.
 
-<Update label="November 20, 2025" tags={["Draft"]}>
-  ## \$/cancelRequest RFD moves to Draft stage
+**April 22, 2026**
 
-  The RFD for adding a \$/cancelRequest method to the protocol has been moved to Draft stage. Please review the [RFD](/rfds/request-cancellation) for more information on the current proposal and provide feedback as work on the implementation begins.
+## session/resume RFD moves to Completed
 
-  ## session/fork RFD moves to Draft stage
+The RFD for the `session/resume` method has been stabilized and is now a part of the protocol. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/session-setup.md#resuming-sessions) for more information.
 
-  The RFD for adding a session/fork method to the protocol has been moved to Draft stage. Please review the [RFD](/rfds/session-fork) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+**April 22, 2026**
 
-<Update label="November 3, 2025" tags={["Draft"]}>
-  ## Session Config Options RFD moves to Draft stage
+## Streamable HTTP & WebSocket Transport RFD moves to Draft stage
 
-  The RFD for adding more generic Session Config Options to the protocol has been moved to Draft stage. Please review the [RFD](/rfds/session-config-options) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+The RFD for standardizing a remote ACP transport based on MCP Streamable HTTP with a WebSocket upgrade has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/streamable-http-websocket-transport.md) for more information on the current proposal and provide feedback as work on the implementation begins.
 
-<Update label="October 31, 2025" tags={["Draft"]}>
-  ## session/list RFD moves to Draft stage
+**April 14, 2026**
 
-  The RFD for adding a session/list method to the protocol has been moved to Draft stage. Please review the [RFD](/rfds/session-list) for more information on the current proposal and provide feedback as work on the implementation begins.
-</Update>
+## session/resume RFD moves to Preview stage
+
+The RFD for adding a `session/resume` method to the protocol has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-resume.md) for more information on the current proposal and provide feedback before the feature is stabilized.
+
+**April 14, 2026**
+
+## session/close RFD moves to Preview stage
+
+The RFD for allowing agents to close a given session has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-close.md) for more information on the current proposal and provide feedback before the feature is stabilized.
+
+**March 27, 2026**
+
+## Custom LLM Endpoint RFD moves to Draft stage
+
+The RFD for allowing clients to specify custom provider configuration has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/custom-llm-endpoint.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**March 24, 2026**
+
+## Additional Directories RFD moves to Draft stage
+
+The RFD for allowing clients to specify additional directories for the agent to access has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/additional-directories.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**March 9, 2026**
+
+## ACP Registry RFD moves to Completed
+
+The RFD for the initial version of the ACP Registry has been completed. Please review the [documentation](https://agentclientprotocol.com/get-started/registry.md) for more information.
+
+## session\_info\_update Notification RFD moves to Completed
+
+The RFD for the session\_info\_update notification has been stabilized and is now a part of the protocol. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/session-list.md#updating-session-metadata) for more information.
+
+## session/list RFD moves to Completed
+
+The RFD for the session/list method has been stabilized and is now a part of the protocol. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/session-list.md) for more information.
+
+**February 24, 2026**
+
+## Next Edit Suggestions RFD moves to Draft stage
+
+The RFD for allowing agents to provide next edit suggestions moved to Draft stage. It was subsequently removed; see the [removal update](#next-edit-suggestions-rfd-removed).
+
+## session/close RFD moves to Draft stage
+
+The RFD for allowing agents to close a given session has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-close.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+## Elicitation RFD moves to Draft stage
+
+The RFD for allowing agents to elicit user input has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/elicitation.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+## Boolean Config Option RFD moves to Draft stage
+
+The RFD for adding boolean config options to the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/boolean-config-option.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**February 20, 2026**
+
+## Delete in Diff RFD moves to Draft stage
+
+The RFD for indicating whether a diff resulted in a file deletion has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/diff-delete.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**February 18, 2026**
+
+## Message ID RFD moves to Draft stage
+
+The RFD for adding message ids to the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/message-id.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**February 18, 2026**
+
+## session/list RFD moves to Preview stage
+
+The RFD for the session/list method has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-list.md) for more information on the current proposal and provide feedback before the feature is stabilized.
+
+## session\_info\_update RFD moves to Preview stage
+
+The RFD for the session\_info\_update notification has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-info-update.md) for more information on the current proposal and provide feedback before the feature is stabilized.
+
+**February 10, 2026**
+
+## ACP Registry RFD moves to Preview stage
+
+The RFD for the ACP Registry has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/acp-agent-registry.md) for more information on the current proposal and provide feedback before the feature is stabilized.
+
+**February 4, 2026**
+
+## Session Config Options RFD moves to Completed
+
+The RFD for adding more generic Session Config Options to the protocol has been stabilized and is now a part of the protocol. Please review the [documentation](https://agentclientprotocol.com/protocol/v1/session-config-options.md) for more information.
+
+**February 4, 2026**
+
+## session/delete moves to Draft stage
+
+The RFD for allowing clients to delete a given session has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-delete.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+## Logout method moves to Draft stage
+
+The RFD for allowing clients to logout from an agent connection has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/logout-method.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**January 15, 2026**
+
+## Rust SDK based on SACP RFD moves to Draft stage
+
+The RFD for basing the Rust SDK on SACP has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/rust-sdk-v1.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**January 15, 2026**
+
+## Session Config Options RFD moves to Preview stage
+
+The RFD for adding more generic Session Config Options to the protocol has been moved to Preview stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-config-options.md) for more information on the current proposal and provide feedback before the feature is stabilized.
+
+**January 14, 2026**
+
+## Authentication Methods RFD moves to Draft stage
+
+The RFD for creating additional types of authentication methods has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/auth-methods.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**January 1, 2026**
+
+## Agent Registry RFD moves to Draft stage
+
+The RFD for creating an Agent Registry has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/acp-agent-registry.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+## Session Usage RFD moves to Draft stage
+
+The RFD for adding a new usage\_update variant on the session/update notification and usage field on prompt responses in the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-usage.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**December 31, 2025**
+
+## Proxy Chains RFD moves to Draft stage
+
+The RFD for adding proxy chain functionality in the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/proxy-chains.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**December 11, 2025**
+
+## Agent Telemetry Export RFD moves to Draft stage
+
+The RFD for providing more guidance on how agents should export telemetry has been moved to Draft stage. (This RFD was later removed — see the July 2, 2026 update.)
+
+**December 3, 2025**
+
+## session\_info\_update notification RFD moves to Draft stage
+
+The RFD for adding a new session\_info\_update variant on the session/update notification in the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-info-update.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+## \_meta Propagation RFD moves to Draft stage
+
+The RFD for providing more guidance on how the \_meta parameter should be used within the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/meta-propagation.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**November 26, 2025**
+
+## session/resume RFD moves to Draft stage
+
+The RFD for adding a session/resume method to the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-resume.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**November 20, 2025**
+
+## \$/cancelRequest RFD moves to Draft stage
+
+The RFD for adding a \$/cancelRequest method to the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/request-cancellation.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+## session/fork RFD moves to Draft stage
+
+The RFD for adding a session/fork method to the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-fork.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**November 3, 2025**
+
+## Session Config Options RFD moves to Draft stage
+
+The RFD for adding more generic Session Config Options to the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-config-options.md) for more information on the current proposal and provide feedback as work on the implementation begins.
+
+**October 31, 2025**
+
+## session/list RFD moves to Draft stage
+
+The RFD for adding a session/list method to the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-list.md) for more information on the current proposal and provide feedback as work on the implementation begins.
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

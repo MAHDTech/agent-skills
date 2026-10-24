@@ -42,10 +42,10 @@ For example:
 
 | Feature | Negotiation and receiver behavior |
 | - | - |
-| [Provider configuration](/protocol/v2/draft/initialization#agent-capabilities) (experimental) | The Agent advertises `capabilities.providers`; Clients must not call provider configuration methods without it. |
-| [Notices](/protocol/v2/draft/prompt-lifecycle#session-notices) and [compaction](/protocol/v2/draft/prompt-lifecycle#session-compaction) | No Client capability is required in v2. Clients without feature-specific handling may preserve, ignore, or generically display the updates. |
-| [Markdown and file-backed plans](/protocol/v2/draft/agent-plan#unstable-plan-operations) (experimental) | No Client capability is required in v2. Clients without these plan representations use the unknown plan-content fallback; sending one does not establish that it will be rendered. |
-| [End-turn token usage](/protocol/v2/draft/prompt-lifecycle#end-turn-token-usage-unstable) (experimental) | Optional `usage` on an idle `state_update`, not on the prompt response. No capability is required; Clients may ignore it. |
+| [Provider configuration](https://agentclientprotocol.com/protocol/v2/draft/initialization.md#agent-capabilities) (experimental) | The Agent advertises `capabilities.providers`; Clients must not call provider configuration methods without it. |
+| [Notices](https://agentclientprotocol.com/protocol/v2/draft/prompt-lifecycle.md#session-notices) and [compaction](https://agentclientprotocol.com/protocol/v2/draft/prompt-lifecycle.md#session-compaction) | No Client capability is required in v2. Clients without feature-specific handling may preserve, ignore, or generically display the updates. |
+| [Markdown and file-backed plans](https://agentclientprotocol.com/protocol/v2/draft/agent-plan.md#unstable-plan-operations) (experimental) | No Client capability is required in v2. Clients without these plan representations use the unknown plan-content fallback; sending one does not establish that it will be rendered. |
+| [End-turn token usage](https://agentclientprotocol.com/protocol/v2/draft/prompt-lifecycle.md#end-turn-token-usage-unstable) (experimental) | Optional `usage` on an idle `state_update`, not on the prompt response. No capability is required; Clients may ignore it. |
 
 These rules are specific to v2. Features with capability gates in v1 retain
 those gates on v1 connections.

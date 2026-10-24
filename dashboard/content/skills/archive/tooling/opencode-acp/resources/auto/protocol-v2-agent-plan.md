@@ -19,7 +19,7 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 Plans are execution strategies for complex tasks that require multiple steps.
 
-Agents may share plans with Clients through [`session/update`](/protocol/v2/prompt-lifecycle#3-agent-reports-output) notifications, providing real-time visibility into their thinking and progress.
+Agents may share plans with Clients through [`session/update`](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#3-agent-reports-output) notifications, providing real-time visibility into their thinking and progress.
 
 `plan_update` carries a `plan` object with a `type` discriminator and a required `planId` so Clients can track multiple plans independently.
 
@@ -65,18 +65,18 @@ When the language model creates an execution plan, the Agent **SHOULD** report i
 }
 ```
 
-<ParamField path="plan.type" type="string" required>
-  The plan content type.
-</ParamField>
+**plan.type** `string` *required*
 
-<ParamField path="plan.planId" type="PlanId" required>
-  A unique identifier for this plan within the session.
-</ParamField>
+The plan content type.
 
-<ParamField path="plan.entries" type="PlanEntry[]" required>
-  An array of [plan entries](#plan-entries) representing the tasks to be
-  accomplished.
-</ParamField>
+**plan.planId** `PlanId` *required*
+
+A unique identifier for this plan within the session.
+
+**plan.entries** `PlanEntry[]` *required*
+
+An array of [plan entries](#plan-entries) representing the tasks to be
+accomplished.
 
 ## Extensibility
 
@@ -88,30 +88,30 @@ Every plan content variant, including custom or future variants, **MUST** carry 
 
 Each plan entry represents a specific task or goal within the overall execution strategy:
 
-<ParamField path="content" type="string" required>
-  A human-readable description of what this task aims to accomplish
-</ParamField>
+**content** `string` *required*
 
-<ParamField path="priority" type="PlanEntryPriority" required>
-  The relative importance of this task.
+A human-readable description of what this task aims to accomplish
 
-  * `high`
-  * `medium`
-  * `low`
+**priority** `PlanEntryPriority` *required*
 
-  Custom or future priority values can be used for display hints. Custom priorities **MUST** begin with `_`; unknown non-underscore priorities are reserved for future ACP variants.
-</ParamField>
+The relative importance of this task.
 
-<ParamField path="status" type="PlanEntryStatus" required>
-  The current [execution status](#status) of this task
+* `high`
+* `medium`
+* `low`
 
-  * `pending`
-  * `in_progress`
-  * `completed`
-  * `cancelled`
+Custom or future priority values can be used for display hints. Custom priorities **MUST** begin with `_`; unknown non-underscore priorities are reserved for future ACP variants.
 
-  Custom or future status values can be used when Clients can preserve or display a generic plan-entry state. Custom statuses **MUST** begin with `_`; unknown non-underscore statuses are reserved for future ACP variants.
-</ParamField>
+**status** `PlanEntryStatus` *required*
+
+The current [execution status](#status) of this task
+
+* `pending`
+* `in_progress`
+* `completed`
+* `cancelled`
+
+Custom or future status values can be used when Clients can preserve or display a generic plan-entry state. Custom statuses **MUST** begin with `_`; unknown non-underscore statuses are reserved for future ACP variants.
 
 ## Updating Plans
 

@@ -50,7 +50,7 @@ A checkout created from your own project folder has a `local` git remote that po
 
 As the agent works, its edits accumulate in the thread. Review them the way you would review any change: read the diffs and ask the agent to revise anything that needs work. You can attach [comments](/docs/agents/comments) to relevant parts of the transcript, or directly to the code in the diffs and file tabs. With a managed checkout, none of this touches your project folder.
 
-The **Changes** tab collects the diffs in one place and is the review drawer’s default panel. Use its selector to choose a comparison:
+The **Changes** tab collects the diffs in one place. On a computer, it is the review drawer’s default panel; on a phone, tap it in the tab bar below the thread title. Use its selector to choose a comparison:
 
 Comparison
 
@@ -90,9 +90,9 @@ For a fuller review, move it into a review thread: a separate conversation attac
 
 ### [Start a review](#start-a-review)
 
-Click the eye button (**Reviews**) in the parent thread’s header. The menu is available even before the thread has changes. Choose an existing review or **Start Review** on desktop or [web](/docs/collaboration/delta-on-the-web). The desktop menu excludes archived reviews. You can also type `/review` in the composer, or press `Cmd+Shift+R` on macOS or `Ctrl+Shift+R` on Linux and Windows.
+On a computer, click the eye button (**Reviews**) in the parent thread’s header. On a phone, open **More > Reviews** in the header. The menu is available even before the thread has changes. Choose an existing review or **Start Review** on desktop or [web](/docs/collaboration/delta-on-the-web). The desktop menu excludes archived reviews. You can also type `/review` in the composer, or press `Cmd+Shift+R` on macOS or `Ctrl+Shift+R` on Linux and Windows.
 
-You can start a review from a top-level thread or a plain subthread, including a nested one. You cannot start one from a Review or Land subthread. Reviewing a subthread covers its changes together with changes inherited from its parents. A thread can have several reviews, each nested beneath it in the sidebar.
+You can start a review from a top-level thread or a **Plain** subthread, such as a fork or subagent, including a nested one. You cannot start one from a Review or Land subthread. Reviewing a subthread covers its changes together with changes inherited from its parents. A thread can have several reviews, each nested beneath it in the sidebar.
 
 You can archive a review from the sidebar and restore it from thread history without archiving the parent thread.
 
@@ -106,7 +106,7 @@ Delta asks the agent to identify work that has already landed on the default bra
 
 In the review thread, [comment](/docs/agents/comments) on the transcript or on code in the diffs, and ask the agent for changes. The review agent works in separate, forked Delta worktrees, so its edits do not change the parent’s files. Finishing the review or submitting a verdict does not merge those edits.
 
-Review threads are separate from agent-created [attached subagents](/docs/agents/subagents). For a separate task rather than a review, you can also [send a message to a subthread](/docs/agents/threads#send-a-message-to-a-subthread).
+Review threads are separate from agent-created [attached subagents](/docs/agents/subagents). For a separate task rather than a review, you can also [send a message to a fork](/docs/agents/threads#send-a-message-to-a-fork).
 
 When you’re done, choose **Submit Review**, then **Approve** or **Request Changes**. You can do this in the desktop app or on the web. Delta posts the verdict back to the parent thread, and the reviewer’s avatar in the parent’s header shows an approved or changes-requested badge. Submitting again updates your current verdict; earlier verdicts remain in the parent thread’s history. You can also use `/approve` or `/request-changes` to submit a verdict in any thread, without first creating a separate review thread.
 
@@ -130,7 +130,7 @@ Sources must belong to the same thread family: the top-level thread, its subthre
 
 ## [Land changes](#land-changes)
 
-To land a thread’s changes, select an available model in the desktop app. Click the merge icon in a top-level thread or plain subthread’s header, then choose **Land Changes From This Thread**. A Land started from a subthread includes changes inherited from its parents. Land Changes is not available in the browser.
+To land a thread’s changes, select an available model in the desktop app. Click the merge icon in the header of a top-level thread or **Plain** subthread, then choose **Land Changes From This Thread**. A Land started from a subthread includes changes inherited from its parents. Land Changes is not available in the browser.
 
 Delta opens a dedicated Land subthread and runs your project’s landing workflow there, leaving the parent conversation separate:
 

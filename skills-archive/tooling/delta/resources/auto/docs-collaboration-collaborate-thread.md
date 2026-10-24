@@ -119,10 +119,11 @@ Each participant must have access to the thread’s selected model or an availab
 
 ## [Where the agent runs](#where-the-agent-runs)
 
-An agent turn runs wherever the sender is using Delta, not on the thread owner’s device or another participant’s device.
+An agent turn runs wherever the sender is using Delta, or on the sender’s cloud runner. It never runs on the thread owner’s device or another participant’s device.
 
 *   In the desktop app, a turn can use mounted checkouts, installed tools, environment variables, credentials, network access, and running processes.
 *   In the browser, a turn works with replicated thread and project data. It has no shell or checkout and cannot access those resources on the sender’s device.
+*   On a [cloud runner](/docs/agents/cloud-runners) (private beta), a turn runs in the sender’s own cloud sandbox. It has a shell and checkouts of the thread’s Delta worktrees, but none of the resources on the sender’s device.
 
 Delta syncs the conversation and recorded file changes, but it does not sync machine-local runtime state. If collaborators alternate between execution environments, the resources available to the agent can therefore change between turns.
 

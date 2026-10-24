@@ -6,9 +6,9 @@
 
 > How Agents report tool call execution
 
-Tool calls represent actions that language models request Agents to perform during a [session](/protocol/v2/prompt-lifecycle). When an LLM determines it needs to interact with external systems—like reading files, running code, or fetching data—it generates tool calls that the Agent executes on its behalf.
+Tool calls represent actions that language models request Agents to perform during a [session](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md). When an LLM determines it needs to interact with external systems—like reading files, running code, or fetching data—it generates tool calls that the Agent executes on its behalf.
 
-Agents report tool calls through [`session/update`](/protocol/v2/prompt-lifecycle#3-agent-reports-output) notifications, allowing Clients to display real-time progress and results to users.
+Agents report tool calls through [`session/update`](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#3-agent-reports-output) notifications, allowing Clients to display real-time progress and results to users.
 
 Tool call updates may arrive while the Agent reports `idle`. They do not change the state.
 
@@ -38,65 +38,65 @@ When the language model requests a tool invocation, the Agent **SHOULD** report 
 }
 ```
 
-<ParamField path="toolCallId" type="ToolCallId" required>
-  A unique identifier for this tool call within the session
-</ParamField>
+**toolCallId** `ToolCallId` *required*
 
-<ParamField path="name" type="string">
-  The optional programmatic name of the invoked tool, such as `read_file`.
-  Agents **SHOULD** include it in the first report when available and **SHOULD
-  NOT** change it later except to correct metadata. Names are opaque,
-  informational metadata: they do not advertise a capability or grant
-  authorization.
-</ParamField>
+A unique identifier for this tool call within the session
 
-<ParamField path="title" type="string">
-  A human-readable title describing what the tool is doing. Agents **SHOULD**
-  include the title the first time they report a `toolCallId`.
-</ParamField>
+**name** `string`
 
-<ParamField path="kind" type="ToolKind">
-  The category of tool being invoked.
+The optional programmatic name of the invoked tool, such as `read_file`.
+Agents **SHOULD** include it in the first report when available and **SHOULD
+NOT** change it later except to correct metadata. Names are opaque,
+informational metadata: they do not advertise a capability or grant
+authorization.
 
-  <Expandable title="kinds">
-    * `read` - Reading files or data
-    * `edit` - Modifying files or content
-    * `delete` - Removing files or data
-    * `move` - Moving or renaming files
-    * `search` - Searching for information
-    * `execute` - Running commands or code
-    * `think` - Internal reasoning or planning
-    * `fetch` - Retrieving external data
-    * `switch_mode` - Changing the session's operating mode
-    * `other` - Other tool types (default)
-  </Expandable>
+**title** `string`
 
-  Tool kinds help Clients choose appropriate icons and optimize how they display tool execution progress.
+A human-readable title describing what the tool is doing. Agents **SHOULD**
+include the title the first time they report a `toolCallId`.
 
-  Custom or future tool kinds can be used when Clients can fall back to generic tool display behavior. Custom tool kinds **MUST** begin with `_`. Unknown non-underscore tool kinds are reserved for future ACP variants.
-</ParamField>
+**kind** `ToolKind`
 
-<ParamField path="status" type="ToolCallStatus">
-  The current [execution status](#status) (defaults to `pending`)
-</ParamField>
+The category of tool being invoked.
 
-<ParamField path="content" type="ToolCallContent[]">
-  [Content produced](#content) by the tool call
-</ParamField>
+**kinds**
 
-<ParamField path="locations" type="ToolCallLocation[]">
-  [File locations](#following-the-agent) affected by this tool call
-</ParamField>
+* `read` - Reading files or data
+* `edit` - Modifying files or content
+* `delete` - Removing files or data
+* `move` - Moving or renaming files
+* `search` - Searching for information
+* `execute` - Running commands or code
+* `think` - Internal reasoning or planning
+* `fetch` - Retrieving external data
+* `switch_mode` - Changing the session's operating mode
+* `other` - Other tool types (default)
 
-<ParamField path="rawInput" type="unknown">
-  The raw input sent to the tool. It may be any JSON value, including an object,
-  array, scalar, or `null`.
-</ParamField>
+Tool kinds help Clients choose appropriate icons and optimize how they display tool execution progress.
 
-<ParamField path="rawOutput" type="unknown">
-  The raw output returned by the tool. It may be any JSON value, including an
-  object, array, scalar, or `null`.
-</ParamField>
+Custom or future tool kinds can be used when Clients can fall back to generic tool display behavior. Custom tool kinds **MUST** begin with `_`. Unknown non-underscore tool kinds are reserved for future ACP variants.
+
+**status** `ToolCallStatus`
+
+The current [execution status](#status) (defaults to `pending`)
+
+**content** `ToolCallContent[]`
+
+[Content produced](#content) by the tool call
+
+**locations** `ToolCallLocation[]`
+
+[File locations](#following-the-agent) affected by this tool call
+
+**rawInput** `unknown`
+
+The raw input sent to the tool. It may be any JSON value, including an object,
+array, scalar, or `null`.
+
+**rawOutput** `unknown`
+
+The raw output returned by the tool. It may be any JSON value, including an
+object, array, scalar, or `null`.
 
 The `tool_call_update` notification is an upsert keyed by `toolCallId`. For
 existing tool calls, fields other than `_meta` leave the previous value
@@ -107,7 +107,7 @@ replaced as whole arrays; send `[]` or `null` to clear them. For `_meta`, omit
 the field to leave it unchanged or set it to `null` to clear it. An object
 patches the stored metadata by top-level key: a key set to `null` is removed,
 any other value replaces that key whole, and keys the object omits are
-unchanged. See [Metadata Patches](/protocol/v2/extensibility#metadata-patches).
+unchanged. See [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility.md#metadata-patches).
 Use `tool_call_content_chunk` when a tool produces content incrementally and the
 Client should append each item instead of replacing the whole `content`
 collection. Display-only terminal bytes use `terminal_output_chunk` instead.
@@ -177,13 +177,13 @@ As tools execute, Agents **MAY** stream individual content items with
 }
 ```
 
-<ParamField path="toolCallId" type="ToolCallId" required>
-  The ID of the tool call this content belongs to
-</ParamField>
+**toolCallId** `ToolCallId` *required*
 
-<ParamField path="content" type="ToolCallContent" required>
-  A single [content item](#content) produced by the tool call
-</ParamField>
+The ID of the tool call this content belongs to
+
+**content** `ToolCallContent` *required*
+
+A single [content item](#content) produced by the tool call
 
 Clients apply `tool_call_update` and `tool_call_content_chunk` notifications in
 the order they are received for each `toolCallId`. A
@@ -194,9 +194,14 @@ chunks. Later chunks append to that replacement content. A `tool_call_update`
 with `content: []` or `content: null` clears the tool-call content. A
 `tool_call_content_chunk`'s `_meta`, when present, is chunk-scoped.
 
+An Agent can stream a tool's text output the way it streams message text, by
+sending each piece as a text content item in its own
+`tool_call_content_chunk`. Clients can present adjacent text items as one
+continuous text.
+
 ## Requesting Permission
 
-Permission requests do not by themselves change the session's foreground state. While foreground work is blocked on a permission response, the Agent **SHOULD** report `requires_action`. Once reported, it **MUST** report `running` when foreground progress resumes, or `idle` if the work ends without resuming. Requests for independent background activity may arrive while the session remains `idle`. See [Waiting for User Action](/protocol/v2/prompt-lifecycle#waiting-for-user-action) for concurrent requests and late answers.
+Permission requests do not by themselves change the session's foreground state. While foreground work is blocked on a permission response, the Agent **SHOULD** report `requires_action`. Once reported, it **MUST** report `running` when foreground progress resumes, or `idle` if the work ends without resuming. Requests for independent background activity may arrive while the session remains `idle`. See [Waiting for User Action](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#waiting-for-user-action) for concurrent requests and late answers.
 
 The Agent **MAY** request permission from the user before proceeding with an operation, such as executing a tool call, by calling the `session/request_permission` method:
 
@@ -231,34 +236,34 @@ The Agent **MAY** request permission from the user before proceeding with an ope
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  The session ID for this request
-</ParamField>
+**sessionId** `SessionId` *required*
 
-<ParamField path="title" type="string" required>
-  Title shown with the permission prompt. This text is separate from any
-  `toolCall` update and does not replace the tool-call title.
-</ParamField>
+The session ID for this request
 
-<ParamField path="description" type="string">
-  Optional explanation shown with the permission prompt. This text is separate
-  from any `toolCall` update and does not replace tool-call content. Omitted or
-  `null` means no separate permission description was provided.
-</ParamField>
+**title** `string` *required*
 
-<ParamField path="subject" type="RequestPermissionSubject">
-  Optional structured context about the operation requiring permission. For tool
-  calls, use `type: "tool_call"` with a `toolCall` update containing details
-  about the operation. Omitted or `null` means no structured subject was
-  provided. Custom or future subject types may appear. Clients that do not
-  understand a subject should preserve it when proxying and use the common
-  prompt fields or decline according to policy.
-</ParamField>
+Title shown with the permission prompt. This text is separate from any
+`toolCall` update and does not replace the tool-call title.
 
-<ParamField path="options" type="PermissionOption[]" required>
-  Available [permission options](#permission-options) for the user to choose
-  from. Must contain at least one option.
-</ParamField>
+**description** `string`
+
+Optional explanation shown with the permission prompt. This text is separate
+from any `toolCall` update and does not replace tool-call content. Omitted or
+`null` means no separate permission description was provided.
+
+**subject** `RequestPermissionSubject`
+
+Optional structured context about the operation requiring permission. For tool
+calls, use `type: "tool_call"` with a `toolCall` update containing details
+about the operation. Omitted or `null` means no structured subject was
+provided. Custom or future subject types may appear. Clients that do not
+understand a subject should preserve it when proxying and use the common
+prompt fields or decline according to policy.
+
+**options** `PermissionOption[]` *required*
+
+Available [permission options](#permission-options) for the user to choose
+from. Must contain at least one option.
 
 For a proposed command, the subject can describe the command directly:
 
@@ -306,7 +311,7 @@ The Client responds with the user's decision:
 
 Clients **MAY** automatically allow or reject permission requests according to the user settings.
 
-If the current active work gets [cancelled](/protocol/v2/prompt-lifecycle#cancellation), the Client **MUST** respond with the `"cancelled"` outcome:
+If the current active work gets [cancelled](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#cancellation), the Client **MUST** respond with the `"cancelled"` outcome:
 
 ```json theme={null}
 {
@@ -320,59 +325,61 @@ If the current active work gets [cancelled](/protocol/v2/prompt-lifecycle#cancel
 }
 ```
 
-<ResponseField name="outcome" type="RequestPermissionOutcome" required>
-  The user's decision. Known outcomes are `cancelled` when the [active work was
-  cancelled](/protocol/v2/prompt-lifecycle#cancellation), and `selected` with an
-  `optionId` for the selected permission option. Custom or future outcomes may
-  appear; agents that do not understand the outcome MUST NOT treat it as
-  approval.
-</ResponseField>
+**outcome** `RequestPermissionOutcome` *required*
+
+The user's decision. Known outcomes are `cancelled` when the [active work was
+cancelled](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#cancellation), and `selected` with an
+`optionId` for the selected permission option. Custom or future outcomes may
+appear; agents that do not understand the outcome MUST NOT treat it as
+approval.
 
 ### Permission Options
 
 Each permission option provided to the Client contains:
 
-<ParamField path="optionId" type="string" required>
-  Unique identifier for this option
-</ParamField>
+**optionId** `string` *required*
 
-<ParamField path="name" type="string" required>
-  Human-readable label to display to the user
-</ParamField>
+Unique identifier for this option
 
-<ParamField path="kind" type="PermissionOptionKind" required>
-  A hint to help Clients choose appropriate icons and UI treatment for each option.
+**name** `string` *required*
 
-  * `allow_once` - Allow this operation only this time
-  * `allow_always` - Allow this operation and remember the choice
-  * `reject_once` - Reject this operation only this time
-  * `reject_always` - Reject this operation and remember the choice
+Human-readable label to display to the user
 
-  Custom or future permission option kinds can be used as UI hints. Custom kinds **MUST** begin with `_`. Unknown non-underscore kinds are reserved for future ACP variants. Clients that do not understand a kind should preserve the value and use a generic permission option treatment.
-</ParamField>
+**kind** `PermissionOptionKind` *required*
+
+A hint to help Clients choose appropriate icons and UI treatment for each option.
+
+* `allow_once` - Allow this operation only this time
+* `allow_always` - Allow this operation and remember the choice
+* `reject_once` - Reject this operation only this time
+* `reject_always` - Reject this operation and remember the choice
+
+Custom or future permission option kinds can be used as UI hints. Custom kinds **MUST** begin with `_`. Unknown non-underscore kinds are reserved for future ACP variants. Clients that do not understand a kind should preserve the value and use a generic permission option treatment.
 
 ## Status
 
 Tool calls progress through different statuses during their lifecycle:
 
-<ResponseField name="pending">
-  The tool call hasn't started running yet because the input is either streaming
-  or awaiting approval
-</ResponseField>
+**pending**
 
-<ResponseField name="in_progress">
-  The tool call is currently running
-</ResponseField>
+The tool call hasn't started running yet because the input is either streaming
+or awaiting approval
 
-<ResponseField name="completed">
-  The tool call completed successfully
-</ResponseField>
+**in\_progress**
 
-<ResponseField name="failed">The tool call failed with an error</ResponseField>
+The tool call is currently running
 
-<ResponseField name="cancelled">
-  The tool call was cancelled before it completed
-</ResponseField>
+**completed**
+
+The tool call completed successfully
+
+**failed**
+
+The tool call failed with an error
+
+**cancelled**
+
+The tool call was cancelled before it completed
 
 Custom or future status values can be used when Clients can display a generic progress state. Custom status values **MUST** begin with `_`; unknown non-underscore statuses are reserved for future ACP variants.
 
@@ -384,7 +391,7 @@ Tool call content `type` values can also be custom or future variants. Implement
 
 ### Regular Content
 
-Standard [content blocks](/protocol/v2/content) like text, images, or resources:
+Standard [content blocks](https://agentclientprotocol.com/protocol/v2/content.md) like text, images, or resources:
 
 ```json theme={null}
 {
@@ -457,7 +464,7 @@ empty.
   platform-specific names. Terminal exit and tool call status are independent.
 * The top-level `_meta` is terminal-scoped and follows the same patch semantics,
   except that an object patches the stored metadata by top-level key. See
-  [Metadata Patches](/protocol/v2/extensibility#metadata-patches).
+  [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility.md#metadata-patches).
 
 For example, a process terminated by a POSIX termination signal can report
 `"exitStatus": { "signal": "SIGTERM" }`.
@@ -509,55 +516,55 @@ Clients MUST handle diffs where `patch` is omitted or `null`.
 }
 ```
 
-<ParamField path="changes" type="DiffChange[]" required>
-  Structured file changes described by this diff.
-</ParamField>
+**changes** `DiffChange[]` *required*
 
-<ParamField path="patch" type="DiffPatch">
-  Optional renderable patch text. Agents SHOULD provide this whenever feasible.
-  Omitted or `null` means no patch text was provided.
-</ParamField>
+Structured file changes described by this diff.
 
-<ParamField path="patch.format" type="string" required>
-  Patch format. `git_patch`, the only ACP-defined value, is one or more `diff   --git` sections in Git's `--patch` (`-p`) text format. Unlike Git, which
-  writes paths relative to the repository root, every path MUST be absolute,
-  including in `rename from`, `rename to`, `copy from`, and `copy to` lines, and
-  MUST NOT have a prefix such as Git's default `a/` and `b/`. Otherwise paths
-  follow Git: `/dev/null` names the missing side of an added or deleted file in
-  the `---` and `+++` lines, and paths with unusual characters are [quoted as Git
-  quotes them](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath).
-  Surrounding commit metadata and email envelopes MUST NOT be included.
+**patch** `DiffPatch`
 
-  Git can produce most of this. With `$ROOT` set to the repository root,
-  `git diff --src-prefix="$ROOT/" --dst-prefix="$ROOT/"` writes absolute
-  `diff --git`, `---`, and `+++` lines. Git never prefixes `rename from`,
-  `rename to`, `copy from`, or `copy to` paths, so those still need the
-  repository root prepended, with Git's quoting applied to the full path.
-</ParamField>
+Optional renderable patch text. Agents SHOULD provide this whenever feasible.
+Omitted or `null` means no patch text was provided.
 
-<ParamField path="patch.text" type="string" required>
-  Renderable patch text in the format named by `patch.format`.
-</ParamField>
+**patch.format** `string` *required*
 
-<ParamField path="changes[].operation" type="string" required>
-  File operation: `add`, `delete`, `modify`, `move`, or `copy`.
-</ParamField>
+Patch format. `git_patch`, the only ACP-defined value, is one or more `diff   --git` sections in Git's `--patch` (`-p`) text format. Unlike Git, which
+writes paths relative to the repository root, every path MUST be absolute,
+including in `rename from`, `rename to`, `copy from`, and `copy to` lines, and
+MUST NOT have a prefix such as Git's default `a/` and `b/`. Otherwise paths
+follow Git: `/dev/null` names the missing side of an added or deleted file in
+the `---` and `+++` lines, and paths with unusual characters are [quoted as Git
+quotes them](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath).
+Surrounding commit metadata and email envelopes MUST NOT be included.
 
-<ParamField path="changes[].path" type="string" required>
-  The absolute path after the operation. For deletes, this is the deleted path.
-</ParamField>
+Git can produce most of this. With `$ROOT` set to the repository root,
+`git diff --src-prefix="$ROOT/" --dst-prefix="$ROOT/"` writes absolute
+`diff --git`, `---`, and `+++` lines. Git never prefixes `rename from`,
+`rename to`, `copy from`, or `copy to` paths, so those still need the
+repository root prepended, with Git's quoting applied to the full path.
 
-<ParamField path="changes[].oldPath" type="string">
-  The absolute path before the operation. Required for `move` and `copy`.
-</ParamField>
+**patch.text** `string` *required*
 
-<ParamField path="changes[].fileType" type="string">
-  Optional file kind: `text`, `binary`, `directory`, or `symlink`.
-</ParamField>
+Renderable patch text in the format named by `patch.format`.
 
-<ParamField path="changes[].mimeType" type="string">
-  Optional MIME type for the file contents.
-</ParamField>
+**changes\[].operation** `string` *required*
+
+File operation: `add`, `delete`, `modify`, `move`, or `copy`.
+
+**changes\[].path** `string` *required*
+
+The absolute path after the operation. For deletes, this is the deleted path.
+
+**changes\[].oldPath** `string`
+
+The absolute path before the operation. Required for `move` and `copy`.
+
+**changes\[].fileType** `string`
+
+Optional file kind: `text`, `binary`, `directory`, or `symlink`.
+
+**changes\[].mimeType** `string`
+
+Optional MIME type for the file contents.
 
 Omit `patch` when there is no useful text patch, such as a same-path binary
 update or symlink target change:
@@ -587,15 +594,15 @@ Tool calls can report file locations they're working with, enabling Clients to i
 }
 ```
 
-<ParamField path="path" type="string" required>
-  The absolute file path being accessed or modified
-</ParamField>
+**path** `string` *required*
 
-<ParamField path="line" type="integer | null">
-  Optional line number within the file, represented as an unsigned 32-bit
-  integer. Omission and `null` are equivalent and mean no specific line was
-  provided.
-</ParamField>
+The absolute file path being accessed or modified
+
+**line** `integer | null`
+
+Optional line number within the file, represented as an unsigned 32-bit
+integer. Omission and `null` are equivalent and mean no specific line was
+provided.
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -24,11 +24,11 @@ This document explains how to communicate and collaborate within the Agent Clien
 In short:
 
 * **[Zulip](https://agentclientprotocol.zulipchat.com/)**: For real-time or ad-hoc discussions.
-* **[RFDs](https://agentclientprotocol.com/rfds/about)**: For proposed changes to the specification.
+* **[RFDs](https://agentclientprotocol.com/rfds/about.md)**: For proposed changes to the specification.
 * **[GitHub Discussions](https://github.com/orgs/agentclientprotocol/discussions)**: For structured, longer-form discussions.
 * **[GitHub Issues](https://github.com/agentclientprotocol/agent-client-protocol/issues)**: For actionable tasks, bug reports, and feature requests.
 
-All communication is governed by our [Code of Conduct](https://agentclientprotocol.com/community/code-of-conduct). We expect all participants to maintain respectful, professional, and inclusive interactions across all channels.
+All communication is governed by our [Code of Conduct](https://agentclientprotocol.com/community/code-of-conduct.md). We expect all participants to maintain respectful, professional, and inclusive interactions across all channels.
 
 ### Zulip
 
@@ -66,7 +66,7 @@ Any significant discussion on Zulip leads to a potential decision or proposal mu
 
 ### RFDs
 
-Please refer to the [RFD process](https://agentclientprotocol.com/rfds/about) for how this is managed. This is the primary way to actually create changes to the protocol.
+Please refer to the [RFD process](https://agentclientprotocol.com/rfds/about.md) for how this is managed. This is the primary way to actually create changes to the protocol.
 
 Conversation about a given RFD can take place within the relevant PRs created to move the RFD forward. Or, a discussion within Zulip can be created in the `rfds` channel to discuss in real-time with other contributors.
 

@@ -8,7 +8,7 @@ Blog
 
 # Escaping the tyranny of worktrees
 
-![](https://avatars.githubusercontent.com/u/94272?v=4)Conrad IrwinOctober 6, 2026
+Conrad IrwinOctober 6, 2026
 
 As agentic work has become more common, and agents remain extremely slow, people keep reaching for Git worktrees to make progress on a bunch of things in parallel.
 
@@ -97,15 +97,6 @@ Parallel agentic work should not mean managing a pile of worktrees. In Delta, is
 
 You can [try Delta](/download) and read more about [how Delta and Git work together](/docs/concepts/delta-and-git).
 
-On this page
-
-1.  [A Delta worktree is not a Git worktree](#a-delta-worktree-is-not-a-git-worktree)
-2.  [Parallel work without branch choreography](#parallel-work-without-branch-choreography)
-3.  [Temporary checkouts require durable setup](#temporary-checkouts-require-durable-setup)
-    1.  [Make setup repeatable](#make-setup-repeatable)
-    2.  [Stop treating ports as constants](#stop-treating-ports-as-constants)
-4.  [Where did I put that agent?](#where-did-i-put-that-agent)
-
 ## More from the blog
 
 *   ### [Beyond Pass Rate: Harness Evals, and Their Blind Spots](/blog/beyond-pass-rate)
@@ -121,8 +112,4 @@ On this page
     ![Joseph Lyons](https://avatars.githubusercontent.com/u/19867440?v=4 "Joseph Lyons")Oct 7, 2026
     
 
-[Download Delta NowD](/download)[Open DeltaD](/threads)
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)
+[Download Delta Now](/download)[Open Delta](/threads)

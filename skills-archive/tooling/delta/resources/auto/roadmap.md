@@ -86,8 +86,3 @@ Delta is in public beta. This roadmap covers what we’re currently working on a
     Up Next
     
     Control access levels when you share a thread, so teammates can follow the conversation and code without making changes.
-    
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)

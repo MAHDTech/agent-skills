@@ -67,6 +67,7 @@
 - [Plan (/plan)](https://antigravity.google/docs/plan): Learn about Plan (/plan).
 - [Browser command (/browser)](https://antigravity.google/docs/commands/browser): Learn about Browser command (/browser).
 - [Goal command (/goal)](https://antigravity.google/docs/commands/goal): Learn about Goal command (/goal).
+- [Grill me command (/grill-me)](https://antigravity.google/docs/commands/grill-me): Learn about Grill me command (/grill-me).
 - [Learn command (/learn)](https://antigravity.google/docs/commands/learn): Learn about Learn command (/learn).
 - [Schedule command (/schedule)](https://antigravity.google/docs/commands/schedule): Learn about Schedule command (/schedule).
 - [Artifacts](https://antigravity.google/docs/artifacts): Learn about Artifacts.

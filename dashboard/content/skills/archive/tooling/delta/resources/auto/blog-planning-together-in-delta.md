@@ -19,7 +19,7 @@ Blog
 
 # Your plan.md is missing the conversation
 
-![](https://avatars.githubusercontent.com/u/1789?v=4)Nathan SoboOctober 1, 2026
+Nathan SoboOctober 1, 2026
 
 Agents can blast out a multi-thousand-line diff in seconds, but they’ll happily build the wrong thing just as efficiently if you’re not clear about what you’re building.
 
@@ -71,10 +71,6 @@ A plan document captures decisions, and a commit captures changes, but neither p
 
 In Delta, the thread is the unit of work. Planning, implementation, and [review](https://delta.dev/docs/agents/review-and-sync) unfold in the same living context, where people and agents can continue without reconstructing what everyone already knew.
 
-On this page
-
-1.  [From planning to implementation](#from-planning-to-implementation)
-
 ## More from the blog
 
 *   ### [Please Stop Sending Me Google Docs](/blog/please-stop-sending-me-google-docs)
@@ -90,8 +86,4 @@ On this page
     ![Joseph Lyons](https://avatars.githubusercontent.com/u/19867440?v=4 "Joseph Lyons")Oct 7, 2026
     
 
-[Download Delta NowD](/download)[Open DeltaD](/threads)
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)
+[Download Delta Now](/download)[Open Delta](/threads)

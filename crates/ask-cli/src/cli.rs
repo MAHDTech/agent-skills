@@ -224,6 +224,12 @@ pub enum SkillsCommands {
         /// Force re-download of existing cached resources.
         #[arg(long, help = "Force re-download of existing cached resources")]
         force: bool,
+        /// Refresh vendor snapshots and catalog artifacts without documentation downloads.
+        #[arg(long)]
+        vendors_only: bool,
+        /// Retain pending snapshots from an existing update branch if a source fails.
+        #[arg(long, requires = "vendors_only")]
+        pending_ref: Option<String>,
     },
 
     /// Remove downloaded skill resources and clear cache.

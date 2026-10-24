@@ -129,6 +129,9 @@ impl SkillDownloader {
     /// any unreferenced orphaned files in `resources/auto/`.
     /// Never modifies or deletes any files in `resources/manual/`.
     pub async fn download_skill_resources(&self, skill: &Skill) -> Result<Vec<ResourceFile>> {
+        if skill.vendor_source().is_some() {
+            return Ok(Vec::new());
+        }
         let skill_dir = skill.path.parent().unwrap_or_else(|| Path::new("."));
         let auto_dir = skill_dir.join("resources").join("auto");
 
@@ -236,6 +239,9 @@ impl SkillDownloader {
     ) -> Result<HashMap<String, Vec<ResourceFile>>> {
         let mut results = HashMap::new();
         for skill in skills {
+            if skill.vendor_source().is_some() {
+                continue;
+            }
             let files = self.download_skill_resources(skill).await?;
             results.insert(skill.name().to_string(), files);
         }
@@ -260,6 +266,9 @@ impl SkillDownloader {
     pub fn clean_all_resources(&self, skills: &[Skill]) -> Result<usize> {
         let mut count = 0;
         for skill in skills {
+            if skill.vendor_source().is_some() {
+                continue;
+            }
             if let Some(parent) = skill.path.parent() {
                 count += self.clean_auto_resources(parent)?;
             }

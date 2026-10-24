@@ -8,7 +8,7 @@
 
 We welcome contributions from the community!
 
-All contributors must adhere to our [Code of Conduct](./code-of-conduct).
+All contributors must adhere to our [Code of Conduct](https://agentclientprotocol.com/community/code-of-conduct.md).
 
 For questions and discussions, please use GitHub Discussions.
 

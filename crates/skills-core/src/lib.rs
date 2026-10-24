@@ -15,6 +15,7 @@ pub mod lint;
 pub mod models;
 pub mod parser;
 pub mod sync;
+pub mod vendors;
 
 pub use artifacts::{
     ArtifactsEngine, ArtifactsGenerator, ArtifactsOptions, ArtifactsSummary,

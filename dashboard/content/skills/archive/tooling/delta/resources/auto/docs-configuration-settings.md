@@ -41,7 +41,9 @@ On this page
     1.  [Files](#files)
     2.  [Changes](#changes)
 6.  [LLM Providers](#llm-providers)
-7.  [What’s next](#whats-next)
+7.  [Cloud Runner](#cloud-runner)
+8.  [Integrations](#integrations)
+9.  [What’s next](#whats-next)
 
 Open settings with `Cmd+,` on macOS or `Ctrl+,` on Linux and Windows. You can also use the **Settings…** menu item. Settings apply to the whole app, and there are no per-project settings.
 
@@ -184,6 +186,17 @@ Worker and Reviewer default to isolated worktrees; Scout defaults to shared. Cha
 Connect model providers with an API key or a subscription sign-in. Each connected provider shows its account details when available. **Model Preferences** lets you choose provider-specific subagent models and thinking effort. **Models Shown in Picker** controls which models appear in the model selector.
 
 Add provider API keys in **Settings > LLM Providers**. Delta stores them in your account settings; keys from your environment are not used automatically. On desktop, **Import existing key** copies a detected key into settings. See [Models & Providers](/docs/agents/models-and-providers) for details.
+
+## [Cloud Runner](#cloud-runner)
+
+The **Cloud Runner** page appears in the desktop app when you have access to the [Cloud Runners](/docs/agents/cloud-runners) private beta.
+
+*   **Preferred Runner Size**: **Medium** by default. Choose **Small**, **Medium**, or **Large** for runners you start after the change. See [The runner environment](/docs/agents/cloud-runners#the-runner-environment).
+*   **Environment Variables**: add the variables your runners need, one at a time or with **Import** from a `.env` file. Values are stored in your encrypted account settings and aren’t shown again after you save them. See [Add environment variables and secrets](/docs/agents/cloud-runners#add-environment-variables-and-secrets).
+
+## [Integrations](#integrations)
+
+The **Integrations** page appears in the desktop app and in the browser with Cloud Runners access. Under **GitHub Account Access**, authorize your GitHub account so runners can push commits and open pull requests as you. See [Use Git and GitHub from a runner](/docs/agents/cloud-runners#use-git-and-github-from-a-runner).
 
 ## [What’s next](#whats-next)
 

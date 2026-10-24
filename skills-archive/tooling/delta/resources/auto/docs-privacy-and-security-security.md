@@ -42,6 +42,8 @@ Delta discovers secrets from:
 *   Locally stored credential caches and supported credential stores. Delta reads existing values without running credential-helper commands or requesting new tokens at startup.
 *   Well-known credential formats, such as GitHub, npm, Google, GitLab, Stripe, Microsoft, Heroku, Fly.io, PyPI, OpenAI, Anthropic, and Slack tokens. Delta can recognize these by their format even if it has not discovered the exact value elsewhere.
 
+On [Cloud Runners](/docs/agents/cloud-runners) (private beta), Delta also redacts the values of the environment variables you add in **Settings > Cloud Runner**.
+
 Delta reloads dotenv and mise files when they change; the home-folder credential sources load once at startup. Short values are excluded: the minimum is eight characters, twelve for all-digit values, and sixteen for values recognized by shape alone. Common non-secret environment variables are also excluded.
 
 If you replace or remove a secret in a dotenv or mise source, Delta keeps the previously loaded value in memory until you quit. This lets Delta continue redacting that value and resolve existing redactions.

@@ -41,6 +41,7 @@ The following agents can be used with an ACP Client:
 * [GitHub Copilot](https://github.com/features/copilot) (in [public preview](https://github.blog/changelog/2026-01-28-acp-support-in-copilot-cli-is-now-in-public-preview/))
 * [Goose](https://block.github.io/goose/docs/guides/acp-clients)
 * [Hermes Agent](https://hermes-agent.nousresearch.com/docs/user-guide/features/acp)
+* [Inferpal](https://github.com/EstaxNet/Inferpal/blob/master/docs/acp.md) (`Inferpal.Host --acp`)
 * [Junie by JetBrains](https://junie.jetbrains.com)
 * [Kaagum](https://git.systemreboot.net/kaagum/about/)
 * [Kimi CLI](https://github.com/MoonshotAI/kimi-cli)
@@ -49,6 +50,7 @@ The following agents can be used with an ACP Client:
 * [Minion Code](https://github.com/femto/minion-code)
 * [Mistral Vibe](https://github.com/mistralai/mistral-vibe)
 * [Muse Spark Code](https://github.com/RandyNorthrup/muse-spark-code/blob/main/docs/acp.md) (unofficial agent for Meta's Muse Spark)
+* [Octomind](https://github.com/muvon/octomind/blob/master/doc/integration/02-acp-protocol.md) (`octomind acp`)
 * [OpenClaw](https://docs.openclaw.ai/cli/acp)
 * [OpenCode](https://github.com/sst/opencode)
 * [OpenHands](https://docs.openhands.dev/openhands/usage/run-openhands/acp)
@@ -62,6 +64,7 @@ The following agents can be used with an ACP Client:
 * [Stakpak](https://github.com/stakpak/agent?tab=readme-ov-file#agent-client-protocol-acp)
 * [stdio Bus](https://github.com/stdiobus/stdiobus)
 * [VT Code](https://github.com/vinhnx/vtcode/blob/main/README.md#zed-ide-integration-agent-client-protocol)
+* [ZenCODE](https://github.com/gerardogrisolini/ZenCODE/blob/main/Docs/xcode.md) (`zen --acp`)
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

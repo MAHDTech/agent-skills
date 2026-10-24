@@ -176,7 +176,7 @@ Windows
 
 ## [Getting help](#getting-help)
 
-If you hit something not covered here, choose **Send Feedback** in the Help or user menu, or type `/delta-feedback` in a thread. In the desktop feedback form, you can enter or correct the model name, attach a screenshot, and select **Include recent logs** to attach logs from the current and previous app sessions, when available. These logs can cover multiple threads and contain file paths, repository names, and other sensitive information. Logs are not included unless you select that option. You can also leave an email address or Discord handle for follow-up.
+If you hit something not covered here, choose **Send Feedback** in the Help or user menu, or type `/send-feedback` in a thread. In the desktop feedback form, you can enter or correct the model name, attach a screenshot, and select **Include recent logs** to attach logs from the current and previous app sessions, when available. These logs can cover multiple threads and contain file paths, repository names, and other sensitive information. Logs are not included unless you select that option. You can also leave an email address or Discord handle for follow-up.
 
 For freezes, select **Include performance data** in the desktop feedback form to attach diagnostic information about recent hangs. Performance data is included only when you select this option.
 

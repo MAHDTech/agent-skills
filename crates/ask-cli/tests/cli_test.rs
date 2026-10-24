@@ -5,6 +5,85 @@ use predicates::prelude::*;
 use skills_core::error::SkillError;
 use std::path::PathBuf;
 
+#[test]
+fn vendor_cli_refreshes_a_local_source_without_fetching_its_documentation() {
+    let temp = tempfile::tempdir().unwrap();
+    let upstream = temp.path().join("upstream");
+    let catalog = temp.path().join("catalog");
+    std::fs::create_dir_all(upstream.join("skills/alpha/resources/auto")).unwrap();
+    std::fs::create_dir(&catalog).unwrap();
+    std::fs::write(upstream.join("skills/alpha/SKILL.md"), "---\nname: alpha\ndescription: Vendor\nresources:\n  - http://127.0.0.1:1/unreachable\n---\n\n# Alpha\n").unwrap();
+    std::fs::write(
+        upstream.join("skills/alpha/resources/auto/keep.md"),
+        "Vendor content",
+    )
+    .unwrap();
+    for args in [
+        vec!["init"],
+        vec!["add", "."],
+        vec![
+            "-c",
+            "user.name=Tests",
+            "-c",
+            "user.email=tests@example.com",
+            "-c",
+            "commit.gpgsign=false",
+            "-c",
+            "core.hooksPath=/dev/null",
+            "commit",
+            "-m",
+            "fixture",
+        ],
+    ] {
+        assert!(
+            std::process::Command::new("git")
+                .args(args)
+                .current_dir(&upstream)
+                .output()
+                .unwrap()
+                .status
+                .success()
+        );
+    }
+    std::fs::write(
+        catalog.join("vendor-skills.yaml"),
+        format!(
+            "version: 1\nsources:\n  - id: example\n    repository: '{}'\n",
+            upstream.display()
+        ),
+    )
+    .unwrap();
+    Command::cargo_bin("ask")
+        .unwrap()
+        .env("AGENT_SKILLS_HOME", &catalog)
+        .args([
+            "--format",
+            "json",
+            "skills",
+            "download-resources",
+            "--vendors-only",
+        ])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("example"));
+    Command::cargo_bin("ask")
+        .unwrap()
+        .env("AGENT_SKILLS_HOME", &catalog)
+        .args(["skills", "clean-resources"])
+        .assert()
+        .success();
+    assert!(
+        catalog
+            .join("skills/vendor/example/alpha/resources/auto/keep.md")
+            .is_file()
+    );
+    assert!(
+        catalog
+            .join("dashboard/content/skills/vendor/example/alpha/_index.md")
+            .is_file()
+    );
+}
+
 fn error_to_exit_code(err: &SkillError) -> i32 {
     match err {
         SkillError::Lint { .. }

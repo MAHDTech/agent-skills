@@ -46,6 +46,9 @@ impl SkillLinter {
         let mut report = LintReport::new();
 
         Self::check_yaml_errors(skill, &mut report);
+        if skill.vendor_source().is_some() {
+            return report;
+        }
         Self::check_frontmatter(skill, &mut report);
         Self::check_naming(skill, &mut report);
         Self::check_category(skill, &mut report);
@@ -630,6 +633,7 @@ impl SkillLinter {
         for source in skills {
             // Archived skills and universal router are exempt as sources
             if source.tree == SkillTree::Archive
+                || source.vendor_source().is_some()
                 || source.name() == "skill-router"
                 || source.dir_name == "skill-router"
             {

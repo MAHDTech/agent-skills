@@ -222,7 +222,8 @@ impl ArtifactsEngine {
         };
 
         let mut body = String::from("\n# Available Skills\n");
-        for category in SkillCategory::standard_promoted() {
+        let mut vendor_heading = false;
+        for category in &catalog_categories(live_skills) {
             let mut matching: Vec<&Skill> = live_skills
                 .iter()
                 .filter(|s| s.tree == SkillTree::Live && s.promoted && s.category == *category)
@@ -234,7 +235,16 @@ impl ArtifactsEngine {
 
             matching.sort_by(|a, b| a.dir_name.cmp(&b.dir_name));
 
-            body.push_str(&format!("\n## {}\n\n", category.title()));
+            let heading = if category.as_str().starts_with("vendor/") {
+                if !vendor_heading {
+                    body.push_str("\n## Vendor Skills\n");
+                    vendor_heading = true;
+                }
+                "###"
+            } else {
+                "##"
+            };
+            body.push_str(&format!("\n{heading} {}\n\n", category.title()));
             for s in matching {
                 let desc = s.frontmatter.description.trim();
                 body.push_str(&format!("- **{}**: {}\n", s.dir_name, desc));
@@ -285,7 +295,8 @@ impl ArtifactsEngine {
         };
 
         let mut category_blocks = Vec::new();
-        for category in SkillCategory::standard_promoted() {
+        let mut vendor_heading = false;
+        for category in &catalog_categories(live_skills) {
             let mut matching: Vec<&Skill> = live_skills
                 .iter()
                 .filter(|s| s.tree == SkillTree::Live && s.promoted && s.category == *category)
@@ -306,8 +317,17 @@ impl ArtifactsEngine {
                 })
                 .collect();
 
+            let heading = if category.as_str().starts_with("vendor/") {
+                if !vendor_heading {
+                    category_blocks.push("### Vendor Skills".to_string());
+                    vendor_heading = true;
+                }
+                "####"
+            } else {
+                "###"
+            };
             category_blocks.push(format!(
-                "### {}\n\n{}\n\n{}",
+                "{heading} {}\n\n{}\n\n{}",
                 category.title(),
                 category.description(),
                 skills_list.join("\n")
@@ -409,7 +429,7 @@ impl ArtifactsEngine {
         let manifest_file = self.workspace_root.join("skills.sh.json");
         let mut groupings = Vec::new();
 
-        for category in SkillCategory::standard_promoted() {
+        for category in &catalog_categories(live_skills) {
             let mut matching: Vec<&Skill> = live_skills
                 .iter()
                 .filter(|s| s.tree == SkillTree::Live && s.promoted && s.category == *category)
@@ -423,7 +443,11 @@ impl ArtifactsEngine {
 
             let skills: Vec<String> = matching.iter().map(|s| s.dir_name.clone()).collect();
             groupings.push(SkillGrouping {
-                title: category.title().to_string(),
+                title: if category.as_str().starts_with("vendor/") {
+                    format!("Vendor Skills / {}", category.title())
+                } else {
+                    category.title().to_string()
+                },
                 description: category.description().to_string(),
                 skills,
             });
@@ -510,7 +534,21 @@ impl ArtifactsEngine {
         archive_root: &Path,
         weight: &mut usize,
     ) -> Result<()> {
-        for category in SkillCategory::standard_promoted() {
+        if live_skills
+            .iter()
+            .any(|skill| skill.vendor_source().is_some())
+        {
+            let vendor_dir = dashboard_content_dir.join("vendor");
+            fs::create_dir_all(&vendor_dir)?;
+            atomic_write(
+                &vendor_dir.join("_index.md"),
+                &format!(
+                    "+++\ntitle = \"Vendor Skills\"\nsort_by = \"title\"\ntemplate = \"section.html\"\nweight = {}\n+++\n",
+                    *weight
+                ),
+            )?;
+        }
+        for category in &catalog_categories(live_skills) {
             let mut matching: Vec<&Skill> = live_skills
                 .iter()
                 .filter(|s| {
@@ -589,6 +627,24 @@ impl ArtifactsEngine {
                         extra_meta: "",
                     };
                     write_sibling_docs(&skill_src_dir, &out_dir, &sibling_ctx)?;
+
+                    if s.vendor_source().is_some() {
+                        for entry in fs::read_dir(&skill_src_dir)? {
+                            let entry = entry?;
+                            if entry.file_type()?.is_dir() && entry.file_name() != "resources" {
+                                let name = entry.file_name().to_string_lossy().into_owned();
+                                sync_resources(
+                                    &entry.path(),
+                                    &out_dir.join(&name),
+                                    &format!("{content_base}/{name}"),
+                                    category.as_str(),
+                                    &s.dir_name,
+                                    false,
+                                    None,
+                                )?;
+                            }
+                        }
+                    }
 
                     // Mirror resources if present
                     let resources_src = skill_src_dir.join("resources");
@@ -1702,4 +1758,15 @@ mod tests {
             "Expected staged normal file in git status, got: {status_str}"
         );
     }
+}
+
+fn catalog_categories(skills: &[Skill]) -> Vec<SkillCategory> {
+    let mut categories = SkillCategory::standard_promoted().to_vec();
+    let vendors: std::collections::BTreeSet<_> = skills
+        .iter()
+        .filter(|skill| skill.vendor_source().is_some())
+        .map(|skill| skill.category.as_str().to_string())
+        .collect();
+    categories.extend(vendors.into_iter().map(SkillCategory::Custom));
+    categories
 }

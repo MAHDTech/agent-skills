@@ -8,16 +8,16 @@
 
 Agents can provide an arbitrary list of configuration options for a session, allowing Clients to offer users customizable selectors for things like models, modes, reasoning levels, and more.
 
-<Info>
-  Session Config Options are the preferred way to expose session-level
-  configuration. If an Agent provides `configOptions`, Clients **SHOULD** use
-  them instead of the [`modes`](/protocol/v1/session-modes) field. Modes will be
-  removed in a future version of the protocol.
-</Info>
+> [!NOTE]
+>
+> Session Config Options are the preferred way to expose session-level
+> configuration. If an Agent provides `configOptions`, Clients **SHOULD** use
+> them instead of the [`modes`](https://agentclientprotocol.com/protocol/v1/session-modes) field. Modes will be
+> removed in a future version of the protocol.
 
 ## Initial State
 
-During [Session Setup](/protocol/v1/session-setup) the Agent **MAY** return a list of configuration options and their current values:
+During [Session Setup](https://agentclientprotocol.com/protocol/v1/session-setup.md) the Agent **MAY** return a list of configuration options and their current values:
 
 ```json theme={null}
 {
@@ -70,61 +70,61 @@ During [Session Setup](/protocol/v1/session-setup) the Agent **MAY** return a li
 }
 ```
 
-<ResponseField name="configOptions" type="ConfigOption[]">
-  The list of configuration options available for this session. The order of
-  this array represents the Agent's preferred priority. Clients **SHOULD**
-  respect this ordering when displaying options.
-</ResponseField>
+**configOptions** `ConfigOption[]`
+
+The list of configuration options available for this session. The order of
+this array represents the Agent's preferred priority. Clients **SHOULD**
+respect this ordering when displaying options.
 
 ### ConfigOption
 
-<ResponseField name="id" type="string" required>
-  Unique identifier for this configuration option. Used when setting values.
-</ResponseField>
+**id** `string` *required*
 
-<ResponseField name="name" type="string" required>
-  Human-readable label for the option
-</ResponseField>
+Unique identifier for this configuration option. Used when setting values.
 
-<ResponseField name="description" type="string">
-  Optional description providing more details about what this option controls
-</ResponseField>
+**name** `string` *required*
 
-<ResponseField name="category" type="ConfigOptionCategory">
-  Optional [semantic category](#option-categories) to help Clients provide
-  consistent UX.
-</ResponseField>
+Human-readable label for the option
 
-<ResponseField name="type" type="ConfigOptionType" required>
-  The type of input control. `select` is supported by default. `boolean` is only
-  supported when the Client advertises `session.configOptions.boolean: {}` in
-  `clientCapabilities`.
-</ResponseField>
+**description** `string`
 
-<ResponseField name="currentValue" type="string | boolean" required>
-  The current value for this option. For `select` options this is a string value
-  ID. For `boolean` options this is a boolean.
-</ResponseField>
+Optional description providing more details about what this option controls
 
-<ResponseField name="options" type="ConfigOptionValue[] | ConfigOptionGroup[]">
-  The available values for a `select` option. Required when `type` is `"select"`
-  and omitted when `type` is `"boolean"`. This is either a flat array of values
-  or an array of groups; values and groups are not mixed in the same array.
-</ResponseField>
+**category** `ConfigOptionCategory`
+
+Optional [semantic category](#option-categories) to help Clients provide
+consistent UX.
+
+**type** `ConfigOptionType` *required*
+
+The type of input control. `select` is supported by default. `boolean` is only
+supported when the Client advertises `session.configOptions.boolean: {}` in
+`clientCapabilities`.
+
+**currentValue** `string | boolean` *required*
+
+The current value for this option. For `select` options this is a string value
+ID. For `boolean` options this is a boolean.
+
+**options** `ConfigOptionValue[] | ConfigOptionGroup[]`
+
+The available values for a `select` option. Required when `type` is `"select"`
+and omitted when `type` is `"boolean"`. This is either a flat array of values
+or an array of groups; values and groups are not mixed in the same array.
 
 ### ConfigOptionValue
 
-<ResponseField name="value" type="string" required>
-  The value identifier used when setting this option
-</ResponseField>
+**value** `string` *required*
 
-<ResponseField name="name" type="string" required>
-  Human-readable name to display
-</ResponseField>
+The value identifier used when setting this option
 
-<ResponseField name="description" type="string">
-  Optional description of what this value does
-</ResponseField>
+**name** `string` *required*
+
+Human-readable name to display
+
+**description** `string`
+
+Optional description of what this value does
 
 ### Grouped Select Options
 
@@ -195,10 +195,10 @@ older Clients should omit the boolean option or provide a `select` fallback.
 
 Each config option **MAY** include a `category` field. Categories are semantic metadata intended to help Clients provide consistent UX, such as attaching keyboard shortcuts, choosing icons, or deciding placement.
 
-\<Warning\>
-  Categories are for UX purposes only and **MUST NOT** be required for
-  correctness. Clients **MUST** handle missing or unknown categories gracefully.
-</Warning>
+> [!WARNING]
+>
+> Categories are for UX purposes only and **MUST NOT** be required for
+> correctness. Clients **MUST** handle missing or unknown categories gracefully.
 
 Category names beginning with `_` are free for custom use (e.g., `_my_custom_category`). Category names that do not begin with `_` are reserved for the ACP spec.
 
@@ -254,19 +254,19 @@ Clients can change a config option value by calling the `session/set_config_opti
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  The ID of the session
-</ParamField>
+**sessionId** `SessionId` *required*
 
-<ParamField path="configId" type="string" required>
-  The `id` of the configuration option to change
-</ParamField>
+The ID of the session
 
-<ParamField path="value" type="string | boolean" required>
-  The new value to set. For `select` options, this must be one of the values
-  listed in the option's `options` array. For `boolean` options, this must be a
-  boolean.
-</ParamField>
+**configId** `string` *required*
+
+The `id` of the configuration option to change
+
+**value** `string | boolean` *required*
+
+The new value to set. For `select` options, this must be one of the values
+listed in the option's `options` array. For `boolean` options, this must be a
+boolean.
 
 For boolean options, Clients send `type: "boolean"` with a boolean `value`:
 
@@ -311,12 +311,12 @@ The Agent **MUST** respond with the complete list of all configuration options a
 }
 ```
 
-\<Note\>
-  The response always contains the **complete** configuration state. This allows
-  Agents to reflect dependent changes. For example, if changing the model
-  affects available reasoning options, or if an option's available values change
-  based on another selection.
-</Note>
+> [!NOTE]
+>
+> The response always contains the **complete** configuration state. This allows
+> Agents to reflect dependent changes. For example, if changing the model
+> affects available reasoning options, or if an option's available values change
+> based on another selection.
 
 ### From the Agent
 
@@ -359,7 +359,7 @@ This notification also contains the complete configuration state. Common reasons
 
 ## Relationship to Session Modes
 
-Session Config Options supersede the older [Session Modes](/protocol/v1/session-modes) API. However, during the transition period, Agents that provide mode-like configuration **SHOULD** send both:
+Session Config Options supersede the older [Session Modes](https://agentclientprotocol.com/protocol/v1/session-modes.md) API. However, during the transition period, Agents that provide mode-like configuration **SHOULD** send both:
 
 * `configOptions` with a `category: "mode"` option for Clients that support config options
 * `modes` for Clients that only support the older API
@@ -370,9 +370,9 @@ If an Agent provides both `configOptions` and `modes` in the session response:
 * Clients that don't support config options **SHOULD** fall back to `modes`
 * Agents **SHOULD** keep both in sync to ensure consistent behavior regardless of which field the Client uses
 
-<Card icon="gears" horizontal href="/protocol/v1/session-modes">
-  Learn about the Session Modes API
-</Card>
+> Learn about the Session Modes API
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/session-modes.md)
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

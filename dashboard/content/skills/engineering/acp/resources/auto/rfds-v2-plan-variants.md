@@ -36,7 +36,7 @@ For now, v2 should stabilize only the item-based plan content variant:
 }
 ```
 
-The markdown, file, and removal pieces from [Plan Operations Support](/rfds/plan-operations) remain behind the unstable plan-operations feature while that RFD continues. V2 does not need a separate `plan` runtime handshake for those unstable operations.
+The markdown, file, and removal pieces from [Plan Operations Support](https://agentclientprotocol.com/rfds/plan-operations.md) remain behind the unstable plan-operations feature while that RFD continues. V2 does not need a separate `plan` runtime handshake for those unstable operations.
 
 ## Status quo
 
@@ -64,7 +64,7 @@ ACP v2 should:
 * Remove the old `sessionUpdate: "plan"` variant from the v2 schema.
 * Add `sessionUpdate: "plan_update"` to the default v2 schema.
 * Stabilize only the `plan.type: "items"` content variant for now.
-* Keep unknown plan content variants parseable and preservable using the [v2 enum variant extension](/rfds/v2/enum-variant-extension) rules.
+* Keep unknown plan content variants parseable and preservable using the [v2 enum variant extension](https://agentclientprotocol.com/rfds/v2/enum-variant-extension.md) rules.
 * Require every plan content variant, including unknown future/custom variants, to carry a `planId`.
 * Remove `ClientCapabilities.plan` from v2.
 * Keep `markdown`, `file`, and `plan_removed` behind `unstable_plan_operations` until the Plan Operations RFD settles.

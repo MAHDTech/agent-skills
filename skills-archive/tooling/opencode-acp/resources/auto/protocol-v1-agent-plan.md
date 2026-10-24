@@ -8,7 +8,7 @@
 
 Plans are execution strategies for complex tasks that require multiple steps.
 
-Agents may share plans with Clients through [`session/update`](/protocol/v1/prompt-turn#3-agent-reports-output) notifications, providing real-time visibility into their thinking and progress.
+Agents may share plans with Clients through [`session/update`](https://agentclientprotocol.com/protocol/v1/prompt-turn#3-agent-reports-output) notifications, providing real-time visibility into their thinking and progress.
 
 ## Creating Plans
 
@@ -44,34 +44,34 @@ When the language model creates an execution plan, the Agent **SHOULD** report i
 }
 ```
 
-<ParamField path="entries" type="PlanEntry[]" required>
-  An array of [plan entries](#plan-entries) representing the tasks to be
-  accomplished
-</ParamField>
+**entries** `PlanEntry[]` *required*
+
+An array of [plan entries](#plan-entries) representing the tasks to be
+accomplished
 
 ## Plan Entries
 
 Each plan entry represents a specific task or goal within the overall execution strategy:
 
-<ParamField path="content" type="string" required>
-  A human-readable description of what this task aims to accomplish
-</ParamField>
+**content** `string` *required*
 
-<ParamField path="priority" type="PlanEntryPriority" required>
-  The relative importance of this task.
+A human-readable description of what this task aims to accomplish
 
-  * `high`
-  * `medium`
-  * `low`
-</ParamField>
+**priority** `PlanEntryPriority` *required*
 
-<ParamField path="status" type="PlanEntryStatus" required>
-  The current [execution status](#status) of this task
+The relative importance of this task.
 
-  * `pending`
-  * `in_progress`
-  * `completed`
-</ParamField>
+* `high`
+* `medium`
+* `low`
+
+**status** `PlanEntryStatus` *required*
+
+The current [execution status](#status) of this task
+
+* `pending`
+* `in_progress`
+* `completed`
 
 ## Updating Plans
 

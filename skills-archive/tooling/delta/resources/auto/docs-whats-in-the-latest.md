@@ -13,36 +13,127 @@ Notable changes in recent Delta releases, newest first.
 
 On this page
 
-1.  [0.20.1](#0.20.1)
-2.  [0.20.0](#0.20.0)
-3.  [0.19.2](#0.19.2)
-4.  [0.19.1](#0.19.1)
-5.  [0.19.0](#0.19.0)
-6.  [0.18.2](#0.18.2)
-7.  [0.18.1](#0.18.1)
-8.  [0.18.0](#0.18.0)
-9.  [0.17.1](#0.17.1)
-10.  [0.17.0](#0.17.0)
-11.  [0.16.1](#0.16.1)
-12.  [0.16.0](#0.16.0)
-13.  [0.15.0](#0.15.0)
-14.  [0.14.0](#0.14.0)
-15.  [0.13.0](#0.13.0)
-16.  [0.12.0](#0.12.0)
-17.  [0.11.0](#0.11.0)
-18.  [0.10.0](#0.10.0)
-19.  [0.9.1](#0.9.1)
-20.  [0.9.0](#0.9.0)
-21.  [0.8.0](#0.8.0)
-22.  [0.7.0](#0.7.0)
-23.  [0.6.2](#0.6.2)
-24.  [0.6.1](#0.6.1)
-25.  [0.6.0](#0.6.0)
-26.  [0.4.0](#0.4.0)
-27.  [0.3.1](#0.3.1)
-28.  [0.3.0](#0.3.0)
-29.  [0.2.0](#0.2.0)
-30.  [0.1.1](#0.1.1)
+1.  [0.21.0](#0.21.0)
+2.  [0.20.1](#0.20.1)
+3.  [0.20.0](#0.20.0)
+4.  [0.19.2](#0.19.2)
+5.  [0.19.1](#0.19.1)
+6.  [0.19.0](#0.19.0)
+7.  [0.18.2](#0.18.2)
+8.  [0.18.1](#0.18.1)
+9.  [0.18.0](#0.18.0)
+10.  [0.17.1](#0.17.1)
+11.  [0.17.0](#0.17.0)
+12.  [0.16.1](#0.16.1)
+13.  [0.16.0](#0.16.0)
+14.  [0.15.0](#0.15.0)
+15.  [0.14.0](#0.14.0)
+16.  [0.13.0](#0.13.0)
+17.  [0.12.0](#0.12.0)
+18.  [0.11.0](#0.11.0)
+19.  [0.10.0](#0.10.0)
+20.  [0.9.1](#0.9.1)
+21.  [0.9.0](#0.9.0)
+22.  [0.8.0](#0.8.0)
+23.  [0.7.0](#0.7.0)
+24.  [0.6.2](#0.6.2)
+25.  [0.6.1](#0.6.1)
+26.  [0.6.0](#0.6.0)
+27.  [0.4.0](#0.4.0)
+28.  [0.3.1](#0.3.1)
+29.  [0.3.0](#0.3.0)
+30.  [0.2.0](#0.2.0)
+31.  [0.1.1](#0.1.1)
+
+## [0.21.0 Oct 21, 2026](#0.21.0)
+
+## [✨ New this release](#0.21.0--new-this-release)
+
+*   Shared threads can now be opened in Claude Code with the `Open in Claude Code` command, on desktop and web, when the Delta plugin for Claude Code is installed.
+*   Collaborators connected through supported external tools, including Claude Code, now appear in the thread’s participant bar with an indication of the tool they’re using.
+*   You can now check for Delta updates with `delta update --check` and install them on macOS and Linux with `delta update`, which shows progress while downloading and installing an update.
+*   Thread images can now be opened in zoomable pane tabs and copied on macOS, Windows, and the web.
+*   You can now use `Compact Now` while a local agent is running.
+*   Settings links in threads open a page or highlight a control, and Settings now offers copy-link buttons and sidebar links to documentation and desktop feedback.
+*   Delta now supports connecting to Figma’s MCP server.
+*   `Apply Tag to Subthreads` in a thread’s right-click menu now copies its tags to existing subthreads.
+*   Copy thread titles directly with `Copy Title` in the sidebar context menu or `Copy Thread Title` in the command palette.
+*   Use `Collapse Child Threads` from the command palette to hide the current thread’s child rows in the sidebar.
+*   On macOS, the `System Notifications` setting now shows whether Delta is allowed to show notifications and includes a `Send Test Notification` button.
+*   Use `tab` and `shift-tab` to move between cells in read-only tables.
+
+## [⚡ Better than before](#0.21.0--better-than-before)
+
+*   Colored tags now control thread colors, and subthreads can have colors independent of their parents.
+*   Editing an earlier message now warns that sending it will replace later conversation, while an in-progress response keeps running until you send.
+*   On phones, Delta Web now puts conversations, changes, files, and open documents in one tab bar, with thread controls in touch-friendly bottom sheets.
+*   Preparing a new thread’s worktree is now faster, especially in repositories with many files.
+*   Slash commands now use action-oriented names: `/send-feedback`, `/toggle-fast`, `/change-model`, `/fork` (still searchable as `subthread`), and `/set-thinking-level`.
+*   Choose the starting branch for each project’s new Delta worktrees in `Delta Worktrees` settings.
+*   The `Keymap` now shows shortcuts from across Delta and lets you search by action or key combination.
+*   On desktop, GitHub file links pinned to a commit can now open matching files and unchanged lines in your thread’s local projects instead of the browser.
+*   Compaction errors now appear directly in the thread instead of in pop-up notifications.
+*   Worktree loading is more reliable when joining shared subthreads.
+*   The `ctrl-tab` thread switcher now shows running and unread indicators alongside thread colors.
+*   Projects with matching default names in the sidebar now show muted owner or path prefixes to help you tell them apart, while custom names stay unchanged.
+*   Closing large diffs in the desktop app is less likely to cause a noticeable pause.
+*   Hovering over someone mentioned by an agent now explains that they were not notified.
+
+## [🔧 Fixes and reliability](#0.21.0--fixes-and-reliability)
+
+*   Threads can now recover after a connection loss interrupts recovery, without getting stuck when you discard local changes.
+*   Agents no longer silently stop when they try to call an unavailable tool.
+*   Long OpenAI sessions no longer stop with a “websocket connection limit reached” error.
+*   Gemini models through OpenRouter, including Gemini 4 Argon, no longer fail with “Provider returned error” in threads that can edit files.
+*   Claude models through OpenCode no longer fail with a `thinking.adaptive.block_binding` error when thinking is enabled.
+*   Mistral Large 4 responses no longer fail when using an OpenAI-compatible provider.
+*   ChatGPT subscription models no longer receive duplicate copies of their previous replies and tool calls.
+*   Long-running agent turns now compact earlier work automatically when using models without built-in compaction.
+*   Claude Haiku 5.5 no longer rejects conversation compaction with an invalid token threshold.
+*   Signing in again to the same account no longer reloads your workspace or interrupts ongoing work.
+*   Threads are now shared in the organization selected when they were created, even if you switch organizations before sharing.
+*   Rejoining a thread no longer fails to load its worktree in some cases after merging changes from a subthread.
+*   Switching a thread’s worktree from Isolated to Existing no longer sits on “Preparing” for minutes in repositories with many branches or tags.
+*   Reviews started from a subthread can now be submitted and have their edits pulled into the original thread.
+*   Agents now receive the affected file paths when merging changes from another thread introduces conflicts, instead of an unqualified success message.
+*   Agents no longer report a change as landed when only its preparation is complete.
+*   `Land Changes` now skips invalid landing skills when a working one is available.
+*   File opens now report storage errors instead of getting stuck.
+*   Reduced delays when opening threads during background cleanup.
+*   You now also receive @mention notifications when the thread is open but not focused.
+*   Grok 4.7 now uses its full 500k-token context window when signed in with a Grok subscription.
+*   Provider setup now explains rejected API keys and lets you enter a replacement without leaving onboarding.
+*   ChatGPT subscription connection errors now explain when OpenAI rejects an unsupported region instead of suggesting another sign-in attempt.
+*   Thinking can now be turned off for models that allow it only at certain effort levels, with an explanation when the selected effort requires thinking.
+*   Thinking output no longer repeats words or characters when using OpenAI-compatible providers such as Bifrost.
+*   Summaries for custom-provider threads now use the thread’s selected model instead of the first configured model.
+*   OpenCode Zen and Go now show current models, including Muse Spark Contributor models on Go.
+*   OpenCode’s model picker no longer offers deprecated models or free Zen models that OpenCode blocks in Delta.
+*   Context usage now updates correctly when using OpenRouter.
+*   Settings no longer closes unexpectedly when startup sign-in finishes.
+*   Switching recent threads with `ctrl-tab` now returns to visible subthreads instead of skipping to their parent threads.
+*   On Linux and Windows, `ctrl-p` now opens `Go to File` while a thread or editor has focus.
+*   `Open in Zed` now opens the file at your cursor position in Changes.
+*   Comments routed into subthreads now show and link back to their original text.
+*   Clicking a thread link inside Delta now jumps to its linked location even when the thread is already open.
+*   Thread titles now refresh when you edit and resubmit the initial prompt.
+*   Images read by the agent now consistently show an expandable preview in the thread.
+*   Images in agent responses now display when referenced by a path relative to the project root.
+*   Comments on new tool diffs now show the file, line number, and diff highlighting in their summaries.
+*   Clicking an unloaded subthread in the sidebar now shows its loading state immediately instead of leaving the previous thread open.
+*   `Remove from Sidebar` now switches away from a thread in the removed project, opening a new thread under Threads if no other thread is visible.
+*   On phones, `Cancel Edit` now lets you leave an earlier-message edit after hiding the keyboard without resending the message.
+*   The project tooltip now updates while you hover to show the current worktree preparation status.
+*   Your comments now use the same color in thread, file, and diff views.
+*   Consecutive assistant messages now appear as separate paragraphs instead of running together.
+*   The composer no longer briefly jumps when sending a message containing only comments.
+*   Tool calls with no output to display no longer show an expand arrow.
+*   The first message in a forked thread no longer crowds against the “Forked from” row after you add or remove worktrees.
+
+## [🗑️ Removed](#0.21.0-️-removed)
+
+*   The `delta daemon start`, `status`, and `stop` commands are gone; Delta now starts for `delta` commands when needed and exits once they finish.
+*   Opening paths or URLs with `delta \<target\>` is no longer supported; use `delta open \<target\>` instead.
 
 ## [0.20.1 Oct 14, 2026](#0.20.1)
 

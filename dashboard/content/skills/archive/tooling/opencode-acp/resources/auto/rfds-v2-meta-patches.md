@@ -27,7 +27,7 @@ ACP v2 upsert updates should apply their top-level `_meta` as a patch one level 
 
 > How do things work today and what problems does this cause? Why would we change things?
 
-v2 upserts such as [`tool_call_update`](./tool-call-updates.mdx), [`terminal_update`](./terminal-output.mdx), and [message updates](./message-updates.mdx) treat `_meta` like every other patch field: omission leaves it unchanged, `null` clears it, and a concrete object replaces the whole stored object.
+v2 upserts such as [`tool_call_update`](./tool-call-updates.mdx), [`terminal_update`](./terminal-output.mdx), and [message updates](https://agentclientprotocol.com/rfds/v2/message-updates.md) treat `_meta` like every other patch field: omission leaves it unchanged, `null` clears it, and a concrete object replaces the whole stored object.
 
 Unlike the other patch fields, `_meta` has more than one writer. Its keys are usually namespaced by the extension that owns them, such as `zed.dev/debugMode`, and some are shared conventions such as W3C trace context. Replacing the whole object makes every writer responsible for every other writer's keys:
 
@@ -119,7 +119,7 @@ The cost is that replay and resynchronization must remove stale keys explicitly,
 > Tell me more about your implementation. What is your detailed implementation plan?
 
 1. Keep the schema shape. These upserts already represent `_meta` as a three-state field, and a `_meta` object can already carry `null` values.
-2. Define the rule, including replay, once in the v2 Extensibility page under [Metadata Patches](/protocol/v2/draft/extensibility#metadata-patches), and reference it from the tool call, terminal, message, session info, compaction, and session replay docs, the schema field descriptions, and the migration guide.
+2. Define the rule, including replay, once in the v2 Extensibility page under [Metadata Patches](https://agentclientprotocol.com/protocol/v2/draft/extensibility.md#metadata-patches), and reference it from the tool call, terminal, message, session info, compaction, and session replay docs, the schema field descriptions, and the migration guide.
 3. Add `apply_meta_update` to the Rust v2 schema module and use it in `ToolCallUpdate::apply_update` and `TerminalUpdate::apply_update`.
 4. Leave v1 unchanged, including the v1 `session_message`, `subagent_update`, and `compaction_update` updates that replace `_meta` as a whole.
 

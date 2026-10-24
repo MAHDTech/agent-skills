@@ -1,608 +1,137 @@
-<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-c37k36qc">\<head\>\<style\>
-  html[data-i18n-pending="true"] main,
-  html[data-i18n-pending="true"] footer,
-  html[data-i18n-pending="true"] nav.sidebar,
-  html[data-i18n-pending="true"] .right-sidebar,
-  html[data-i18n-pending="true"] [data-header] nav,
-  html[data-i18n-pending="true"] [data-header] .download-button,
-  html[data-i18n-pending="true"] [data-header] .cta-button,
-  html[data-i18n-pending="true"] .docs-nav-links,
-  html[data-i18n-pending="true"] .header-download-btn,
-  html[data-i18n-pending="true"] .header-cta-btn,
-  html[data-i18n-pending="true"] .rc-pill,
-  html[data-i18n-pending="true"] .subnav-bar,
-  html[data-i18n-pending="true"] site-search button > span {
-    opacity: 0 !important;
-  }
-</style>\<script\>
-  if (window.location.hostname === 'www.antigravity.google') {
-    window.location.replace(
-      `https://antigravity.google${window.location.pathname}${window.location.search}${window.location.hash}`
-    );
-  }
-  try {
-    var __agyLoc = window.localStorage.getItem('antigravity_locale');
-    var __agyNonDefault = [
-      'en-GB', 'en-CA', 'hi', 'ja', 'ko', 'zh-CN', 'zh-TW',
-      'id', 'th', 'de', 'fr-FR', 'it', 'pl', 'pt-BR', 'es-ES', 'es-MX'
-    ];
-    if (__agyLoc && __agyNonDefault.indexOf(__agyLoc) !== -1) {
-      document.documentElement.lang = __agyLoc;
-      document.documentElement.setAttribute('data-i18n-pending', 'true');
-      window.__agyI18nTimer = window.setTimeout(function () {
-        document.documentElement.removeAttribute('data-i18n-pending');
-      }, 350);
-    }
-  } catch (e) {}
-</script><script type="module" src="/_astro/HeadOverride.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script><script type="speculationrules">
-  {
-    "prefetch": [
-      {
-        "where": {
-          "and": [
-            { "href_matches": "/*" },
-            { "not": { "href_matches": "/api/*" } },
-            { "not": { "selector_matches": "[download], [target=_blank]" } }
-          ]
-        },
-        "eagerness": "moderate"
-      }
-    ]
-  }
-</script><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>\<title\>Browser Overview | Google Antigravity Docs</title><link rel="canonical" href="https://antigravity.google/docs/ide/browser/"/><link rel="sitemap" href="/sitemap-index.xml"/><link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48"/><link rel="icon" type="image/png" href="/apple-touch-icon.png" sizes="180x180"/><link rel="icon" type="image/png" href="/assets/image/antigravity-logo.png" sizes="276x276"/><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"/><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" sizes="180x180"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@20..48,100..700,0..1,-50..200,0..100&display=block" media="print" onload="this.media='all'"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,slnt,wdth,wght,ROND@8..144,-10..0,25..150,400..500,0..100&display=swap" media="print" onload="this.media='all'"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.2.9"/><meta name="generator" content="Starlight v0.41.5"/><meta property="og:title" content="Browser Overview | Google Antigravity Docs"/><meta property="og:type" content="article"/><meta property="og:url" content="https://antigravity.google/docs/ide/browser/"/><meta property="og:locale" content="en"/><meta property="og:site_name" content="Google Antigravity Docs"/><meta property="og:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta property="og:image:secure_url" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="Google Antigravity can open, read, and actuate a local Chrome browser, enabling you to test development websites, read documentation sources, and automate a…"/><meta property="og:description" content="Google Antigravity can open, read, and actuate a local Chrome browser, enabling you to test development websites, read documentation sources, and automate a…"/><meta name="twitter:title" content="Browser Overview | Google Antigravity Docs"/><meta name="twitter:description" content="Google Antigravity can open, read, and actuate a local Chrome browser, enabling you to test development websites, read documentation sources, and automate a…"/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Browser Overview","description":"Google Antigravity can open, read, and actuate a local Chrome browser, enabling you to test development websites, read documentation sources, and automate a…","url":"https://antigravity.google/docs/ide/browser/","mainEntityOfPage":{"@type":"WebPage","@id":"https://antigravity.google/docs/ide/browser/"},"author":{"@type":"Organization","name":"Google Antigravity","url":"https://antigravity.google/"},"publisher":{"@type":"Organization","name":"Google","url":"https://www.google.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://antigravity.google/docs/overview/"},{"@type":"ListItem","position":2,"name":"Overview","item":"https://antigravity.google/docs/ide/browser/"}]}]}</script><link href="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.css" rel="stylesheet" media="print" onload="this.media='all'">\<script\>
-  window.dataLayer = window.dataLayer || [];
-  window.__agyGtmLoaded = window.__agyGtmLoaded || false;
-  window.__agyLastPageViewPath = window.__agyLastPageViewPath || '';
+{I'wϧbX42'A8"əc=3QUY@V!YGK6g&;s2tҭ[IfI+tff:"mcw{N2G=bgֺg2#<<<<<<=<z|_<d4ܼGb荏\ VIo^9JߋՓ;IؓG/݊'Qz'xTA߼wq8	Ϟ-F^|DD,,X/t0SGc18G^ټǐ6$D♗'Ea;7%?/#oIc2/?mNPIL%qB+v7M»xzIG~?Du~;ߟ3
+k
+Y Oe?W<:AkcLqVhWހ~u0LYW5JQp4H4S\	1!ʾwwI^F8u\/v35ue:HjjD=g)P0sQSwbߋz!	%6E<ƊÉͭ`4	'rVkȩ`|D8ІlM:ك7yD~/x:p</}?b(@օ77򴌦C($,3Ł?b茂(/w^YH)	>d^;1N1FG'6;Ac?.Mb@,t,ST۷n{1h`&?<eKwvbI
+ʥl/WR*ũKhNK{Q^pb1mBx(}f=|GFC\md_De(Nݣ0<8S"`	#(r4Øn"$4QPBQxɀ-4a^QՄTKMbIVB=@rsqpDO^|) I&q(tI|S䧂ZQ]><"a|ۮxr!?o]wB)I@amUBRF%EoG7TOqe`p#p{jpcUR@x_$`?-S8LMu̍Pfx::%*})9?<$T,WIYC62IڴRdxPT}L+,-I$	OҪҔW͔"f&1X!ɭ1^(ϫ8gߪa+*HAZD*]$^3=鸤O,FeGyPZ^#rI=ȁmgBPI	K!VISbTO(P!ĺȔ#Hj`TSqzUI[)@mI
+28#"{x-]f%t=3EI*cҾS.1C
+eK"*C꥘G1kb&2#e^V*\@dE5L1੒5mDM,><	R˚J><bKB)-_sJBeǟqC
+)YKyz	(a V	A5Y^.D	g1hY,2*~;p.??B`Z˶_%AףtRž_2lV/cc}?v ;"hذ>=.)b`_/a:cҩP4ͳpT{PKmA?^8L3pe~e3ߓA#/ҟA~*Σ-~>\3=A41,P .o^k$.`݄^4~Z[ (#(F#A/wSM20CT06C%?IQu/ɽ^Uw\4ށ1g1@@,6KP;K(cdș35hp-w -zrZl|/m )=	IL!I?e1.WdްbMປ`d96dӁ'Fv~-` -R(ܰV-{1e5VN!|% *|˦#\]7A-gmld8O&1H9aPجfBء6Ev>JQpx^PBX_co1rs~CABE]1M|oD;~⋥Oĥ,7@-̭{dZ]ċ 9{o[օxch@OsX1l^J7AB/i0f626ae6 })!=agN6nh
+dVGуKx'atH1
+ceSem[+"zJc?݁c[riu|G'c^s?ofKKSé/83U!]H
+ps0NMȠbnE۲Tw'.q8B#7~4mX^cljJFEK[a$*z䨀fİ[]bKؼ7~\t#mڞ'z@,349t6*(R٭SDe7ɒn4'n?	z?pyC'&;}E@ 4/=?#%	5[V<^Cָa/AeD:~̾̬b@ RPy~;̑h-qg5̇Е_ld|dN{K<ÿ1#lGax{}<(&$Lv`l?Ɗ/4ͳ=n*[Y"6 Ѐh?4<) ƝpS?/ٓ_l=ßQo5w٬OO[j6o{~v==x)`(lK[ic#	ޒ[P;Bq;4W=$ǲ8i+:(QrޭGV+43o8/0NUT5
+%/4M$342Ij`xspGG*Lc[ӵen]{&e+92:&8h*=&x+C0C)x^#}ܾP`]<U'	LKFSzVNc/PO돻+q&8=]aӷRl^T~YRE;oatTW~/dPFQZFPl)1[V	zȋrTiשύz]Jk
+Es=V??|IKA}A_+]nC|y0*IwW&ӃauڍΌw~1\^S< ׋%tG1XL'i \֥^66M].XaP&.rx綥0}kKϓ#3+[f%v(BXr
+dljhy5lu!p&ٌn"2O=O6"=2/IUT@LN|6zh6nv.O(w
+Vt8$;З^#[})<Nx*rB6%s$,)<-@Ep=zgz3#NF"/I_zlEx2IJB#|qƤ!3Y0Eܑwv/Bal(Dcqƃ|Ytc{0y<\}L5-e9~rf'1u=WgK6X R
+Mes@-Ea0OU&WSNͪ2M8;
+`ί%P9R`ibP6B!}
+F!JG$=2FԜ͔~TA&#oBVVCU%jWX9	-ݝf	rcId}6BጸQM|$Dȃ?\L{*#M|p
+JvYlNYV(>vDK
+){J|,YNx5_nblx qEK5803ad^AHXb@)6YfR.vvAcatv*RclfLf̃trfLvZVk\@eRۤAۙH9aHq<*VN۴Ʈ5^2,ה|гPSpAh]caش'DHɉ$3TQW))T,qՕEM*p:FF\p<J=83x^!%'UbBiT ˬjjxF`	et~I#YHǙ%Z#=s|zC#Q_ٹ5ƳAV&!yqb7%#y
+j:Xpk*FOŭ
 
-  var __agySegmentMql =
-    typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia(
-          '(horizontal-viewport-segments: 2), (vertical-viewport-segments: 2)'
-        )
-      : null;
-  var __agyUa =
-    typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
-  var __agyIsFoldableUA =
-    /Pixel Fold|SM-F9|SM-F7|Galaxy Z Fold|Surface Duo/i.test(__agyUa);
-  var __agyIsIpad =
-    /ipad/i.test(__agyUa) ||
-    (typeof navigator !== 'undefined' &&
-      navigator.maxTouchPoints > 0 &&
-      /macintosh/i.test(__agyUa));
-  var __agyOs = 'unknown';
-  if (/iphone|ipod/i.test(__agyUa)) __agyOs = 'iphone';
-  else if (__agyIsIpad) __agyOs = 'ipad';
-  else if (/googlebook|cros/i.test(__agyUa)) __agyOs = 'googlebook';
-  else if (/android/i.test(__agyUa)) __agyOs = 'android';
-  else if (/windows/i.test(__agyUa)) __agyOs = 'windows';
-  else if (/macintosh|mac os x/i.test(__agyUa)) __agyOs = 'mac';
-  else if (/linux/i.test(__agyUa)) __agyOs = 'linux';
-
-  function __agyDetectViewport() {
-    const width = Math.round(
-      window.innerWidth ||
-        (document.documentElement && document.documentElement.clientWidth) ||
-        1440
-    );
-    const height = Math.round(
-      window.innerHeight ||
-        (document.documentElement && document.documentElement.clientHeight) ||
-        900
-    );
-    const orientation = width >= height ? 'landscape' : 'portrait';
-    const minDim = Math.min(width, height);
-    const maxDim = Math.max(width, height);
-    const aspectRatio = minDim > 0 ? maxDim / minDim : 1;
-
-    const hasSegments =
-      Boolean(
-        window.visualViewport &&
-          window.visualViewport.segments &&
-          window.visualViewport.segments.length > 1
-      ) ||
-      Boolean(
-        typeof navigator !== 'undefined' &&
-          navigator.devicePosture &&
-          navigator.devicePosture.type === 'folded'
-      ) ||
-      Boolean(__agySegmentMql && __agySegmentMql.matches);
-    const isFoldableUnfolded =
-      minDim >= 600 && maxDim <= 1150 && aspectRatio <= 1.3;
-    const isFoldableCover =
-      (width >= 320 &&
-        width <= 368 &&
-        height >= 700 &&
-        height / width >= 2.0) ||
-      (height >= 320 &&
-        height <= 368 &&
-        width >= 700 &&
-        width / height >= 2.0);
-
-    let viewportCategory = 'desktop';
-    if (
-      hasSegments ||
-      __agyIsFoldableUA ||
-      isFoldableUnfolded ||
-      isFoldableCover
-    ) {
-      viewportCategory = 'foldable';
-    } else if (width < 600) {
-      viewportCategory = 'mobile';
-    } else if (width <= 1024 || __agyIsIpad) {
-      viewportCategory = 'tablet';
-    }
-
-    return {
-      viewportCategory: viewportCategory,
-      formFactor: viewportCategory,
-      viewportWidth: width,
-      viewportHeight: height,
-      orientation: orientation,
-      operatingSystem: __agyOs,
-    };
-  }
-
-  function __agyRecordPageView() {
-    const currentPath = window.location.pathname || '/';
-    if (window.__agyLastPageViewPath === currentPath) return;
-
-    if (
-      window.agyAnalytics &&
-      typeof window.agyAnalytics.trackPageView === 'function'
-    ) {
-      window.agyAnalytics.trackPageView();
-      return;
-    }
-
-    window.__agyLastPageViewPath = currentPath;
-    const vp = __agyDetectViewport();
-    const eventParams = {
-      pagePath: currentPath,
-      locale: document.documentElement.lang || 'en-US',
-      viewportCategory: vp.viewportCategory,
-      formFactor: vp.formFactor,
-      viewportWidth: vp.viewportWidth,
-      viewportHeight: vp.viewportHeight,
-      orientation: vp.orientation,
-      operatingSystem: vp.operatingSystem,
-    };
-    if (document.title) {
-      eventParams.pageTitle = document.title;
-    }
-    if (document.referrer) {
-      eventParams.referrer = document.referrer;
-    }
-    try {
-      const sp = new URLSearchParams(window.location.search || '');
-      const utmSource = sp.get('utm_source');
-      const utmMedium = sp.get('utm_medium');
-      const utmCampaign = sp.get('utm_campaign');
-      const utmTerm = sp.get('utm_term');
-      const utmContent = sp.get('utm_content');
-      if (utmSource) {
-        eventParams.utm_source = utmSource;
-        eventParams.utmSource = utmSource;
-      }
-      if (utmMedium) {
-        eventParams.utm_medium = utmMedium;
-        eventParams.utmMedium = utmMedium;
-      }
-      if (utmCampaign) {
-        eventParams.utm_campaign = utmCampaign;
-        eventParams.utmCampaign = utmCampaign;
-      }
-      if (utmTerm) {
-        eventParams.utm_term = utmTerm;
-        eventParams.utmTerm = utmTerm;
-      }
-      if (utmContent) {
-        eventParams.utm_content = utmContent;
-        eventParams.utmContent = utmContent;
-      }
-    } catch (_err) {
-      // Ignore URLSearchParams errors
-    }
-
-    const entry = {
-      event: 'page_view',
-      pagePath: currentPath,
-      viewportCategory: vp.viewportCategory,
-      formFactor: vp.formFactor,
-      viewportWidth: vp.viewportWidth,
-      viewportHeight: vp.viewportHeight,
-      orientation: vp.orientation,
-      operatingSystem: vp.operatingSystem,
-      eventParams: eventParams,
-    };
-    if (eventParams.pageTitle) entry.pageTitle = eventParams.pageTitle;
-    if (eventParams.referrer) entry.referrer = eventParams.referrer;
-    if (eventParams.utm_source) {
-      entry.utm_source = eventParams.utm_source;
-      entry.utmSource = eventParams.utmSource;
-    }
-    if (eventParams.utm_medium) {
-      entry.utm_medium = eventParams.utm_medium;
-      entry.utmMedium = eventParams.utmMedium;
-    }
-    if (eventParams.utm_campaign) {
-      entry.utm_campaign = eventParams.utm_campaign;
-      entry.utmCampaign = eventParams.utmCampaign;
-    }
-    if (eventParams.utm_term) {
-      entry.utm_term = eventParams.utm_term;
-      entry.utmTerm = eventParams.utmTerm;
-    }
-    if (eventParams.utm_content) {
-      entry.utm_content = eventParams.utm_content;
-      entry.utmContent = eventParams.utmContent;
-    }
-
-    window.dataLayer.push(entry);
-    window.dataLayer.push({ eventParams: undefined });
-  }
-
-  __agyRecordPageView();
-
-  window.glueCookieNotificationBarLoaded = function () {
-    if (window.__agyGtmLoaded) return;
-    window.__agyGtmLoaded = true;
-    (function (w, d, s, l, i) {
-      w[l] = w[l] || [];
-      w[l].push({
-        'gtm.start': new Date().getTime(),
-        event: 'gtm.js',
-      });
-      const f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s),
-        dl = l != 'dataLayer' ? '&l=' + l : '';
-      j.async = true;
-      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-      f.parentNode.insertBefore(j, f);
-    })(window, document, 'script', 'dataLayer', 'GTM-M4N2ZKXQ');
-    __agyRecordPageView();
-  };
-
-  document.addEventListener('astro:page-load', function () {
-    __agyRecordPageView();
-  });
-</script><script type="module" src="/_astro/AnalyticsBootstrap.astro_astro_type_script_index_0_lang.BtyBE0kN.js"></script><script defer src="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.js" data-glue-cookie-notification-bar-category="2A" data-glue-cookie-notification-bar-language="" data-glue-cookie-notification-bar-site-id=""></script>\<script\>
-	window.StarlightThemeProvider = (() => {
-		const storedTheme =
-			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
-		const theme =
-			storedTheme ||
-			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
-		return {
-			updatePickers(theme = storedTheme || 'auto') {
-				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
-					const select = picker.querySelector('select');
-					if (select) select.value = theme;
-					/** @type {HTMLTemplateElement | null} */
-					const tmpl = document.querySelector(`#theme-icons`);
-					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
-					if (newIcon) {
-						const oldIcon = picker.querySelector('svg.label-icon');
-						if (oldIcon) {
-							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
-						}
-					}
-				});
-			},
-		};
-	})();
-</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/_astro/index.CDMXz1pZ.css">\<style\>@layer starlight.components{svg:where(.astro-jlnlh7vs){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em}}
-</style><link rel="stylesheet" href="/_astro/AnnouncementPill.ubgfVsjK.css">\<style\>.button{font-size:var(--base-size);line-height:var(--cta-line-height);letter-spacing:var(--cta-letter-spacing);border-radius:var(--shape-corner-rounded,999px);cursor:pointer;text-align:center;border:1px solid #0000;justify-content:center;align-self:flex-start;align-items:center;height:fit-content;padding:10px 24px;font-family:Google Sans Flex,sans-serif;font-weight:450;text-decoration:none;transition:all .15s ease-out;display:inline-flex}.button span{text-decoration:none}.button .icon{color:currentColor;margin:0 var(--space-sm) 0 0;flex-shrink:0;align-items:center;line-height:0;display:inline-flex}.button:disabled{cursor:not-allowed}.button-primary{background:var(--theme-primary-primary,#1a73e8);color:var(--theme-primary-on-primary,#fff)}.button-primary:hover,.button-primary:focus-visible{background:var(--theme-button-states-primary-hovered,#1557b0);outline:none}.button-primary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-primary-inverse{background:var(--palette-grey-0);color:var(--palette-grey-1200)}.button-primary-inverse:hover,.button-primary-inverse:focus-visible{background:var(--theme-surface-surface-container-high);outline:none}.button-primary-inverse:active{background:var(--theme-surface-surface-container-high)}.button-primary-inverse:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary{color:var(--theme-surface-on-surface);background:var(--theme-secondary-button);backdrop-filter:blur(6px);border:1px solid var(--theme-outline-variant)}.button-secondary:hover,.button-secondary:focus-visible{background:var(--theme-button-secondary-hover);outline:none}.button-secondary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary-inverse{color:var(--theme-surface-surface);background:var(--theme-nav-button-hover);backdrop-filter:blur(8px);border:1px solid var(--theme-inverse-outline-variant)}.button-secondary-inverse:hover,.button-secondary-inverse:focus-visible{background:var(--theme-button-secondary-inverse-hover);outline:none}.button-secondary-inverse:disabled{background:var(--palette-grey-1100);color:var(--palette-grey-50-20)}.button-text,.button-nav{background:0 0}.button-text{color:var(--theme-text-on-text)}.button-text:hover,.button-text:focus-visible{background:var(--theme-button-states-hovered);outline:none}.button-text:active{background:var(--theme-button-states-pressed)}.button-text:disabled{color:var(--theme-button-states-on-disabled)}.button-compact{min-block-size:36px;padding:6px 16px}.download-button,.button-nav{font-size:var(--cta-sm-size);line-height:var(--cta-sm-line-height);letter-spacing:var(--cta-sm-letter-spacing);font-weight:450}.button-nav{color:var(--theme-surface-on-surface-variant)}.button-nav:hover,.button-nav:focus-visible{color:#000;background:var(--theme-nav-button-hover);outline:none}@media (width<=767px){.button-nav{width:100%}}.dropdown-nav{padding-right:8px}.dropdown-icon,.play-icon{letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;-webkit-font-smoothing:antialiased;text-rendering:optimizelegibility;font-feature-settings:"liga";-webkit-font-feature-settings:"liga";font-variation-settings:"FILL" 0, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48;margin:0 0 0 var(--space-xs);transition:transform .3s all;direction:ltr;flex-shrink:0;justify-content:center;align-items:center;font-family:Google Symbols;font-size:1.5em;font-weight:300;line-height:1;display:inline-flex}.dropdown-icon svg,.play-icon svg{fill:currentColor;display:block}.button.dropdown-open .dropdown-icon,.button[aria-expanded=true] .dropdown-icon,.dropdown-open>.dropdown-icon{transform:rotate(-180deg)}.play-icon{font-variation-settings:"FILL" 1, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48}@media (width<=1024px){.nav-button{padding:var(--space-md);width:100%}}
-</style><script type="module" src="/_astro/page.LAbJoB63.js"></script>\<style\>@layer starlight.components{.card:where(.astro-tjfwtz2t){--sl-card-border:var(--sl-color-purple);--sl-card-bg:var(--sl-color-purple-low);border:1px solid var(--sl-color-gray-5);background-color:var(--sl-color-black);flex-direction:column;gap:clamp(.5rem,.125rem + 1vw,1rem);padding:clamp(1rem,.125rem + 3vw,2.5rem)}.card:where(.astro-tjfwtz2t):nth-child(4n+1){--sl-card-border:var(--sl-color-orange);--sl-card-bg:var(--sl-color-orange-low)}.card:where(.astro-tjfwtz2t):nth-child(4n+3){--sl-card-border:var(--sl-color-green);--sl-card-bg:var(--sl-color-green-low)}.card:where(.astro-tjfwtz2t):nth-child(4n+4){--sl-card-border:var(--sl-color-red);--sl-card-bg:var(--sl-color-red-low)}.card:where(.astro-tjfwtz2t):nth-child(4n+5){--sl-card-border:var(--sl-color-blue);--sl-card-bg:var(--sl-color-blue-low)}.title:where(.astro-tjfwtz2t){font-weight:600;font-size:var(--sl-text-h4);color:var(--sl-color-white);line-height:var(--sl-line-height-headings);align-items:center;gap:1rem}.card:where(.astro-tjfwtz2t) .icon:where(.astro-tjfwtz2t){border:1px solid var(--sl-card-border);background-color:var(--sl-card-bg);border-radius:.25rem;flex-shrink:0;padding:.2em}.card:where(.astro-tjfwtz2t) .body:where(.astro-tjfwtz2t){font-size:clamp(var(--sl-text-sm), calc(.5rem + 1vw), var(--sl-text-body));margin:0}}
-</style>\<style\>@layer starlight.components{.card-grid:where(.astro-5njella6){grid-template-columns:100%;gap:1rem;display:grid}.card-grid:where(.astro-5njella6)>*{margin-top:0!important}@media (width>=50rem){.card-grid:where(.astro-5njella6){grid-template-columns:1fr 1fr;gap:1.5rem}.stagger:where(.astro-5njella6){--stagger-height:5rem;padding-bottom:var(--stagger-height)}.stagger:where(.astro-5njella6)>:nth-child(2n){transform:translateY(var(--stagger-height))}}}
-</style>\<style\>@layer starlight.components{.sl-link-card:where(.astro-3i5abahx){border:1px solid var(--sl-color-gray-5);box-shadow:var(--sl-shadow-sm);border-radius:.5rem;grid-template-columns:1fr auto;gap:.5rem;padding:1rem;display:grid;position:relative}a:where(.astro-3i5abahx){line-height:var(--sl-line-height-headings);text-decoration:none}a:where(.astro-3i5abahx):before{content:"";position:absolute;inset:0}.stack:where(.astro-3i5abahx){flex-direction:column;gap:.5rem}.title:where(.astro-3i5abahx){color:var(--sl-color-white);font-weight:600;font-size:var(--sl-text-lg)}.description:where(.astro-3i5abahx){color:var(--sl-color-gray-3);line-height:1.5}.icon:where(.astro-3i5abahx){color:var(--sl-color-gray-3)}.sl-link-card:where(.astro-3i5abahx):hover{background:var(--sl-color-gray-7,var(--sl-color-gray-6));border-color:var(--sl-color-gray-2)}.sl-link-card:where(.astro-3i5abahx):hover .icon:where(.astro-3i5abahx){color:var(--sl-color-white)}}
-</style>\<style\>@layer starlight.components{.sl-steps{--bullet-size:calc(var(--sl-line-height) * 1rem);--bullet-margin:.375rem;counter-reset:steps-counter var(--sl-steps-start,0);padding-inline-start:0;list-style:none}.sl-steps>li{counter-increment:steps-counter;padding-inline-start:calc(var(--bullet-size) + 1rem);min-height:calc(var(--bullet-size) + var(--bullet-margin));padding-bottom:1px;position:relative}.sl-steps>li+li{margin-top:0}.sl-steps>li:before{content:counter(steps-counter);top:0;width:var(--bullet-size);height:var(--bullet-size);line-height:var(--bullet-size);font-size:var(--sl-text-xs);text-align:center;color:var(--sl-color-white);background-color:var(--sl-color-gray-6);box-shadow:inset 0 0 0 1px var(--sl-color-gray-5);border-radius:99rem;font-weight:600;position:absolute;inset-inline-start:0}.sl-steps>li:after{--guide-width:1px;content:"";top:calc(var(--bullet-size) + var(--bullet-margin));bottom:var(--bullet-margin);width:var(--guide-width);background-color:var(--sl-color-hairline-light);position:absolute;inset-inline-start:calc((var(--bullet-size) - var(--guide-width)) / 2)}}@layer starlight.content{.sl-steps>li>:first-child{--lh:calc(1em * var(--sl-line-height));--shift-y:calc(.5 * (var(--bullet-size) - var(--lh)));transform:translateY(var(--shift-y));margin-bottom:var(--shift-y)}.sl-steps>li>:first-child:where(h1,h2,h3,h4,h5,h6){--lh:calc(1em * var(--sl-line-height-headings))}@supports (--prop:1lh){.sl-steps>li>:first-child{--lh:1lh}}}
-</style>\<style\>@layer starlight.components{starlight-tabs:where(.astro-53dtxyig){display:block}.tablist-wrapper:where(.astro-53dtxyig){overflow-x:auto}:where(.astro-53dtxyig)[role=tablist]{border-bottom:2px solid var(--sl-color-gray-5);padding:0;list-style:none;display:flex}.tab:where(.astro-53dtxyig){display:flex}.tab:where(.astro-53dtxyig)>:where(.astro-53dtxyig)[role=tab]{--sl-tab-color-border:var(--sl-color-gray-5);line-height:var(--sl-line-height-headings);box-shadow:0 2px 0 var(--sl-tab-color-border);color:var(--sl-color-gray-3);outline-offset:var(--sl-outline-offset-inside);overflow-wrap:initial;align-items:center;gap:.5rem;padding:.275rem 1.25rem;text-decoration:none;display:flex}.tab:where(.astro-53dtxyig) :where(.astro-53dtxyig)[role=tab][aria-selected=true]{--sl-tab-color-border:var(--sl-color-text-accent);color:var(--sl-color-white);font-weight:600}.tablist-wrapper:where(.astro-53dtxyig)~[role=tabpanel]{margin-top:1rem}}
-</style></head><body class="astro-c37k36qc"><a class="sl-skip-link astro-kgjdphe6" href="#_top">Skip to content</a><div class="page sl-flex astro-mruzmsw7"><header class="header astro-mruzmsw7"><div class="header-stack astro-mtusqnhg" data-analytics-nav="docs_header"><!-- Row 1: Logo and Search / Controls --><div class="header-main astro-mtusqnhg"><div class="title-wrapper sl-flex astro-mtusqnhg"><a href="/" class="site-title sl-flex astro-3woganpc"><img class="light:sl-hidden print:hidden astro-3woganpc" alt src="/_astro/antigravity_product_lockup_dark.YcYY_PSr.svg" width="1687" height="217"><img class="dark:sl-hidden print:block astro-3woganpc" alt src="/_astro/antigravity_product_lockup_full_color.cUD_Se6a.svg" width="1687" height="217"><span class="sr-only astro-3woganpc" translate="no">Google Antigravity Docs</span></a></div><div class="sl-flex search-wrapper print:hidden astro-mtusqnhg"><site-search id="doc-search-root" class="agy-hybrid-search" data-i18n-ignore="true" data-index-version="6d6ec5be"><button type="button" data-open-modal id="doc-search-trigger" class="agy-search-trigger" aria-label="Search documentation" aria-keyshortcuts="Control+K Meta+K /"><span class="agy-search-trigger__left"><svg class="agy-search-trigger__icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span class="agy-search-trigger__text">Search<span class="agy-search-trigger__text-suffix"> docs...</span></span></span><kbd class="agy-search-trigger__kbd" aria-hidden="true">⌘K</kbd></button><dialog id="doc-search-modal" class="agy-search-dialog" aria-label="Search"><div class="dialog-frame sl-flex"><div id="starlight__search" class="agy-search-container"><div class="agy-search-header"><div class="agy-search-input-wrap"><svg class="agy-search-input-icon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input id="doc-search-input" class="pagefind-ui__search-input" type="search" placeholder="Search documentation..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Search documentation" aria-controls="doc-search-results-list"><button type="button" class="agy-search-clear" data-clear-search hidden aria-label="Clear search query" title="Clear search"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></button></div><div class="agy-search-header__actions"><button type="button" class="agy-shortcuts-toggle agy-search-help-btn" data-toggle-shortcuts aria-expanded="false" aria-controls="doc-search-shortcuts-panel" aria-label="Keyboard shortcuts" title="Keyboard shortcuts"><span aria-hidden="true">?</span></button><button type="button" data-close-modal class="agy-search-close" aria-label="Close search"><span class="agy-search-close__kbd" aria-hidden="true">ESC</span><span class="agy-search-close__touch" aria-hidden="true">Cancel</span></button></div></div><div class="agy-search-filters" role="toolbar" aria-label="Filter results by product surface"><button type="button" class="agy-surface-pill active" data-surface-filter="all" data-surface-label="All" aria-pressed="true"><span class="agy-surface-pill__label">All</span></button><button type="button" class="agy-surface-pill" data-surface-filter="2-0" data-surface-label="Antigravity App" aria-pressed="false"><span class="agy-surface-pill__label">App</span><span class="agy-surface-pill__mute" data-exclude-surface="2-0" aria-hidden="true" title="Exclude Antigravity App from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="cli" data-surface-label="Antigravity CLI" aria-pressed="false"><span class="agy-surface-pill__label">CLI</span><span class="agy-surface-pill__mute" data-exclude-surface="cli" aria-hidden="true" title="Exclude Antigravity CLI from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="antigravity-ide" data-surface-label="Antigravity IDE" aria-pressed="false"><span class="agy-surface-pill__label">IDE</span><span class="agy-surface-pill__mute" data-exclude-surface="antigravity-ide" aria-hidden="true" title="Exclude Antigravity IDE from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="ide" data-surface-label="IDE Extensions" aria-pressed="false"><span class="agy-surface-pill__label">Extensions</span><span class="agy-surface-pill__mute" data-exclude-surface="ide" aria-hidden="true" title="Exclude IDE Extensions from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="sdk" data-surface-label="Antigravity SDK" aria-pressed="false"><span class="agy-surface-pill__label">SDK</span><span class="agy-surface-pill__mute" data-exclude-surface="sdk" aria-hidden="true" title="Exclude Antigravity SDK from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="blog" data-surface-label="Blog" aria-pressed="false"><span class="agy-surface-pill__label">Blog</span><span class="agy-surface-pill__mute" data-exclude-surface="blog" aria-hidden="true" title="Exclude Blog from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="releases" data-surface-label="Releases" aria-pressed="false"><span class="agy-surface-pill__label">Releases</span><span class="agy-surface-pill__mute" data-exclude-surface="releases" aria-hidden="true" title="Exclude Releases from results">×</span></button></div><div id="doc-search-status" class="agy-search-status" data-search-status data-i18n-ignore="true" role="status" aria-live="polite" aria-atomic="true" hidden></div><div id="doc-search-results" class="pagefind-ui__results-area agy-search-results-area" data-results-container data-i18n-ignore="true"><div class="agy-search-suggestions" data-search-suggestions><p class="agy-search-suggestions__heading" data-discovery-heading>Explore Antigravity</p><div class="agy-discover-grid" data-discovery-grid><a class="agy-discover-card agy-search-card" data-doc-card="getting-started" href="/docs/getting-started/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Getting Started</span><span class="agy-discover-card__desc agy-search-card-desc">Install & launch your first agent</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="remote-control" href="/docs/remote-control/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Remote Control</span><span class="agy-discover-card__desc agy-search-card-desc">Drive desktop & CLI sessions from any browser</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="skills" href="/docs/skills/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Agent Skills & Rules</span><span class="agy-discover-card__desc agy-search-card-desc">Reusable workflows & workspace instructions</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="subagents" href="/docs/subagents/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Subagents & Teamwork</span><span class="agy-discover-card__desc agy-search-card-desc">Parallel multi-agent orchestration</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="sdk" href="/docs/sdk/overview/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Antigravity SDK</span><span class="agy-discover-card__desc agy-search-card-desc">Build custom Python agents & hooks</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="permissions" href="/docs/permissions/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Permissions & Sandbox</span><span class="agy-discover-card__desc agy-search-card-desc">File access controls & safe execution</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a></div><div class="agy-try-searching"><span class="agy-try-searching__label" data-try-searching-label>Try searching</span><div class="agy-try-searching__chips" data-suggestion-chips><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="Remote Control" data-query="Remote Control">Remote Control</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="agent skills" data-query="agent skills">Agent skills</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="custom subagents" data-query="custom subagents">Custom subagents</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="IDE extensions" data-query="IDE extensions">IDE extensions</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="sandbox permissions" data-query="sandbox permissions">Sandbox permissions</button></div></div></div><ol id="doc-search-results-list" class="pagefind-ui__results agy-search-results-list" data-results-list data-i18n-ignore="true"></ol></div><div class="agy-related-topics" data-related-topics data-i18n-ignore="true" hidden></div><div id="doc-search-shortcuts-panel" class="agy-search-footer agy-search-help-popover" data-shortcuts-panel hidden><div class="agy-search-footer__hints"><span class="agy-footer-hint">\<kbd\>↑</kbd>\<kbd\>↓</kbd><span data-footer-hint="navigate">Navigate</span></span><span class="agy-footer-hint">\<kbd\>↵</kbd> <span data-footer-hint="open">Open</span></span><span class="agy-footer-hint">\<kbd\>esc</kbd> <span data-footer-hint="close">Close</span></span></div></div></div></div></dialog></site-search><script type="module" src="/_astro/SearchOverride.astro_astro_type_script_index_0_lang.B8vV1dU8.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-mtusqnhg"><div class="header-cta-group astro-mtusqnhg"><a class="top-nav-btn remote-control-btn astro-mtusqnhg" href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" title="Launch Remote Control"><span class="btn-icon astro-mtusqnhg" aria-hidden="true">🚀</span> Remote Control</a><a href="/download" class="call-to-action--nav button button-primary button-compact download-button dropdown-nav" aria-haspopup="false" aria-expanded="false" data-analytics-event="download-cta" data-module-name="header" data-page-position="main nav" class="astro-mtusqnhg"><span>Download</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.979 19.804 4.588 19.413C4.196 19.021 4.00067 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.804 19.021 19.413 19.413C19.021 19.804 18.55 20 18 20H6Z"></path></svg></span></a><script type="module">var e=/^\d+\.\d+\.\d+$/,t=/^\d+$/;function n(n){let r=Array.isArray(n)?n:n&&typeof n==`object`&&Array.isArray(n.versions)?n.versions:null;if(!r||r.length===0)return null;let i=r[0];if(!i||typeof i!=`object`)return null;let{version:a,execution_id:o}=i;return typeof a!=`string`||!e.test(a)||typeof o!=`string`||!t.test(o)?null:{version:a,executionId:o}}function r(e,t,n){let r=`https://storage.googleapis.com/antigravity-public/antigravity-hub/${e}-${t}`;return n===`darwin-arm`||n===`darwin-x64`?`${r}/${n}/Antigravity.dmg`:n===`windows-x64`?`${r}/windows-x64/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-x64.exe`}`:n===`windows-arm64`?`${r}/windows-arm/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-arm64.exe`}`:n===`linux-x64`?`${r}/linux-x64/Antigravity.tar.gz`:n===`linux-arm`?`${r}/linux-arm/Antigravity.tar.gz`:`${r}/${n}/Antigravity.dmg`}var i=null,a=null;async function o(){return i&&Date.now()-i.fetchedAt<3e5?i.build:a||(a=(async()=>{let e=new AbortController,t=setTimeout(()=>e.abort(),8e3);try{let t=await fetch(`https://antigravity-hub-auto-updater-974169037036.us-central1.run.app/releases`,{cache:`no-store`,signal:e.signal});if(!t.ok)return null;let r=n(await t.json());return r&&(i={build:r,fetchedAt:Date.now()}),r}catch{return null}finally{clearTimeout(t),a=null}})(),a)}function s(e,t=document){t.querySelectorAll(`a[data-hub-platform]`).forEach(t=>{let n=t.getAttribute(`data-hub-platform`);n&&(t.href=r(e.version,e.executionId,n),t.setAttribute(`data-hub-version`,e.version))}),t.querySelectorAll(`[data-hub-latest-version]`).forEach(t=>{t.textContent=`v${e.version}`})}async function c(){if(!document.querySelector(`a[data-hub-platform]`))return;let e=await o();e&&s(e)}function l(){document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,()=>{c()}):c(),document.addEventListener(`astro:page-load`,()=>{c()})}l();</script></div><div class="sl-flex social-icons astro-mtusqnhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-ebngfqm6"><span class="sr-only astro-ebngfqm6">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-ebngfqm6"><option value="dark" class="astro-ebngfqm6">Dark</option><option value="light" class="astro-ebngfqm6">Light</option><option value="auto" selected class="astro-ebngfqm6">Auto</option></select><svg aria-hidden="true" class="icon caret astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
-	StarlightThemeProvider.updatePickers();
-</script><script type="module">var e=`starlight-theme`,t=e=>e===`auto`||e===`dark`||e===`light`?e:`auto`,n=()=>t(typeof localStorage<`u`&&localStorage.getItem(e));function r(t){typeof localStorage<`u`&&localStorage.setItem(e,t===`light`||t===`dark`?t:``)}var i=()=>matchMedia(`(prefers-color-scheme: light)`).matches?`light`:`dark`;function a(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e===`auto`?i():e,r(e)}matchMedia(`(prefers-color-scheme: light)`).addEventListener(`change`,()=>{n()===`auto`&&a(`auto`)});var o=class extends HTMLElement{constructor(){super(),a(n()),this.querySelector(`select`)?.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&a(t(e.currentTarget.value))})}};customElements.define(`starlight-theme-select`,o);</script></div><div class="sl-flex print:hidden docs-lang-wrapper astro-mtusqnhg"><div class="language-selector docs-language-selector astro-mtusqnhg astro-fe4j42sm" data-language-selector data-custom-select-wrapper="language" data-custom-select-open="false" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language"><span class="language-selector__icon astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><circle cx="12" cy="12" r="10" class="astro-fe4j42sm"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" class="astro-fe4j42sm"></path><path d="M2 12h20" class="astro-fe4j42sm"></path></svg></span><span class="language-selector__code astro-fe4j42sm" data-language-code aria-hidden="true" translate="no">EN</span><span class="language-selector__chevron astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><polyline points="6 9 12 15 18 9" class="astro-fe4j42sm"></polyline></svg></span><select class="language-selector__select astro-fe4j42sm" data-language-select tabindex="-1" aria-label="Select language" title="English (United States)"><option value="en-US" selected class="astro-fe4j42sm">English (United States)</option><option value="id" class="astro-fe4j42sm">Bahasa Indonesia (Indonesia)</option><option value="de" class="astro-fe4j42sm">Deutsch (Deutschland)</option><option value="en-CA" class="astro-fe4j42sm">English (Canada)</option><option value="en-GB" class="astro-fe4j42sm">English (United Kingdom)</option><option value="es-ES" class="astro-fe4j42sm">Español (España)</option><option value="es-MX" class="astro-fe4j42sm">Español (México)</option><option value="fr-FR" class="astro-fe4j42sm">Français (France)</option><option value="it" class="astro-fe4j42sm">Italiano (Italia)</option><option value="pl" class="astro-fe4j42sm">Polski (Polska)</option><option value="pt-BR" class="astro-fe4j42sm">Português (Brasil)</option><option value="hi" class="astro-fe4j42sm">हिन्दी (भारत)</option><option value="th" class="astro-fe4j42sm">ไทย (ประเทศไทย)</option><option value="ja" class="astro-fe4j42sm">日本語 (日本)</option><option value="zh-CN" class="astro-fe4j42sm">简体中文 (中国)</option><option value="zh-TW" class="astro-fe4j42sm">繁體中文 (台灣)</option><option value="ko" class="astro-fe4j42sm">한국어 (대한민국)</option></select></div>\<script\>
-  (function () {
-    try {
-      var valid = [
-        'en-US',
-        'id',
-        'de',
-        'en-CA',
-        'en-GB',
-        'es-ES',
-        'es-MX',
-        'fr-FR',
-        'it',
-        'pl',
-        'pt-BR',
-        'hi',
-        'th',
-        'ja',
-        'zh-CN',
-        'zh-TW',
-        'ko',
-      ];
-      var shortLabels = {
-        'en-US': 'EN',
-        'en-GB': 'EN-GB',
-        'en-CA': 'EN-CA',
-        hi: 'HI',
-        ja: 'JA',
-        ko: 'KO',
-        'zh-CN': 'ZH-CN',
-        'zh-TW': 'ZH-TW',
-        id: 'ID',
-        th: 'TH',
-        de: 'DE',
-        'fr-FR': 'FR',
-        it: 'IT',
-        pl: 'PL',
-        'pt-BR': 'PT',
-        'es-ES': 'ES',
-        'es-MX': 'ES-MX',
-      };
-      var active = window.__agyActiveLocale;
-      if (!active) {
-        var stored = window.localStorage.getItem('antigravity_locale');
-        active = 'en-US';
-        if (stored !== null) {
-          if (valid.indexOf(stored) !== -1) {
-            active = stored;
-          } else {
-            window.localStorage.setItem('antigravity_locale', 'en-US');
-            active = 'en-US';
-          }
-        } else {
-          var langs =
-            navigator.languages && navigator.languages.length
-              ? navigator.languages
-              : [navigator.language || 'en-US'];
-          for (var i = 0; i < langs.length; i++) {
-            var raw = String(langs[i] || '')
-              .trim()
-              .replace(/_/g, '-');
-            if (!raw) continue;
-            var lower = raw.toLowerCase();
-            var exactIdx = -1;
-            for (var j = 0; j < valid.length; j++) {
-              if (valid[j].toLowerCase() === lower) {
-                exactIdx = j;
-                break;
-              }
-            }
-            if (exactIdx !== -1) {
-              active = valid[exactIdx];
-              break;
-            }
-            var parts = lower.split('-');
-            var base = parts[0];
-            var subtag = parts[1] || '';
-            var region = parts[2] || subtag;
-            if (base === 'zh') {
-              active =
-                subtag === 'tw' ||
-                subtag === 'hk' ||
-                subtag === 'mo' ||
-                subtag === 'hant' ||
-                region === 'tw' ||
-                region === 'hk' ||
-                region === 'mo'
-                  ? 'zh-TW'
-                  : 'zh-CN';
-              break;
-            }
-            if (base === 'id' || base === 'in') {
-              active = 'id';
-              break;
-            }
-            if (base === 'th') {
-              active = 'th';
-              break;
-            }
-            if (base === 'it') {
-              active = 'it';
-              break;
-            }
-            if (base === 'pl') {
-              active = 'pl';
-              break;
-            }
-            if (base === 'es') {
-              active = subtag === 'es' ? 'es-ES' : 'es-MX';
-              break;
-            }
-            if (base === 'pt') {
-              active = 'pt-BR';
-              break;
-            }
-            if (base === 'fr') {
-              active = 'fr-FR';
-              break;
-            }
-            if (base === 'de') {
-              active = 'de';
-              break;
-            }
-            if (base === 'ja') {
-              active = 'ja';
-              break;
-            }
-            if (base === 'ko') {
-              active = 'ko';
-              break;
-            }
-            if (base === 'hi') {
-              active = 'hi';
-              break;
-            }
-            if (base === 'en') {
-              active =
-                subtag === 'gb' ||
-                subtag === 'uk' ||
-                subtag === 'au' ||
-                subtag === 'nz' ||
-                subtag === 'ie'
-                  ? 'en-GB'
-                  : subtag === 'ca'
-                    ? 'en-CA'
-                    : 'en-US';
-              break;
-            }
-          }
-          if (active !== 'en-US') {
-            window.localStorage.setItem('antigravity_locale', active);
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-              event: 'language_auto_detect',
-              eventParams: {
-                locale: active,
-                browserLanguage: langs[0] || '',
-                pagePath: window.location.pathname,
-              },
-            });
-            window.dataLayer.push({ eventParams: undefined });
-          }
-        }
-        window.__agyActiveLocale = active;
-      }
-      if (document.documentElement.lang !== active) {
-        document.documentElement.lang = active;
-      }
-      var selects = document.querySelectorAll('select[data-language-select]');
-      for (var k = 0; k < selects.length; k++) {
-        if (selects[k].value !== active) {
-          selects[k].value = active;
-        }
-      }
-      var codes = document.querySelectorAll('[data-language-code]');
-      var shortCode = shortLabels[active] || 'EN';
-      for (var m = 0; m < codes.length; m++) {
-        if (codes[m].textContent !== shortCode) {
-          codes[m].textContent = shortCode;
-        }
-      }
-    } catch (e) {
-      document.documentElement.lang = 'en-US';
-    }
-  })();
-</script><script type="module" src="/_astro/LanguageSelector.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script></div></div><!-- Row 2: Subnav Bar below logo and controls (Get Started, Features, etc.) --><nav class="subnav-bar print:hidden astro-mtusqnhg" aria-label="Documentation sections"><div class="subnav-container astro-mtusqnhg"><div class="subnav-left astro-mtusqnhg"><a href="/docs/overview/" class="subnav-pill astro-mtusqnhg">Get Started</a><a href="/docs/features/" class="subnav-pill active astro-mtusqnhg" aria-current="page">Features</a><a href="/docs/sdk/overview/" class="subnav-pill astro-mtusqnhg">SDK</a></div><div class="subnav-right astro-mtusqnhg"><a href="/docs/changelog/" class="subnav-pill astro-mtusqnhg">Changelog</a><a href="/blog/" class="subnav-pill external-link blog-link astro-mtusqnhg">Blog <span class="arrow astro-mtusqnhg" aria-hidden="true">↗</span></a></div></div></nav><!-- Row 3: Dismissible Top Banners under Docs Menu --><div class="docs-top-banner-slot print:hidden astro-mtusqnhg" data-docs-announcement-slot="top-banner"><script type="module" src="/_astro/AnnouncementPill.astro_astro_type_script_index_0_lang.kU0csqlr.js"></script><div class="announcement-pill announcement-pill--surface-docs announcement-pill--host-docs announcement-pill--placement-top-banner announcement-pill--dark is-interactive astro-mtusqnhg astro-pyiv6lj6" role="region" aria-label="New announcement" data-announcement-pill data-pill-surface="docs" data-pill-host-surface="docs" data-pill-placement="top-banner" data-pill-variant="dark" data-pill-icon-name="spark" data-pill-badge="New" data-cta-text="Learn more" data-destination="/blog/gemini-4-argon-in-google-antigravity" data-pill-storage-key="agy_announcement_dismissed_docs" data-pill-fingerprint="New|Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity|/blog/gemini-4-argon-in-google-antigravity" data-pill-ttl-ms="604800000" data-analytics-event="announcement-pill" data-module-name="docs_top_banner" data-page-position="top-banner"><a href="/blog/gemini-4-argon-in-google-antigravity" class="pill-main-link astro-pyiv6lj6" data-pill-link><span class="pill-badge astro-pyiv6lj6" data-pill-badge><span class="pill-icon astro-pyiv6lj6" data-pill-icon aria-hidden="true"><svg class="pill-spark-icon astro-pyiv6lj6" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M8 0.5C8.5 4.6 11.4 7.5 15.5 8C11.4 8.5 8.5 11.4 8 15.5C7.5 11.4 4.6 8.5 0.5 8C4.6 7.5 7.5 4.6 8 0.5Z" fill="currentColor" class="astro-pyiv6lj6"></path></svg></span><span class="pill-badge-label astro-pyiv6lj6" data-pill-badge-label>New</span></span><span class="pill-text astro-pyiv6lj6" data-pill-text>Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity</span><span class="pill-cta astro-pyiv6lj6" data-pill-cta><span class="pill-cta-label astro-pyiv6lj6" data-pill-cta-label>Learn more</span><svg class="pill-arrow astro-pyiv6lj6" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="astro-pyiv6lj6"></path></svg></span></a><button type="button" class="pill-dismiss astro-pyiv6lj6" data-pill-dismiss data-analytics-event="" aria-label="Dismiss New announcement" title="Dismiss announcement"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true" class="astro-pyiv6lj6"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" class="astro-pyiv6lj6"></path></svg></button></div>\<script\>
-        (() => {
-          try {
-            const pills = document.querySelectorAll(
-              '[data-announcement-pill]:not([data-prechecked])',
-            );
-            pills.forEach((pill) => {
-              pill.setAttribute('data-prechecked', 'true');
-              const key = pill.getAttribute('data-pill-storage-key');
-              const fp = pill.getAttribute('data-pill-fingerprint');
-              if (!key) return;
-              const raw = window.localStorage.getItem(key);
-              if (!raw) return;
-              const parsed = JSON.parse(raw);
-              if (
-                parsed &&
-                parsed.fingerprint === fp &&
-                typeof parsed.expiresAt === 'number' &&
-                Date.now() < parsed.expiresAt
-              ) {
-                pill.hidden = true;
-                pill.setAttribute('data-pill-dismissed', 'true');
-              }
-            });
-
-            const homeSlot = document.querySelector('[data-home-banner-slot]');
-            if (homeSlot) {
-              const visibleHome = homeSlot.querySelectorAll(
-                '[data-announcement-pill]:not([hidden])',
-              );
-              if (visibleHome.length === 0) {
-                document.documentElement.style.setProperty(
-                  '--home-banner-offset',
-                  '0px',
-                );
-              } else {
-                const slotHeightPx = Math.ceil(
-                  homeSlot.getBoundingClientRect().height,
-                );
-                if (slotHeightPx > 0) {
-                  document.documentElement.style.setProperty(
-                    '--home-banner-offset',
-                    `${slotHeightPx}px`,
-                  );
-                }
-              }
-            }
-
-            const docsSlot = document.querySelector(
-              '[data-docs-announcement-slot="top-banner"]',
-            );
-            const docsHeader = document.querySelector('header.header');
-            if (docsSlot && docsHeader) {
-              const visibleDocs = docsSlot.querySelectorAll(
-                '[data-announcement-pill]:not([hidden])',
-              );
-              if (visibleDocs.length === 0) {
-                document.documentElement.style.removeProperty(
-                  '--sl-nav-height',
-                );
-              } else {
-                const headerHeightPx = Math.ceil(
-                  docsHeader.getBoundingClientRect().height,
-                );
-                if (headerHeightPx > 0) {
-                  document.documentElement.style.setProperty(
-                    '--sl-nav-height',
-                    `${headerHeightPx}px`,
-                    'important',
-                  );
-                }
-              }
-            }
-          } catch {}
-        })();
-      </script></div></div></header><nav class="sidebar print:hidden astro-mruzmsw7" aria-label="Main"><starlight-menu-button class="print:hidden astro-mwbvl5vk"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-mwbvl5vk"><svg aria-hidden="true" class="open-menu astro-mwbvl5vk astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-mwbvl5vk astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg></button></starlight-menu-button><script type="module">var e=class extends HTMLElement{btn=this.querySelector(`button`);constructor(){super(),this.btn.addEventListener(`click`,()=>this.toggleExpanded());let e=this.closest(`nav`);e&&e.addEventListener(`keyup`,e=>this.closeOnEscape(e)),matchMedia(`(min-width: 50em)`).addEventListener(`change`,()=>this.setExpanded(!1))}setExpanded(e){this.setAttribute(`aria-expanded`,String(e)),document.body.toggleAttribute(`data-mobile-menu-expanded`,e),document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}toggleExpanded(){this.setExpanded(this.getAttribute(`aria-expanded`)!==`true`)}closeOnEscape(e){e.code===`Escape`&&(this.setExpanded(!1),this.btn.focus())}};customElements.define(`starlight-menu-button`,e);</script><div id="starlight__sidebar" class="sidebar-pane astro-mruzmsw7"><div class="sidebar-content sl-flex astro-mruzmsw7"><div class="sidebar-wrapper astro-s3sbtxwf" data-default-section="features" data-analytics-nav="docs_sidebar"><sl-sidebar-state-persist data-hash="0jnks46" class="astro-guximn66"><script aria-hidden="true">
-		(() => {
-			try {
-				if (!matchMedia('(min-width: 50em)').matches) return;
-				/** @type {HTMLElement | null} */
-				const target = document.querySelector('sl-sidebar-state-persist');
-				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
-				if (!target || !state || target.dataset.hash !== state.hash) return;
-				window._starlightScrollRestore = state.scroll;
-				customElements.define(
-					'sl-sidebar-restore',
-					class SidebarRestore extends HTMLElement {
-						connectedCallback() {
-							try {
-								const idx = parseInt(this.dataset.index || '');
-								const details = this.closest('details');
-								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
-							} catch {}
-						}
-					}
-				);
-			} catch {}
-		})();
-	</script><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="get-started"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Get Started</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/overview/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/getting-started/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Quickstart</span></a></li><li class="astro-stlrkwvc"><a href="/docs/install/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Authenticate</span></a></li><li class="astro-stlrkwvc"><a href="/docs/models/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Choose a model</span></a></li><li class="astro-stlrkwvc"><a href="/docs/build-with-google/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Build with Google</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">IDE Extensions</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/vscode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual Studio Code</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/visual-studio/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual Studio</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/jetbrains/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">JetBrains IDEs</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/zed/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Zed</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/xcode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Xcode</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">CLI reference</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/reference/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI commands</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/features/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI features</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/using/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI settings and tips</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/troubleshooting/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI troubleshooting</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/best-practices/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI best practices</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/credits/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI AI credits</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Migrations</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/gcli-migration/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Gemini CLI</span></a></li><li class="astro-stlrkwvc"><a href="/docs/firebase-studio-migration/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Firebase Studio</span></a></li><li class="astro-stlrkwvc"><a href="/docs/migration/workflows-to-skills/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Workflows to Skills</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Resources</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/plans/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plans</span></a></li><li class="astro-stlrkwvc"><a href="/docs/enterprise/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Enterprise Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/faq/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">FAQ</span></a></li></ul></section></div><div class="sidebar-sections is-active astro-s3sbtxwf" data-sidebar-section="features"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">LEARN</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/features/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/remote-control/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Remote Control</span></a></li><li class="astro-stlrkwvc"><a href="/docs/marketplace/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Marketplace</span></a></li><li class="astro-stlrkwvc"><a href="/docs/plugins/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plugins</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sandbox/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Terminal sandbox</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/review-changes-editor/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Review changes</span></a></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Terminal</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/modes/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Execution modes</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/headless/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Headless mode</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/statusline/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Status line customization</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/title/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Terminal title customization</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details open class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Browser</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/browser/" aria-current="page" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/browser-recordings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Browser recordings</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/allowlist-denylist/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Allowlist and denylist</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/separate-chrome-profile/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Separate Chrome profile</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Artifacts</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/artifacts/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/implementation-plan/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Implementation plan</span></a></li><li class="astro-stlrkwvc"><a href="/docs/walkthrough/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Walkthrough</span></a></li><li class="astro-stlrkwvc"><a href="/docs/screenshots/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual screenshots</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/artifacts/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Reviewing artifacts (CLI)</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Projects</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/projects/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/prompting/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Prompting and interaction</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/conversations/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Managing conversations</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Permissions</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/permissions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Editor features</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/tab/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Tab completion</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/agent-side-panel/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent side panel</span></a></li><li class="astro-stlrkwvc"><a href="/docs/agent/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/tools/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Task groups</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Settings</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="6"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/settings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/agent-settings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent settings</span></a></li><li class="astro-stlrkwvc"><a href="/docs/artifact-review/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Artifact review</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/vim-editor-mode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Vim editor mode</span></a></li></ul></details></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">SLASH COMMANDS</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/slash-commands/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/agents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agents (/agents)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/boost/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Boost (/boost)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/browser/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Browser (/browser)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/btw/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Side question (/btw)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/changelog/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Changelog (/changelog)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/codesearch/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Code search (/codesearch)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/context/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Context (/context)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/credits/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">AI credits (/credits)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/diff/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Diff (/diff)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/effort/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Reasoning effort (/effort)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/goal/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Goal (/goal)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/learn/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Learn (/learn)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/permissions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Permissions (/permissions)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/plan/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plan (/plan)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/resume/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Resume (/resume)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/schedule/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Schedule (/schedule)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/statusline/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Status line (/statusline)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/teamwork/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Teamwork (/teamwork-preview)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/title/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Window title (/title)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/usage/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Model quotas (/usage)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/voice/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Voice dictation (/voice)</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">EXTEND</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/mcp/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">MCP</span></a></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Skills</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="7"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/skills/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent skills</span></a></li><li class="astro-stlrkwvc"><a href="/docs/rules/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Rules</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/workflows/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">IDE workflows</span></a></li></ul></details></li><li class="astro-stlrkwvc"><a href="/docs/subagents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Custom subagents</span></a></li><li class="astro-stlrkwvc"><a href="/docs/hooks/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Lifecycle hooks</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sidecars/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Sidecars</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="sdk"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">ANTIGRAVITY SDK</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/sdk/overview/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview and quickstart</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/local-models/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Local models</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/personas/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Personas</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/tools/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Tools and skills</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/mcp/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">MCP</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/policies/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Policies</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/subagents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Subagents</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/structured-output/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Structured output</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/lifecycle/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Lifecycle and hooks</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="changelog"></div><script aria-hidden="true">
-		(() => {
-			const scroller = document.getElementById('starlight__sidebar');
-			if (!window._starlightScrollRestore || !scroller) return;
-			scroller.scrollTop = window._starlightScrollRestore;
-			delete window._starlightScrollRestore;
-		})();
-	</script></sl-sidebar-state-persist><div class="md:sl-hidden astro-s3sbtxwf"><div class="mobile-preferences sl-flex astro-vpdi4hhg"><div class="social-icons astro-vpdi4hhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-ebngfqm6"><span class="sr-only astro-ebngfqm6">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-ebngfqm6"><option value="dark" class="astro-ebngfqm6">Dark</option><option value="light" class="astro-ebngfqm6">Light</option><option value="auto" selected class="astro-ebngfqm6">Auto</option></select><svg aria-hidden="true" class="icon caret astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
-	StarlightThemeProvider.updatePickers();
-</script><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></div></div></div></nav><div class="main-frame astro-mruzmsw7"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-ro3y4cfw"><aside class="right-sidebar-container print:hidden astro-ro3y4cfw"><div class="right-sidebar astro-ro3y4cfw"><div class="lg:sl-hidden astro-cnunmcpo"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-sgnutmzh"><nav aria-labelledby="starlight__on-this-page--mobile" data-analytics-nav="docs_toc" class="astro-sgnutmzh"><details id="starlight__mobile-toc" class="astro-sgnutmzh"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-sgnutmzh"><span class="toggle sl-flex astro-sgnutmzh">On this page<svg aria-hidden="true" class="caret astro-sgnutmzh" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="
-             m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1
-             1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002
-             1.002 0 0 0 0-1.42Z
-            " class="astro-sgnutmzh"></path></svg></span><span class="display-current astro-sgnutmzh"></span></summary><div class="dropdown astro-sgnutmzh"><ul class="isMobile astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#_top" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Overview</span></a></li><li class="astro-sgnutmzh"><a href="#core-mechanisms" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Core mechanisms</span></a></li><li class="astro-sgnutmzh"><a href="#deep-dive" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Deep dive</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){if(e===this._current)return;this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e;let t=this.querySelector(`.display-current`);t&&(t.textContent=e.textContent)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=this.querySelector(`details`),t=()=>{e&&e.open&&(e.open=!1)};if(e){let n=n=>{e.open&&(e.contains(n.target)||t())},r=n=>{n.key===`Escape`&&e.open&&(t(),e.querySelector(`summary`)?.focus())};window.addEventListener(`click`,n,{passive:!0}),window.addEventListener(`keydown`,r),this._cleanup.push(()=>{window.removeEventListener(`click`,n),window.removeEventListener(`keydown`,r)})}let n=Array.from(this.querySelectorAll(`a`));if(!n.length)return;let r=[],i=new Map,a=document.getElementById(`_top`);if(a){let e=n.find(e=>e.hash===`#_top`);if(e){i.set(`_top`,e);let t=e.closest(`li`);t&&r.push({link:e,li:t,heading:a,tabpanel:null,surfacePane:null})}}n.forEach(e=>{let t=decodeURIComponent(e.hash.slice(1));if(!t||t===`_top`)return;let n=document.getElementById(t),a=e.closest(`li`);if(n&&a){i.set(t,e);let o=n.closest(`[role="tabpanel"]`),s=n.closest(`.surface-pane`);r.push({link:e,li:a,heading:n,tabpanel:o,surfacePane:s})}});let o=e=>e?e.hidden||e.hasAttribute(`hidden`)||e.style.display===`none`:!1,s=e=>{if(!e)return!1;if(e.hidden||e.hasAttribute(`hidden`))return!0;if(e.style.display)return e.style.display===`none`;let t=e.getAttribute(`data-surface-pane`);return t?t!==`hub`:getComputedStyle(e).display===`none`},c=!1,l=()=>{c||(c=!0,requestAnimationFrame(u))},u=()=>{c=!1;let e=r.filter(e=>e.heading.id===`_top`||!e.heading.hidden&&e.heading.style.display!==`none`&&!o(e.tabpanel)&&!s(e.surfacePane));if(!e.length)return;let t=e[0];if(window.scrollY>10)for(let n of e)if(n.heading.getBoundingClientRect().top<=130)t=n;else break;let n=i.get(t.heading.id);n&&(this.current=n)},d=(e=!1)=>{r.forEach(e=>{let t=o(e.tabpanel)||s(e.surfacePane),n=t?`none`:``;e.li.style.display!==n&&(e.li.style.display=n),t?e.li.getAttribute(`data-tab-hidden`)!==`true`&&e.li.setAttribute(`data-tab-hidden`,`true`):e.li.hasAttribute(`data-tab-hidden`)&&e.li.removeAttribute(`data-tab-hidden`)}),e?u():l()},f=e=>{let n=e.target?.closest(`a`);if(!n||!this.contains(n))return;t();let r=decodeURIComponent(n.hash.slice(1));if(!r)return;let i=document.getElementById(r);if(i){let e=i.closest(`.surface-pane[data-surface-pane]`);if(e&&s(e)){let t=e.getAttribute(`data-surface-pane`);t&&(document.querySelector(`.surface-card-btn[data-surface-id="${t}"]`)?.click(),requestAnimationFrame(()=>{d()}))}let t=i.closest(`starlight-tabs [role="tabpanel"]`);if(t){let e=t.closest(`starlight-tabs`);if(e){let n=Array.from(e.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(t);n!==-1&&(e.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{d()}))}}}};this.addEventListener(`click`,f),this._cleanup.push(()=>{this.removeEventListener(`click`,f)});let p=document.querySelectorAll(`[role="tabpanel"], .surface-pane`);if(p.length>0){let e=0,t,n=()=>{e||=requestAnimationFrame(()=>{e=0,clearTimeout(t),t=setTimeout(()=>{d()},0)})};this._observer=new MutationObserver(n),p.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})}),document.addEventListener(`ag-surface-changed`,n),this._cleanup.push(()=>{document.removeEventListener(`ag-surface-changed`,n)})}this._onScroll=l,window.addEventListener(`scroll`,this._onScroll,{passive:!0}),d(!0)}};customElements.get(`mobile-starlight-toc`)||customElements.define(`mobile-starlight-toc`,e);</script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-cnunmcpo"><div class="sl-container astro-cnunmcpo"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page" data-analytics-nav="docs_toc"><h2 id="starlight__on-this-page">On this page</h2><ul class="starlight-toc-list">\<li\><a href="#_top"><span>Overview</span></a></li>\<li\><a href="#core-mechanisms"><span>Core mechanisms</span></a></li>\<li\><a href="#deep-dive"><span>Deep dive</span></a></li></ul></nav></starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){e!==this._current&&(this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=Array.from(this.querySelectorAll(`a`));if(!e.length)return;let t=[],n=new Map,r=document.getElementById(`_top`);if(r){let i=e.find(e=>e.hash===`#_top`);if(i){n.set(`_top`,i);let e=i.closest(`li`);e&&t.push({link:i,li:e,heading:r,tabpanel:null,surfacePane:null})}}e.forEach(e=>{let r=decodeURIComponent(e.hash.slice(1));if(!r||r===`_top`)return;let i=document.getElementById(r),a=e.closest(`li`);if(i&&a){n.set(r,e);let o=i.closest(`[role="tabpanel"]`),s=i.closest(`.surface-pane`);t.push({link:e,li:a,heading:i,tabpanel:o,surfacePane:s})}});let i=e=>e?e.hidden||e.hasAttribute(`hidden`)||e.style.display===`none`:!1,a=e=>{if(!e)return!1;if(e.hidden||e.hasAttribute(`hidden`))return!0;if(e.style.display)return e.style.display===`none`;let t=e.getAttribute(`data-surface-pane`);return t?t!==`hub`:getComputedStyle(e).display===`none`},o=!1,s=()=>{o||(o=!0,requestAnimationFrame(c))},c=()=>{if(o=!1,window.innerWidth<800||this.offsetParent===null)return;let e=t.filter(e=>e.heading.id===`_top`||!e.heading.hidden&&e.heading.style.display!==`none`&&!i(e.tabpanel)&&!a(e.surfacePane));if(!e.length)return;let r=e[0];if(window.scrollY>10)for(let t of e)if(t.heading.getBoundingClientRect().top<=130)r=t;else break;let s=n.get(r.heading.id);s&&(this.current=s)},l=(e=!1)=>{window.innerWidth<800||(t.forEach(e=>{let t=i(e.tabpanel)||a(e.surfacePane),n=t?`none`:``;e.li.style.display!==n&&(e.li.style.display=n),t?e.li.getAttribute(`data-tab-hidden`)!==`true`&&e.li.setAttribute(`data-tab-hidden`,`true`):e.li.hasAttribute(`data-tab-hidden`)&&e.li.removeAttribute(`data-tab-hidden`)}),e?c():s())},u=e=>{let t=e.target?.closest(`a`);if(!t||!this.contains(t))return;let n=decodeURIComponent(t.hash.slice(1));if(!n)return;let r=document.getElementById(n);if(r){let e=r.closest(`.surface-pane[data-surface-pane]`);if(e&&a(e)){let t=e.getAttribute(`data-surface-pane`);t&&(document.querySelector(`.surface-card-btn[data-surface-id="${t}"]`)?.click(),requestAnimationFrame(()=>{l()}))}let t=r.closest(`starlight-tabs [role="tabpanel"]`);if(t){let e=t.closest(`starlight-tabs`);if(e){let n=Array.from(e.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(t);n!==-1&&(e.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{l()}))}}}};this.addEventListener(`click`,u),this._cleanup.push(()=>{this.removeEventListener(`click`,u)});let d=document.querySelectorAll(`[role="tabpanel"], .surface-pane`);if(d.length>0){let e=0,t,n=()=>{e||=requestAnimationFrame(()=>{e=0,clearTimeout(t),t=setTimeout(()=>{l()},0)})};this._observer=new MutationObserver(n),d.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})}),document.addEventListener(`ag-surface-changed`,n),this._cleanup.push(()=>{document.removeEventListener(`ag-surface-changed`,n)})}this._onScroll=s,window.addEventListener(`scroll`,this._onScroll,{passive:!0}),l(!0)}};customElements.get(`starlight-toc`)||customElements.define(`starlight-toc`,e);</script></div></div></div></aside><div class="main-pane astro-ro3y4cfw"><main data-pagefind-body class="astro-c37k36qc" lang="en" dir="ltr"><div class="content-panel astro-7iy7a7c3"><div class="sl-container astro-7iy7a7c3"><div class="pagefind-search-meta sr-only astro-hkwnjoai" data-i18n-ignore="true"><span data-pagefind-meta="title" class="astro-hkwnjoai">Browser Overview - Antigravity IDE</span><span data-pagefind-meta="surface" class="astro-hkwnjoai">antigravity-ide</span><span data-pagefind-meta="surfaceLabel" class="astro-hkwnjoai">Antigravity IDE</span><span data-pagefind-meta="section" class="astro-hkwnjoai">Features</span><span data-pagefind-weight="6" class="astro-hkwnjoai">Browser Overview - Antigravity IDE Antigravity IDE Features</span><span data-pagefind-filter="surface:antigravity-ide" class="astro-hkwnjoai">Antigravity IDE</span></div><div class="breadcrumbs-row astro-hkwnjoai" data-pagefind-ignore><nav aria-label="Breadcrumb" class="starlight-breadcrumbs astro-hkwnjoai"><span class="breadcrumb-item  astro-hkwnjoai" title="Features">Features</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item  astro-hkwnjoai" title="Learn">Learn</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item  astro-hkwnjoai" title="Browser">Browser</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item breadcrumb-last astro-hkwnjoai" title="Overview">Overview</span></nav><div id="md-actions-root" class="markdown-dropdown-wrapper astro-pyacvpuh" data-pathname="/docs/ide/browser/"><button type="button" class="call-to-action--nav button button-primary button-compact markdown-trigger-btn dropdown-nav" aria-haspopup="true" aria-expanded="false" aria-label="Markdown Options" class="astro-pyacvpuh"><span>Markdown</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><div class="markdown-dropdown-menu astro-pyacvpuh" data-md-menu hidden><button type="button" class="markdown-menu-item astro-pyacvpuh" data-copy-md><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M318.46-230.77q-23.53,0-40.61-17.08t-17.08-40.61V-802.31q0-23.53 17.08-40.61T318.46-860H712.31q23.53,0 40.61,17.08T770-802.31v513.84q0,23.53-17.08,40.61t-40.61,17.08H318.46Zm0-45.38H712.31q4.62,0 8.46-3.85t3.85-8.46V-802.31q0-4.62-3.85-8.46t-8.46-3.85H318.46q-4.62,0-8.46,3.85t-3.85,8.46v513.84q0,4.62 3.85,8.46t8.46,3.85ZM207.69-120q-23.53,0-40.61-17.08T150-177.7V-736.92h45.38V-177.7q0,4.62 3.85,8.46t8.46,3.85H646.92V-120H207.69Zm98.46-156.15q0,0 0-3.85t0-8.46V-802.31q0-4.62 0-8.46t0-3.85q0,0 0,3.85t0,8.46v513.84q0,4.62 0,8.46t0,3.85Z"></path></svg><span class="item-label astro-pyacvpuh">Copy Markdown</span></button><a href="#" data-view-md-link target="_blank" rel="noopener noreferrer" class="markdown-menu-item astro-pyacvpuh"><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg><span class="item-label astro-pyacvpuh">View Markdown</span></a></div></div><script type="module">function e(){document.querySelectorAll(`.markdown-dropdown-wrapper`).forEach(e=>{if(e.dataset.mdInitialized===`true`)return;e.dataset.mdInitialized=`true`;let t=e.querySelector(`.markdown-trigger-btn, .button`),n=e.querySelector(`[data-md-menu]`),r=e.querySelector(`[data-copy-md]`),i=e.querySelector(`[data-view-md-link]`),a=`${(e.dataset.pathname||window.location.pathname).replace(/\/$/,``)}.md`;i&&(i.href=a),!(!t||!n)&&(t.addEventListener(`click`,e=>{e.stopPropagation(),n.hasAttribute(`hidden`)?(n.removeAttribute(`hidden`),t.setAttribute(`aria-expanded`,`true`)):(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))}),document.addEventListener(`click`,r=>{n.hasAttribute(`hidden`)||e.contains(r.target)||(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))},{passive:!0}),r&&r.addEventListener(`click`,async e=>{e.stopPropagation();let i=r.querySelector(`.item-label`),o=i?.textContent||`Copy Markdown`;try{i&&(i.textContent=`Fetching...`);let e=await fetch(a);if(!e.ok)throw Error(`Failed to fetch markdown: ${e.status}`);let r=await e.text(),s=new DOMParser().parseFromString(r,`text/html`).querySelector(`pre`),c=s?s.textContent||``:r;await navigator.clipboard.writeText(c),i&&(i.textContent=`Copied!`,setTimeout(()=>{i.textContent=o,n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`)},1200))}catch(e){console.error(`Error copying markdown:`,e),i&&(i.textContent=`Error copying`),setTimeout(()=>{i&&(i.textContent=o)},2e3)}}))})}document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,e):e(),document.addEventListener(`astro:page-load`,e);</script></div><div class="surface-chips-row not-content astro-hkwnjoai" data-pagefind-ignore><span class="surface-chips-label astro-hkwnjoai">Available on:</span><div class="surface-chips-list astro-hkwnjoai"><span class="surface-chip surface-chip-antigravity-ide astro-hkwnjoai"><svg class="surface-chip-icon astro-hkwnjoai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="2" class="astro-hkwnjoai"></rect><line x1="2" y1="9" x2="22" y2="9" class="astro-hkwnjoai"></line><polyline points="8 14 6 16 8 18" class="astro-hkwnjoai"></polyline><polyline points="16 14 18 16 16 18" class="astro-hkwnjoai"></polyline></svg><span class="astro-hkwnjoai">Antigravity IDE</span></span></div></div><script type="module" src="/_astro/StarlightPageTitleOverride.astro_astro_type_script_index_0_lang.D8WSbctB.js"></script></div></div><div class="content-panel astro-7iy7a7c3"><div class="sl-container astro-7iy7a7c3"><div class="sl-markdown-content"><div class="sl-heading-wrapper level-h1"><h1 id="browser-overview">Browser overview</h1><a class="sl-anchor-link" href="#browser-overview"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Browser overview”</span></a></div>
-<p>Google Antigravity can open, read, and actuate a local Chrome browser, enabling you to test development websites, read documentation sources, and automate a variety of browser tasks.</p>
-\<hr\>
-<div class="sl-heading-wrapper level-h2"><h2 id="core-mechanisms">Core mechanisms</h2><a class="sl-anchor-link" href="#core-mechanisms"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Core mechanisms”</span></a></div>
-<p>Using the specialized <a href="/docs/subagents">Browser Subagent</a>, Antigravity operates on browser tabs as needed, capturing screenshots and saving action videos as interactive artifacts.</p>
-<p>To completely disable browser tools, toggle the <strong>Browser Tools</strong> setting in the <strong>Browser</strong> section of the user settings.</p>
-\<hr\>
-<div class="sl-heading-wrapper level-h2"><h2 id="deep-dive">Deep dive</h2><a class="sl-anchor-link" href="#deep-dive"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Deep dive”</span></a></div>
-<p>Explore the key security and privacy features of Antigravity’s browser integration:</p>
-<div class="horizontal-cards"><article class="card sl-flex astro-tjfwtz2t"><p class="title sl-flex astro-tjfwtz2t"><svg aria-hidden="true" class="icon astro-tjfwtz2t astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M12 13a1.5 1.5 0 0 0-1 2.6V17a1 1 0 0 0 2 0v-1.4a1.5 1.5 0 0 0-1-2.6m5-4V7A5 5 0 0 0 7 7v2a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7a3 3 0 0 0-3-3M9 7a3 3 0 0 1 6 0v2H9Zm9 12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1Z"/></svg><span class="astro-tjfwtz2t">Allowlist and denylist</span></p><div class="body astro-tjfwtz2t"><p>Learn about the two-layer security model (denylist and allowlist) used to control URL access. <a href="/docs/ide/allowlist-denylist">Read the allowlist and denylist guide</a></p></div></article><article class="card sl-flex astro-tjfwtz2t"><p class="title sl-flex astro-tjfwtz2t"><svg aria-hidden="true" class="icon astro-tjfwtz2t astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M21.17 2.06A13.1 13.1 0 0 0 19 1.87a12.94 12.94 0 0 0-7 2.05 12.94 12.94 0 0 0-7-2 13.1 13.1 0 0 0-2.17.19 1 1 0 0 0-.83 1v12a1 1 0 0 0 1.17 1 10.9 10.9 0 0 1 8.25 1.91l.12.07h.11a.91.91 0 0 0 .7 0h.11l.12-.07A10.899 10.899 0 0 1 20.83 16 1 1 0 0 0 22 15V3a1 1 0 0 0-.83-.94ZM11 15.35a12.87 12.87 0 0 0-6-1.48H4v-10c.333-.02.667-.02 1 0a10.86 10.86 0 0 1 6 1.8v9.68Zm9-1.44h-1a12.87 12.87 0 0 0-6 1.48V5.67a10.86 10.86 0 0 1 6-1.8c.333-.02.667-.02 1 0v10.04Zm1.17 4.15a13.098 13.098 0 0 0-2.17-.19 12.94 12.94 0 0 0-7 2.05 12.94 12.94 0 0 0-7-2.05c-.727.003-1.453.066-2.17.19A1 1 0 0 0 2 19.21a1 1 0 0 0 1.17.79 10.9 10.9 0 0 1 8.25 1.91 1 1 0 0 0 1.16 0A10.9 10.9 0 0 1 20.83 20a1 1 0 0 0 1.17-.79 1 1 0 0 0-.83-1.15Z"/></svg><span class="astro-tjfwtz2t">Isolated profile</span></p><div class="body astro-tjfwtz2t"><p>Understand how the agent executes inside a completely separate Chrome profile to protect your personal data. <a href="/docs/ide/separate-chrome-profile">Read the isolated profile guide</a></p></div></article></div></div><footer class="sl-flex docs-footer docs-footer-wrapper astro-4mgpquaz" data-pagefind-ignore><div class="meta sl-flex astro-4mgpquaz"></div><div class="pagination-links print:hidden astro-qs5fwxza" dir="ltr"><a href="/docs/cli/title/" rel="prev" class="astro-qs5fwxza"><svg aria-hidden="true" class="astro-qs5fwxza astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-qs5fwxza">Previous<br class="astro-qs5fwxza"><span class="link-title astro-qs5fwxza">Terminal title customization</span></span></a><a href="/docs/ide/browser-recordings/" rel="next" class="astro-qs5fwxza"><svg aria-hidden="true" class="astro-qs5fwxza astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-qs5fwxza">Next<br class="astro-qs5fwxza"><span class="link-title astro-qs5fwxza">Browser recordings</span></span></a></div><nav class="docs-legal-nav print:hidden astro-4mgpquaz" data-analytics-nav="docs_footer" aria-label="Google legal and cookie links"><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/" target="_blank" rel="noopener noreferrer">About Google</a><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/products/" target="_blank" rel="noopener noreferrer">Google Products</a><a class="docs-footer-link astro-4mgpquaz" href="https://policies.google.com/privacy?hl=en-US" target="_blank" rel="noopener noreferrer">Privacy</a><a class="docs-footer-link astro-4mgpquaz" href="/terms">Terms</a><a aria-hidden="true" class="docs-footer-link glue-cookie-notification-bar-control astro-4mgpquaz">Manage cookies</a></nav></footer></div></div></main></div></div></div></div></body></html>
+s"e\,Gc!u,%Yc%Md:P
+@b7Njr!:`2i])%'` K:2z5*"pL	dNO4?ԅ3,>qӟO4[#]btFmboMYa5Dbs[GK&b5RKkF[~fL#TB\?DR!ovٮ
+PDFwٞ4/N-eKg:*)Gǝ{qI~y)lOb#ng8LCaz:.SSZ0襚UIyJIPV벢V5絫@5fϵOc8mP	Jl^ږ=9
+uY~f
+^iaٴ	GCG.=9ЧsZ/ؔu3d0Ð#i<x-\<ؓ 	kDv(<#KJ9lRYѿ+eʁ&eU&0}T0F(Y\rm3Tʞ2<TUU
+xє+/_Eew%4ѯ
+X*~sF$ʰQ+uP+W^պXe,wO)
+\B#BH|N%.|.d "Ƭw+&:_Vمْ[x-"`|Zph<D,Y:oP@^PJȍ%Xj{j,
+ִd>xpbdaGѧ?8=^7ߤrlHol5ا!lE
+h=QڡP"hĢ3s*7%ޑ
+ڔ!ܭAag>(3"䁏_}.kj1,ju酢˧ӕgW՟hpZy>Ac6t)uiоg7|BWQe AXh"S:v*exp``T޺NyڍRn:)VcU*VȮvO~	zI)e^D	t
+!ĞOa\O>Dxg#=h	J^1ˆQ7mdv0Q-Rocu$v0B`+u#82TT;Gj8\Q"ĥ*W!$_*8Ec	/gR_bpD~=]_o[J/EHG^oPN%3tFKb\e,lV}G|TY2j=(b5~S!"₎_Gl4%?LKP%&	
+Ny/?86g@]Y|#$b.$BR0H<1N
+4
+C2bo>TuS'Yyu]վEJJlѱkl??ޡ=}BI*@1&EB}
+/
+<Xe$҉d&rgzL+ڭ/U6S³n	핊8DfnE׶i"ʚmǉ%xȖ?*Uj{-0i9ojbв~"Vw[i(LlQ
+o/V	BkV[Z+u-'vjk',Xum-@!cRW#&p|g&!rMt?_f
+e{ꭁcw(OަFm"VZk]65`s[3Uo]o-aF-Pը)x(MTu%H(TRB!N+3b4v^Q4dSyA~E,j3#LZnsYru2V|+>lj_괭 ^ZM/?%'P&FɹY-j^QƵ>qi4;Ɗmńm	 㬻.OH+6ej[˲β8[,R@Ak~,89_5h5׾´QN_QiNfZ;gKC0:srFagFyp2i}kseGݶj#g1}veʪ<&gkUEҙe_XXrq=1ҵ{`wzptU޹2-E(c.E:
+0eO2!,HKe^"9vNk-h;w&gp\34|TdaD&g"H&v9#w.UI)>35+RjqgjL<QHS)>zoh)
+eS^Ym^ %1Ϸ3\
+HCJAqq}$P$!/q:&L)AƊ!m5.3 TIĦ>:,ww%8yiPPPÉ}.FyZFp":8@Uk]㖷oCH,-VǇ|SŲu!$1MQБ񙺪?n cGT.4o26tgKRUEB`>%&sPyqpi[mc4M0@|1|hOsM@t7;t%K1Z"kQQ}l-9J*"u`g9Nۂ4A R0-F?}^sJw[NTcYb\50TC{J#X+FiZ)X& 20δ5{r'g3)zSK.тhD;(msV73é\zESF_9\2R1Hu
+~UCY[_[.FRg]0>.ej3+^Vy4x4WkKaRͥkBH(-J8̍;=L,I:	trVu1/l:mAw.ApHpJB)/rpDKG6y%thRJ(şI)4xpSw`7]ϑi9#LWCK0oBW!GBOqDNiȡxj(	E\Ɲ
+}r7B<>R-t
+"uQCBS:_WFeA.R7>R8W$_R\9z$62KqCѵfU!ZA?/`l H) %O)Af'k6,g9m]lo
+EFh3$;RH#Ⱥen"R3twqƝgh]WDHC>Rwgჵ'.S"I╷Go6?))bgKް4B]8othpjdNcChN7AѤ"Ym/6z_kfUl\|2<q2pطR]ں\ش ,zƗn3<6rupo޷ի
+bS	0ϚġK	Aj3Xjy5,3T֯ZфXu._ȌMI<马q0ܢ^nJ,lٚ%9LNuql~fgzeANNGa/$ bXYOy 7z!-lH546+fw	Px0H2b-;ig!emZAXFZ`g
+BiIf-߼U5YȵR9=	~8]̙,*5xAF4Mќݚi|w`0n!鲠Ct"қK¤Z-b,oscIKybw),`׌BqRD>#ŚF5x({]=$/2ҶJe0k	a.}m0RO˞AJ/Wju([y8O7 W0^LO-
+>
+y6ˮG䃂!A~#18J0&iy*!2@>gaqay"	ƈDٶaZ[;E&r]T%{pHb݃O	{Yt//TozbLRfТ%%o!USݦLݤe|XI>gj1r'>!k2.;w0]8Fg%(LLhY{`_̇),e.Nrk޵3}#g'3Vq%SoO$	Ubμ2jG]86
+5,:uaf00gyLCnq* 8LsY*?E:vb7P+F	ʐ^5&b5h`>XV5$]ݣt]LgRN_E2yO98~v3pdDāY7{HWyuHQuK
+59&*@v.kͬ /]?}ӻ
+n`:1SFk:ĐiaCHhbf}FNxxHˬ!v=st$zbgeŧeJGI\I|iNyaļţ ^{^o&C`Coś[jauPuE!J:.#ۅd<9CwN=,9]Karj)6RT(דh5^K(!~J5~IR8Y6=(_H[K!r-H'k[\Jt,)@b;&mR>dѢ+gr\7T<)\;W7<]U`tqTd\CT!ɦqrA2ۄ8N(ju׿{[Z(ΛֳQBP[Ch8{Cޮ]|1cM8rYqX,BTy	}Cf5G˛]̠#Jf(35Gڃ7ጢaRuȮ$_+;=߆4:Y݁s[Ykz\#gQ')øY)Bwu(ҼbiVvHU䙁c<V٦6]ͯO!"=4=^lK{{C0b8`Q'_J9Q(<mG~*omڊ]
+eEx~yD6-z8jqMq?zِ9g-jq#*DHt59iA!zଲI
+".Ε"^{=iyHcJf2KCJYU&QW$sEkGeA[|kVeu0Lv<-\8n53?4D*iJ&Kp|s +`$(('H(R3p-Fw (!8?;V8jWf[T%HbX$<3dyqAx޼0w%R^0'TVA2JamRZrYB:x_wâ|m0|S$^E+i\JteQLҒ\UT`#
+J%f)])FGtup$Xye0E>17q,<SmE
+S0M+$ygYI/%bd\(&98cѶmz8
+-qŽYӣm||B lb?Pr1Ad-]>D6Jq;8DXNslX*n:l'2Pq}t+aʽQRd^0URNKn5ՎV6Q@RNCJv7]>	n
+ʢ.uqL4PSz)ђ,/x(鱯ljD}""Dyr#"}q"2GDQhQA^%\oNG\Q;3M1fy
+de|&eBɸxÚq#RiȘ^MC[`ݏBD!2G\HnN;ģ>
+:Mj_7rs^MATL)F	F\9_,)\b*U#8K	?n~R06L{!catObf/7C9FƦcd
+%P%}!%F8-Ǟg*쑛
+Xlso+cR"GQp=k^
+gӊ~k0nA"\=2n2#k=r	lr"9G$S%FbWb4k@R4V=l>A^68z(Nn)cG-t3$syz<KO(Xo02p]uv`>θ|hז3,#+	zv\L"5CUu+-nS`(kJ->8_S>K/g7 8!٥I744я?QPkh}t}:|x6Ƅ?nТH.3 9E^hqx0E4G&xq٧i'9qQ5G $jHA)&j Iפ֜%VM3T!RC_gc;+kZQH;,Z3iSYɥW
+4r.H/NMVv)q_{`\QAi%X&5n%@r**̖M=W"u{zAg_yK,R%HjRE/!XlmfDZe6kIme(mhٓd6¡d8f!҉)}8vӮ=a5<k7_ZE	4b^u%S61y)?Q!?Txf2[u 8Vgꛖ3Voi_6ts|7pi.́6BeHC\lķK%c4aez=ܣs{Ǖ5>u3u4.qԧ@}Ά(r
+XFdn<;dFaQTpO%fo4xJ9-O+4~pjMi1`LA
+$.(CfؑV2v`ș6=/qn
+"M )e
+]iZL=ӹ 6EBRHIrnvK!gO#PtAUDk#"Uo$z!uȍ@񷌇YQJCՄCn#ërqi@Vi8uE^\`\b>!4&tŕdLkRĤ6FrRv6\p\-7]jqk+BFas=nn+w֑4+Xi-o;k+H\l[7j"gkn6"/J(MY+ku,m,oek	m{uOD>I㮹b\ũbn!g+B	7/G.۷UqE<۹."۲P|aV]nz͚ƈT4xN2+\:^lp=wp<]٫V{CtqԝvP3zQկ'uC}- )<z	Kn"QErw//#?.Qu|ٰvntرJ[QjwM@a	pe6pKq3|Ml̓LgG(dyPZg.i.]bHڅP\dw֜=bVro_ (ݻ׭2jҽ,[8ql!i&]+Zp"JezPزp5v\;zXpUÆ9r(PӑW$DΝڝzsyEN:rc[ˍcXϸ_?@*_T;+ ]>Me\%ЄqG۷AB%ruR*^%.4i(.)R(!tuNԘ&j)2F[a{K0fׄwOzHH	ݫ@@7𫘜PjHlRkKc̓>G=̥GV1Om
+yI1{L{rvcFUS-KYR$S6iؽJ)1m?OĐHo#m_*?CPyRZ!Zla}7[ǆQx!>{
+#mש]SwN+MLqC>:ͫg,չPV5!G(0s|N;#[|9͌+GjПB.%jEkg(PϏ}]'7沰i$T{
+>^CVWd.Ys`.JKN0;-J!4dqp:Nǿ'fwVz=?D4whƝgav!iW\\B|`5T a%%uaC'#mf%~	Į4/˩Jkp>wg>_
+ubQgڿMK]IUiV؈OeW>EUZa	]>'XŚ=,Q/W1nڟ{+.)ǋk_KW2=rZ&Zu"O-vPLo{	hd%9<f~,*(%H܇_=#rlURHz)kKb*:Q쿧#j%PNejȫHٺč	Tc$C	/jIޯZ3g^18#5+Tać>T>Q_yҎZ4YgJcխҪr}'{iBx(
+&1rF1tG?#˚ǆ{{HB=/\ʬZW[̥]Kn8Xra3\뤬v=@]^3k_U+;<%c,5*dL_W|7]H3<zf^DT	a|QT4er	Voރp~[dLAp9kf`!
+WJL`FI5"P5IW̜Rj%W/qpQhvċQ<AHD1|F}5OVFv/wgi7gK, Qx'8Y0?	UτnLq{|j(%fCGY8AdvU<5<~%f&>3|{A,τXy.e	!̈́1ySǁT$΃ٽyhyyq0fo}ѷoDŷ߿_~΄f鷿woo?V	-n3?ʯ3|3p̈́oo(o/gou/?ox`2{se.\`m]]/ۂǑWurqX~u߷=A܃k2"޷W2_</i?8ͯ7w-*q1hHZGLMDN$|I:P[O~n9ϭ2KOx1:o2{N,=yhMx+k>,Ql	{iŎd.x\տ)ʳeַfY[oz
+hg	a$cP)+%pΜ#MSb# هC"5.ﴲd%\W/ŗ^YYWu{ǐE4lQ1eL1(vB^,?"pvc˼BLG.>M1Elş{q>|i~8wwԮrW_oZ!FSuMv886oj̾hƦRmtm=ICq&.ɖ'!a4Pie_"Dx"HdpW-od[Fl#|,LfFEN$ͷ8Zֳ)'8F%2AR-GQ+PpEaT:|HKP`{հ\P&rfA
+K!:^cC5%"++]]d6v`S	ZJNR$,K4(qE!`<g`XaІf<wtkoyyؓ%M"OSPN7l0Gݰl^߰6^x}S^߰<)6J]dzWBse/4ƴ*C`.ڈ2,n(oĽZWIQc=f#>j:p䫹i<^h șGR7'@  :[sz-wMHw;v\'|I{CStV@nPPK׹>O44vno'c_d~SRnr,u
+qQ\MMƺhyYV*|Lzd!ӦYA9ޤ[u84쟎uP8y"H7.B#egc+hzRɫtEr=VLtRh\X]2PZ^ˡ,
+ۏOC$`<!FEBp#Ґ@&)-У<Y.q7SJ_2LgdIԥpλt
++;{~v\ub7,.=#T>vGNhcK#*|Èrgո.քl#$-̞~sj#z-ӚV̀KHq*^43XTaJ"],gA
+H{23"*F,J6RKjXYHB$偄lj$X3*Mf.sYy(}_7f-GmAl(U9:!Z<@;T	>GaiDC9`x|g_L1tcAKYi|<e淘 `*;d4`.WC\#(H?5Jز kąիfzkJTKW"Btz)"^6A4F^'k÷k:rG1g8`#BG7fĽPm.|kR.K8@q:`ߛ}wpvL{[y5pKYcJ?+
+ˑ qFn\mBs
+Br$=:߳	K4a^4pG1>qlމ T})"t|[=W)zIt4W6p7&H"-=dVP3gt%ʞdDcf&VWf
+:iKǔybWey0GjV֚|]Cn>BDp@WDė	burC x}(5mM/ZPP~+o
+fЦc&V,da##ӄ\5>*&*9@ÍF9Xm	o_S"xjlY-w9ZL1OCl0/t]#-@\,鎛yYZxh3ˑͮJWlKsů-ME$	9 O:`Ǚ?]O@ACMLnZ!Ym|Ɩ)yTKzGh￩j6ͻXeJ?SEz=?$$45v*	'sQ|>񩴗YP'WT"2&5$H8%Hd%\q"_a3{l(PЉ>~URcd۷gqγ*)Hh8&:	g+K=4'aΡ`4(&RWt1#~*9шA5ٴLJbrߥm,`U2*h-l]C+vYvTǀuGf%WLuI,,ǻYZ6S|YrePq&9/"ǦZ2'$Ko$I`?~<A	EEJ~ӡam0iUkaujɴ)JySI@~7ΝԾ*i}Y6hc5&Z4&ֲ@Ιg@=y,/=e,]h_h^ P+XMK3aqLYN+4ΑXNДΏ+&NtT(vCL\ԽtD>,F-A0mC1Ehb	NډrERǈɲ˷Qŀe3،)&0gyaj\WڲRl}txHY&}sUXmx0dPnbu
+4M)0r[b5?8[tKj+;M6<$+aotڏou6Oj\i5իKU|Bq?JZHEe.Ix5qV~EϡQ:.?M.N1{Jq
+PΝg1T|*:2w_FǖǗا^tm6gJA5%ecH[kiX6WAݲHbu,Os)yޣ3rD0f1A>BBlB+=?q]7r9NxG5/9lpaosxfeH&|>ҵH%3+>ZuB᜖`<}"h$JcϏ!w7cvآ}p~@="($$fj&@ey9ao8+97	S*n[}FHE_ٕ/).AG`a<ɫ(BbrrdG%lBIWYfd'AoDp>X>i×Olbͳj~-نj6~S3e+߃xǧQ.OhOL7g?]H0e2ި5v-=YH:
+-%A|fkeK?dXFz}-YbhTu4%qL"'RJ.)(`M''#"RB.Y,H6-=#	PmGyiIC*Z/v)[)ii
+;ŞGQ
+KEMiIT`ciϒL[ՖGFjS>s{RVV朽ZPo}RiѽƠyo: 
+ߞM1e4f2^W`nKʡLm"G
+.~@K.4*&T6؅s?Bqٙމޘ0Cb5MXjSu[m\ہBeq$8#԰dB!G^3BpTBƔ+x3){䇛L՜?wA|J8%n@,Qsg*P&~; %{][
+0{'E'a>ޣ)O0݀~Eu|ORm>?Mv"Ԑdkm؇0 AӋ'PLe|&7,H#>>$7@,fT:P7!bCfHS HnY)`=MI'~@Ki
+E(sׄ9# 73O#\Hwu۩$/ͅI(vja[[y~(>Cª[͵
+;a'֟c}g,@~&>g+Ԇtvm}* o>ˍD#8}o|~i
+מhY{etR%]NBYE>p"N#-a f_0,`^R)4{dQފVD;d]"}Wq]0u	i7H?Rq|A_}	lWpv;g{1#{,B=u(td*0v\=취H_dhE`o(.UuFp{g|Ә.(v2IvMQsZU8J*5J"]mע03Ǔ_df?M| 3EYQk-yM/0bkatԀ_!
+O)'JDK@l\n\L1AD(YŰ&,[@mEIpd 7Y.er@&d~<@0'=	h :L!,x|\?6y+hqlH)ȭ,V.Ded>x'V}?ONF ].'~Eͥ'H 1-|;>k\&KxIh!n	aO<3)ML1^k}ow*,ұ^p:̔K#6zi`a)w\.'
+pSւw@H1Pa,Gp >ñp-_EMB]
+cՄo ~QK/>#J?^b<ow)tP߂i|mҐ%Qi<>2jsK3FAf'3hCq!(}ŗ$|яl>ϟ>zpEC*stLt9M,n0/FD7W^m3i]AoBBƻd=HPQT5
+*!|0xHVQtvcV\WH
+7[~ H7@Ehޢ[!P(hѕqTp7Z7@8ubqnwkӖ0!Ţ'Yq[ߟ.!$db3ɍ#ǬسQJ|oD$]`7`&k8I2;.J9	qjQDriW/={v>dA<~Q D.?^b|EsYSVjs<#>3,48eb00
+مM}t#6'{%vgp+CY	zUVOIkUgpf2_}z_l}_̕R^mH?@3Iwa]e/S@2-{Uמčp+0h
+SVHH,Po#qU7Dd(@d2]ԜԒ
+pnF^NP"E;2L:g5Fl0<ԭo@7LBCnF+9Οq()ON2q2+q@NGe%3&wyp㭾evNB:[i%[IItY.٬ق2c)~D	o\R̃գ~x3a/et']
+Aw'=eH"MdF<v6\|N(*jOV>嚦]Y#'
+i!y#(2a=n~`f_!~c#OW޲XegqX>Y@;uNkb?pOvzi9WOqyNkjuWHN+jjZPXa1!0=!bi1,'p6^Oe!k
+yle¬,b13G0uCSq'SQi qPQ ݙZJYO4LNPo+kvS}JMgq\gAZ EwIiK!G"Ovu4B}MIN'H_@H(W_-|eZm^kYי}2v,\IٕpRf夓ᡠQ$^.H\O_#=t](fͦuqtz+qIƱA_S)Qz1(k==\wH%#7MiπvIw|~]+C4"!Z.73?ZkJmf劖<Uoi?f$]~ZIWnwoQ2_77)y)wwΙǄ5GKVynjvko'XU/K|'yNTjP]ߠ{׼܄b9V=IQu\g̠AhApxNuSu)T#dݪ_O4E]<;f_'o~=kwA"7@	bp!Dצb$4Sf<FQ	)J@s+3hTs@D]zy2a޽ibw`jaF2"ftKVQLz8}7"[Uo6)!7Օ|m'sƬȯWq)8F*H(֓7(9B;2Gi2fP"r-eipͯ+)5q-,(t@dv[cK{z3|rT_jִAZ#ȿBU\e==GHy <V(EX-yMFIbtOWI^e
+f%!>!npYSdm4dv}/Oq4Zib ~^,7Yյ]t\GA=ug&*kn;^m)*@@7U/4#t/jC	|cYn#HkRw+۝[981nˋ3bZed='µ#}0=;|1pƐ HZ<#I8JKQ;{Ǌ,IoAAtɑdZ~B
+aϙsݖʕ͌ͥ`|9%YbOUj`j_ś3)g+c{:x5~ĸO8ʼt-.4OFBڤ3]ycu󏝕q
+7
+zyIn|:>|wc޿yGV:":..|VBPXmeW`۹C=&TݟOWĄhITMhTܾջf!pGBߌ&vFՠ,9(v(=Pj"rK9YVݴmE)EFPtdWEvv?lgҪ)wQw|\ѭ*IoyuŘu끾+H.eqG6xP@FclAǯS6l˰1A>QᑍR/pƎKn]ܳ³/xs_8aE;G\sjK%z.MerfR#¾7;0h={ERIص:|NE={8DP&H)mD:yGw 8q3oD1߹բVjxS4މY-3hnPMSNrDr?kӃ*OaڥAv=˙{Wf=1dk*?_:Pɢ;T,~f;0P_>6M wC]Ӛ߽ôUA ]hdI}VF9k`T s$B_7XIV9V%O
+2(AY!6u[l9wq/T1l52P~n@Ơ_fPe@ݻ< âs40Kv-*</MLo7"+[ᲐVyb`TA'aƿ߫:|!^}ʓGsK,{V^0p\%&Ը["b.'b3{sj}Q*`5T|],]Ȁ/	F׬yųo͠NläN"$Nԃ䐦T2n.%ݭYw%:n0N",7Ut3ܠY^MџSlLwZ<2b()D7CKV4"*4*I5K9SW-tV1*oLa%+iGYO =s6E/`&q0G$FݔRCϕ
+cswLS龫tS/m\,mgt^kk%Y`p-$i5_븇fZ90:7XH_xȫsϰzT+*{PK!iDBg9{a.?.0錩@oʔ`١4жl|͚jNgI0pt+>nQ2L"l-s"}(sGpxadᢼKM+`C!ǧ㷡(D;+-G>H
+1Mx:[62Gl~;\rlR3P<;	\902]EoHg,&>t+c/L<q5ڕ*-R6trt?{tt;HĬal7u+P:&*E/-aw+lMͰ4Fqܭdi4NOOe7fIfqPed>AA;Rq1&Ra2	^(w<[Aq?mbUfP_QG1p@Mw$Unͱ&Yr`;;t泲~o0hX|ca$_l[+TR&6@>6@L01n!7yNɹf:Py051n`i,P&ē~"ôx!0㐫\pVl~RRZ"#?0JM$|/UϠ}PЃQCe|Tu^<¼]JM]ܰ?@%CzD(kHQqHZVť+)٣ް|/`
+^*~類ۭ՝u	V;UwU?Zs\RVn1˨fmFxV^C[\C=KiH.Ր˹ԗs0m>wF}
+GSK[sg)Կt1_Y#ÿYnQ^n_㯻\o:+MwDr6mwuS\D{`m5bRsٗMdn|ݬs9N&X~5^򆆾⮵M9	}8M*oE[A~Qg0NpRX	¯nekW2x=N|%@?^[(n>jUE?o,#.6˺'&Mٱ)ghZjjJ4|x|,[;t`CeOCIȇT̫gDlݑl2VF\|6s*0`;,'rW0XS{6G)x@ऽ~)9c٫+2W}Xm?mg}{
+AZ-(*,dE6a"?aTpF?NǸ:	xӉU]`*,вg
+%0YTE:-D
+HMt7Md]{
+MW/UDjL഑qL|^.B8QF],G/!Ʌť;$$CǗ"o\4ۢ$@RSw&)*CN),}<\-'~â6+jz+TY}7KiZIKa3jAQ2TaACQP0	7tIIhdS09Y,'8h!'@H?f78 ?-Iuf !O]+BBȻJ輛%}$K;Pw,	.MZ >%3a0)1%zX7|%%hK%*8Y*!.}x`#wߥyҨNriօpm%"+/6KJ	!x
+LJ84a-&DBM#CH7@Ď9Bh$p8
+d{G[f*Foznx#d GQ<Ŀ\X0KxMJp4%H" 'kCwϟ"с՚>C.^eúzA,fާ2_)FDR9;U5PR+vGW̏$31|H`rFIF˖<$fe*Ø΁߿U_A^ͯIrwt].Drba)ef.Y|
+r8<%fO>tau[cS:hh\aq&B)}]:$aP$5QM"-T(_v0!B+@O}-=zY%gVWn]btg7A1G~]$D!)8Z-0J)Ȓ@CҪ.!Z3äZjoj,84MVV,,txRxMC}[jhBb3txo#ɜJ `[h˙UL%Y:[_jBOeg?SJ,2Y0f%yfUQ>d毀C]y=`u&	&-&)8an[aXln@k>]mUBYr0pd"#a`"Jhb-31#C!g\yqo"pZ8nZn8"YFYX/C|?kIps"E?g%N~xWĚh	|3N~
+2P&b@׳O,SCkXezILDOZۻkx8`Z֓{.\6~ݡ)]=h	`u*\[tK1qA<]"9ϋSݦC.1!4>{ffR_~Mu33Fw*vW?eW*pUF2iS>6
+o]@V|ȃk![7od1pW7Sk@!wTFH(qH1UJES7R4
+{i"O7j&+@&h!<A;mB9$e%M
+T+ݮՓ^}
+l1|zA3_ѽaxΖ==I5뜿)<uj^`{5ƲI{pJFD&O1@?c%Pu8FȼB.!yN0|T⬇j	޻8vA.`?q-@Y$N}{R˫By@(r\>K|$F8O|Jq^'sZFDrrKރpg	$IC&1x1̑>l	uXx&H(I-c;yCazc2Ϣ>
+rBݭdeLx8L:!T(Hu|K*q)4Fv9&Qp
+{#e2_GLY5P??de8{hzt6AS?̂vL'.(_+,O޹TKoH8A|R$,Dv~AgfOsiI╷?{۶Wa}^dƅۢp$rƐmEVJ%I?$8PD@Drvwvvߙ*rrn=DV~Qw7ջAiY+I?0&˯uz\F=ld!)4͛5˼%&$8$e􇵒)%W^"] Nљ6J);[͔Q	}<"cg]756JCsViх>㼝7ŠS>cC	*XVG]lVjրna<cw|&)9h~x+ŻZcĉO^>{ĢN̒-f괨ʾYkR2P$9'ѪTXLVSXNm1plpdv',7R͹Z5L#\[UWaxfF.CW9FMA}E\ќL6`O"AUH)qÑU/õCý
+ܮ_!+*?q;4_ޗts^z=}oGYnuzY._'_yKV.cF5/\0hr<|["G}\}PCGYjcxBd1RFGjjשr;@Ŋm䨠wOWT{8EɇhI&^p[sc'O޲d`i!kR@J3uF!XyĽ$5;m&]6c[K׆ӫnﷀ=qzk-)et!_"i>o.7WL:gyj7qȵoӸ[RjܮxÙ)lrL%fdD:g=KӌfvMFgTPS5(YJ@nOm%'T\k{$C'5ԢOꔻ۳%NGh#Pޛ5f:$Ro{|1U0-t:Hf8y)7q'|iqIGe5ŃecZgwFު:Vo<N'gۛSh5Oz퀥wNXIɅB나1OXjA#p;LʓMY|겸; qTsΩMM
+kxZ߾{%QզgSa{ǡad	`xyAzV,wwRB<+jXCuBd,_;d|)=u55Q$@/Yk>|)&)n
+3[H׶})]ٜEcROUJ쀘WbX圡L'wiqW:֘Kn̉6_K973鬛 &Cr>#&-HPA!9:֊E:u<$
+7?%6n!aE,l#iȇۆ`O/ƳI>8е4/ߨzaNrvJsOɏZ~>6
+6㇡oRE{~C90G6#6qvuTSB&$&`.jn`0pb~+*XW`}1Fv`bfZ"o%7Xz+tV,yT˯+=@7ǫɂc[X	LDm84τ`.zE;/^``9-£O^0b)bHz	q2,{ҙóie^,eR[F9Qd^..~"<g	+ӱ([{`<#j/!+C -͙9<43>CN@x5^ɗ/f+4vtiGFϩό5rNA7y8/NקdӞ?	Jw)b	u	GL5nmOTH0R8^16%Q@}/zgZϔւ|qnYJ{[(H׊g*0[MnfS.Z\ŖUZ$W8^wYҹ~cm)ްfzƆ㈧Mf:vZg7AA1XCib:ir	2Efx4?Hq¨<C
+?|[;P_?	6R>ƥha;Vw1

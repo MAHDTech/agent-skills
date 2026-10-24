@@ -16,33 +16,31 @@ The protocol follows the [JSON-RPC 2.0](https://www.jsonrpc.org/specification) s
 * **Notifications**: One-way messages that don't expect a response
 
 ACP follows JSON-RPC 2.0 batch behavior. See
-[Transports](/protocol/v2/transports#json-rpc-batch-messages) for batch
+[Transports](https://agentclientprotocol.com/protocol/v2/transports.md#json-rpc-batch-messages) for batch
 handling requirements.
 
 ## Message Flow
 
 A typical flow follows this pattern:
 
-\<Steps\>
-  <Step title="Initialization Phase">
-    * Client → Agent: `initialize` to establish connection
-    * Client → Agent: `auth/login` if required by the Agent
-  </Step>
+**1. Initialization Phase**
 
-  <Step title="Session Setup - either:">
-    * Client → Agent: `session/new` to create a new session
-    * Client → Agent: `session/resume` to resume an existing session
-  </Step>
+* Client → Agent: `initialize` to establish connection
+* Client → Agent: `auth/login` if required by the Agent
 
-  <Step title="Prompt Lifecycle">
-    * Client → Agent: `session/prompt` to send user message
-    * Agent → Client: `session/prompt` response once the prompt is accepted
-    * Agent → Client: `session/update` notifications for accepted messages, state updates, and progress updates
-    * Agent → Client: Permission requests as needed
-    * Client → Agent: `session/cancel` to interrupt processing if needed
-    * Agent → Client: An idle `state_update` with a stop reason when foreground work ends, even if background activity continues
-  </Step>
-</Steps>
+**2. Session Setup - either:**
+
+* Client → Agent: `session/new` to create a new session
+* Client → Agent: `session/resume` to resume an existing session
+
+**3. Prompt Lifecycle**
+
+* Client → Agent: `session/prompt` to send user message
+* Agent → Client: `session/prompt` response once the prompt is accepted
+* Agent → Client: `session/update` notifications for accepted messages, state updates, and progress updates
+* Agent → Client: Permission requests as needed
+* Client → Agent: `session/cancel` to interrupt processing if needed
+* Agent → Client: An idle `state_update` with a stop reason when foreground work ends, even if background activity continues
 
 ## Agent
 
@@ -52,48 +50,48 @@ Agents are programs that use generative AI to autonomously modify code. They typ
 
 Some baseline methods belong to optional surfaces. An Agent that returns one or more valid entries in `authMethods` **MUST** implement both `auth/login` and `auth/logout`. If `authMethods` is omitted or empty, Clients **MUST NOT** call either method.
 
-<ResponseField name="initialize" post={[<a href="/protocol/v2/schema#initialize">Schema</a>]}>
-  [Negotiate versions and exchange capabilities.](/protocol/v2/initialization).
-</ResponseField>
+**initialize**
 
-<ResponseField name="auth/login" post={[<a href="/protocol/v2/schema#auth%2Flogin">Schema</a>]}>
-  Authenticate with the Agent (if required).
-</ResponseField>
+[Negotiate versions and exchange capabilities.](https://agentclientprotocol.com/protocol/v2/initialization.md).
 
-<ResponseField name="auth/logout" post={[<a href="/protocol/v2/schema#auth%2Flogout">Schema</a>]}>
-  [End the current authenticated
-  state](/protocol/v2/authentication#logging-out).
-</ResponseField>
+**auth/login**
 
-<ResponseField name="session/new" post={[<a href="/protocol/v2/schema#session%2Fnew">Schema</a>]}>
-  [Create a new conversation
-  session](/protocol/v2/session-setup#creating-a-session).
-</ResponseField>
+Authenticate with the Agent (if required).
 
-<ResponseField name="session/prompt" post={[<a href="/protocol/v2/schema#session%2Fprompt">Schema</a>]}>
-  [Send user prompts](/protocol/v2/prompt-lifecycle#1-user-message) to the
-  Agent.
-</ResponseField>
+**auth/logout**
 
-<ResponseField name="session/list" post={[<a href="/protocol/v2/schema#session%2Flist">Schema</a>]}>
-  [List known sessions](/protocol/v2/session-list).
-</ResponseField>
+[End the current authenticated
+state](https://agentclientprotocol.com/protocol/v2/authentication.md#logging-out).
 
-<ResponseField name="session/resume" post={[<a href="/protocol/v2/schema#session%2Fresume">Schema</a>]}>
-  [Resume an existing session, optionally replaying
-  history](/protocol/v2/session-setup#resuming-sessions).
-</ResponseField>
+**session/new**
 
-<ResponseField name="session/close" post={[<a href="/protocol/v2/schema#session%2Fclose">Schema</a>]}>
-  [Close an active session](/protocol/v2/session-setup#closing-active-sessions).
-</ResponseField>
+[Create a new conversation
+session](https://agentclientprotocol.com/protocol/v2/session-setup.md#creating-a-session).
+
+**session/prompt**
+
+[Send user prompts](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#1-user-message) to the
+Agent.
+
+**session/list**
+
+[List known sessions](https://agentclientprotocol.com/protocol/v2/session-list.md).
+
+**session/resume**
+
+[Resume an existing session, optionally replaying
+history](https://agentclientprotocol.com/protocol/v2/session-setup.md#resuming-sessions).
+
+**session/close**
+
+[Close an active session](https://agentclientprotocol.com/protocol/v2/session-setup.md#closing-active-sessions).
 
 ### Notifications
 
-<ResponseField name="session/cancel" post={[<a href="/protocol/v2/schema#session%2Fcancel">Schema</a>]}>
-  [Cancel ongoing operations](/protocol/v2/prompt-lifecycle#cancellation) (no
-  response expected).
-</ResponseField>
+**session/cancel**
+
+[Cancel ongoing operations](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#cancellation) (no
+response expected).
 
 ## Client
 
@@ -101,37 +99,37 @@ Clients provide the interface between users and agents. They are typically code 
 
 ### Baseline Methods
 
-<ResponseField name="session/request_permission" post={[<a href="/protocol/v2/schema#session%2Frequest_permission">Schema</a>]}>
-  [Request user authorization](/protocol/v2/tool-calls#requesting-permission)
-  for operations such as tool calls and commands.
-</ResponseField>
+**session/request\_permission**
+
+[Request user authorization](https://agentclientprotocol.com/protocol/v2/tool-calls.md#requesting-permission)
+for operations such as tool calls and commands.
 
 ### Optional Methods
 
-<ResponseField name="elicitation/create" post={[<a href="/protocol/v2/schema#elicitation%2Fcreate">Schema</a>]}>
-  [Request structured information from the user](/protocol/v2/elicitation)
-  (requires the matching `elicitation` mode capability).
-</ResponseField>
+**elicitation/create**
+
+[Request structured information from the user](https://agentclientprotocol.com/protocol/v2/elicitation.md)
+(requires the matching `elicitation` mode capability).
 
 ### Notifications
 
-<ResponseField name="elicitation/complete" post={[<a href="/protocol/v2/schema#elicitation%2Fcomplete">Schema</a>]}>
-  [Report completion of an out-of-band URL
-  interaction](/protocol/v2/elicitation#url-completion) (no response expected).
-</ResponseField>
+**elicitation/complete**
 
-<ResponseField name="session/update" post={[<a href="/protocol/v2/schema#session%2Fupdate">Schema</a>]}>
-  [Send session updates](/protocol/v2/prompt-lifecycle#3-agent-reports-output)
-  to inform the Client of changes (no response expected). This includes [message
-  updates and chunks](/protocol/v2/content), [tool calls, updates, and content
-  chunks](/protocol/v2/tool-calls), [display-only terminal state and output
-  chunks](/protocol/v2/tool-calls#display-only-terminals),
-  [plans](/protocol/v2/agent-plan), [available commands
-  updates](/protocol/v2/slash-commands#advertising-commands), [config option
-  updates](/protocol/v2/session-config-options#from-the-agent), [context
-  compactions](/protocol/v2/prompt-lifecycle#session-compaction), and
-  [user-facing notices](/protocol/v2/prompt-lifecycle#session-notices).
-</ResponseField>
+[Report completion of an out-of-band URL
+interaction](https://agentclientprotocol.com/protocol/v2/elicitation.md#url-completion) (no response expected).
+
+**session/update**
+
+[Send session updates](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#3-agent-reports-output)
+to inform the Client of changes (no response expected). This includes [message
+updates and chunks](https://agentclientprotocol.com/protocol/v2/content.md), [tool calls, updates, and content
+chunks](https://agentclientprotocol.com/protocol/v2/tool-calls.md), [display-only terminal state and output
+chunks](https://agentclientprotocol.com/protocol/v2/tool-calls.md#display-only-terminals),
+[plans](https://agentclientprotocol.com/protocol/v2/agent-plan.md), [available commands
+updates](https://agentclientprotocol.com/protocol/v2/slash-commands.md#advertising-commands), [config option
+updates](https://agentclientprotocol.com/protocol/v2/session-config-options.md#from-the-agent), [context
+compactions](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#session-compaction), and
+[user-facing notices](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#session-notices).
 
 ## Argument requirements
 
@@ -160,15 +158,15 @@ The protocol provides built-in mechanisms for adding custom functionality while 
 * Create custom methods by prefixing their name with underscore (`_`)
 * Advertise custom capabilities during initialization
 
-Learn about [protocol extensibility](/protocol/v2/extensibility) to understand how to use these mechanisms.
+Learn about [protocol extensibility](https://agentclientprotocol.com/protocol/v2/extensibility.md) to understand how to use these mechanisms.
 
 ## Next Steps
 
-* Learn about [Initialization](/protocol/v2/initialization) to understand version and capability negotiation
-* Understand [Session Setup](/protocol/v2/session-setup) for creating and loading sessions
-* Review the [Prompt Lifecycle](/protocol/v2/prompt-lifecycle)
-* Explore [Extensibility](/protocol/v2/extensibility) to add custom features
-* Check your agent implementation with the [Test Compatibility Kit](/libraries/testing)
+* Learn about [Initialization](https://agentclientprotocol.com/protocol/v2/initialization.md) to understand version and capability negotiation
+* Understand [Session Setup](https://agentclientprotocol.com/protocol/v2/session-setup.md) for creating and loading sessions
+* Review the [Prompt Lifecycle](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md)
+* Explore [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility.md) to add custom features
+* Check your agent implementation with the [Test Compatibility Kit](https://agentclientprotocol.com/libraries/testing.md)
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

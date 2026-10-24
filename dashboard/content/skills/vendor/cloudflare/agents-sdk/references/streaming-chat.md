@@ -1,0 +1,26 @@
++++
+title = "streaming-chat"
+[extra]
+skill = false
+category = "vendor/cloudflare"
+mermaid = false
+skill_name = "agents-sdk"
++++
+
+# Streaming Chat with AIChatAgent
+
+Use `AIChatAgent` for persisted conversations with streaming and tools; use callable streaming RPC for non-chat output. Before adapting an existing app, check its installed `agents`, `@cloudflare/ai-chat`, and AI SDK versions against the current docs.
+
+Read the relevant documentation before implementing:
+
+| Task | Documentation |
+|------|---------------|
+| Build a chat agent | [Chat agent example](https://developers.cloudflare.com/agents/examples/chat-agent/index.md) — setup, provider, server, and UI |
+| Implement or customize chat | [Chat agents](https://developers.cloudflare.com/agents/communication-channels/chat/chat-agents/index.md) — message format, tools, custom streams, persistence, concurrency, cancellation, and recovery |
+| Connect a client | [Client guidance](@/skills/vendor/cloudflare/agents-sdk/references/client-sdk.md) — React, vanilla JS, HTTP, and authentication |
+| Stream non-chat results | [Callable methods](https://developers.cloudflare.com/agents/runtime/lifecycle/callable-methods/index.md) — server and client streaming RPC |
+| Trigger background turns | [Server-driven messages](@/skills/vendor/cloudflare/agents-sdk/references/server-driven-messages.md) |
+| Add approvals | [Human-in-the-loop](@/skills/vendor/cloudflare/agents-sdk/references/human-in-the-loop.md) |
+
+Forward the request abort signal to the model call so cancellation stops generation. When customizing streams, verify persistence and completion behavior for the installed version. Treat client reconnection and Durable Object eviction as separate recovery cases.
+

@@ -19,11 +19,11 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 **Published:** June 5, 2026
 
-The [Session Delete RFD](/rfds/session-delete) has moved to Completed and the `session/delete` method is stabilized.
+The [Session Delete RFD](https://agentclientprotocol.com/rfds/session-delete.md) has moved to Completed and the `session/delete` method is stabilized.
 
 Clients can use this capability-gated method to remove sessions from future `session/list` results. ACP standardizes the user-facing behavior while leaving soft deletion, hard deletion, and retention policy to the Agent.
 
-For the protocol documentation, see [Session Delete](/protocol/v1/session-delete).
+For the protocol documentation, see [Session Delete](https://agentclientprotocol.com/protocol/v1/session-delete.md).
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

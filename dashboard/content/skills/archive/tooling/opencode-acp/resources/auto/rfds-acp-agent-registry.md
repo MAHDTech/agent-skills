@@ -182,7 +182,7 @@ To be listed in the registry, an agent **must support at least one** of the foll
 
 CI verifies this by checking that the agent returns an `authMethods` array in
 its `initialize` response, with at least one method. See the [Terminal
-Authentication RFD](./auth-methods) for the terminal flow.
+Authentication RFD](https://agentclientprotocol.com/rfds/auth-methods.md) for the terminal flow.
 
 ## What we propose to do about it
 

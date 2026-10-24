@@ -1,0 +1,15 @@
+---
+version: 1
+sources:
+  - id: cloudflare
+    repository: https://github.com/cloudflare/skills.git
+    ref: main
+    path: skills
+    excludes: []
+  - id: spacetimedb
+    repository: https://github.com/clockworklabs/SpacetimeDB.git
+    ref: master
+    path: skills
+    excludes: []
+    license-files:
+      - codex-plugin/plugins/spacetimedb/LICENSE

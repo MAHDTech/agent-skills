@@ -31,11 +31,11 @@ When a `$/cancel_request` notification is received by a supporting implementatio
 * **MAY** finish sending any pending notifications before responding
 * **MUST** send one of these responses for the original request:
   * A valid response with appropriate data (such as partial results or cancellation marker)
-  * An error response with code [`-32800` (Request Cancelled)](/protocol/v1/schema#errorcode)
+  * An error response with code [`-32800` (Request Cancelled)](https://agentclientprotocol.com/protocol/v1/schema#errorcode)
 
 The calling side **MAY** implement graceful cancellation processing by waiting for the response from the remote side.
 
-Cancellation **MAY** also be done explicitly on a per-feature basis within the protocol to cover specific scenarios, such as cancellation of a [prompt turn](/protocol/v1/prompt-turn#cancellation).
+Cancellation **MAY** also be done explicitly on a per-feature basis within the protocol to cover specific scenarios, such as cancellation of a [prompt turn](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#cancellation).
 
 ## Internal Cancellation
 
@@ -51,7 +51,7 @@ When internal cancellation occurs, the executing party **SHOULD**:
 
 ## Example: Cascading Cancellation Flow
 
-This example shows an Agent explicitly propagating cancellation to an outstanding terminal request. That propagation is optional, not an automatic protocol guarantee. Independently, the Client **MUST** answer pending permission requests with the `cancelled` outcome when it sends `session/cancel`, as specified in [prompt turn cancellation](/protocol/v1/prompt-turn#cancellation); it does not wait for `$/cancel_request`.
+This example shows an Agent explicitly propagating cancellation to an outstanding terminal request. That propagation is optional, not an automatic protocol guarantee. Independently, the Client **MUST** answer pending permission requests with the `cancelled` outcome when it sends `session/cancel`, as specified in [prompt turn cancellation](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#cancellation); it does not wait for `$/cancel_request`.
 
 ```mermaid theme={null}
 sequenceDiagram

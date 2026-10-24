@@ -8,9 +8,7 @@
 
 The `session/delete` method allows Clients to remove sessions from an Agent's `session/list` results. This gives users a standard way to manage session history across ACP Clients and Agents.
 
-Before deleting sessions, Clients **MUST** first complete the [initialization](/protocol/v2/initialization) phase and verify the Agent supports this capability.
-
-<br />
+Before deleting sessions, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v2/initialization.md) phase and verify the Agent supports this capability.
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -30,8 +28,6 @@ sequenceDiagram
     Client->>Agent: session/list
     Agent-->>Client: session/list response (without deleted session)
 ```
-
-<br />
 
 ## Checking Support
 
@@ -74,9 +70,9 @@ Clients delete a session by calling `session/delete` with the session ID to remo
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  Unique identifier for the session to delete.
-</ParamField>
+**sessionId** `SessionId` *required*
+
+Unique identifier for the session to delete.
 
 On success, the Agent returns an empty result:
 

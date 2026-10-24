@@ -31,7 +31,7 @@ If you only remember five things, remember these:
 
 This guide describes the stable v2 baseline (`schema/v2/schema.json`). The v2 protocol surface as a whole is still labeled draft, so gate **v2 support behind explicit version negotiation and feature flags until it stabilizes.**
 
-The unstable schema (`schema/v2/schema.unstable.json`) layers experimental features on top of that baseline. Negotiating `protocolVersion: 2` does **not** imply support for them. Follow each feature's documented negotiation requirements: optional operations requiring peer participation use explicit capabilities or another documented mechanism, while informational additions with safe forward-compatible handling may be sent without a capability when the feature permits it. Local feature flags control rollout, not peer support. See [Experimental Features and Negotiation](/protocol/v2/extensibility#experimental-features-and-negotiation).
+The unstable schema (`schema/v2/schema.unstable.json`) layers experimental features on top of that baseline. Negotiating `protocolVersion: 2` does **not** imply support for them. Follow each feature's documented negotiation requirements: optional operations requiring peer participation use explicit capabilities or another documented mechanism, while informational additions with safe forward-compatible handling may be sent without a capability when the feature permits it. Local feature flags control rollout, not peer support. See [Experimental Features and Negotiation](https://agentclientprotocol.com/protocol/v2/extensibility.md#experimental-features-and-negotiation).
 
 ## Version negotiation
 
@@ -95,94 +95,90 @@ Nothing about v2 changes the underlying JSON-RPC framing, so a single connection
 
 v1 used role-specific field names: the Client sent `clientCapabilities` and optional `clientInfo`, and the Agent returned `agentCapabilities` and optional `agentInfo`. v2 uses the same two field names in both directions (`capabilities` and `info`), and `info` is now **required** on both sides.
 
-\<CodeGroup\>
-  ```json v1 request theme={null}
-  {
-    "jsonrpc": "2.0",
-    "id": 0,
-    "method": "initialize",
-    "params": {
-      "protocolVersion": 1,
-      "clientCapabilities": {
-        "fs": { "readTextFile": true, "writeTextFile": true },
-        "terminal": true
-      },
-      "clientInfo": { "name": "my-client", "version": "1.0.0" }
-    }
+```json v1 request theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 0,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": 1,
+    "clientCapabilities": {
+      "fs": { "readTextFile": true, "writeTextFile": true },
+      "terminal": true
+    },
+    "clientInfo": { "name": "my-client", "version": "1.0.0" }
   }
-  ```
+}
+```
 
-  ```json v2 request theme={null}
-  {
-    "jsonrpc": "2.0",
-    "id": 0,
-    "method": "initialize",
-    "params": {
-      "protocolVersion": 2,
-      "info": {
-        "name": "my-client",
-        "title": "My Client",
-        "version": "1.0.0"
-      },
-      "capabilities": {}
-    }
+```json v2 request theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 0,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": 2,
+    "info": {
+      "name": "my-client",
+      "title": "My Client",
+      "version": "1.0.0"
+    },
+    "capabilities": {}
   }
-  ```
-</CodeGroup>
+}
+```
 
-\<CodeGroup\>
-  ```json v1 response theme={null}
-  {
-    "jsonrpc": "2.0",
-    "id": 0,
-    "result": {
-      "protocolVersion": 1,
-      "agentCapabilities": {
-        "loadSession": true,
-        "promptCapabilities": { "image": true, "embeddedContext": true },
-        "mcpCapabilities": { "http": true, "sse": false },
-        "sessionCapabilities": {
-          "list": {},
-          "resume": {},
-          "close": {}
-        }
-      },
-      "authMethods": [],
-      "agentInfo": { "name": "my-agent", "version": "0.3.0" }
-    }
+```json v1 response theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 0,
+  "result": {
+    "protocolVersion": 1,
+    "agentCapabilities": {
+      "loadSession": true,
+      "promptCapabilities": { "image": true, "embeddedContext": true },
+      "mcpCapabilities": { "http": true, "sse": false },
+      "sessionCapabilities": {
+        "list": {},
+        "resume": {},
+        "close": {}
+      }
+    },
+    "authMethods": [],
+    "agentInfo": { "name": "my-agent", "version": "0.3.0" }
   }
-  ```
+}
+```
 
-  ```json v2 response theme={null}
-  {
-    "jsonrpc": "2.0",
-    "id": 0,
-    "result": {
-      "protocolVersion": 2,
-      "info": {
-        "name": "my-agent",
-        "title": "My Agent",
-        "version": "0.3.0"
-      },
-      "capabilities": {
-        "session": {
-          "prompt": {
-            "image": {},
-            "embeddedContext": {}
-          },
-          "mcp": {
-            "stdio": {},
-            "http": {}
-          },
-          "delete": {},
-          "additionalDirectories": {}
-        }
-      },
-      "authMethods": []
-    }
+```json v2 response theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 0,
+  "result": {
+    "protocolVersion": 2,
+    "info": {
+      "name": "my-agent",
+      "title": "My Agent",
+      "version": "0.3.0"
+    },
+    "capabilities": {
+      "session": {
+        "prompt": {
+          "image": {},
+          "embeddedContext": {}
+        },
+        "mcp": {
+          "stdio": {},
+          "http": {}
+        },
+        "delete": {},
+        "additionalDirectories": {}
+      }
+    },
+    "authMethods": []
   }
-  ```
-</CodeGroup>
+}
+```
 
 Both responses above have an empty `authMethods` array. In v2, omitting `authMethods` has the same availability meaning: the Agent does not advertise the authentication surface, and Clients **MUST NOT** call `auth/login` or `auth/logout`.
 
@@ -251,9 +247,9 @@ Convert a boolean support marker from `true` to `{}` and from `false` to an omit
 
 The draft per-child-session `capabilities.cancel` marker in `subagent_update` is unchanged. It is not an initialize capability.
 
-For surviving capability objects, move `_meta` with its owning group (for example, Agent `promptCapabilities._meta` → `capabilities.session.prompt._meta`). Root capability metadata moves to `capabilities._meta`. For removed groups or markers, review extension semantics and choose a supported root or nested `_meta` location explicitly. See [Advertising Custom Capabilities](/protocol/v2/extensibility#advertising-custom-capabilities).
+For surviving capability objects, move `_meta` with its owning group (for example, Agent `promptCapabilities._meta` → `capabilities.session.prompt._meta`). Root capability metadata moves to `capabilities._meta`. For removed groups or markers, review extension semantics and choose a supported root or nested `_meta` location explicitly. See [Advertising Custom Capabilities](https://agentclientprotocol.com/protocol/v2/extensibility.md#advertising-custom-capabilities).
 
-Receivers **MUST** ignore unknown fields, including nested capability fields, but this does not make v1 field names valid v2 advertisements. See [Unknown Object Fields](/protocol/v2/extensibility#unknown-object-fields).
+Receivers **MUST** ignore unknown fields, including nested capability fields, but this does not make v1 field names valid v2 advertisements. See [Unknown Object Fields](https://agentclientprotocol.com/protocol/v2/extensibility.md#unknown-object-fields).
 
 ## Authentication
 
@@ -295,27 +291,25 @@ Stable v2 defines two types: `agent` and `terminal`. Custom types **MUST** begin
 * `env` is an array of `{ "name", "value" }` entries with unique names, instead of an object that maps names to values.
 * The Client advertises terminal auth support with the support marker `capabilities.auth.terminal: {}` instead of `clientCapabilities.auth.terminal: true` (see [Support markers](#support-markers-are-objects-not-booleans)).
 
-\<CodeGroup\>
-  ```json v1 theme={null}
-  {
-    "id": "terminal-login",
-    "name": "Log in from the terminal",
-    "type": "terminal",
-    "args": ["--login"],
-    "env": { "ACP_INTERACTIVE_LOGIN": "1" }
-  }
-  ```
+```json v1 theme={null}
+{
+  "id": "terminal-login",
+  "name": "Log in from the terminal",
+  "type": "terminal",
+  "args": ["--login"],
+  "env": { "ACP_INTERACTIVE_LOGIN": "1" }
+}
+```
 
-  ```json v2 theme={null}
-  {
-    "methodId": "terminal-login",
-    "name": "Log in from the terminal",
-    "type": "terminal",
-    "args": ["--login"],
-    "env": [{ "name": "ACP_INTERACTIVE_LOGIN", "value": "1" }]
-  }
-  ```
-</CodeGroup>
+```json v2 theme={null}
+{
+  "methodId": "terminal-login",
+  "name": "Log in from the terminal",
+  "type": "terminal",
+  "args": ["--login"],
+  "env": [{ "name": "ACP_INTERACTIVE_LOGIN", "value": "1" }]
+}
+```
 
 ## The new prompt lifecycle
 
@@ -351,7 +345,7 @@ In v2, acceptance means insertion of the user message into the ACP conversation.
 
 `messageId` is a required, non-null string identifying the inserted user message. The request is unchanged. Clients do not generate this ID.
 
-Insertion adds a logical user message with an ID and a position relative to other messages. See [Prompt Accepted](/protocol/v2/prompt-lifecycle#2-prompt-accepted) for adapter examples.
+Insertion adds a logical user message with an ID and a position relative to other messages. See [Prompt Accepted](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#2-prompt-accepted) for adapter examples.
 
 Everything else happens through `session/update` notifications:
 
@@ -397,9 +391,9 @@ Clients reconcile their submitted input with the response's `(sessionId, message
 
 An Agent may know it is idle without knowing why the work stopped. Clients **MUST** recognize idle even when the stop reason is omitted, `null`, malformed, or unknown. They cannot infer success or failure without a recognized stop reason.
 
-User messages, including [locally handled commands](/protocol/v2/slash-commands#running-commands), must be reported live but need not be retained. If an Agent retains and replays an inserted user message, it must reuse the response's ID. A lost prompt response remains ambiguous. Neither replay omission nor an identical message proves which submission was inserted, and retrying is not automatically safe.
+User messages, including [locally handled commands](https://agentclientprotocol.com/protocol/v2/slash-commands.md#running-commands), must be reported live but need not be retained. If an Agent retains and replays an inserted user message, it must reuse the response's ID. A lost prompt response remains ambiguous. Neither replay omission nor an identical message proves which submission was inserted, and retrying is not automatically safe.
 
-Pre-insertion rejection receives a JSON-RPC error response with no user-message updates for that submission. State updates still describe actual foreground work, independently of the request outcome. See [Prompts that are never inserted](/protocol/v2/prompt-lifecycle#prompts-that-are-never-inserted).
+Pre-insertion rejection receives a JSON-RPC error response with no user-message updates for that submission. State updates still describe actual foreground work, independently of the request outcome. See [Prompts that are never inserted](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#prompts-that-are-never-inserted).
 
 ### Session states
 
@@ -411,7 +405,7 @@ Pre-insertion rejection receives a JSON-RPC error response with no user-message 
 
 Foreground work is the Agent's active response or workflow in the session, including model processing, tool execution, and waiting for user action needed to continue. Agent-initiated work, such as pursuing an ongoing goal or following up on a completed background task, **MUST** use the same foreground lifecycle as prompt-driven work, with the same guidance for stop reasons. It does not require a prompt request or a synthetic user message.
 
-Background activity can continue and emit other `session/update` notifications while the Agent reports `idle`. A detached task's progress, completion, or permission request does not by itself change the foreground state. If the Agent starts a response or workflow to act on a background result, it **MUST** report an active state and report `idle` when that work ends, and **SHOULD** include a stop reason on the idle update. See [Foreground and Background Work](/protocol/v2/prompt-lifecycle#foreground-and-background-work) for contrasting examples.
+Background activity can continue and emit other `session/update` notifications while the Agent reports `idle`. A detached task's progress, completion, or permission request does not by itself change the foreground state. If the Agent starts a response or workflow to act on a background result, it **MUST** report an active state and report `idle` when that work ends, and **SHOULD** include a stop reason on the idle update. See [Foreground and Background Work](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#foreground-and-background-work) for contrasting examples.
 
 States are aggregate snapshots, not per-request events. Clients **MUST** apply
 repeats idempotently, without counting additional work, completions, or usage.
@@ -430,12 +424,12 @@ may arrive before the new-session response, which does not overwrite them.
 Every successful `session/resume` **MUST** be preceded by a current-state
 snapshot, after any requested replay. Resume does not imply idle, and Agents
 **MUST NOT** replay historical state updates as current activity.
-See [Current-State Synchronization](/protocol/v2/session-setup#current-state-synchronization)
-and the [transition table and lifecycle examples](/protocol/v2/prompt-lifecycle#state-transitions).
+See [Current-State Synchronization](https://agentclientprotocol.com/protocol/v2/session-setup.md#current-state-synchronization)
+and the [transition table and lifecycle examples](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#state-transitions).
 
 The v1 stop reasons (`end_turn`, `max_tokens`, `max_turn_requests`, `refusal`, `cancelled`) are unchanged. They just moved from the `session/prompt` response to the idle `state_update` and describe why foreground work stopped.
 
-v2 adds the `error` stop reason. v1 reported a failure during the turn as an error response to the pending `session/prompt`. In v2, once the user message is inserted, a failure ends foreground work with an idle `state_update` whose `stopReason` is `error` and whose optional `error` field carries the same JSON-RPC error object. An error response to `session/prompt` now always means the message was not inserted. See [Failures](/protocol/v2/prompt-lifecycle#failures).
+v2 adds the `error` stop reason. v1 reported a failure during the turn as an error response to the pending `session/prompt`. In v2, once the user message is inserted, a failure ends foreground work with an idle `state_update` whose `stopReason` is `error` and whose optional `error` field carries the same JSON-RPC error object. An error response to `session/prompt` now always means the message was not inserted. See [Failures](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#failures).
 
 ### Cancellation
 
@@ -460,7 +454,7 @@ Because foreground progress is now expressed entirely in notifications, the same
 
 Every message chunk and message update in v2 **MUST** carry a `messageId`. In v1, `messageId` was optional on chunks. Message IDs are opaque strings generated by the Agent: the Agent owns session history, so it is the single source of message identity. All chunks of one message share one `messageId`. A changed `messageId` starts a new message.
 
-Message IDs are unique per message type within a session, not across types: a user message, an Agent message, and an Agent thought may share the same `messageId` and remain distinct messages. The same applies to other entity IDs such as `toolCallId` and `planId`. Clients key entities by type and ID. See [Entity IDs](/protocol/v2/prompt-lifecycle#entity-ids).
+Message IDs are unique per message type within a session, not across types: a user message, an Agent message, and an Agent thought may share the same `messageId` and remain distinct messages. The same applies to other entity IDs such as `toolCallId` and `planId`. Clients key entities by type and ID. See [Entity IDs](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#entity-ids).
 
 ### Whole-message upserts
 
@@ -508,7 +502,7 @@ keeping a `tool_call_update`'s `_meta`, so Agents could use it for data about
 one report. In v2, a concrete `_meta` patches the tool call's stored metadata
 by top-level key: keys it omits keep their stored values, a key set to `null`
 is removed, and any other value replaces that key whole (see
-[Metadata Patches](/protocol/v2/extensibility#metadata-patches)). A key sent on
+[Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility.md#metadata-patches)). A key sent on
 an earlier report therefore stays until the Agent sets it to `null` or clears
 `_meta`. Put data about a single report in the `session/update`
 notification's `params._meta` instead.
@@ -602,7 +596,7 @@ The v1 diff shape (a single `path` with `oldText`/`newText`) could not distingui
 ```
 
 * `changes` (required) is the authoritative list of file-level operations. `add`, `delete`, and `modify` carry a `path`. `move` and `copy` carry `oldPath` and `path`. Each change may carry an optional `fileType` (`text`, `binary`, `directory`, `symlink`) and `mimeType`. Clients can build file trees and summaries from `changes` without parsing any patch text.
-* `patch` (optional) carries renderable text for some or all changes and **MUST** be consistent with `changes`. Stable v2 defines `git_patch` as one or more `diff --git` sections in Git's `--patch` (`-p`) text format. Unlike Git's repository-relative paths, every path **MUST** be absolute, including in `rename from`, `rename to`, `copy from`, and `copy to` lines, with no prefix such as Git's default `a/` and `b/`. Otherwise paths follow Git, including `/dev/null` for the missing side of an added or deleted file and Git's quoting of unusual paths. See [Diffs](/protocol/v2/tool-calls#diffs) for producing this with `git diff`. Surrounding commit metadata and email envelopes **MUST NOT** be included. Agents **SHOULD** provide `patch` whenever feasible. Clients **MUST** handle diffs where `patch` is omitted or `null` (binary changes, symlink retargets, and similar cases have no useful text rendering).
+* `patch` (optional) carries renderable text for some or all changes and **MUST** be consistent with `changes`. Stable v2 defines `git_patch` as one or more `diff --git` sections in Git's `--patch` (`-p`) text format. Unlike Git's repository-relative paths, every path **MUST** be absolute, including in `rename from`, `rename to`, `copy from`, and `copy to` lines, with no prefix such as Git's default `a/` and `b/`. Otherwise paths follow Git, including `/dev/null` for the missing side of an added or deleted file and Git's quoting of unusual paths. See [Diffs](https://agentclientprotocol.com/protocol/v2/tool-calls.md#diffs) for producing this with `git diff`. Surrounding commit metadata and email envelopes **MUST NOT** be included. Agents **SHOULD** provide `patch` whenever feasible. Clients **MUST** handle diffs where `patch` is omitted or `null` (binary changes, symlink retargets, and similar cases have no useful text rendering).
 
 A deleted file is now simply:
 
@@ -684,16 +678,31 @@ A command permission subject is self-contained rather than a patch:
 
 `options` and the response shape are unchanged: options carry `optionId`, `name`, and `kind` (`allow_once`, `allow_always`, `reject_once`, `reject_always`), and the response outcome is `{ "outcome": "selected", "optionId": ... }` or `{ "outcome": "cancelled" }`. Both unions are extensible in v2, with one safety rule: an Agent that receives an outcome it does not understand **MUST NOT** treat it as approval.
 
-While foreground work as a whole is blocked on a permission response, the Agent **SHOULD** report `state_update` with `requires_action`. Once reported, it **MUST** report `running` when foreground progress resumes, or `idle` if the work ends without resuming. A permission request for independent background activity does not by itself change the foreground state, and resolving a permission request does not itself imply `running`. Apply the [aggregate transition rules](/protocol/v2/prompt-lifecycle#waiting-for-user-action), including with concurrent requests and late answers.
+While foreground work as a whole is blocked on a permission response, the Agent **SHOULD** report `state_update` with `requires_action`. Once reported, it **MUST** report `running` when foreground progress resumes, or `idle` if the work ends without resuming. A permission request for independent background activity does not by itself change the foreground state, and resolving a permission request does not itself imply `running`. Apply the [aggregate transition rules](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#waiting-for-user-action), including with concurrent requests and late answers.
 
 ## Plans
 
 The v1 `plan` update was a flat entries list with no identity and no room to grow. v2 replaces it with `plan_update`, whose payload is a tagged union keyed by a required `planId`:
 
-\<CodeGroup\>
-  ```json v1 theme={null}
-  {
-    "sessionUpdate": "plan",
+```json v1 theme={null}
+{
+  "sessionUpdate": "plan",
+  "entries": [
+    {
+      "content": "Check for syntax errors",
+      "priority": "high",
+      "status": "pending"
+    }
+  ]
+}
+```
+
+```json v2 theme={null}
+{
+  "sessionUpdate": "plan_update",
+  "plan": {
+    "type": "items",
+    "planId": "plan-1",
     "entries": [
       {
         "content": "Check for syntax errors",
@@ -702,25 +711,8 @@ The v1 `plan` update was a flat entries list with no identity and no room to gro
       }
     ]
   }
-  ```
-
-  ```json v2 theme={null}
-  {
-    "sessionUpdate": "plan_update",
-    "plan": {
-      "type": "items",
-      "planId": "plan-1",
-      "entries": [
-        {
-          "content": "Check for syntax errors",
-          "priority": "high",
-          "status": "pending"
-        }
-      ]
-    }
-  }
-  ```
-</CodeGroup>
+}
+```
 
 Stable v2 defines the `items` plan type. The entry shape (`content`, `priority`, `status`, all required) is unchanged from v1. Entry priorities and statuses are now extensible enums, and `status` adds `cancelled`. Each `plan_update` for a given `planId` replaces that plan's entries, and the `planId` allows multiple plans per session and future plan content types (such as markdown or file-backed plans, which remain unstable) without another breaking change.
 
@@ -748,7 +740,7 @@ v1 had two ways to reattach to a session: `session/load` (replays full history, 
 
 The cursor is a tagged union so future versions can add replay-from-a-point variants without new methods. The schema accepts custom and future cursor types for preservation by intermediaries, but Agents **MUST** reject unsupported types or malformed cursors with `-32602` (Invalid params), not silently fall back to another replay mode.
 
-Retained user messages **MUST** preserve the ID returned by `session/prompt`. Agents **SHOULD** preserve agent and thought message IDs when possible, but Clients cannot assume those IDs remain stable across reconnects or restarts. For full replay, Clients **SHOULD** rebuild agent and thought message history rather than merge it into existing history solely by `messageId`. An empty-content primer resets only the ID used in that replay; it cannot clear a message previously delivered under another ID. See [Resuming Sessions](/protocol/v2/session-setup#resuming-sessions).
+Retained user messages **MUST** preserve the ID returned by `session/prompt`. Agents **SHOULD** preserve agent and thought message IDs when possible, but Clients cannot assume those IDs remain stable across reconnects or restarts. For full replay, Clients **SHOULD** rebuild agent and thought message history rather than merge it into existing history solely by `messageId`. An empty-content primer resets only the ID used in that replay; it cannot clear a message previously delivered under another ID. See [Resuming Sessions](https://agentclientprotocol.com/protocol/v2/session-setup.md#resuming-sessions).
 
 ### Consistent lifecycle requests
 
@@ -828,7 +820,7 @@ If you maintain a validator or generated models, v2 also tightens schema-level d
 
 ## Slash commands
 
-Agents **MAY** now return initial `availableCommands` alongside `configOptions` in `session/new` and `session/resume` responses. The draft `session/fork` response also supports commands for the newly created session when forking is supported. This avoids requiring command notifications before the `session/new` response. See the [setup response example](/protocol/v2/session-setup#initial-session-state).
+Agents **MAY** now return initial `availableCommands` alongside `configOptions` in `session/new` and `session/resume` responses. The draft `session/fork` response also supports commands for the newly created session when forking is supported. This avoids requiring command notifications before the `session/new` response. See the [setup response example](https://agentclientprotocol.com/protocol/v2/session-setup.md#initial-session-state).
 
 In setup responses, `availableCommands` is an optional array: omission or `[]` means no initial commands are advertised, and empty lists are omitted when serializing. `null` is not a valid outbound value. Tolerant v2 receivers treat `null` or a malformed non-array value like omission and skip invalid command items within an array.
 
@@ -836,23 +828,21 @@ In setup responses, `availableCommands` is an optional array: omission or `[]` m
 
 A command still carries `name` and `description`, but its optional `input` specification is now a tagged union. The v1 untagged unstructured input gains an explicit `type: "text"` discriminator so richer input types can be added later:
 
-\<CodeGroup\>
-  ```json v1 theme={null}
-  {
-    "name": "search",
-    "description": "Search the codebase",
-    "input": { "hint": "query to search for" }
-  }
-  ```
+```json v1 theme={null}
+{
+  "name": "search",
+  "description": "Search the codebase",
+  "input": { "hint": "query to search for" }
+}
+```
 
-  ```json v2 theme={null}
-  {
-    "name": "search",
-    "description": "Search the codebase",
-    "input": { "type": "text", "hint": "query to search for" }
-  }
-  ```
-</CodeGroup>
+```json v2 theme={null}
+{
+  "name": "search",
+  "description": "Search the codebase",
+  "input": { "type": "text", "hint": "query to search for" }
+}
+```
 
 As with other extensible unions, unknown input types should be preserved when proxying. A client that can't render one can fall back to plain text input or hide the command's input hint.
 
@@ -875,14 +865,14 @@ A few schema definition names also changed without any wire-format change, which
 v2 makes the whole schema forward-compatible by convention:
 
 * **Open enums and tagged unions.** Every enum-like string accepts unknown values. Values beginning with `_` are reserved for implementation-specific extensions (e.g. `_mycompany_widget`). Unknown values *without* a leading `_` are reserved for future ACP versions. Receivers **SHOULD** preserve unknown values when storing, replaying, proxying, or forwarding, and either render them generically or fall back safely. Do not mint non-underscore custom values.
-* **`_meta` everywhere.** As in v1, `_meta` objects carry implementation metadata. In v2's upsert-style updates, top-level `_meta` is a patch: omitted means unchanged, `null` clears it, and an object patches stored metadata by top-level key, where a key set to `null` is removed and any other value replaces that key whole (see [Metadata Patches](/protocol/v2/extensibility#metadata-patches)). Metadata nested in a snapshot, exit-status object, content item, command permission subject, or chunk is scoped to that object. Omission and `null` are equivalent.
+* **`_meta` everywhere.** As in v1, `_meta` objects carry implementation metadata. In v2's upsert-style updates, top-level `_meta` is a patch: omitted means unchanged, `null` clears it, and an object patches stored metadata by top-level key, where a key set to `null` is removed and any other value replaces that key whole (see [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility.md#metadata-patches)). Metadata nested in a snapshot, exit-status object, content item, command permission subject, or chunk is scoped to that object. Omission and `null` are equivalent.
 * **Custom methods** still use the `_` prefix, unchanged from v1.
 
 ## Transports
 
 stdio remains the primary transport and is unchanged except that v2 explicitly follows **JSON-RPC 2.0 batch** behavior: a newline-delimited message may be a single request, notification, response, or a batch array. Receivers may process batch entries concurrently, must not reply to notifications, and return per-entry `-32600` errors for invalid entries. Don't batch lifecycle-sensitive messages (`initialize`, `auth/login`, `session/new`, `session/resume`, `session/prompt`). They change which later messages are valid.
 
-A standard remote transport (streamable HTTP with SSE streams, plus WebSocket) is being specified in its own RFD and is not part of the core v2 protocol surface. See the [transport RFD](/rfds/streamable-http-websocket-transport) for its current state.
+A standard remote transport (streamable HTTP with SSE streams, plus WebSocket) is being specified in its own RFD and is not part of the core v2 protocol surface. See the [transport RFD](https://agentclientprotocol.com/rfds/streamable-http-websocket-transport.md) for its current state.
 
 ## Migration checklist: Agents
 
@@ -935,7 +925,7 @@ Supporting both versions is the recommended path, not an edge case: v1 peers wil
 
 ### Negotiate once, then use the selected surface
 
-The [v2 version negotiation rules](/protocol/v2/initialization#version-negotiation) apply to Agent endpoints implementing v2, including dual-stack endpoints. They do not impose new requirements on legacy v1-only Agents:
+The [v2 version negotiation rules](https://agentclientprotocol.com/protocol/v2/initialization.md#version-negotiation) apply to Agent endpoints implementing v2, including dual-stack endpoints. They do not impose new requirements on legacy v1-only Agents:
 
 * The Client **MUST** request the latest version it supports.
 * An Agent implementing v2 **MUST** select the highest supported version at or below the requested version. If none exists, it **MUST** return `-32022` with `requested` and `supported` data instead of a higher-version success response.

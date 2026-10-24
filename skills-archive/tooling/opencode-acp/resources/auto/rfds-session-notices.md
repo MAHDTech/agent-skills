@@ -60,7 +60,7 @@ The fields are deliberately small:
   mean that the Agent supplied no event metadata.
 
 `NoticeSeverity` is open in both protocol versions from its introduction and
-follows the [v2 enum-extension rules](/rfds/v2/enum-variant-extension). Values
+follows the [v2 enum-extension rules](https://agentclientprotocol.com/rfds/v2/enum-variant-extension.md). Values
 beginning with `_` are reserved for implementation-specific extensions, while
 other unknown values are reserved for future ACP severities. Clients preserve
 an unknown string and use a generic notice presentation without inferring

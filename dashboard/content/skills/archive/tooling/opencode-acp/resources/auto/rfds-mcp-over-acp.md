@@ -346,7 +346,7 @@ The Rust reference implementation supervises cancellation and joins owned backen
 
 Normative MCP references: [2026-07-28 specification](https://modelcontextprotocol.io/specification/2026-07-28), [versioning](https://modelcontextprotocol.io/specification/2026-07-28/basic/lifecycle), [MRTR](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr), [subscriptions](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/subscriptions), [cancellation](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/cancellation), and [Streamable HTTP](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http).
 
-This proposal was split from the [proxy-chain RFD](./proxy-chains). Earlier drafts used server `id`/`acpId`, an MCP connection ID, connect/disconnect methods, and reverse requests. Those drafts and the stateful implementation checkpoint are not compatibility commitments. This revision replaces them with server-addressed requests and request-scoped notifications targeting MCP 2026-07-28 only.
+This proposal was split from the [proxy-chain RFD](https://agentclientprotocol.com/rfds/proxy-chains.md). Earlier drafts used server `id`/`acpId`, an MCP connection ID, connect/disconnect methods, and reverse requests. Those drafts and the stateful implementation checkpoint are not compatibility commitments. This revision replaces them with server-addressed requests and request-scoped notifications targeting MCP 2026-07-28 only.
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

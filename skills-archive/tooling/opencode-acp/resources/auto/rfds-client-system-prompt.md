@@ -244,7 +244,7 @@ The feature has the same shape in both protocol versions:
 | Requests carrying it | `session/new`, `session/load`, `session/resume`, `session/fork` | `session/new`, `session/resume`, `session/fork` |
 | Unknown content block types | Rejected when parsing | Preserved as `ContentBlock::Other`; agents reject types they don't support |
 
-In both versions, `mode` follows the [enum variant extension](/rfds/v2/enum-variant-extension) rule, like other values that receivers act on, such as v2 MCP server transports. Values beginning with `_` are reserved for implementation-specific modes, and other unknown values for future ACP modes. Receivers parse unknown modes instead of failing, so proxies and older SDKs can store and forward them. Clients **MUST** only use a mode the agent advertised; custom modes are advertised however their extension defines, for example in `_meta`. An agent that receives a mode it does not support **MUST** return an error rather than treating it as `append` or `override`.
+In both versions, `mode` follows the [enum variant extension](https://agentclientprotocol.com/rfds/v2/enum-variant-extension.md) rule, like other values that receivers act on, such as v2 MCP server transports. Values beginning with `_` are reserved for implementation-specific modes, and other unknown values for future ACP modes. Receivers parse unknown modes instead of failing, so proxies and older SDKs can store and forward them. Clients **MUST** only use a mode the agent advertised; custom modes are advertised however their extension defines, for example in `_meta`. An agent that receives a mode it does not support **MUST** return an error rather than treating it as `append` or `override`.
 
 ### Agent behavior
 
@@ -274,8 +274,8 @@ Override mode removes the agent's default instructions, which can include tool g
 The field is optional and capability-gated, so there is no default behavior change anywhere:
 
 * Existing clients that don't send `systemPrompt` see no difference.
-* Existing agents never receive the field, because they don't advertise the capability and clients gate on it. The unknown-param hazard — an old agent may silently ignore the field (no error, no incorporation) or, if it validates strictly, reject the request — is closed by construction, matching the approach taken by [`additionalDirectories`](/rfds/additional-directories).
-* Capability detection follows the established rule from [initialization](https://agentclientprotocol.com/protocol/v1/draft/initialization#capabilities): all capabilities omitted in the `initialize` response are treated as unsupported, and introducing a new capability is not a breaking change.
+* Existing agents never receive the field, because they don't advertise the capability and clients gate on it. The unknown-param hazard — an old agent may silently ignore the field (no error, no incorporation) or, if it validates strictly, reject the request — is closed by construction, matching the approach taken by [`additionalDirectories`](https://agentclientprotocol.com/rfds/additional-directories).
+* Capability detection follows the established rule from [initialization](https://agentclientprotocol.com/protocol/v1/draft/initialization.md#capabilities): all capabilities omitted in the `initialize` response are treated as unsupported, and introducing a new capability is not a breaking change.
 
 ## Frequently asked questions
 
@@ -327,7 +327,7 @@ No single storage rule fits all of them. Requiring agents to restore the prompt 
 
 ### How does this interact with session config options and modes?
 
-[Session config options](https://agentclientprotocol.com/protocol/session-config-options) (and v1 session modes) are agent-defined settings the client selects from; `systemPrompt` is client-authored content. They are independent mechanisms. Selecting a mode or config option does not remove the client-provided prompt, but how an agent combines its own mode- or config-driven instructions with it is implementation-defined — for example, an agent may add plan-mode instructions alongside an appended client prompt.
+[Session config options](https://agentclientprotocol.com/protocol/session-config-options.md) (and v1 session modes) are agent-defined settings the client selects from; `systemPrompt` is client-authored content. They are independent mechanisms. Selecting a mode or config option does not remove the client-provided prompt, but how an agent combines its own mode- or config-driven instructions with it is implementation-defined — for example, an agent may add plan-mode instructions alongside an appended client prompt.
 
 ### Why include both append and override in the first version?
 

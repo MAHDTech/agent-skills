@@ -21,7 +21,7 @@ The filesystem methods allow Agents to read and write text files within the Clie
 
 ## Checking Support
 
-Before attempting to use filesystem methods, Agents **MUST** verify that the Client supports these capabilities by checking the [Client Capabilities](/protocol/v1/initialization#client-capabilities) field in the Client's `initialize` request:
+Before attempting to use filesystem methods, Agents **MUST** verify that the Client supports these capabilities by checking the [Client Capabilities](https://agentclientprotocol.com/protocol/v1/initialization.md#client-capabilities) field in the Client's `initialize` request:
 
 ```json highlight={9,10} theme={null}
 {
@@ -60,21 +60,21 @@ The `fs/read_text_file` method allows Agents to read text file contents from the
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  The [Session ID](/protocol/v1/session-setup#session-id) for this request
-</ParamField>
+**sessionId** `SessionId` *required*
 
-<ParamField path="path" type="string" required>
-  Absolute path to the file to read
-</ParamField>
+The [Session ID](https://agentclientprotocol.com/protocol/v1/session-setup.md#session-id) for this request
 
-<ParamField path="line" type="number">
-  Optional line number to start reading from (1-based)
-</ParamField>
+**path** `string` *required*
 
-<ParamField path="limit" type="number">
-  Optional maximum number of lines to read
-</ParamField>
+Absolute path to the file to read
+
+**line** `number`
+
+Optional line number to start reading from (1-based)
+
+**limit** `number`
+
+Optional maximum number of lines to read
 
 The Client responds with the file contents:
 
@@ -105,19 +105,19 @@ The `fs/write_text_file` method allows Agents to write or update text files in t
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  The [Session ID](/protocol/v1/session-setup#session-id) for this request
-</ParamField>
+**sessionId** `SessionId` *required*
 
-<ParamField path="path" type="string" required>
-  Absolute path to the file to write.
+The [Session ID](https://agentclientprotocol.com/protocol/v1/session-setup.md#session-id) for this request
 
-  The Client **MUST** create the file if it doesn't exist.
-</ParamField>
+**path** `string` *required*
 
-<ParamField path="content" type="string" required>
-  The text content to write to the file
-</ParamField>
+Absolute path to the file to write.
+
+The Client **MUST** create the file if it doesn't exist.
+
+**content** `string` *required*
+
+The text content to write to the file
 
 The Client responds with an empty result on success:
 

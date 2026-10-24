@@ -15,7 +15,7 @@ description: Single source of truth for agent instructions
 - **diagnosing-bugs**: A disciplined loop for hard bugs and performance regressions. Use when the user says debug or diagnose this, or reports something broken, throwing, failing, flaky, or slow. Insists on building a tight, red-capable feedback loop before hypothesising, then reproduces, minimises, ranks hypotheses, instruments, fixes with a regression test, and runs a post-mortem.
 - **domain-modeling**: Build and sharpen a project's domain model as you design - pin down the ubiquitous language in a CONTEXT.md glossary and record hard-to-reverse architectural decisions as ADRs. Use when you want to nail down domain terminology, challenge fuzzy or conflicting terms, invent edge-case scenarios to stress-test the model, or record an architectural decision - or when another skill needs to maintain the domain model.
 - **egui**: Build immediate-mode GUIs in Rust using egui - widgets, layout, containers, styling, custom painting, state retention, eframe apps, and testing. Use when building desktop or web interfaces in Rust, creating custom immediate-mode widgets or canvas painters, styling egui visuals, or querying docs.rs rustdoc without hallucination.
-- **mcp**: Design, build, and debug Model Context Protocol (MCP) servers - implementing tools, resources, and prompts, managing JSON-RPC 2.0 protocol lifecycles, configuring stdio and Streamable HTTP transports, and using official SDKs (TypeScript, Python, Kotlin, Go). Use when implementing or testing MCP servers, defining tool schemas, managing resource subscriptions, or debugging with the MCP Inspector.
+- **model-context-protocol**: Design, build, and debug Model Context Protocol (MCP) servers - implementing tools, resources, and prompts, managing JSON-RPC 2.0 protocol lifecycles, configuring stdio and Streamable HTTP transports, and using official SDKs (TypeScript, Python, Kotlin, Go). Use when implementing or testing MCP servers, defining tool schemas, managing resource subscriptions, or debugging with the MCP Inspector.
 - **nutanix-api-v4**: API endpoints, SDK usage, OData filtering and sorting, namespace specifications, release updates, and troubleshooting for Nutanix v4 APIs (AOS 7.0+, Prism Central pc.2024.3+). Use when developing, integrating, or troubleshooting with Nutanix v4 REST APIs, Python/Go/Java/JavaScript v4 SDKs, OData parameters, or migrating off deprecated legacy Nutanix APIs (v1, v2, v3).
 - **nutanix-enterprise-ai**: Architecture reference, sizing guidelines, Helm deployment, fine-grained RBAC authorization, Hugging Face and NVIDIA NIM model management, local and unified inference endpoints, batch inference, security scanning, and MCP server configuration for Nutanix Enterprise AI (NAI v2.8). Use when configuring or troubleshooting Nutanix Enterprise AI, GPT-in-a-Box 2.0, LLM model serving, AI Gateway, or Model Context Protocol on Kubernetes.
 - **nutanix-files**: CLI commands, architecture reference, file server & share management, SMB/NFS protocols, directory services, smart tiering, disaster recovery, analytics, performance tuning, and troubleshooting for Nutanix Files (v5.0). Use when working with Nutanix Files, SMB/NFS file shares, file analytics, Smart Tiering, Metro Availability, Files REST APIs, or file server performance optimization.
@@ -110,3 +110,41 @@ description: Single source of truth for agent instructions
 
 - **tars-goal**: Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly asks to establish or resume a persistent goal.
 - **tars-run-factory**: Run the TARS software factory unattended over one repository's backlog. The agent becomes the foreman: it drives the Antigravity CLI (agy) headlessly through batch runs, peer reviews, and rework until the backlog drains or a human is needed.
+
+## Vendor Skills
+
+### cloudflare
+
+- **agents-sdk**: Build, debug, or review Cloudflare Agents SDK applications using the agents package.
+- **basin**: Build and troubleshoot Cloudflare Basin analytics workflows with Basin Pipelines, Basin Catalog, and Basin SQL. Use for streaming data into R2 Iceberg tables, managing catalogs, or querying those tables; also use for requests using the former Data Platform, Pipelines, R2 Data Catalog, or R2 SQL names.
+- **cf-cli**: Cloudflare's official cf CLI (beta) for the public Cloudflare API and Workers projects. Use for finding and running Cloudflare commands from the terminal — sign-in and profiles, cf cli search, cf schema, cf deploy/dev/build, resource commands for DNS, zones, D1, KV, and R2 — and for choosing between cf and Wrangler in a project.
+- **cloudflare**: Discover and choose Cloudflare products for apps, APIs, AI agents, storage, networking, and security. Use for architecture and product selection, including when the user describes a need without naming a Cloudflare product; then find the relevant skill or documentation.
+- **cloudflare-email-service**: Implement or troubleshoot Cloudflare Email Sending and Email Routing integrations and their delivery configuration.
+- **cloudflare-one**: Design, configure, troubleshoot, or review Cloudflare One Zero Trust and SASE deployments. Use cloudflare-one-migrations for migration planning from other vendors.
+- **cloudflare-one-migrations**: Assess and plan migrations from existing VPN, SWG, or SASE platforms to Cloudflare One, including policy mapping, parity gaps, and rollout.
+- **durable-objects**: Build, debug, or review Cloudflare Durable Objects code for persistent state and coordination.
+- **gateway-workers**: Build, debug, or review Cloudflare Workers invoked by the Forward action in Gateway HTTP policies, including the GatewayMiddleware entrypoint, Gateway types, context, and continuation.
+- **k2**: Build and troubleshoot Cloudflare K2 or K2 Streams durable logs. Use for stream setup, producing from Workers or HTTP, configuring retention and inputs, and consuming through subscriptions.
+- **nextjs-on-cloudflare**: Build, migrate, and deploy Next.js apps on Cloudflare Workers with vinext. Use when starting a Next.js project on Cloudflare, moving an existing app to Workers, choosing between vinext and OpenNext, or setting up vinext for Workers. For setup, migration, or deployment, install vinext's upstream skills with `npx skills add cloudflare/vinext` if missing, then read and follow the applicable skill and docs.
+- **sandbox-migrate-to-next**: Migrate Cloudflare Sandbox apps from stable @cloudflare/sandbox to @cloudflare/sandbox@next (SDK 1.0 preview). Use sandbox-next for apps already on the preview.
+- **sandbox-next**: Build or maintain Cloudflare Sandbox apps on @cloudflare/sandbox@next (SDK 1.0 preview). Use sandbox-migrate-to-next when porting a stable app.
+- **sandbox-stable**: Build or maintain Cloudflare Sandbox apps on the stable @cloudflare/sandbox package. Use sandbox-next for preview apps and sandbox-migrate-to-next for stable-to-preview migrations.
+- **turnstile-spin**: Set up, repair, or migrate to Cloudflare Turnstile bot verification in an existing frontend and backend, including server-side Siteverify.
+- **web-perf**: Audit, diagnose, or optimize website loading and interaction performance, Core Web Vitals, and Lighthouse performance scores.
+- **workers-best-practices**: Cloudflare Workers best practices for production applications. Use when writing, reviewing, or configuring Workers.
+- **workers-profiling**: Profile or debug CPU usage and memory allocation in deployed Cloudflare Workers and Durable Objects. Then use this information to optimize your code.
+- **wrangler**: Run or troubleshoot Wrangler CLI commands in projects that have a wrangler.jsonc, wrangler.json, or wrangler.toml file, including local development, Previews, deployment, and resource management. For new projects and projects without a Wrangler configuration file, use the cf CLI instead.
+
+### spacetimedb
+
+- **cli**: SpacetimeDB CLI reference for initializing projects, building modules, publishing databases, querying data, and managing servers
+- **concepts**: Understand SpacetimeDB architecture and core concepts. Use when learning SpacetimeDB or making architectural decisions.
+- **cpp-server**: SpacetimeDB C++ server module SDK reference. Use when writing tables, reducers, or module logic in C++.
+- **csharp-client**: SpacetimeDB C#/.NET client SDK reference. Use when building C# clients that connect to SpacetimeDB (console, desktop, or any .NET app).
+- **csharp-server**: SpacetimeDB C# server module SDK reference. Use when writing tables, reducers, or module logic in C#.
+- **mcp**: Operate a running SpacetimeDB database through MCP tools rather than the CLI - list databases, read schemas, run SQL, and call reducers. Use when the client exposes spacetimedb MCP tools and the task is to inspect or change data in a live database.
+- **rust-server**: SpacetimeDB Rust server module SDK reference. Use when writing tables, reducers, or module logic in Rust.
+- **typescript-client**: SpacetimeDB TypeScript/React client SDK reference. Use when building web clients that connect to SpacetimeDB.
+- **typescript-server**: SpacetimeDB TypeScript server module SDK reference. Use when writing tables, reducers, or module logic in TypeScript.
+- **unity**: Integrate SpacetimeDB with Unity game projects. Use when building Unity clients with MonoBehaviour lifecycle, FrameTick, and PlayerPrefs token persistence.
+- **unreal**: SpacetimeDB Unreal Engine client SDK reference. Use when building Unreal Engine clients that connect to SpacetimeDB.

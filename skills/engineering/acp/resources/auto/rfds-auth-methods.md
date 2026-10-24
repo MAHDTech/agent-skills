@@ -61,36 +61,34 @@ descriptor includes:
 
 The identifier and `env` wire shapes differ between protocol versions.
 
-\<CodeGroup\>
-  ```json v1 theme={null}
-  {
-    "id": "agent-login",
-    "name": "Log in from the terminal",
-    "description": "Open the Agent's interactive login flow",
-    "type": "terminal",
-    "args": ["--login"],
-    "env": {
-      "ACP_INTERACTIVE_LOGIN": "1"
-    }
+```json v1 theme={null}
+{
+  "id": "agent-login",
+  "name": "Log in from the terminal",
+  "description": "Open the Agent's interactive login flow",
+  "type": "terminal",
+  "args": ["--login"],
+  "env": {
+    "ACP_INTERACTIVE_LOGIN": "1"
   }
-  ```
+}
+```
 
-  ```json v2 theme={null}
-  {
-    "methodId": "agent-login",
-    "name": "Log in from the terminal",
-    "description": "Open the Agent's interactive login flow",
-    "type": "terminal",
-    "args": ["--login"],
-    "env": [
-      {
-        "name": "ACP_INTERACTIVE_LOGIN",
-        "value": "1"
-      }
-    ]
-  }
-  ```
-</CodeGroup>
+```json v2 theme={null}
+{
+  "methodId": "agent-login",
+  "name": "Log in from the terminal",
+  "description": "Open the Agent's interactive login flow",
+  "type": "terminal",
+  "args": ["--login"],
+  "env": [
+    {
+      "name": "ACP_INTERACTIVE_LOGIN",
+      "value": "1"
+    }
+  ]
+}
+```
 
 The descriptor cannot specify a command. The Client constructs the terminal
 invocation from the same configured Agent program and base launch configuration
@@ -103,27 +101,25 @@ the Agent from selecting an unrelated program.
 Clients opt in because terminal authentication requires Client-side process and
 terminal support.
 
-\<CodeGroup\>
-  ```json v1 theme={null}
-  {
-    "clientCapabilities": {
-      "auth": {
-        "terminal": true
-      }
+```json v1 theme={null}
+{
+  "clientCapabilities": {
+    "auth": {
+      "terminal": true
     }
   }
-  ```
+}
+```
 
-  ```json v2 theme={null}
-  {
-    "capabilities": {
-      "auth": {
-        "terminal": {}
-      }
+```json v2 theme={null}
+{
+  "capabilities": {
+    "auth": {
+      "terminal": {}
     }
   }
-  ```
-</CodeGroup>
+}
+```
 
 A Client advertises this capability only when it can reproduce the configured
 Agent invocation in an interactive terminal. In particular, a Client connected

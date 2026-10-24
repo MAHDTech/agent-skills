@@ -70,7 +70,7 @@ Send a message
 
 `Ctrl+Enter`
 
-Send a message to a subthread
+Send a message to a fork
 
 `Cmd+Shift+Enter`
 
@@ -278,12 +278,12 @@ Context-specific gestures are documented with their workflows:
 
 *   [Thread search and navigation](/docs/agents/threads#search-and-navigate) covers moving through a thread by whole turns and selecting code blocks.
 *   [Starting a thread](/docs/agents/threads#start-a-thread) covers composer indentation.
-*   [Sending to a subthread](/docs/agents/threads#send-a-message-to-a-subthread) covers the shortcut and modified-click gesture.
+*   [Sending to a fork](/docs/agents/threads#send-a-message-to-a-fork) covers the shortcut and modified-click gesture.
 *   [Opening files from the transcript](/docs/agents/threads#open-files-from-the-transcript) covers where `Option+Enter` works.
 
 ## [Custom keybindings](#custom-keybindings)
 
-Delta does not support rebinding keys yet. The defaults are fixed, apart from the composer’s send behavior: `Cmd+Enter` (`Ctrl+Enter` on Linux and Windows) sends by default, and turning the [Send With Modifier setting](/docs/configuration/settings) off makes `Enter` send instead. With that setting off, `Cmd+Enter` on macOS or `Ctrl+Enter` on Linux and Windows sends to a new subthread.
+Delta does not support rebinding keys yet. The defaults are fixed, apart from the composer’s send behavior: `Cmd+Enter` (`Ctrl+Enter` on Linux and Windows) sends by default, and turning the [Send With Modifier setting](/docs/configuration/settings) off makes `Enter` send instead. With that setting off, `Cmd+Enter` on macOS or `Ctrl+Enter` on Linux and Windows sends to a new fork.
 
 ## [What’s next](#whats-next)
 

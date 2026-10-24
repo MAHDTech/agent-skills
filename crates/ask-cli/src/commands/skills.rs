@@ -9,7 +9,7 @@ use comfy_table::{Attribute, Cell, Table};
 
 use crate::cli::{OutputFormat, SkillsArgs, SkillsCommands};
 use crate::commands::{CliError, resolve_root};
-use skills_core::artifacts::ArtifactsEngine;
+use skills_core::artifacts::{ArtifactsEngine, ArtifactsOptions};
 use skills_core::downloader::SkillDownloader;
 use skills_core::error::SkillError;
 use skills_core::installer::{InstallOptions, Installer, TargetEnvironment, UninstallOptions};
@@ -45,7 +45,13 @@ pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError>
             SkillsCommands::Lint { path, fix } => run_lint(path.as_deref(), *fix, format).await,
             SkillsCommands::Sync { dry_run } => run_sync(*dry_run).await,
             SkillsCommands::Download { url } => run_download(url).await,
-            SkillsCommands::DownloadResources { force } => run_download_resources(*force).await,
+            SkillsCommands::DownloadResources {
+                force,
+                vendors_only,
+                pending_ref,
+            } => {
+                run_download_resources(*force, *vendors_only, pending_ref.as_deref(), format).await
+            }
             SkillsCommands::CleanResources => run_clean_resources().await,
         }
     } else {
@@ -72,7 +78,7 @@ async fn run_action(action: &str, args: &SkillsArgs, format: OutputFormat) -> Re
         "install" | "uninstall" => run_bulk_action(action, args).await,
         "lint" => run_lint(None, false, format).await,
         "sync" => run_sync(args.dry_run).await,
-        "download-resources" => run_download_resources(false).await,
+        "download-resources" => run_download_resources(false, false, None, format).await,
         "clean-resources" => run_clean_resources().await,
         other => Err(CliError::Io(std::io::Error::new(
             std::io::ErrorKind::InvalidInput,
@@ -170,7 +176,10 @@ async fn run_list(
     skills.sort_by(|a, b| a.dir_name.cmp(&b.dir_name));
 
     if let Some(cat) = category {
-        skills.retain(|s| s.category.as_str().eq_ignore_ascii_case(cat));
+        skills.retain(|s| {
+            s.category.as_str().eq_ignore_ascii_case(cat)
+                || cat.eq_ignore_ascii_case("vendor") && s.vendor_source().is_some()
+        });
     }
 
     if json_flag || format == OutputFormat::Json {
@@ -562,16 +571,70 @@ async fn run_download(url: &str) -> Result<(), CliError> {
     Ok(())
 }
 
-async fn run_download_resources(_force: bool) -> Result<(), CliError> {
+async fn run_download_resources(
+    _force: bool,
+    vendors_only: bool,
+    pending_ref: Option<&str>,
+    format: OutputFormat,
+) -> Result<(), CliError> {
     let root = resolve_root()?;
+    let vendor_root = root.clone();
+    let pending = pending_ref.map(str::to_string);
+    let report = tokio::task::spawn_blocking(move || {
+        skills_core::vendors::update_vendors(&vendor_root, pending.as_deref())
+    })
+    .await
+    .map_err(|e| SkillError::validation(&root, e.to_string()))??;
     let skills = SkillParser::discover_skills(&root)?;
-    let downloader = SkillDownloader::new();
-    let results = downloader.download_all_resources(&skills).await?;
-    let total_downloaded: usize = results.values().map(Vec::len).sum();
-    println!(
-        "Downloaded {total_downloaded} resource files across {} skills.",
-        results.len()
-    );
+    let resources = if vendors_only {
+        Ok(0)
+    } else {
+        SkillDownloader::new()
+            .download_all_resources(&skills)
+            .await
+            .map(|results| results.values().map(Vec::len).sum::<usize>())
+    };
+    ArtifactsEngine::with_options(
+        &root,
+        ArtifactsOptions {
+            no_stage: true,
+            ..Default::default()
+        },
+    )
+    .generate_all()?;
+    if format == OutputFormat::Json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(SkillError::GeneralJson)?
+        );
+    } else {
+        println!("## Vendor skill updates\n");
+        for (id, snapshot) in &report.fetched {
+            let commit = &snapshot.commit;
+            if snapshot.repository.starts_with("https://github.com/") {
+                let repository = snapshot.repository.trim_end_matches(".git");
+                println!("- Refreshed **{id}** at [{commit}]({repository}/commit/{commit}).");
+            } else {
+                println!("- Refreshed **{id}** at `{commit}`.");
+            }
+        }
+        for id in &report.removed {
+            println!("- Removed undeclared source **{id}**.");
+        }
+        for (id, error) in &report.skipped {
+            println!("- Skipped **{id}**: {}", error.replace(['\n', '\r'], " "));
+        }
+        for id in &report.retained_pending {
+            println!("- Preserved **{id}** from the existing update PR.");
+        }
+        if !vendors_only {
+            println!(
+                "\nDownloaded {} documentation resource files.",
+                resources.as_ref().copied().unwrap_or_default()
+            );
+        }
+    }
+    resources?;
     Ok(())
 }
 

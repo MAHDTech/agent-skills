@@ -14,7 +14,7 @@
         "diagnosing-bugs",
         "domain-modeling",
         "egui",
-        "mcp",
+        "model-context-protocol",
         "nutanix-api-v4",
         "nutanix-enterprise-ai",
         "nutanix-files",
@@ -136,6 +136,48 @@
       "skills": [
         "tars-goal",
         "tars-run-factory"
+      ]
+    },
+    {
+      "title": "Vendor Skills / cloudflare",
+      "description": "Skills maintained by this vendor.",
+      "skills": [
+        "agents-sdk",
+        "basin",
+        "cf-cli",
+        "cloudflare",
+        "cloudflare-email-service",
+        "cloudflare-one",
+        "cloudflare-one-migrations",
+        "durable-objects",
+        "gateway-workers",
+        "k2",
+        "nextjs-on-cloudflare",
+        "sandbox-migrate-to-next",
+        "sandbox-next",
+        "sandbox-stable",
+        "turnstile-spin",
+        "web-perf",
+        "workers-best-practices",
+        "workers-profiling",
+        "wrangler"
+      ]
+    },
+    {
+      "title": "Vendor Skills / spacetimedb",
+      "description": "Skills maintained by this vendor.",
+      "skills": [
+        "cli",
+        "concepts",
+        "cpp-server",
+        "csharp-client",
+        "csharp-server",
+        "mcp",
+        "rust-server",
+        "typescript-client",
+        "typescript-server",
+        "unity",
+        "unreal"
       ]
     }
   ]

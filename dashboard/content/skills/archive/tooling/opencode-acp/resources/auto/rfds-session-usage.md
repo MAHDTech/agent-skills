@@ -24,7 +24,7 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 Add a standardized `usage_update` session notification that lets agents report the current context window utilization and optional cumulative session cost.
 
-This RFD is intentionally scoped to session-level context size and cost. End-turn token accounting is covered separately in the [End-Turn Token Usage RFD](/rfds/end-turn-token-usage).
+This RFD is intentionally scoped to session-level context size and cost. End-turn token accounting is covered separately in the [End-Turn Token Usage RFD](https://agentclientprotocol.com/rfds/end-turn-token-usage.md).
 
 ## Status quo
 
@@ -162,7 +162,7 @@ This approach provides flexibility for different agent implementations:
 4. Document the `session/update` notification variant in the protocol docs.
 5. Add examples showing when agents should send context window and cost updates.
 
-This RFD does not add end-turn token usage to the turn-completion signal. That proposal remains in draft in the [End-Turn Token Usage RFD](/rfds/end-turn-token-usage).
+This RFD does not add end-turn token usage to the turn-completion signal. That proposal remains in draft in the [End-Turn Token Usage RFD](https://agentclientprotocol.com/rfds/end-turn-token-usage.md).
 
 ## Frequently asked questions
 

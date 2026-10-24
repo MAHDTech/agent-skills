@@ -50,8 +50,11 @@ Delta stores these categories of data on its servers:
     *   The Git remote URL you configured, the derived repository name, and a normalized lookup key. Avoid remotes that embed credentials.
     *   Each collaborator’s GitHub login when a thread is shared.
     *   Git commit author and committer identities and commit messages.
-*   **Account settings.** Your application settings, including model provider API keys and subagent profiles, sync between devices. Each device keeps an encrypted local cache.
+*   **Account settings.** Your application settings, including model provider API keys and subagent profiles, sync between devices. Each device keeps an encrypted local cache. Environment variables you add for Cloud Runners are stored here.
+*   **Cloud runner sandboxes.** If you use [Cloud Runners](/docs/agents/cloud-runners) (private beta), each runner’s sandbox holds checkouts of the thread’s Delta worktrees and anything the agent or your setup script creates there. Archiving or deleting the thread deletes your sandbox for it.
 *   **Subscription credentials.** Zed Cloud stores the OAuth grants for ChatGPT and Grok subscriptions and provides Delta with short-lived access tokens. GitHub Copilot credentials remain in your operating system keychain.
+
+> **TODO:** Cloud runner sandbox provider, region, and retention for paused sandboxes.
 
 ## [Where your data lives](#where-your-data-lives)
 

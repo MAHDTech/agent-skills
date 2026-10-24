@@ -17,9 +17,7 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 > How all Agent Client Protocol connections begin
 
-The Initialization phase allows [Clients](/protocol/v1/overview#client) and [Agents](/protocol/v1/overview#agent) to negotiate protocol versions, capabilities, and authentication methods.
-
-<br />
+The Initialization phase allows [Clients](https://agentclientprotocol.com/protocol/v1/overview.md#client) and [Agents](https://agentclientprotocol.com/protocol/v1/overview.md#agent) to negotiate protocol versions, capabilities, and authentication methods.
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -32,8 +30,6 @@ sequenceDiagram
     Agent-->>Client: initialize response
     Note over Client,Agent: Ready for session setup
 ```
-
-<br />
 
 Before a Session can be created, Clients **MUST** initialize the connection by calling the `initialize` method with:
 
@@ -123,7 +119,7 @@ Capabilities are high-level and are not attached to a specific base protocol con
 
 Capabilities may specify the availability of protocol methods, notifications, or a subset of their parameters. They may also signal behaviors of the Agent or Client implementation.
 
-Implementations can also [advertise custom capabilities](/protocol/v1/extensibility#advertising-custom-capabilities) using the `_meta` field to indicate support for protocol extensions.
+Implementations can also [advertise custom capabilities](https://agentclientprotocol.com/protocol/v1/extensibility.md#advertising-custom-capabilities) using the `_meta` field to indicate support for protocol extensions.
 
 ### Client Capabilities
 
@@ -131,152 +127,152 @@ The Client **SHOULD** specify whether it supports the following capabilities:
 
 #### Terminal Authentication
 
-<ParamField path="auth.terminal" type="boolean">
-  The Client can reproduce the configured Agent invocation in an interactive
-  terminal. When `true`, the Agent may advertise `type: "terminal"`
-  authentication methods.
-</ParamField>
+**auth.terminal** `boolean`
 
-<Card icon="terminal" horizontal href="/protocol/v1/authentication">
-  Learn more about Terminal Authentication
-</Card>
+The Client can reproduce the configured Agent invocation in an interactive
+terminal. When `true`, the Agent may advertise `type: "terminal"`
+authentication methods.
+
+> Learn more about Terminal Authentication
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/authentication.md)
 
 #### File System
 
-<ParamField path="readTextFile" type="boolean">
-  The `fs/read_text_file` method is available.
-</ParamField>
+**readTextFile** `boolean`
 
-<ParamField path="writeTextFile" type="boolean">
-  The `fs/write_text_file` method is available.
-</ParamField>
+The `fs/read_text_file` method is available.
 
-<Card icon="file" horizontal href="/protocol/v1/file-system">
-  Learn more about File System methods
-</Card>
+**writeTextFile** `boolean`
+
+The `fs/write_text_file` method is available.
+
+> Learn more about File System methods
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/file-system.md)
 
 #### Terminal
 
-<ParamField path="terminal" type="boolean">
-  All `terminal/*` methods are available, allowing the Agent to execute and
-  manage shell commands.
-</ParamField>
+**terminal** `boolean`
 
-<Card icon="terminal" horizontal href="/protocol/v1/terminals">
-  Learn more about Terminals
-</Card>
+All `terminal/*` methods are available, allowing the Agent to execute and
+manage shell commands.
+
+> Learn more about Terminals
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/terminals.md)
 
 #### Elicitation
 
-<ParamField path="elicitation" type="ElicitationCapabilities Object">
-  The Client advertises its supported `elicitation/create` modes. Omitted or
-  `null` means no modes are advertised. A present object advertises each mode
-  only through its corresponding non-null `form` or `url` field. Empty and
-  all-null objects are valid but advertise no supported modes. Unlike MCP, ACP
-  does not treat `{}` as form support.
-</ParamField>
+**elicitation** `ElicitationCapabilities Object`
 
-<Card icon="message-question" horizontal href="/protocol/v1/elicitation">
-  Learn more about Elicitation
-</Card>
+The Client advertises its supported `elicitation/create` modes. Omitted or
+`null` means no modes are advertised. A present object advertises each mode
+only through its corresponding non-null `form` or `url` field. Empty and
+all-null objects are valid but advertise no supported modes. Unlike MCP, ACP
+does not treat `{}` as form support.
+
+> Learn more about Elicitation
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/elicitation.md)
 
 #### Boolean Config Options
 
-<ParamField path="session.configOptions.boolean" type="BooleanConfigOptionCapabilities Object">
-  The Client supports `boolean` session configuration options. Omitted or `null`
-  at any level means the Client does not advertise support. Supplying `{}` means
-  Agents may include `type: "boolean"` options in v1 `configOptions` payloads.
-</ParamField>
+**session.configOptions.boolean** `BooleanConfigOptionCapabilities Object`
 
-<Card icon="sliders" horizontal href="/protocol/v1/session-config-options">
-  Learn more about Session Config Options
-</Card>
+The Client supports `boolean` session configuration options. Omitted or `null`
+at any level means the Client does not advertise support. Supplying `{}` means
+Agents may include `type: "boolean"` options in v1 `configOptions` payloads.
+
+> Learn more about Session Config Options
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/session-config-options.md)
 
 #### Session Compaction
 
-<ParamField path="session.compaction" type="CompactionCapabilities Object">
-  The Client supports ID-addressed `compaction_update` and
-  `compaction_summary_chunk` session updates, including their lifecycle,
-  placement, patch, and replay semantics. Omitted or `null` at either level
-  means unsupported. Supplying `{}` advertises the complete contract. Agents
-  must not send these updates to a v1 Client that does not advertise it.
-</ParamField>
+**session.compaction** `CompactionCapabilities Object`
 
-<Card icon="compress" horizontal href="/protocol/v1/prompt-turn#session-compaction">
-  Learn more about Session Compaction
-</Card>
+The Client supports ID-addressed `compaction_update` and
+`compaction_summary_chunk` session updates, including their lifecycle,
+placement, patch, and replay semantics. Omitted or `null` at either level
+means unsupported. Supplying `{}` advertises the complete contract. Agents
+must not send these updates to a v1 Client that does not advertise it.
+
+> Learn more about Session Compaction
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#session-compaction)
 
 #### Session Notices
 
-<ParamField path="session.notices" type="NoticeCapabilities Object">
-  The Client can present live `notice` session updates to the user. This field
-  is optional and nullable. Omitting `session` or `notices`, or setting either
-  to `null`, means unsupported. Supplying `{}` advertises notice support. Agents
-  must not send notices without this capability and may instead use an agent
-  message when the information should still be surfaced to the user.
-</ParamField>
+**session.notices** `NoticeCapabilities Object`
 
-<Card icon="message" horizontal href="/protocol/v1/prompt-turn#session-notices">
-  Learn more about Session Notices
-</Card>
+The Client can present live `notice` session updates to the user. This field
+is optional and nullable. Omitting `session` or `notices`, or setting either
+to `null`, means unsupported. Supplying `{}` advertises notice support. Agents
+must not send notices without this capability and may instead use an agent
+message when the information should still be surfaced to the user.
+
+> Learn more about Session Notices
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#session-notices)
 
 ### Agent Capabilities
 
 The Agent **SHOULD** specify whether it supports the following capabilities:
 
-<ResponseField name="loadSession" type="boolean" post={["default: false"]}>
-  The [`session/load`](/protocol/v1/session-setup#loading-sessions) method is
-  available.
-</ResponseField>
+**loadSession** `boolean`
 
-<ResponseField name="promptCapabilities" type="PromptCapabilities Object">
-  Object indicating the different types of [content](/protocol/v1/content) that
-  may be included in `session/prompt` requests.
-</ResponseField>
+The [`session/load`](https://agentclientprotocol.com/protocol/v1/session-setup#loading-sessions) method is
+available.
 
-<ResponseField name="auth" type="AgentAuthCapabilities Object">
-  Authentication-related capabilities supported by the Agent.
-</ResponseField>
+**promptCapabilities** `PromptCapabilities Object`
+
+Object indicating the different types of [content](https://agentclientprotocol.com/protocol/v1/content.md) that
+may be included in `session/prompt` requests.
+
+**auth** `AgentAuthCapabilities Object`
+
+Authentication-related capabilities supported by the Agent.
 
 #### Prompt capabilities
 
 As a baseline, all Agents **MUST** support `ContentBlock::Text` and `ContentBlock::ResourceLink` in `session/prompt` requests.
 
-Optionally, they **MAY** support richer types of [content](/protocol/v1/content) by specifying the following capabilities:
+Optionally, they **MAY** support richer types of [content](https://agentclientprotocol.com/protocol/v1/content.md) by specifying the following capabilities:
 
-<ResponseField name="image" type="boolean" post={["default: false"]}>
-  The prompt may include `ContentBlock::Image`
-</ResponseField>
+**image** `boolean`
 
-<ResponseField name="audio" type="boolean" post={["default: false"]}>
-  The prompt may include `ContentBlock::Audio`
-</ResponseField>
+The prompt may include `ContentBlock::Image`
 
-<ResponseField name="embeddedContext" type="boolean" post={["default: false"]}>
-  The prompt may include `ContentBlock::Resource`
-</ResponseField>
+**audio** `boolean`
+
+The prompt may include `ContentBlock::Audio`
+
+**embeddedContext** `boolean`
+
+The prompt may include `ContentBlock::Resource`
 
 #### MCP capabilities
 
-<ResponseField name="http" type="boolean" post={["default: false"]}>
-  The Agent supports connecting to MCP servers over HTTP.
-</ResponseField>
+**http** `boolean`
 
-<ResponseField name="sse" type="boolean" post={["default: false"]}>
-  The Agent supports connecting to MCP servers over SSE.
+The Agent supports connecting to MCP servers over HTTP.
 
-  Note: This transport has been deprecated by the MCP spec.
-</ResponseField>
+**sse** `boolean`
+
+The Agent supports connecting to MCP servers over SSE.
+
+Note: This transport has been deprecated by the MCP spec.
 
 #### Authentication Capabilities
 
-<ResponseField name="logout" type="LogoutCapabilities Object">
-  The [`logout`](/protocol/v1/authentication#logging-out) method is available.
-</ResponseField>
+**logout** `LogoutCapabilities Object`
 
-<Card icon="shield-check" horizontal href="/protocol/v1/authentication">
-  Learn more about Authentication
-</Card>
+The [`logout`](https://agentclientprotocol.com/protocol/v1/authentication#logging-out) method is available.
+
+> Learn more about Authentication
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/authentication.md)
 
 #### Session Capabilities
 
@@ -284,49 +280,49 @@ As a baseline, all Agents **MUST** support `session/new`, `session/prompt`, `ses
 
 Optionally, they **MAY** support other session methods and notifications by specifying additional capabilities.
 
-<ResponseField name="delete" type="SessionDeleteCapabilities Object">
-  The [`session/delete`](/protocol/v1/session-delete) method is available.
-  Omitted or `null` both mean the Agent does not advertise support. Supplying an
-  empty object means the Agent supports deleting sessions from `session/list`.
-</ResponseField>
+**delete** `SessionDeleteCapabilities Object`
 
-<ResponseField name="additionalDirectories" type="SessionAdditionalDirectoriesCapabilities Object">
-  The Agent supports `additionalDirectories` on supported session lifecycle
-  requests. Omitted or `null` both mean the Agent does not advertise support.
-  Supplying `{}` means the Agent supports additional workspace roots.
-</ResponseField>
+The [`session/delete`](https://agentclientprotocol.com/protocol/v1/session-delete) method is available.
+Omitted or `null` both mean the Agent does not advertise support. Supplying an
+empty object means the Agent supports deleting sessions from `session/list`.
 
-\<Note\>
-  `session/load` is still handled by the top-level `load_session` capability.
-  This will be unified in future versions of the protocol.
-</Note>
+**additionalDirectories** `SessionAdditionalDirectoriesCapabilities Object`
+
+The Agent supports `additionalDirectories` on supported session lifecycle
+requests. Omitted or `null` both mean the Agent does not advertise support.
+Supplying `{}` means the Agent supports additional workspace roots.
+
+> [!NOTE]
+>
+> `session/load` is still handled by the top-level `load_session` capability.
+> This will be unified in future versions of the protocol.
 
 ## Implementation Information
 
 Both Clients and Agents **SHOULD** provide information about their implementation in the `clientInfo` and `agentInfo` fields respectively. Both take the following three fields:
 
-<ParamField path="name" type="string">
-  Intended for programmatic or logical use, but can be used as a display name
-  fallback if title isn’t present.
-</ParamField>
+**name** `string`
 
-<ParamField path="title" type="string">
-  Intended for UI and end-user contexts — optimized to be human-readable and
-  easily understood. If not provided, the name should be used for display.
-</ParamField>
+Intended for programmatic or logical use, but can be used as a display name
+fallback if title isn’t present.
 
-<ParamField path="version" type="string">
-  Version of the implementation. Can be displayed to the user or used for
-  debugging or metrics purposes.
-</ParamField>
+**title** `string`
 
-<Info>
-  Note: in future versions of the protocol, this information will be required.
-</Info>
+Intended for UI and end-user contexts — optimized to be human-readable and
+easily understood. If not provided, the name should be used for display.
+
+**version** `string`
+
+Version of the implementation. Can be displayed to the user or used for
+debugging or metrics purposes.
+
+> [!NOTE]
+>
+> Note: in future versions of the protocol, this information will be required.
 
 ***
 
-Once the connection is initialized, you're ready to [create a session](/protocol/v1/session-setup) and begin the conversation with the Agent.
+Once the connection is initialized, you're ready to [create a session](https://agentclientprotocol.com/protocol/v1/session-setup.md) and begin the conversation with the Agent.
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -88,7 +88,7 @@ When a `$/cancel_request` notification is received by a supporting implementatio
 * **MAY** finish sending any pending notifications before responding
 * **MUST** send one of these responses for the original request:
   * A valid response with appropriate data (such as partial results or cancellation marker)
-  * An error response with code [`-32800` (Request Cancelled)](/protocol/v1/draft/schema#errorcode)
+  * An error response with code [`-32800` (Request Cancelled)](https://agentclientprotocol.com/protocol/v1/draft/schema#errorcode)
 
 Sending `$/cancel_request` does not guarantee that the receiver stops the request or its nested activities. It also does not automatically withdraw requests that the receiver has sent to the other party; propagating cancellation to those requests requires explicit implementation support.
 
@@ -165,7 +165,7 @@ Note: it is possible that `session/cancel` could be replaced by the more generic
 
 #### Example: Cascading Cancellation Flow
 
-This v1 example shows an Agent explicitly propagating cancellation to an outstanding terminal request. That propagation is optional, not an automatic protocol guarantee. Independently, the Client **MUST** answer pending permission requests with the `cancelled` outcome when it sends `session/cancel`, as specified in [prompt turn cancellation](/protocol/v1/prompt-turn#cancellation); it does not wait for `$/cancel_request`.
+This v1 example shows an Agent explicitly propagating cancellation to an outstanding terminal request. That propagation is optional, not an automatic protocol guarantee. Independently, the Client **MUST** answer pending permission requests with the `cancelled` outcome when it sends `session/cancel`, as specified in [prompt turn cancellation](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#cancellation); it does not wait for `$/cancel_request`.
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -210,7 +210,7 @@ Implementations can propagate cancellation to nested activities and outstanding 
 
 Each outstanding request still requires a response. Where a feature defines its own cancellation semantics, those semantics apply: for example, `session/cancel` requires the Client to answer pending `session/request_permission` requests with the `cancelled` outcome, regardless of whether the Agent sends `$/cancel_request`.
 
-See the protocol's [v1 prompt turn cancellation](/protocol/v1/prompt-turn#cancellation) and [v2 active session work cancellation](/protocol/v2/prompt-lifecycle#cancellation) rules for the Agent's cleanup and completion obligations.
+See the protocol's [v1 prompt turn cancellation](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#cancellation) and [v2 active session work cancellation](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#cancellation) rules for the Agent's cleanup and completion obligations.
 
 ## Revision history
 

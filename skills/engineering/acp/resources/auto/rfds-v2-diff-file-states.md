@@ -41,7 +41,7 @@ That shape has several problems:
 * Clients have to reconstruct or parse a diff to render changes.
 * The protocol cannot express whether a file path was added, deleted, modified, moved, or copied.
 
-The v1 [Represent deleted files in diff](/rfds/diff-delete) RFD is a useful
+The v1 [Represent deleted files in diff](https://agentclientprotocol.com/rfds/diff-delete.md) RFD is a useful
 stop-gap for deletes, but v2 can use a cleaner breaking shape instead of adding
 more flags to the v1 structure.
 

@@ -21,7 +21,7 @@ The Session List RFD has moved to Completed and the session/list method is stabi
 
 This gives clients a standard way to discover sessions known to an agent, making features like session history, session switching, and cleanup much easier to implement consistently across ACP clients.
 
-For the shipped protocol, see [Session List](/protocol/v1/session-list). For the design history, see the [Session List RFD](/rfds/session-list).
+For the shipped protocol, see [Session List](https://agentclientprotocol.com/protocol/v1/session-list.md). For the design history, see the [Session List RFD](https://agentclientprotocol.com/rfds/session-list.md).
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

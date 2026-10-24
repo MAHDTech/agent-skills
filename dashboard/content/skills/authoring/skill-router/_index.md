@@ -141,7 +141,7 @@ Beyond `/code-review` on the main flow:
 - `/prek` - reach for this when running, configuring, or troubleshooting pre-commit hooks (note: pre-commit CLI is deprecated, use prek).
 - `/herdr` - reach for this when controlling Herdr terminal multiplexer, managing workspaces, tabs, and panes, or coordinating coding agents.
 - [/acp](@/skills/engineering/acp/_index.md) - reach for this when building, integrating, or debugging Agent Client Protocol (ACP) agents, clients, JSON-RPC 2.0 schemas, or SDKs.
-- [/mcp](@/skills/engineering/mcp/_index.md) - reach for this when building Model Context Protocol (MCP) servers, exposing tools, resources, prompts, handling transports, and JSON-RPC 2.0 schemas.
+- [/model-context-protocol](@/skills/engineering/model-context-protocol/_index.md) - reach for this when building Model Context Protocol (MCP) servers, exposing tools, resources, prompts, handling transports, and JSON-RPC 2.0 schemas.
 - [/nix-shell](@/skills/tooling/nix-shell/_index.md) - reach for this when running ad-hoc CLI utilities or diagnostic tools in ephemeral Nix shells.
 - [/pagefind](@/skills/tooling/pagefind/_index.md) - reach for this when configuring, indexing, or troubleshooting Pagefind static search for websites.
 - `/scratchpad` - reach for this when temporary or experimental scripts need a gitignored `scratch/` home.

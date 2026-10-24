@@ -49,7 +49,7 @@ the Agent **MUST** support these baseline session methods:
 * `session/update`
 
 The v2 schema should remove the optional `session.list`, `session.resume`, and
-`session.close` capability fields. The [Session Resume Replay](./session-resume-replay.mdx)
+`session.close` capability fields. The [Session Resume Replay](https://agentclientprotocol.com/rfds/v2/session-resume-replay.md)
 RFD removes `session/load` from v2 and folds history replay into
 `session/resume`.
 

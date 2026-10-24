@@ -8,7 +8,7 @@
 
 **Published:** June 25, 2026
 
-The [Rust SDK based on SACP RFD](/rfds/rust-sdk-v1) has moved to Completed after both the Rust and TypeScript ACP SDKs reached version 1.0.0.
+The [Rust SDK based on SACP RFD](https://agentclientprotocol.com/rfds/rust-sdk-v1.md) has moved to Completed after both the Rust and TypeScript ACP SDKs reached version 1.0.0.
 
 The Rust SDK's component-based architecture provides explicit message ordering and composable handlers for clients, agents, and protocol adapters. The matching TypeScript milestone demonstrates that the SDK design goals apply across language ecosystems.
 

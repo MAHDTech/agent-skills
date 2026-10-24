@@ -39,46 +39,26 @@ Zed-hosted models, available out of the box.
 
 ## How Delta plans work
 
-Which plan is right for me?+
+Which plan is right for me?
 
 Personal is for users who want to use their existing subscription keys or external agents. Pro includes Zed-hosted models out of the box. Business is for teams that need centralized control over how Zed is used.
 
-Does my existing Zed subscription include Delta?+
+Does my existing Zed subscription include Delta?
 
 Yes. Delta uses the same account and plans as Zed, so your current Zed plan also applies to Delta. Edit predictions are not available in Delta.
 
-Do my Business plan controls carry over?+
+Do my Business plan controls carry over?
 
 Yes. When you use Delta with a Zed Business organization selected, that organization’s server-enforced data and privacy controls apply in Delta.
 
-How does the Pro free trial work?+
+How does the Pro free trial work?
 
 The Pro trial lasts for two weeks after activation and includes $5 in GPT-6 Luna credits. Your balance is shared across Zed and Delta. The trial includes unlimited edit predictions in Zed. Edit predictions are not available in Delta. No credit card is required.
 
-Where do I manage or cancel my subscription?+
+Where do I manage or cancel my subscription?
 
 You can manage or cancel your subscription through your Zed account.
 
 ## Talk to us about Delta
 
-Name
-
-Work email
-
-Company
-
-Role
-
-Engineering team sizeSelect a range1–1011–5051–200201–500501–1,0001,001+
-
-How do you plan to use Delta?
-
-Zed will use this information to respond to your inquiry. Read our [Privacy Policy](https://zed.dev/privacy).
-
-Talk to us
-
-[Download Delta NowD](/download)[Open DeltaD](/threads)
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)
+[Download Delta Now](/download)[Open Delta](/threads)

@@ -5269,7 +5269,7 @@ A cache hit must retain the stored token. A write with no returned revision stor
 
 > How the language SDKs are built, packaged, and released, and which platforms each one supports
 
-SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript, Haskell, PHP, C#, Swift (0.18+), and JVM languages (0.20+). This page is for contributors: how the SDKs are put together, how each one is packaged and released, which platforms each artifact covers, and what to update when adding a platform or a new SDK. For the user-facing architecture and API, see the [SDK overview](/sdk/overview).
+SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript, Haskell, PHP, C#, Swift (0.18+), JVM languages (0.20+), and Elixir (0.22+). This page is for contributors: how the SDKs are put together, how each one is packaged and released, which platforms each artifact covers, and what to update when adding a platform or a new SDK. For the user-facing architecture and API, see the [SDK overview](/sdk/overview).
 
 > **Native library name**
 >
@@ -5295,17 +5295,22 @@ Package versions for the non-Rust SDKs are not hand-edited: release workflows ru
 
 Each SDK has a dedicated distribution workflow that builds artifacts per platform and publishes on a version tag:
 
-| SDK           | Package                                                                                    | Workflow                                         |
-| ------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| Rust          | `secretspec` on crates.io (source)                                                         | `publish.yml`                                    |
-| Python        | `secretspec` wheels on PyPI                                                                | `python-wheels.yml`                              |
-| Node.js       | `secretspec` + per-platform packages on npm                                                | `node-addon.yml`                                 |
-| Go            | Go module (source) + `libsecretspec` release assets                                        | `go-embed.yml`, `go-static.yml`, `ffi-build.yml` |
-| Ruby          | `secretspec` platform gems on RubyGems                                                     | `ruby-gems.yml`                                  |
-| C#            | `Cachix.SecretSpec` on NuGet                                                               | `dotnet-package.yml`                             |
-| Swift (0.18+) | SwiftPM source package + XCFramework release asset                                         | `swift-package.yml`                              |
-| PHP           | Composer package (source) + prebuilt extension binaries and `libsecretspec` release assets | `php-ext.yml`, `ffi-build.yml`                   |
-| Haskell       | `secretspec` on Hackage (source)                                                           | `haskell-build.yml`                              |
+| SDK            | Package                                                                                    | Workflow                                         |
+| -------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| Rust           | `secretspec` on crates.io (source)                                                         | `publish.yml`                                    |
+| Python         | `secretspec` wheels on PyPI                                                                | `python-wheels.yml`                              |
+| Node.js        | `secretspec` + per-platform packages on npm                                                | `node-addon.yml`                                 |
+| Go             | Go module (source) + `libsecretspec` release assets                                        | `go-embed.yml`, `go-static.yml`, `ffi-build.yml` |
+| Ruby           | `secretspec` platform gems on RubyGems                                                     | `ruby-gems.yml`                                  |
+| C#             | `Cachix.SecretSpec` on NuGet                                                               | `dotnet-package.yml`                             |
+| Swift (0.18+)  | SwiftPM source package + XCFramework release asset                                         | `swift-package.yml`                              |
+| PHP            | Composer package (source) + prebuilt extension binaries and `libsecretspec` release assets | `php-ext.yml`, `ffi-build.yml`                   |
+| Haskell        | `secretspec` on Hackage (source)                                                           | `haskell-build.yml`                              |
+| Elixir (0.22+) | `secretspec` on Hex.pm, using `secretspec serve`                                           | `elixir-package.yml`                             |
+
+**New in version 0.22**
+
+The Elixir SDK is available from SecretSpec 0.22 and uses the shared resolver IPC protocol.
 
 ## Platform support
 
@@ -5323,6 +5328,7 @@ Platforms each released artifact covers. Windows support for the Python wheel, t
 | PHP                 | ✓                        | ✓                        | —           | ✓                   | ✓ (0.17+)             | —             |
 | Haskell (source)    | ✓ (CI-covered)           | —                        | —           | —                   | ✓ (CI-covered, 0.17+) | —             |
 | JVM (0.20+)         | ✓                        | ✓                        | ✓           | ✓                   | ✓                     | ✓             |
+| Elixir (0.22+)      | ✓                        | ✓                        | —           | ✓                   | ✓                     | —             |
 
 Notes:
 
@@ -11686,12 +11692,43 @@ Secrets are stored as note items. The vault defaults to `secretspec`, and the it
 
 ## Use existing secrets
 
-A secret’s [`ref`](/reference/configuration/#secret-references) field names an existing item instead: `item` is the exact item title, whose note is read (`field` is not supported). Reads and writes target that item in place.
+A secret’s [`ref`](/reference/configuration/#secret-references) field names an existing item instead: `item` is the exact item title, whose note is read. Reads and writes target that item in place.
 
 ```toml
 [profiles.production]
 DATABASE_URL = { description = "DB", ref = { item = "Production Database" }, providers = ["protonpass://Work"] }
 ```
+
+### Read a specific field
+
+**New in version 0.22**
+
+Add `field` to read any field of an item of any type (login, note, custom, and so on) instead of its note. SecretSpec passes the name to `pass-cli item view --field`, so it accepts the same names: `password`, `username`, `email`, `url`, `note`, `totp` (the current code), custom field names, and `Section.field` for fields in a named section. Field names are case-insensitive.
+
+```toml
+[profiles.production]
+DB_PASSWORD = { description = "DB password", ref = { item = "Production Database", field = "password" }, providers = ["protonpass://Work"] }
+DB_USER = { description = "DB user", ref = { item = "Production Database", field = "username" }, providers = ["protonpass://Work"] }
+```
+
+This is equivalent to:
+
+```bash
+$ pass-cli item view --vault-name Work --item-title "Production Database" --field password
+```
+
+`pass-cli` reports an empty field the same way as a missing one, so both count as an unset secret.
+
+Refs with `field` are read-only: `secretspec set` refuses them before prompting for a value. Update the field in a Proton Pass app instead. Refs without `field`, and the default note storage, remain writable.
+
+> **Why field refs are read-only**
+>
+> This follows from how `pass-cli` works. Its only way to change a field is `pass-cli item update --field name=value`:
+>
+> * The value must be passed as a command-line argument, with no stdin or template form, so other local users can read it in the process list (for example with `ps`) while the command runs. Note writes do not have this problem: SecretSpec sends them to `pass-cli item create note --from-template -` on stdin.
+> * A field name the item does not already have is added as a new custom field in plain text, with no way to make it hidden.
+>
+> SecretSpec will support writing fields once `pass-cli` can accept a field value without putting it on the command line.
 
 ## CI/CD
 
@@ -14512,11 +14549,13 @@ GOOGLE_APPLICATION_CREDENTIALS = { description = "GCP service account", as_path 
 
 In SecretSpec 0.21+, the file always contains the exact logical bytes. When combined with `encoding` (0.19+), those are the decoded bytes rather than the stored representation. When combined with `extract` (0.19+), it contains only the selected logical value. In 0.21+, `get` and Rust’s `resolve_bytes()` and `resolve_named_bytes()` also return binary values inline. `run` preserves non-UTF-8 inline values on Unix, but environment values cannot contain NULs. Use `as_path` when an application needs a file. Text SDK responses and text exports require UTF-8.
 
-| Context                     | Behavior                                                                                |
-| --------------------------- | --------------------------------------------------------------------------------------- |
-| CLI (`get`, `check`, `run`) | Files are persisted (not deleted after command exits)                                   |
-| Rust SDK                    | Files cleaned up when `ValidatedSecrets` is dropped; use `keep_temp_files()` to persist |
-| Rust SDK types              | `PathBuf` or `Option\<PathBuf\>` instead of `String`                                      |
+| Context             | Behavior                                                                                |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| CLI `get`, `export` | Files are persisted (not deleted after command exits) because the path is printed       |
+| CLI `run`           | Files are deleted after the child process exits                                         |
+| CLI `check`         | Files are deleted when the command exits (0.22+; earlier versions left them behind)     |
+| Rust SDK            | Files cleaned up when `ValidatedSecrets` is dropped; use `keep_temp_files()` to persist |
+| Rust SDK types      | `PathBuf` or `Option\<PathBuf\>` instead of `String`                                      |
 
 ### Secret Encoding
 
@@ -14768,10 +14807,10 @@ GITHUB_TOKEN = { description = "GitHub token", ref = { item = "GITHUB_PAT" }, pr
 
 Stores fall into two groups for `field`:
 
-| Store                                                                                                           | Shape of one secret     | `field`                                                   |
-| --------------------------------------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------- |
-| dotenv, file (0.19+), env, pass, LastPass, Proton Pass, Bitwarden, AWS Parameter Store (0.18+), Doppler (0.21+) | a single value          | Rejected: there is nothing to select                      |
-| 1Password, Keeper (0.18+), Passbolt (0.19+), Vault KV, AWS Secrets Manager, keyring                             | a record of named parts | Selects the part: field label, map key, JSON key, account |
+| Store                                                                                                    | Shape of one secret     | `field`                                                   |
+| -------------------------------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------- |
+| dotenv, file (0.19+), env, pass, LastPass, Bitwarden, AWS Parameter Store (0.18+), Doppler (0.21+)       | a single value          | Rejected: there is nothing to select                      |
+| 1Password, Keeper (0.18+), Passbolt (0.19+), Proton Pass (0.22+), Vault KV, AWS Secrets Manager, keyring | a record of named parts | Selects the part: field label, map key, JSON key, account |
 
 `vault` is the only container coordinate. For every store except 1Password the container is part of the provider URI, not the ref:
 
@@ -14816,35 +14855,35 @@ During profile inheritance, `ref` and `refs` (0.19+) form one setting rather tha
 
 #### How providers interpret the coordinates
 
-| Provider                                                                                      | `item`                                                      | `field`                                           | Without `field`                                                                                      | Writes via ref                                                              |
-| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [1Password](/providers/onepassword/#use-existing-secrets)                                     | Item title or UUID                                          | Field label; `vault` and `section` also apply     | Reads the item like a convention secret (its value or password field); writes edit the `value` field | ✅ via `op item edit` (adds a missing field, never creates items)            |
-| [Keeper (0.18+)](/providers/keeper/#use-existing-records)                                     | Record UID or exact title                                   | Standard field type/label or custom field label   | Reads `password`                                                                                     | ✅ for existing records and fields                                           |
-| [keyring](/providers/keyring/#use-existing-secrets)                                           | Service                                                     | Account (defaults to the current system username) | Current user’s entry                                                                                 | ✅                                                                           |
-| [dotenv](/providers/dotenv/#use-existing-secrets)                                             | `.env` key                                                  | Rejected                                          | Reads the key                                                                                        | ✅                                                                           |
-| [file (0.19+)](/providers/file/#use-existing-files)                                           | Relative file path beneath the configured root              | Rejected                                          | Reads the complete file as arbitrary bytes (0.21+)                                                   | ✅                                                                           |
-| [env](/providers/env/#use-existing-secrets)                                                   | Variable name                                               | Rejected                                          | Reads the variable                                                                                   | — (read-only)                                                               |
-| [EJSON (0.20+)](/providers/ejson/#use-existing-secrets)                                       | RFC 6901 JSON Pointer                                       | Rejected                                          | Reads the selected JSON string                                                                       | — (read-only)                                                               |
-| [systemd credentials (0.17+)](/providers/systemd-credential/#use-an-existing-credential-name) | Credential filename                                         | Rejected                                          | Reads arbitrary credential bytes (0.21+)                                                             | — (read-only)                                                               |
-| [Fly.io secrets (0.20+)](/providers/fly/#use-existing-secrets)                                | Fly app secret name                                         | Rejected                                          | Error: Fly.io does not expose plaintext values                                                       | ✅ write-only via `flyctl secrets set`                                       |
-| [Cloudflare Secrets Store (0.20+)](/providers/cloudflare/#use-existing-secrets-020)           | Account-secret name in the selected store                   | Rejected                                          | Error: Cloudflare’s management API does not expose plaintext values                                  | ✅ write-only via the Cloudflare API                                         |
-| [pass](/providers/pass/#use-existing-secrets)                                                 | Entry path                                                  | Rejected                                          | Reads the entry                                                                                      | ✅                                                                           |
-| [Gopass (0.15+)](/providers/gopass/#use-existing-secrets)                                     | Entry path, including any mount-point prefix                | Rejected                                          | Reads the entry                                                                                      | ✅                                                                           |
-| [LastPass](/providers/lastpass/#use-existing-secrets)                                         | Item name                                                   | Rejected                                          | Reads the item                                                                                       | ✅                                                                           |
-| [Dashlane (0.18+)](/providers/dashlane/#use-existing-secrets)                                 | Item title or identifier                                    | Field name on the item                            | Reads the type’s default field (`content`, or `password` for a login)                                | — (read-only)                                                               |
-| [Proton Pass](/providers/protonpass/#use-existing-secrets)                                    | Item title                                                  | Rejected                                          | Reads the note                                                                                       | ✅                                                                           |
-| [Passbolt (0.19+)](/providers/passbolt/#use-existing-resources)                               | Resource UUID or exact name                                 | `password`, `username`, `uri`, or `description`   | Reads `password`                                                                                     | ✅ for existing resources; never creates through `ref`                       |
-| [Vault](/providers/vault/#use-existing-secrets)                                               | KV path relative to the mount                               | Required (KV entries are maps)                    | Error                                                                                                | — (read-only)                                                               |
-| [OpenBao](/providers/openbao/#use-existing-secrets) (0.17+)                                   | KV path relative to the mount                               | Required (KV entries are maps)                    | Error                                                                                                | — (read-only)                                                               |
-| [AWS Secrets Manager](/providers/awssm/#use-existing-secrets)                                 | Secret name or ARN                                          | JSON key (UTF-8 only)                             | Whole `SecretString` or `SecretBinary` value (0.21+)                                                 | — (read-only)                                                               |
-| [AWS Parameter Store (0.18+)](/providers/awsps/#use-existing-parameters)                      | Parameter name or ARN; `version` selects a version or label | Rejected                                          | Reads the decrypted value                                                                            | ✅ by unversioned parameter name; version, label, and ARN refs are read-only |
-| [GCSM](/providers/gcsm/#use-existing-secrets)                                                 | Secret id; `version` also applies                           | Rejected                                          | Reads latest or the pinned version                                                                   | — (read-only)                                                               |
-| [Doppler (0.21+)](/providers/doppler/#use-existing-secrets)                                   | `config/NAME`, or a bare `NAME` when the URI pins a config  | Rejected                                          | Reads the secret’s resolved value                                                                    | ✅                                                                           |
-| [Bitwarden (bws)](/providers/bws/#use-existing-secrets)                                       | BWS key name                                                | Rejected                                          | Reads the key                                                                                        | ✅                                                                           |
-| [Azure Key Vault (0.15+)](/providers/akv/#use-existing-secrets)                               | Secret name; `version` pins a version (0.20+)               | Rejected                                          | Reads latest or the pinned version (0.20+)                                                           | — (read-only)                                                               |
-| [Azure App Configuration (0.20+)](/providers/aac/#use-existing-key-values)                    | App Configuration key                                       | Rejected                                          | Reads the direct value or resolves its canonical Key Vault reference                                 | — (read-only)                                                               |
-| [Infisical (0.16+)](/providers/infisical/#use-existing-secrets)                               | Folder and key; `version` also applies                      | Rejected                                          | Reads the latest version                                                                             | ✅ unless a version is pinned                                                |
-| [Kubernetes (0.20+)](/providers/kubernetes/#use-existing-secrets)                             | Secret key                                                  | Rejected                                          | Reads entry                                                                                          | ✅                                                                           |
+| Provider                                                                                      | `item`                                                      | `field`                                                                                       | Without `field`                                                                                      | Writes via ref                                                              |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [1Password](/providers/onepassword/#use-existing-secrets)                                     | Item title or UUID                                          | Field label; `vault` and `section` also apply                                                 | Reads the item like a convention secret (its value or password field); writes edit the `value` field | ✅ via `op item edit` (adds a missing field, never creates items)            |
+| [Keeper (0.18+)](/providers/keeper/#use-existing-records)                                     | Record UID or exact title                                   | Standard field type/label or custom field label                                               | Reads `password`                                                                                     | ✅ for existing records and fields                                           |
+| [keyring](/providers/keyring/#use-existing-secrets)                                           | Service                                                     | Account (defaults to the current system username)                                             | Current user’s entry                                                                                 | ✅                                                                           |
+| [dotenv](/providers/dotenv/#use-existing-secrets)                                             | `.env` key                                                  | Rejected                                                                                      | Reads the key                                                                                        | ✅                                                                           |
+| [file (0.19+)](/providers/file/#use-existing-files)                                           | Relative file path beneath the configured root              | Rejected                                                                                      | Reads the complete file as arbitrary bytes (0.21+)                                                   | ✅                                                                           |
+| [env](/providers/env/#use-existing-secrets)                                                   | Variable name                                               | Rejected                                                                                      | Reads the variable                                                                                   | — (read-only)                                                               |
+| [EJSON (0.20+)](/providers/ejson/#use-existing-secrets)                                       | RFC 6901 JSON Pointer                                       | Rejected                                                                                      | Reads the selected JSON string                                                                       | — (read-only)                                                               |
+| [systemd credentials (0.17+)](/providers/systemd-credential/#use-an-existing-credential-name) | Credential filename                                         | Rejected                                                                                      | Reads arbitrary credential bytes (0.21+)                                                             | — (read-only)                                                               |
+| [Fly.io secrets (0.20+)](/providers/fly/#use-existing-secrets)                                | Fly app secret name                                         | Rejected                                                                                      | Error: Fly.io does not expose plaintext values                                                       | ✅ write-only via `flyctl secrets set`                                       |
+| [Cloudflare Secrets Store (0.20+)](/providers/cloudflare/#use-existing-secrets-020)           | Account-secret name in the selected store                   | Rejected                                                                                      | Error: Cloudflare’s management API does not expose plaintext values                                  | ✅ write-only via the Cloudflare API                                         |
+| [pass](/providers/pass/#use-existing-secrets)                                                 | Entry path                                                  | Rejected                                                                                      | Reads the entry                                                                                      | ✅                                                                           |
+| [Gopass (0.15+)](/providers/gopass/#use-existing-secrets)                                     | Entry path, including any mount-point prefix                | Rejected                                                                                      | Reads the entry                                                                                      | ✅                                                                           |
+| [LastPass](/providers/lastpass/#use-existing-secrets)                                         | Item name                                                   | Rejected                                                                                      | Reads the item                                                                                       | ✅                                                                           |
+| [Dashlane (0.18+)](/providers/dashlane/#use-existing-secrets)                                 | Item title or identifier                                    | Field name on the item                                                                        | Reads the type’s default field (`content`, or `password` for a login)                                | — (read-only)                                                               |
+| [Proton Pass](/providers/protonpass/#use-existing-secrets)                                    | Item title                                                  | Any `pass-cli` field name, such as `password` or a custom field (0.22+); rejected before 0.22 | Reads the note                                                                                       | ✅ (refs with `field` are read-only, 0.22+)                                  |
+| [Passbolt (0.19+)](/providers/passbolt/#use-existing-resources)                               | Resource UUID or exact name                                 | `password`, `username`, `uri`, or `description`                                               | Reads `password`                                                                                     | ✅ for existing resources; never creates through `ref`                       |
+| [Vault](/providers/vault/#use-existing-secrets)                                               | KV path relative to the mount                               | Required (KV entries are maps)                                                                | Error                                                                                                | — (read-only)                                                               |
+| [OpenBao](/providers/openbao/#use-existing-secrets) (0.17+)                                   | KV path relative to the mount                               | Required (KV entries are maps)                                                                | Error                                                                                                | — (read-only)                                                               |
+| [AWS Secrets Manager](/providers/awssm/#use-existing-secrets)                                 | Secret name or ARN                                          | JSON key (UTF-8 only)                                                                         | Whole `SecretString` or `SecretBinary` value (0.21+)                                                 | — (read-only)                                                               |
+| [AWS Parameter Store (0.18+)](/providers/awsps/#use-existing-parameters)                      | Parameter name or ARN; `version` selects a version or label | Rejected                                                                                      | Reads the decrypted value                                                                            | ✅ by unversioned parameter name; version, label, and ARN refs are read-only |
+| [GCSM](/providers/gcsm/#use-existing-secrets)                                                 | Secret id; `version` also applies                           | Rejected                                                                                      | Reads latest or the pinned version                                                                   | — (read-only)                                                               |
+| [Doppler (0.21+)](/providers/doppler/#use-existing-secrets)                                   | `config/NAME`, or a bare `NAME` when the URI pins a config  | Rejected                                                                                      | Reads the secret’s resolved value                                                                    | ✅                                                                           |
+| [Bitwarden (bws)](/providers/bws/#use-existing-secrets)                                       | BWS key name                                                | Rejected                                                                                      | Reads the key                                                                                        | ✅                                                                           |
+| [Azure Key Vault (0.15+)](/providers/akv/#use-existing-secrets)                               | Secret name; `version` pins a version (0.20+)               | Rejected                                                                                      | Reads latest or the pinned version (0.20+)                                                           | — (read-only)                                                               |
+| [Azure App Configuration (0.20+)](/providers/aac/#use-existing-key-values)                    | App Configuration key                                       | Rejected                                                                                      | Reads the direct value or resolves its canonical Key Vault reference                                 | — (read-only)                                                               |
+| [Infisical (0.16+)](/providers/infisical/#use-existing-secrets)                               | Folder and key; `version` also applies                      | Rejected                                                                                      | Reads the latest version                                                                             | ✅ unless a version is pinned                                                |
+| [Kubernetes (0.20+)](/providers/kubernetes/#use-existing-secrets)                             | Secret key                                                  | Rejected                                                                                      | Reads entry                                                                                          | ✅                                                                           |
 
 A provider rejects coordinates it has no equivalent for, with an error naming the coordinate (for example, `field` on the env provider).
 
@@ -16552,7 +16591,7 @@ protonpass://Work                                  # Specific vault
 protonpass://Work/{project}/{profile}/{key}        # Custom vault and title template
 ```
 
-**Features**: Read/write, end-to-end encryption, cloud sync, vault organisation, PAT-based CI auth **Prerequisites**: `pass-cli`, authenticated with `pass-cli login` (or `pass-cli login --pat $PAT` for CI) **Storage**: Note item titled `{project}/{profile}/{key}` inside the configured vault
+**Features**: Read/write, end-to-end encryption, cloud sync, vault organisation, PAT-based CI auth **Prerequisites**: `pass-cli`, authenticated with `pass-cli login` (or `pass-cli login --pat $PAT` for CI) **Storage**: Note item titled `{project}/{profile}/{key}` inside the configured vault **References**: `ref = { item = "\<title\>" }` reads an item’s note; adding `field = "password"` (or any `pass-cli` field name) reads that field of any item type (0.22+)
 
 `pass-cli` ships backward incompatible changes in patch releases without advance notice, so a CLI upgrade can break secret resolution on its own. `pass-cli` 2.2.4 removed `pass-cli test`, which SecretSpec 0.18.0 and earlier use to check the session before every read and write; those releases need `pass-cli` 2.2.3 or earlier, while SecretSpec 0.19+ tries `pass-cli info` and falls back to `pass-cli test`, working with either. Pin a tested build and select it with `SECRETSPEC_PROTONPASS_CLI_PATH`. See [`pass-cli` compatibility](/providers/protonpass/#pass-cli-compatibility).
 
@@ -17645,6 +17684,231 @@ var certificatePath = resolved.Secrets["TLS_CERT"].Get();
 
 The NuGet runtime asset is selected automatically. For local SDK development, `SECRETSPEC_FFI_LIB` can point to a particular `libsecretspec` build. From a SecretSpec source checkout, the SDK also searches an ancestor Cargo `target/debug` or `target/release` directory.
 
+# Elixir SDK
+
+> Resolve SecretSpec secrets from Elixir
+
+**New in version 0.22**
+
+The Elixir SDK (`secretspec`, 0.22+) is a pure Elixir client for the `secretspec.resolver/1` IPC protocol. It requires a compatible `secretspec` executable (0.21+) and launches `secretspec serve` directly, without a shell, NIF, native archive, or Rust code in the Hex package.
+
+## Install
+
+```elixir
+defp deps do
+  [{:secretspec, "~> 0.22"}]
+end
+```
+
+The package requires Elixir 1.19 or later. Run `mix deps.get` to fetch it. Install the [SecretSpec CLI](/quick-start/) separately and make `secretspec` available on `PATH`, or set `executable:` as described below.
+
+## Quick start
+
+Given a `secretspec.toml` declaring `DATABASE_URL`, resolve it from the `production` profile:
+
+```
+{:ok, %SecretSpec.Secret{value: database_url}} =
+  SecretSpec.with_session(
+    [manifest: "secretspec.toml", profile: "production", reason: "boot web app"],
+    fn session ->
+      SecretSpec.Session.get(session, "DATABASE_URL",
+        representation: :value,
+        purpose: %{consumer: "my_app", operation: "connect"}
+      )
+    end
+  )
+
+# Use database_url to configure the database connection.
+is_binary(database_url)
+```
+
+`SecretSpec.with_session/2` returns the callback’s result and closes the session when the callback returns or raises. Each `get/3` resolves one declared name. Handle missing secrets and resolver errors explicitly:
+
+```
+SecretSpec.with_session([manifest: "secretspec.toml", reason: "boot web app"], fn session ->
+  case SecretSpec.Session.get(session, "DATABASE_URL",
+         representation: :value,
+         purpose: %{consumer: "my_app", operation: "connect"}
+       ) do
+    {:ok, %SecretSpec.Secret{value: value}} ->
+      {:ok, value}
+
+    {:missing, true} ->
+      {:error, :missing_required}
+
+    {:missing, false} ->
+      {:ok, nil}
+
+    :undeclared ->
+      {:error, :undeclared}
+
+    {:error, %SecretSpec.Error{kind: kind}} ->
+      {:error, kind}
+  end
+end)
+```
+
+A failed session start returns `{:error, reason}` without running the callback.
+
+## Caller context
+
+Pass `purpose:` on every `Session.get/3` call. It must contain non-empty `consumer` and `operation` strings; `host` and `path` are optional attribution fields:
+
+```elixir
+SecretSpec.Session.get(session, "DATABASE_URL",
+  representation: :value,
+  purpose: %{consumer: "my_app", operation: "connect", host: "db.example.com"}
+)
+```
+
+Set the session’s `reason:` to explain why secrets are being accessed. Caller attribution does not satisfy a project’s `require_reason` policy. Keep secret values out of both the purpose metadata and the reason.
+
+## Inline specifications
+
+Pass `manifest: %{toml: toml, base_dir: base_dir}` to embed a TOML manifest in your application. `base_dir` resolves relative provider paths. This example uses the `null://` provider to resolve a declared default without a secret store:
+
+```
+manifest = %{
+  toml: """
+  [project]
+  name = "inline-app"
+  revision = "1.0"
+
+  [profiles.default]
+  DATABASE_URL = { description = "Database URL", default = "postgres://localhost/app" }
+  """,
+  base_dir: File.cwd!()
+}
+
+{:ok, %SecretSpec.Secret{value: database_url}} =
+  SecretSpec.with_session(
+    [manifest: manifest, provider: "null://", reason: "configure local database"],
+    fn session ->
+      SecretSpec.Session.get(session, "DATABASE_URL",
+        representation: :value,
+        purpose: %{consumer: "my_app", operation: "connect"}
+      )
+    end
+  )
+
+is_binary(database_url)
+```
+
+## Scopes
+
+Pass `scope: "api"` when opening the session to limit access to a named `[scopes.api]` subset:
+
+```toml
+[project]
+name = "my_app"
+revision = "1.0"
+
+
+[profiles.default]
+DATABASE_URL = { description = "Database URL" }
+API_KEY = { description = "API key" }
+DEPLOY_TOKEN = { description = "Deployment token" }
+
+
+[scopes.api]
+secrets = ["DATABASE_URL", "API_KEY"]
+```
+
+```
+{:ok, %SecretSpec.Secret{value: database_url}} =
+  SecretSpec.with_session(
+    [manifest: "secretspec.toml", scope: "api", reason: "boot API server"],
+    fn session ->
+      SecretSpec.Session.get(session, "DATABASE_URL",
+        representation: :value,
+        purpose: %{consumer: "api", operation: "connect"}
+      )
+    end
+  )
+
+is_binary(database_url)
+```
+
+Requesting `DEPLOY_TOKEN` from this session returns `:undeclared`. To select a different scope, open a new session.
+
+## Typed access
+
+Successful results use the `%SecretSpec.Secret{}` struct. Pattern-match on `value` for inline secrets or `path` and `lease_id` for file secrets, as shown in the quick-start and file examples. `representation: :value` or `:path` makes the expected result explicit; the default, `:auto`, follows the secret’s declaration. The Elixir SDK resolves individual names and does not expose the whole-profile field map used by other SDKs’ code-generation examples.
+
+## Files (`as_path`)
+
+File-shaped results include a readable `path` and a `lease_id`. Keep the session and lease alive until the file’s last consumer finishes:
+
+```
+SecretSpec.with_session([manifest: "secretspec.toml", reason: "configure TLS"], fn session ->
+  {:ok, %SecretSpec.Secret{path: path, lease_id: lease_id}} =
+    SecretSpec.Session.get(session, "TLS_CERT",
+      representation: :path,
+      purpose: %{consumer: "my_app", operation: "configure_tls"}
+    )
+
+  try do
+    # Read the file while its lease is active.
+    certificate = File.read!(path)
+    byte_size(certificate)
+  after
+    :ok = SecretSpec.Session.release(session, lease_id)
+  end
+end)
+```
+
+`Session.release/2` releases a lease explicitly. Closing the session releases all remaining leases. Consume file paths inside the `with_session/2` callback; returning a path from that callback would outlive its lease.
+
+## Sessions
+
+A session fixes the manifest, profile, scope, provider override, and reason for its lifetime. For multiple requests, keep a session open and close it after the last consumer finishes:
+
+```elixir
+{:ok, session} =
+  SecretSpec.Session.start_link(
+    manifest: "secretspec.toml",
+    profile: "production",
+    provider: "keyring://",
+    reason: "start application"
+  )
+
+
+try do
+  SecretSpec.Session.get(session, "DATABASE_URL",
+    representation: :value,
+    timeout: 5_000,
+    purpose: %{consumer: "my_app", operation: "connect"}
+  )
+after
+  SecretSpec.Session.close(session)
+end
+```
+
+`timeout:` is a per-request deadline in milliseconds, defaulting to 30,000. Requests that reach their deadline return an error with `kind: "deadline_exceeded"`. `start_link/1` links the session to the calling process; `with_session/2` also arranges cleanup when its owner exits.
+
+## Results
+
+* `{:ok, %SecretSpec.Secret{}}`
+* `{:missing, required}`
+* `:undeclared`
+* `{:error, %SecretSpec.Error{}}`
+
+`%SecretSpec.Error{}` carries `kind`, `message`, and `data`. Match on `kind` for error handling. See the [resolver protocol](/reference/resolver-protocol/) for result semantics and error categories.
+
+## Executable discovery
+
+The SDK finds `secretspec` through `PATH`. Point a session at a particular installation with an absolute `executable:` path:
+
+```elixir
+{:ok, session} =
+  SecretSpec.Session.start_link(
+    executable: "/opt/secretspec/bin/secretspec",
+    manifest: "secretspec.toml"
+  )
+```
+
+The SDK starts the executable with `serve` and negotiates `secretspec.resolver/1`. Include the CLI and any provider executables in your deployment environment. Whole-profile resolution and value-free reports are not exposed by the Elixir SDK; use [`secretspec check`](/reference/cli/#check) for preflight checks.
+
 # Go SDK
 
 > Resolve SecretSpec secrets from Go
@@ -18287,7 +18551,7 @@ console.log(typed.DATABASE_URL);
 
 > How the SecretSpec language SDKs work
 
-SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript, Haskell, PHP, C# (0.16+), Swift (0.18+) and JVM languages (0.20+). They all resolve secrets from the same declarative `secretspec.toml`, and they all behave identically, because they share one resolver.
+SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript, Haskell, PHP, C# (0.16+), Swift (0.18+), JVM languages (0.20+), and Elixir (0.22+). They all resolve secrets from the same declarative `secretspec.toml`, and they all behave identically, because they share one resolver.
 
 > **C# compatibility:** Available since SecretSpec 0.16. The 0.15.0 NuGet package is an unsupported package-ID bootstrap; use version 0.16 or later for the API shown in the C# guide.
 
@@ -18305,6 +18569,7 @@ Resolution (providers, fallback chains, profiles, generation, `as_path` material
 * **Python** uses a [pyo3](https://pyo3.rs/) native extension, and **Node.js/TypeScript** uses a [napi-rs](https://napi.rs/) native addon; both embed the same resolver directly and exchange the same JSON request/response shape as the C ABI.
 * **PHP** prefers an [ext-php-rs](https://github.com/davidcole1340/ext-php-rs) extension that embeds the resolver (working under FPM with no `ffi.enable`), and falls back to loading the same C ABI at runtime through `ext-ffi`.
 * **JVM (0.20+)** loads the same C ABI with JNA from a runtime-specific native asset in the Jar package.
+* **Elixir (0.22+)** uses a pure Elixir client for `secretspec.resolver/1` and launches `secretspec serve` directly.
 
 Because resolution happens in one place, every provider, chain, profile, and generator works the same in every language, and a new provider added to the core is immediately available everywhere with no per-SDK change. A cross-language conformance suite asserts that all the SDKs reduce the same inputs to the same result.
 
@@ -18324,7 +18589,7 @@ resolved = SecretSpec.builder().with_provider("keyring://").with_reason("boot").
 print(resolved.secrets["DATABASE_URL"].get)
 ```
 
-See each language’s page for the idiomatic spelling: [Rust](/sdk/rust), [Python](/sdk/python), [Go](/sdk/go), [Ruby](/sdk/ruby), [Node.js](/sdk/nodejs), [Haskell](/sdk/haskell), [PHP](/sdk/php), [C# (0.16+)](/sdk/csharp), [Swift (0.18+)](/sdk/swift) and [JVM languages (0.20+)](/sdk/jvm).
+See each language’s page for the idiomatic spelling: [Rust](/sdk/rust), [Python](/sdk/python), [Go](/sdk/go), [Ruby](/sdk/ruby), [Node.js](/sdk/nodejs), [Haskell](/sdk/haskell), [PHP](/sdk/php), [C# (0.16+)](/sdk/csharp), [Swift (0.18+)](/sdk/swift), [JVM languages (0.20+)](/sdk/jvm), and [Elixir (0.22+)](/sdk/elixir).
 
 Every builder also takes a [scope (0.17+)](/concepts/scopes/), resolving only a named subset of the profile and returning the selected name on the result. The one exception is Rust’s typed loader, which always resolves the full profile because a generated struct has a field per declared secret; see [Rust](/sdk/rust#scopes-017).
 
@@ -18352,6 +18617,7 @@ The resolver ships inside each package, so there is nothing extra to install and
 * **Node.js** builds the resolver into a napi-rs addon.
 * **PHP** ships as a normal PHP extension (provisioned like `ext-redis`), with an `ext-ffi` fallback that dlopens the bundled `cdylib`.
 * **JVM** ships the `cdylib` as runtime-specific native assets in one Jar package and loads the matching asset through JNA; glibc/musl Linux, Intel/Arm macOS, and x64/Arm64 Windows assets are included.
+* **Elixir (0.22+)** is architecture-independent and requires a compatible `secretspec` executable.
 
 Because the resolver is linked or embedded directly, the SDKs do not depend on a separately installed `cdylib` or an `LD_LIBRARY_PATH`/`SECRETSPEC_FFI_LIB` override at runtime — the one exception being PHP’s optional `ext-ffi` fallback, where `SECRETSPEC_FFI_LIB` can point at a specific library build.
 
@@ -18371,6 +18637,7 @@ Prebuilt packages cover the following platforms. Windows support for the Python 
 | PHP                 | ✓         | ✓           | —           | ✓                   | ✓ (0.17+)   | —             |
 | Haskell (source)    | ✓         | —           | —           | —                   | ✓ (0.17+)   | —             |
 | JVM (0.20+)         | ✓         | ✓           | ✓           | ✓                   | ✓           | ✓             |
+| Elixir (0.22+)      | ✓         | ✓           | —           | ✓                   | ✓           | —             |
 
 Most Linux packages build against a manylinux\_2\_28 baseline (glibc 2.28 or newer); the C# and JVM packages additionally ship musl Linux assets. Hackage distributes the Haskell SDK as source, so its row records the platforms CI builds and tests. Contributors: the [SDK development](/development/sdks) page documents how these artifacts are built and how to add a platform.
 

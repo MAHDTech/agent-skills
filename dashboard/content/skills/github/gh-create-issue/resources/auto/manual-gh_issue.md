@@ -15,7 +15,7 @@ skill_name = "gh-create-issue"
   <meta http-equiv="content-language" content="en-gb">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preload" href="/assets/fonts/Mona-Sans.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" type="text/css" href="/style.css?1d8220411922660306f81120dfad8bdbf40aa52e">
+  <link rel="stylesheet" type="text/css" href="/style.css?88cc676f3bcc8c56fed6919e8aeb29d5b9b8788f">
   <link rel="icon" type="image/x-icon" href="https://github.githubassets.com/favicon.ico">
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700" rel="stylesheet">
   <meta name="google-site-verification" content="c1kuD-K2HIVF635lypcsWPoD4kilo5-jA_wBFyT4uMY">
@@ -1401,6 +1401,111 @@ skill_name = "gh-create-issue"
       
     >issue</a>
     </h5>
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact"
+      
+      class="text-mono d-block"
+      
+    >artifact</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_create"
+      
+      class="text-mono d-block"
+      
+    >artifact create</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_delete"
+      
+      class="text-mono d-block"
+      
+    >artifact delete</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_download"
+      
+      class="text-mono d-block"
+      
+    >artifact download</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_edit"
+      
+      class="text-mono d-block"
+      
+    >artifact edit</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_list"
+      
+      class="text-mono d-block"
+      
+    >artifact list</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_view"
+      
+      class="text-mono d-block"
+      
+    >artifact view</a>
+    
     </li>
   
     
@@ -5073,6 +5178,111 @@ skill_name = "gh-create-issue"
     \<li\>
     
     <a
+      href="/manual/gh_issue_artifact"
+      
+      class="text-mono d-block"
+      
+    >artifact</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_create"
+      
+      class="text-mono d-block"
+      
+    >artifact create</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_delete"
+      
+      class="text-mono d-block"
+      
+    >artifact delete</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_download"
+      
+      class="text-mono d-block"
+      
+    >artifact download</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_edit"
+      
+      class="text-mono d-block"
+      
+    >artifact edit</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_list"
+      
+      class="text-mono d-block"
+      
+    >artifact list</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
+      href="/manual/gh_issue_artifact_view"
+      
+      class="text-mono d-block"
+      
+    >artifact view</a>
+    
+    </li>
+  
+    
+    
+    
+    
+    \<li\>
+    
+    <a
       href="/manual/gh_issue_close"
       
       class="text-mono d-block"
@@ -7408,6 +7618,7 @@ skill_name = "gh-create-issue"
 <h3 id="targeted-commands">Targeted commands</h3>
 
 \<ul\>
+  \<li\><a href="./gh_issue_artifact">gh issue artifact</a></li>
   \<li\><a href="./gh_issue_close">gh issue close</a></li>
   \<li\><a href="./gh_issue_comment">gh issue comment</a></li>
   \<li\><a href="./gh_issue_delete">gh issue delete</a></li>
@@ -7592,7 +7803,7 @@ skill_name = "gh-create-issue"
     </div>
   </div>
 </footer>
-<script src="/assets/dist.js?1792047335"></script>
+<script src="/assets/dist.js?1792787266"></script>
 
     </div>
   </body>

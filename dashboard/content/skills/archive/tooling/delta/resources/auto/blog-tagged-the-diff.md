@@ -24,8 +24,3 @@ Blog
 *   ## [The Diff: September 2026](/blog/the-diff-2026-09)
     
     ![Joseph Lyons](https://avatars.githubusercontent.com/u/19867440?v=4 "Joseph Lyons")Oct 7, 2026
-    
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)

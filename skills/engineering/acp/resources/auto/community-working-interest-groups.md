@@ -107,14 +107,14 @@ Lead and Core Maintainers reserve the right to modify the list of Facilitators a
 
 These IG and WG abstractions help provide an elegant on-ramp:
 
-1. [Join the Zulip](/community/communication#zulip) and follow conversations in IGs relevant to you. Attend live calls. Participate.
+1. [Join the Zulip](https://agentclientprotocol.com/community/communication.md#zulip) and follow conversations in IGs relevant to you. Attend live calls. Participate.
 2. Offer to facilitate calls. Contribute your use cases in RFD proposals and other work.
 3. When you're comfortable contributing to deliverables, jump in to contribute to WG work.
 4. Active and valuable contributors will be nominated by WG maintainers as new maintainers.
 
 ### Where can I find a list of all current WGs and IGs?
 
-On the [ACP Zulip Chat](/community/communication#zulip) there is a section of channels for each Working and Interest Group.
+On the [ACP Zulip Chat](https://agentclientprotocol.com/community/communication.md#zulip) there is a section of channels for each Working and Interest Group.
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

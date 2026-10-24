@@ -7,8 +7,8 @@ This file helps language models discover the most useful content on this site.
 ## Home
 
 - [Delta — Blog](https://delta.dev/blog.md): News, product updates, and ideas from the team building Delta.
+- [DeltaDB — Keep the context behind every change](https://delta.dev/deltadb.md): The version control system that records every edit with the conversation behind it.
 - [Delta — Download](https://delta.dev/download.md): Download the Delta desktop app or open shared threads in your browser.
-- [Something went wrong | Delta](https://delta.dev/error.md): An error occurred while using Delta.
 - [Delta — A Multiplayer Environment for Coding with Agents](https://delta.dev/index.md): Build and review software with teammates and agents in shared threads, with every conversation and code change kept in context.
 - [Delta — Pricing](https://delta.dev/pricing.md): Compare Personal and Pro plans for Delta.
 - [Delta — Roadmap](https://delta.dev/roadmap.md): Follow what we're currently working on for Delta and what's up next.

@@ -19,7 +19,7 @@ Agents can provide an arbitrary list of configuration options for a session, all
 
 ## Initial State
 
-During [Session Setup](/protocol/v2/session-setup) the Agent **MAY** return a list of configuration options and their current values:
+During [Session Setup](https://agentclientprotocol.com/protocol/v2/session-setup.md) the Agent **MAY** return a list of configuration options and their current values:
 
 ```json theme={null}
 {
@@ -79,59 +79,59 @@ During [Session Setup](/protocol/v2/session-setup) the Agent **MAY** return a li
 }
 ```
 
-<ResponseField name="configOptions" type="ConfigOption[]">
-  The list of configuration options available for this session. The order of
-  this array represents the Agent's preferred priority. Clients **SHOULD**
-  respect this ordering when displaying options.
-</ResponseField>
+**configOptions** `ConfigOption[]`
+
+The list of configuration options available for this session. The order of
+this array represents the Agent's preferred priority. Clients **SHOULD**
+respect this ordering when displaying options.
 
 ### ConfigOption
 
-<ResponseField name="configId" type="string" required>
-  Unique identifier for this configuration option. Used when setting values.
-</ResponseField>
+**configId** `string` *required*
 
-<ResponseField name="name" type="string" required>
-  Human-readable label for the option
-</ResponseField>
+Unique identifier for this configuration option. Used when setting values.
 
-<ResponseField name="description" type="string">
-  Optional description providing more details about what this option controls
-</ResponseField>
+**name** `string` *required*
 
-<ResponseField name="category" type="ConfigOptionCategory">
-  Optional [semantic category](#option-categories) to help Clients provide
-  consistent UX.
-</ResponseField>
+Human-readable label for the option
 
-<ResponseField name="type" type="ConfigOptionType" required>
-  The type of input control. `select` and `boolean` are supported.
-</ResponseField>
+**description** `string`
 
-<ResponseField name="currentValue" type="string | boolean" required>
-  The current value for this option. For `select` options this is a string value
-  ID. For `boolean` options this is a boolean.
-</ResponseField>
+Optional description providing more details about what this option controls
 
-<ResponseField name="options" type="ConfigOptionValue[] | ConfigOptionGroup[]">
-  The available values for a `select` option. Required when `type` is `"select"`
-  and omitted when `type` is `"boolean"`. This is either a flat array of values
-  or an array of groups; values and groups are not mixed in the same array.
-</ResponseField>
+**category** `ConfigOptionCategory`
+
+Optional [semantic category](#option-categories) to help Clients provide
+consistent UX.
+
+**type** `ConfigOptionType` *required*
+
+The type of input control. `select` and `boolean` are supported.
+
+**currentValue** `string | boolean` *required*
+
+The current value for this option. For `select` options this is a string value
+ID. For `boolean` options this is a boolean.
+
+**options** `ConfigOptionValue[] | ConfigOptionGroup[]`
+
+The available values for a `select` option. Required when `type` is `"select"`
+and omitted when `type` is `"boolean"`. This is either a flat array of values
+or an array of groups; values and groups are not mixed in the same array.
 
 ### ConfigOptionValue
 
-<ResponseField name="value" type="string" required>
-  The value identifier used when setting this option
-</ResponseField>
+**value** `string` *required*
 
-<ResponseField name="name" type="string" required>
-  Human-readable name to display
-</ResponseField>
+The value identifier used when setting this option
 
-<ResponseField name="description" type="string">
-  Optional description of what this value does
-</ResponseField>
+**name** `string` *required*
+
+Human-readable name to display
+
+**description** `string`
+
+Optional description of what this value does
 
 ### Grouped Select Options
 
@@ -176,10 +176,10 @@ Boolean config options use `type: "boolean"` for simple on/off toggles:
 
 Each config option **MAY** include a `category` field. Categories are semantic metadata intended to help Clients provide consistent UX, such as attaching keyboard shortcuts, choosing icons, or deciding placement.
 
-\<Warning\>
-  Categories are for UX purposes only and **MUST NOT** be required for
-  correctness. Clients **MUST** handle missing or unknown categories gracefully.
-</Warning>
+> [!WARNING]
+>
+> Categories are for UX purposes only and **MUST NOT** be required for
+> correctness. Clients **MUST** handle missing or unknown categories gracefully.
 
 Category names beginning with `_` are free for custom use (e.g., `_my_custom_category`). Category names that do not begin with `_` are reserved for the ACP spec.
 
@@ -236,24 +236,24 @@ Clients can change a config option value by calling the `session/set_config_opti
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  The ID of the session
-</ParamField>
+**sessionId** `SessionId` *required*
 
-<ParamField path="configId" type="string" required>
-  The `configId` of the configuration option to change
-</ParamField>
+The ID of the session
 
-<ParamField path="type" type="&#x22;id&#x22; | &#x22;boolean&#x22;" required>
-  The shape of the value. Use `id` for `select` and other id-based options. Use
-  `boolean` for boolean options.
-</ParamField>
+**configId** `string` *required*
 
-<ParamField path="value" type="string | boolean" required>
-  The new value to set. For `select` options, this must be one of the values
-  listed in the option's `options` array. For `boolean` options, this must be a
-  boolean.
-</ParamField>
+The `configId` of the configuration option to change
+
+**type** `"id" | "boolean"` *required*
+
+The shape of the value. Use `id` for `select` and other id-based options. Use
+`boolean` for boolean options.
+
+**value** `string | boolean` *required*
+
+The new value to set. For `select` options, this must be one of the values
+listed in the option's `options` array. For `boolean` options, this must be a
+boolean.
 
 For boolean options, Clients send `type: "boolean"` with a boolean `value`:
 
@@ -316,12 +316,12 @@ The Agent **MUST** respond with the complete list of all configuration options a
 }
 ```
 
-\<Note\>
-  The response always contains the **complete** configuration state. This allows
-  Agents to reflect dependent changes. For example, if changing the model
-  affects available reasoning options, or if an option's available values change
-  based on another selection.
-</Note>
+> [!NOTE]
+>
+> The response always contains the **complete** configuration state. This allows
+> Agents to reflect dependent changes. For example, if changing the model
+> affects available reasoning options, or if an option's available values change
+> based on another selection.
 
 ### From the Agent
 
