@@ -16,10 +16,11 @@ Commit managed vendor snapshots as part of the shared catalog:
 
 - A YAML source manifest identifies Git repositories and their skill directory paths. A Rust module in `skills-core` uses the existing Git executable for acquisition and authentication. No Node or npm runtime is required.
 - Git records the downloaded content; no skill lockfile, persisted hash inventory, or restore-from-lock command is needed.
-- Each source contributes all its skills, including future additions discovered during updates.
+- Each source contributes all its skills, including future additions discovered during updates, except exact names explicitly listed in its optional `excludes` list. The list defaults to `[]` and can work around collisions without renaming upstream skills.
 - Store vendor skills under `skills/vendor/<vendor>/<skill>/`. Present a Vendor Skills section grouped by source in the dashboard and generated indexes.
 - Preserve upstream files unchanged. Give only managed vendor content explicit exceptions from local authoring rules; retain import validation for usable frontmatter, contained paths, required files, and name collisions.
 - Reject duplicate active skill names within or across sources, including custom skills. Report the conflicting sources before replacing snapshots.
+- Keep SpacetimeDB's upstream `mcp` name. Rename our custom MCP skill to `model-context-protocol`, as approved by the user, to resolve the initial collision.
 - Treat vendor folders as disposable generated output. Updates regenerate them and overwrite local edits. Customizations belong outside managed vendor paths.
 - Mirror upstream removals by removing the corresponding managed snapshots. Previous versions remain in Git history. Custom skills retain their archive policy.
 - `ask skills download-resources` advances declared vendor branches and refreshes documentation. It also regenerates repository catalog artifacts. Local agent linking remains an `ask skills sync` operation.

@@ -105,6 +105,78 @@ fn vendor_refresh_preserves_support_files_and_mirrors_changes() {
 }
 
 #[test]
+fn vendor_exclusions_resolve_collisions_and_can_be_cleared() {
+    let temp = tempdir().unwrap();
+    let upstream = temp.path().join("upstream");
+    let root = temp.path().join("catalog");
+    repository(&upstream);
+    fs::create_dir_all(&root).unwrap();
+    skill(&upstream, "alpha", "# Vendor alpha");
+    skill(&upstream, "beta", "# Vendor beta");
+    commit(&upstream);
+    manifest(&root, &[("example", &upstream)]);
+    update_vendors(&root, None).unwrap();
+    let declaration = fs::read_to_string(root.join("vendor-skills.yaml")).unwrap();
+    skill(&root, "alpha", "# Custom alpha");
+    fs::write(
+        root.join("vendor-skills.yaml"),
+        format!("{declaration}    excludes:\n      - alpha\n"),
+    )
+    .unwrap();
+
+    let report = update_vendors(&root, None).unwrap();
+    assert!(report.fetched.contains_key("example"));
+    assert!(!root.join("skills/vendor/example/alpha").exists());
+    assert!(root.join("skills/vendor/example/beta/SKILL.md").is_file());
+    assert!(root.join("skills/alpha/SKILL.md").is_file());
+
+    fs::remove_dir_all(root.join("skills/alpha")).unwrap();
+    fs::write(
+        root.join("vendor-skills.yaml"),
+        format!("{declaration}    excludes: []\n"),
+    )
+    .unwrap();
+    update_vendors(&root, None).unwrap();
+    assert!(root.join("skills/vendor/example/alpha/SKILL.md").is_file());
+    assert!(root.join("skills/vendor/example/beta/SKILL.md").is_file());
+}
+
+#[test]
+fn vendor_exclusions_can_omit_multiple_or_all_skills() {
+    let temp = tempdir().unwrap();
+    let upstream = temp.path().join("upstream");
+    let root = temp.path().join("catalog");
+    repository(&upstream);
+    fs::create_dir_all(&root).unwrap();
+    for name in ["alpha", "beta", "gamma"] {
+        skill(&upstream, name, "# Vendor skill");
+    }
+    commit(&upstream);
+    manifest(&root, &[("example", &upstream)]);
+    update_vendors(&root, None).unwrap();
+    let declaration = fs::read_to_string(root.join("vendor-skills.yaml")).unwrap();
+    fs::write(
+        root.join("vendor-skills.yaml"),
+        format!("{declaration}    excludes: [alpha, beta, unknown]\n"),
+    )
+    .unwrap();
+    let report = update_vendors(&root, None).unwrap();
+    assert!(report.fetched.contains_key("example"));
+    assert!(!root.join("skills/vendor/example/alpha").exists());
+    assert!(!root.join("skills/vendor/example/beta").exists());
+    assert!(root.join("skills/vendor/example/gamma/SKILL.md").is_file());
+
+    fs::write(
+        root.join("vendor-skills.yaml"),
+        format!("{declaration}    excludes: [alpha, beta, gamma]\n"),
+    )
+    .unwrap();
+    let report = update_vendors(&root, None).unwrap();
+    assert!(report.fetched.contains_key("example"));
+    assert!(!root.join("skills/vendor/example/gamma").exists());
+}
+
+#[test]
 fn vendor_collisions_do_not_replace_the_existing_catalog() {
     let temp = tempdir().unwrap();
     let upstream = temp.path().join("upstream");

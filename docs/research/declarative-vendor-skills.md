@@ -167,9 +167,9 @@ SpacetimeDB's default branch is `master`; the source repository is
 `https://github.com/clockworklabs/SpacetimeDB`, and `skills` is a subtree rather
 than a separate Git repository. Its plugin manifest declares 11 skill folders.
 Each listed skill's frontmatter name matches its folder name, including the
-generic name `mcp`, which collides with this repository's custom MCP skill.
-Both cannot participate in a catalog requiring unique original names without
-an explicit collision decision.
+generic name `mcp`, which initially collided with this repository's custom MCP
+skill. The user approved renaming the custom skill to `model-context-protocol`,
+preserving the vendor name and unique catalog names.
 [SpacetimeDB repository](https://github.com/clockworklabs/SpacetimeDB),
 [Declared skill paths](https://github.com/clockworklabs/SpacetimeDB/blob/master/.claude-plugin/marketplace.json).
 

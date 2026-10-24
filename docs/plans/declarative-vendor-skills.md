@@ -8,7 +8,7 @@ Status: Implementation approved, including local tests, commit, push, and PR cre
 
 A YAML manifest declares vendor Git URLs, branches, and skill directory paths. A Rust module within `skills-core` retrieves complete skill folders using the existing Git executable. No Node, npm, or skill lockfile is required. Git records the exact catalog at every repository commit.
 
-Import all skills, including future additions, under `skills/vendor/<vendor>/<skill>/`. Preserve upstream files and their support files, permissions, licenses, and notices. Display a Vendor Skills section grouped by source in the README, agent index, manifest, and dashboard. Give vendor files scoped exceptions from local authoring rules while retaining import validation and unique active skill names.
+Import all skills, including future additions, under `skills/vendor/<vendor>/<skill>/`, except names explicitly listed in a source's optional `excludes` list (default `[]`). Preserve upstream files and their support files, permissions, licenses, and notices. Display a Vendor Skills section grouped by source in the README, agent index, manifest, and dashboard. Give vendor files scoped exceptions from local authoring rules while retaining import validation and unique active skill names.
 
 `ask skills download-resources` updates vendors, downloads custom-skill documentation, and regenerates catalog artifacts. A vendor-only mode supports automation. Ordinary installs, syncs, lint, builds, and tests consume the committed snapshots. Documentation cleanup must never modify vendor-owned files.
 
@@ -27,13 +27,17 @@ sources:
     repository: https://github.com/cloudflare/skills.git
     ref: main
     path: skills
+    excludes: []
   - id: spacetimedb
     repository: https://github.com/clockworklabs/SpacetimeDB.git
     ref: master
     path: skills
+    excludes: []
+    license-files:
+      - codex-plugin/plugins/spacetimedb/LICENSE
 ```
 
-SpacetimeDB's `mcp` skill conflicts with the custom `mcp` skill. The naming resolution is pending user input; implement independent functionality while waiting.
+SpacetimeDB keeps its upstream `mcp` name. The user approved renaming the custom skill to `model-context-protocol`, resolving the initial collision while preserving unique catalog names.
 
 ## Implementation sequence
 
@@ -50,6 +54,7 @@ SpacetimeDB's `mcp` skill conflicts with the custom `mcp` skill. The naming reso
 - A failed source retains its previous snapshot while another vendor updates successfully.
 - Upstream additions and removals appear after successful refreshes; local edits are regenerated.
 - Collisions report both origins and do not publish an ambiguous catalog.
+- Exact-name exclusions can resolve collisions, remove previously imported skills, and be cleared to restore inclusion. Empty or omitted exclusions include all skills; excluding every skill is allowed.
 - Vendor files remain unchanged by formatting hooks, documentation downloads, or cleanup.
 - All generated catalogs and local installation discover the source-grouped vendor layout.
 - An unmerged daily PR is updated in place; failed vendors retain successful snapshots already pending there.

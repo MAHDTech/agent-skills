@@ -32,6 +32,8 @@ struct Source {
     path: PathBuf,
     #[serde(default, rename = "license-files")]
     license_files: Vec<PathBuf>,
+    #[serde(default)]
+    excludes: Vec<String>,
 }
 
 fn default_skill_path() -> PathBuf {
@@ -263,6 +265,9 @@ fn validate_manifest(manifest: &Manifest, path: &Path) -> Result<()> {
         for license in &source.license_files {
             validate_relative_path(license)?;
         }
+        for name in &source.excludes {
+            validate_identifier(name)?;
+        }
         let repository = &source.repository;
         if !(repository.starts_with("https://")
             || repository.starts_with("ssh://")
@@ -436,12 +441,15 @@ fn prepare_source(source: &Source, staging: &Path) -> Result<(PathBuf, String)> 
             continue;
         }
         let name = entry.file_name().to_string_lossy().into_owned();
+        count += 1;
+        if source.excludes.contains(&name) {
+            continue;
+        }
         validate_identifier(&name)?;
         let target = destination.join(&name);
         copy_tree(&skill, &target)?;
         SkillParser::parse_file(target.join("SKILL.md"))?;
         copy_licenses(source, &checkout, &target)?;
-        count += 1;
     }
     if count == 0 {
         return Err(SkillError::validation(

@@ -9,9 +9,20 @@ sources:
     repository: https://github.com/cloudflare/skills.git
     ref: main
     path: skills
+    excludes: []
 ```
 
-The source `id` becomes the directory under `skills/vendor/`. `repository` supports HTTPS and SSH Git URLs; absolute local repositories are also supported for testing. `ref` is optional and defaults to the repository's default branch. `path` defaults to `skills` and must stay within the repository. Every skill in the declared collection is imported.
+The source `id` becomes the directory under `skills/vendor/`. `repository` supports HTTPS and SSH Git URLs; absolute local repositories are also supported for testing. `ref` is optional and defaults to the repository's default branch. `path` defaults to `skills` and must stay within the repository. Every skill in the declared collection is imported unless explicitly excluded.
+
+Optional `excludes` defaults to `[]`. List exact skill names to omit from that source, for example to work around a name collision:
+
+```yaml
+excludes:
+  - example-a
+  - example-b
+```
+
+Names match the upstream skill directory and frontmatter name; patterns and paths are not supported. Successful refreshes remove excluded skills from the managed snapshot. Removing an exclusion includes that skill again on the next successful refresh. Unknown names have no effect, and excluding every skill is allowed. Failed downloads still retain the previous snapshot.
 
 The initial downloader supports flat collections of complete skill directories. Nested collections and symlinks are reported as unsupported rather than partially imported. The failed source retains its previous snapshot. Scripts are copied with their permissions and are never executed during acquisition.
 
