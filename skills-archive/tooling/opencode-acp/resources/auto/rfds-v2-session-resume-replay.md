@@ -60,7 +60,7 @@ result in `-32602`.
 
 This does not require the Agent to retain every inserted user message.
 Live-only or discarded messages may be absent; retained user messages must
-preserve the ID returned on insertion, as defined by the [Prompt Lifecycle RFD](./prompt.mdx#correlation-and-replay).
+preserve the ID returned on insertion, as defined by the [Prompt Lifecycle RFD](https://agentclientprotocol.com/rfds/v2/prompt.md#correlation-and-replay).
 
 Agents **SHOULD** preserve agent and thought message IDs across replay when
 possible, but Clients cannot assume stability across reconnects or Agent
@@ -94,7 +94,7 @@ restore methods.
 2. Add `replayFrom` to `ResumeSessionRequest` as an optional tagged union.
 3. Add the initial `replayFrom` variant `{ "type": "start" }`.
 
-Replay applies top-level `_meta` as a [metadata patch](./meta-patches.mdx), as
+Replay applies top-level `_meta` as a [metadata patch](https://agentclientprotocol.com/rfds/v2/meta-patches.md), as
 live delivery does, and does not reset it. When the Client may already hold
 metadata for an entity, the Agent removes stale keys by setting them to `null`,
 or sends `_meta: null` before the current object.
@@ -114,7 +114,7 @@ An object leaves room for future cursor forms that need fields. The initial
 
 ## Revision history
 
-* 2026-10-13: Replay applies top-level `_meta` as a key-level patch, per [Metadata Patches](./meta-patches.mdx).
+* 2026-10-13: Replay applies top-level `_meta` as a key-level patch, per [Metadata Patches](https://agentclientprotocol.com/rfds/v2/meta-patches.md).
 * 2026-07-02: Initial draft.
 
 

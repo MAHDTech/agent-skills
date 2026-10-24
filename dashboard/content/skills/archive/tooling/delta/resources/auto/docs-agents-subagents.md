@@ -67,7 +67,7 @@ Messages between agents appear as folded **Sent Agent Message** and **Received A
 
 Press `Cmd+F` on macOS or `Ctrl+F` on Linux and Windows to search the focused subagent conversation. Press `Escape` there to stop that subagent.
 
-New agent-created subthreads appear with **Plain** children in the desktop sidebar filter. **Subagents** remains available for older attached subagents, alongside **Reviews** and **Land** children. An expanded parent shows the six newest matching children across these kinds. Choose **Show N more** to reveal the rest.
+New agent-created subthreads appear under **Plain** in the desktop sidebar filter, alongside forks. **Subagents** remains available for older attached subagents, alongside **Reviews** and **Land** children. An expanded parent shows the six newest matching children across these kinds. Choose **Show N more** to reveal the rest.
 
 Click a subagent to open it as primary, or hold `Cmd` on macOS or `Ctrl` on Linux and Windows while clicking to open it in a tab. You can also use the sidebar row’s **Open in Tab** button. Closing a subagent tab does not stop its work.
 

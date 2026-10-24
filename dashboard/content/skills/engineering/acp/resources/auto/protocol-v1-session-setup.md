@@ -15,11 +15,9 @@ skill_name = "acp"
 
 > Creating and loading sessions
 
-Sessions represent a specific conversation or thread between the [Client](/protocol/v1/overview#client) and [Agent](/protocol/v1/overview#agent). Each session maintains its own context, conversation history, and state, allowing multiple independent interactions with the same Agent.
+Sessions represent a specific conversation or thread between the [Client](https://agentclientprotocol.com/protocol/v1/overview.md#client) and [Agent](https://agentclientprotocol.com/protocol/v1/overview.md#agent). Each session maintains its own context, conversation history, and state, allowing multiple independent interactions with the same Agent.
 
-Before creating a session, Clients **MUST** first complete the [initialization](/protocol/v1/initialization) phase to establish protocol compatibility and capabilities.
-
-<br />
+Before creating a session, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v1/initialization.md) phase to establish protocol compatibility and capabilities.
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -51,8 +49,6 @@ sequenceDiagram
 
     Note over Client,Agent: Ready for prompts
 ```
-
-<br />
 
 ## Creating a Session
 
@@ -145,12 +141,12 @@ To load an existing session, Clients **MUST** call the `session/load` method wit
 
 The Agent **MUST** replay the entire conversation to the Client in the form of `session/update` notifications (like `session/prompt`).
 
-[Session compactions](/protocol/v1/prompt-turn#session-compaction) are
+[Session compactions](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#session-compaction) are
 replayed using the same update, chunk, and patch semantics as live delivery.
 The Client's `session.compaction` capability is required for replay as well as
 live delivery.
 
-Live-only [notices](/protocol/v1/prompt-turn#session-notices) are not
+Live-only [notices](https://agentclientprotocol.com/protocol/v1/prompt-turn.md#session-notices) are not
 conversation history and **SHOULD NOT** be replayed. If the underlying
 condition is still relevant after loading finishes, the Agent may emit a new
 notice as a new live event, subject to the Client's `session.notices`
@@ -315,11 +311,11 @@ To close an active session, Clients **MUST** call the `session/close` method wit
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  The ID of the active session to close.
-</ParamField>
+**sessionId** `SessionId` *required*
 
-The Agent **MUST** cancel any ongoing work for that session as if [`session/cancel`](/protocol/v1/prompt-turn#cancellation) had been called, then free the resources associated with the session.
+The ID of the active session to close.
+
+The Agent **MUST** cancel any ongoing work for that session as if [`session/cancel`](https://agentclientprotocol.com/protocol/v1/prompt-turn#cancellation) had been called, then free the resources associated with the session.
 
 On success, the Agent responds with an empty result object:
 
@@ -403,31 +399,31 @@ While they are not required to by the spec, new Agents **SHOULD** support the HT
 
 All Agents **MUST** support connecting to MCP servers via stdio (standard input/output). This is the default transport mechanism.
 
-<ParamField path="name" type="string" required>
-  A human-readable identifier for the server
-</ParamField>
+**name** `string` *required*
 
-<ParamField path="command" type="string" required>
-  The absolute path to the MCP server executable
-</ParamField>
+A human-readable identifier for the server
 
-<ParamField path="args" type="array" required>
-  Command-line arguments to pass to the server
-</ParamField>
+**command** `string` *required*
 
-<ParamField path="env" type="EnvVariable[]">
-  Environment variables to set when launching the server
+The absolute path to the MCP server executable
 
-  <Expandable title="EnvVariable">
-    <ParamField path="name" type="string">
-      The name of the environment variable.
-    </ParamField>
+**args** `array` *required*
 
-    <ParamField path="value" type="string">
-      The value of the environment variable.
-    </ParamField>
-  </Expandable>
-</ParamField>
+Command-line arguments to pass to the server
+
+**env** `EnvVariable[]`
+
+Environment variables to set when launching the server
+
+**EnvVariable**
+
+**name** `string`
+
+The name of the environment variable.
+
+**value** `string`
+
+The value of the environment variable.
 
 Example stdio transport configuration:
 
@@ -449,31 +445,31 @@ Example stdio transport configuration:
 
 When the Agent supports `mcpCapabilities.http`, Clients can specify MCP servers configurations using the HTTP transport.
 
-<ParamField path="type" type="string" required>
-  Must be `"http"` to indicate HTTP transport
-</ParamField>
+**type** `string` *required*
 
-<ParamField path="name" type="string" required>
-  A human-readable identifier for the server
-</ParamField>
+Must be `"http"` to indicate HTTP transport
 
-<ParamField path="url" type="string" required>
-  The URL of the MCP server
-</ParamField>
+**name** `string` *required*
 
-<ParamField path="headers" type="HttpHeader[]" required>
-  HTTP headers to include in requests to the server
+A human-readable identifier for the server
 
-  <Expandable title="HttpHeader">
-    <ParamField path="name" type="string">
-      The name of the HTTP header.
-    </ParamField>
+**url** `string` *required*
 
-    <ParamField path="value" type="string">
-      The value to set for the HTTP header.
-    </ParamField>
-  </Expandable>
-</ParamField>
+The URL of the MCP server
+
+**headers** `HttpHeader[]` *required*
+
+HTTP headers to include in requests to the server
+
+**HttpHeader**
+
+**name** `string`
+
+The name of the HTTP header.
+
+**value** `string`
+
+The value to set for the HTTP header.
 
 Example HTTP transport configuration:
 
@@ -499,33 +495,35 @@ Example HTTP transport configuration:
 
 When the Agent supports `mcpCapabilities.sse`, Clients can specify MCP servers configurations using the SSE transport.
 
-\<Warning\>This transport was deprecated by the MCP spec.</Warning>
+> [!WARNING]
+>
+> This transport was deprecated by the MCP spec.
 
-<ParamField path="type" type="string" required>
-  Must be `"sse"` to indicate SSE transport
-</ParamField>
+**type** `string` *required*
 
-<ParamField path="name" type="string" required>
-  A human-readable identifier for the server
-</ParamField>
+Must be `"sse"` to indicate SSE transport
 
-<ParamField path="url" type="string" required>
-  The URL of the SSE endpoint
-</ParamField>
+**name** `string` *required*
 
-<ParamField path="headers" type="HttpHeader[]" required>
-  HTTP headers to include when establishing the SSE connection
+A human-readable identifier for the server
 
-  <Expandable title="HttpHeader">
-    <ParamField path="name" type="string">
-      The name of the HTTP header.
-    </ParamField>
+**url** `string` *required*
 
-    <ParamField path="value" type="string">
-      The value to set for the HTTP header.
-    </ParamField>
-  </Expandable>
-</ParamField>
+The URL of the SSE endpoint
+
+**headers** `HttpHeader[]` *required*
+
+HTTP headers to include when establishing the SSE connection
+
+**HttpHeader**
+
+**name** `string`
+
+The name of the HTTP header.
+
+**value** `string`
+
+The value to set for the HTTP header.
 
 Example SSE transport configuration:
 

@@ -18,6 +18,7 @@ This file helps language models discover the most useful content on this site.
 
 ## Agents
 
+- [Cloud Runners](https://delta.dev/docs/agents/cloud-runners.md): Run a thread's agent turns in a cloud sandbox instead of on your computer.
 - [Comments](https://delta.dev/docs/agents/comments.md): Attach comments to any part of a thread and get linked replies.
 - [MCP Servers](https://delta.dev/docs/agents/mcp.md): Connect remote MCP servers to give Delta's agents access to external tools.
 - [Models & Providers](https://delta.dev/docs/agents/models-and-providers.md): Configure which models power Delta's agents.

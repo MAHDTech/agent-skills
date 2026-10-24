@@ -1,0 +1,65 @@
+---
+name: Vendor Skills Update
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vendor-skills-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Set Up Consumer
+        uses: tars-cloud/actions/composite/setup-consumer@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
+        with:
+          fetch-depth: 0
+
+      - name: Create Update Token
+        id: token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ secrets.UPDATE_APP_ID || secrets.APP_ID }}
+          private-key: ${{ secrets.UPDATE_APP_PRIVATE_KEY || secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Refresh Vendor Snapshots
+        uses: tars-cloud/actions/composite/run-devenv@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
+        with:
+          run: |
+            ask skills download-resources --vendors-only \
+              --pending-ref refs/remotes/origin/automation/vendor-skills \
+              > "$RUNNER_TEMP/vendor-update.md"
+            cat "$RUNNER_TEMP/vendor-update.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate Catalog
+        uses: tars-cloud/actions/composite/run-devenv@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
+        with:
+          run: |
+            prek run --all-files
+            ./scripts/run-tests.sh
+
+      - name: Create or Refresh Update PR
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ steps.token.outputs.token }}
+          branch: automation/vendor-skills
+          base: ${{ github.event.repository.default_branch }}
+          title: "[CHORE] Update vendor skills"
+          commit-message: "chore(skills): refresh vendor snapshots"
+          body-path: ${{ runner.temp }}/vendor-update.md
+          add-paths: |
+            skills/vendor/
+            README.md
+            agents/AGENTS.md
+            skills.sh.json
+            dashboard/content/

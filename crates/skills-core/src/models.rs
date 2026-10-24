@@ -1,4 +1,5 @@
 //! Core domain models and data structures for Agent Skills.
+// cspell:words rposition
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -101,7 +102,7 @@ impl SkillCategory {
             Self::Tooling => "Tooling",
             Self::Tars => "TARS",
             Self::InProgress => "In Progress",
-            Self::Custom(s) => s.as_str(),
+            Self::Custom(s) => s.strip_prefix("vendor/").unwrap_or(s.as_str()),
         }
     }
 
@@ -120,6 +121,7 @@ impl SkillCategory {
             Self::Tooling => "Environments, CLIs, and agent conventions.",
             Self::Tars => "Autonomous software factory and persistent goal workflows.",
             Self::InProgress => "Drafts not yet promoted.",
+            Self::Custom(s) if s.starts_with("vendor/") => "Skills maintained by this vendor.",
             Self::Custom(_) => "Custom user-defined category.",
         }
     }
@@ -339,6 +341,12 @@ pub struct Skill {
 }
 
 impl Skill {
+    /// Identifies snapshots by their repository-owned path, never upstream metadata.
+    #[must_use]
+    pub fn vendor_source(&self) -> Option<&str> {
+        vendor_source_from_path(&self.path)
+    }
+
     /// Returns the skill name from frontmatter.
     #[must_use]
     pub fn name(&self) -> &str {
@@ -385,6 +393,16 @@ impl Skill {
     #[must_use]
     pub fn replaced_by(&self) -> Option<&str> {
         self.replaced_by.as_deref()
+    }
+}
+
+pub(crate) fn vendor_source_from_path(path: &std::path::Path) -> Option<&str> {
+    let parts: Vec<_> = path.iter().collect();
+    let index = parts.iter().rposition(|part| *part == "skills")?;
+    if parts.get(index + 1).is_some_and(|part| *part == "vendor") {
+        parts.get(index + 2).and_then(|part| part.to_str())
+    } else {
+        None
     }
 }
 

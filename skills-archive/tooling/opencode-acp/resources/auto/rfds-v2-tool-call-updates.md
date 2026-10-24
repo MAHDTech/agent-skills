@@ -12,7 +12,7 @@ Author(s): [@benbrandt](https://github.com/benbrandt)
 
 ACP v2 should use a single `sessionUpdate: "tool_call_update"` notification for both creating and updating tool calls. The payload is an upsert keyed by `toolCallId`: if the Client has not seen the ID before, it creates a new displayed tool call; otherwise, it patches the existing tool call.
 
-ACP v2 should also add `sessionUpdate: "tool_call_content_chunk"` for streaming discrete tool-call content items. Chunks are keyed by `toolCallId` and append one `ToolCallContent` item to the current content for that tool call. The separate [Terminal Output](./terminal-output.mdx) RFD defines byte chunks for a referenced terminal.
+ACP v2 should also add `sessionUpdate: "tool_call_content_chunk"` for streaming discrete tool-call content items. Chunks are keyed by `toolCallId` and append one `ToolCallContent` item to the current content for that tool call. The separate [Terminal Output](https://agentclientprotocol.com/rfds/v2/terminal-output.md) RFD defines byte chunks for a referenced terminal.
 
 ## Status quo
 
@@ -55,11 +55,11 @@ The v2 `ToolCallUpdate` payload has the following semantics:
 * Any concrete value replaces the previous value.
 * `content` and `locations` are replaced as whole arrays, not appended.
 * `[]` and `null` both clear a collection field.
-* `_meta` preserves omitted, `null`, and object values as distinct update signals. An object patches the stored metadata by top-level key, as defined by [Metadata Patches](./meta-patches.mdx).
+* `_meta` preserves omitted, `null`, and object values as distinct update signals. An object patches the stored metadata by top-level key, as defined by [Metadata Patches](https://agentclientprotocol.com/rfds/v2/meta-patches.md).
 * For a new `toolCallId`, omitted fields use Client defaults.
 * Agents **SHOULD** include `title` the first time they report a `toolCallId`.
 
-The `session/request_permission` method should also carry this same `ToolCallUpdate` shape for tool-call permissions. In v2, [permission requests](./permission-requests.mdx) use an optional `subject` tagged union; tool-call permissions set `subject.type: "tool_call"` and carry the update in the subject's `toolCall` field, so the permission UI receives the same patch/upsert payload shape as session updates while leaving room for future permission subjects.
+The `session/request_permission` method should also carry this same `ToolCallUpdate` shape for tool-call permissions. In v2, [permission requests](https://agentclientprotocol.com/rfds/v2/permission-requests.md) use an optional `subject` tagged union; tool-call permissions set `subject.type: "tool_call"` and carry the update in the subject's `toolCall` field, so the permission UI receives the same patch/upsert payload shape as session updates while leaving room for future permission subjects.
 
 Permission-specific prompt text should be carried by the request's common required `title` and optional `description` fields instead of `ToolCallUpdate.title` or `ToolCallUpdate.content`. That keeps a permission prompt from accidentally replacing displayed tool-call state.
 
@@ -120,7 +120,7 @@ Tool-call updates need both operations. Omission means "I am not changing this f
 
 ## Revision history
 
-* 2026-10-13: A top-level `_meta` object now patches stored metadata by key, per [Metadata Patches](./meta-patches.mdx).
+* 2026-10-13: A top-level `_meta` object now patches stored metadata by key, per [Metadata Patches](https://agentclientprotocol.com/rfds/v2/meta-patches.md).
 * 2026-07-14: Distinguished tool-call content item chunks from terminal byte-stream chunks.
 * 2026-07-02: Updated permission requests to carry tool-call updates through an optional `subject` tagged union and to use separate `title` and `description` fields for permission-specific prompt text.
 * 2026-06-09: Added `tool_call_content_chunk` for streaming tool-call content.

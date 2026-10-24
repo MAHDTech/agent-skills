@@ -31,9 +31,10 @@ On this page
     2.  [Does .agents/linked need to be committed?](#does-agentslinked-need-to-be-committed)
     3.  [Where linked files live](#where-linked-files-live)
 3.  [Run development environments in parallel](#run-development-environments-in-parallel)
-4.  [Delta-specific overrides](#delta-specific-overrides)
-5.  [Custom emoji](#custom-emoji)
-6.  [What’s next](#whats-next)
+4.  [Set up Cloud Runners with .agents/setup](#set-up-cloud-runners-with-agentssetup)
+5.  [Delta-specific overrides](#delta-specific-overrides)
+6.  [Custom emoji](#custom-emoji)
+7.  [What’s next](#whats-next)
 
 Automate setup for new isolated workspaces, and choose which local files they share.
 
@@ -54,6 +55,10 @@ Reuse selected local files on one machine
 Run several development environments at once
 
 [Separate ports and mutable resources](#run-development-environments-in-parallel)
+
+Install tools on a cloud runner
+
+[`.agents/setup`](#set-up-cloud-runners-with-agentssetup)
 
 ## [Run setup in each checkout](#run-setup-in-each-checkout)
 
@@ -144,6 +149,10 @@ Isolated checkouts still use the same machine’s processes and services. Give e
 
 Configure these through your development tools rather than hard-coding the same values for every checkout. Don’t link configuration files that need different values in each environment.
 
+## [Set up Cloud Runners with `.agents/setup`](#set-up-cloud-runners-with-agentssetup)
+
+[Cloud Runners](/docs/agents/cloud-runners) (private beta) run an executable `.agents/setup` script when they start, after `.agents/prepare` has run in each checkout. Use it to install toolchains and command-line tools that only the runner needs. See [Set up your repository](/docs/agents/cloud-runners#set-up-your-repository).
+
 ## [Delta-specific overrides](#delta-specific-overrides)
 
 Use `.agents/` for shared project configuration. To customize Delta without changing that shared configuration, use `.delta/`:
@@ -160,11 +169,15 @@ Delta-specific configuration
 
 `.delta/linked`
 
+`.agents/setup`
+
+`.delta/setup`
+
 `.agents/skills/`
 
 `.delta/skills/`
 
-For `prepare` and `linked`, the `.delta/` file replaces the corresponding `.agents/` file when present. Only one preparation script runs, and linked-file lists aren’t merged. Empty overrides still take precedence; invalid or failing overrides report errors rather than falling back.
+For `prepare`, `linked`, and `setup`, the `.delta/` file replaces the corresponding `.agents/` file when present. Only one preparation or setup script runs, and linked-file lists aren’t merged. Empty overrides still take precedence; invalid or failing overrides report errors rather than falling back.
 
 Skills from both folders are available. A valid `.delta/skills/` skill overrides a shared skill with the same frontmatter `name`, regardless of folder name. Other skills remain available, and invalid definitions report load errors without hiding valid shared skills.
 

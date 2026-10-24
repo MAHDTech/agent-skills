@@ -48,19 +48,17 @@ support exactly the features they need.
 
 See the following pages for more details on the different components:
 
-<CardGroup cols={3}>
-  <Card title="Lifecycle" icon="arrows-rotate" href="/specification/2024-11-05/basic/lifecycle" />
+> **[Lifecycle](https://modelcontextprotocol.io/specification/2024-11-05/basic/lifecycle.md)**
 
-  <Card title="Resources" icon="file-lines" href="/specification/2024-11-05/server/resources" />
+> **[Resources](https://modelcontextprotocol.io/specification/2024-11-05/server/resources.md)**
 
-  <Card title="Prompts" icon="message" href="/specification/2024-11-05/server/prompts" />
+> **[Prompts](https://modelcontextprotocol.io/specification/2024-11-05/server/prompts.md)**
 
-  <Card title="Tools" icon="wrench" href="/specification/2024-11-05/server/tools" />
+> **[Tools](https://modelcontextprotocol.io/specification/2024-11-05/server/tools.md)**
 
-  <Card title="Logging" icon="rectangle-list" href="/specification/2024-11-05/server/utilities/logging" />
+> **[Logging](https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/logging.md)**
 
-  <Card title="Sampling" icon="code" href="/specification/2024-11-05/client/sampling" />
-</CardGroup>
+> **[Sampling](https://modelcontextprotocol.io/specification/2024-11-05/client/sampling.md)**
 
 ## Auth
 

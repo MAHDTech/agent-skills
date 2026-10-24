@@ -19,7 +19,7 @@ Blog
 
 # Beyond Pass Rate: Harness Evals, and Their Blind Spots
 
-![](https://avatars.githubusercontent.com/u/3103248?v=4)Anant GoelSeptember 24, 2026
+Anant GoelSeptember 24, 2026
 
 Whatever lab you get tokens from likely gives you an agent harness along with it. The labs building these harnesses have a level of model access that nobody else has, and therefore often the model is trained inside the harness.
 
@@ -30,34 +30,6 @@ The current thing™ in agent evaluation is to rely on a subset of popular evals
 ### Models do as well in Delta as in their own harness
 
 What changes when each model runs in Delta instead of its native harness.
-
-ChartData
-
-Tasks solved
-
-← native betterDelta better →
-
-GPT-5.6 Solvs Codex
-
-GPT-6 Astravs Codex
-
-Claude Opus 5vs Claude Code
-
-Claude Fable 5.1[2](#user-content-fn-fable)vs Claude Code
-
-Cost per pass
-
-← native betterDelta better →
-
-GPT-5.6 Solvs Codex
-
-GPT-6 Astravs Codex
-
-Claude Opus 5vs Claude Code
-
-Claude Fable 5.1[2](#user-content-fn-fable)vs Claude Code
-
-Swipe horizontally to explore the full charts.
 
 Model (effort)
 
@@ -130,10 +102,6 @@ A similar trend continues with open-weight models such as Kimi K3 \[[6](#ref-6)\
 ### Delta solves the most tasks at lower cost
 
 Each dot is one harness running Kimi K3 on the same 30 tasks.
-
-ChartData
-
-Swipe horizontally to explore the full charts.
 
 Harness
 
@@ -292,7 +260,7 @@ Indulge me in an example: an edit that matches two places in the same file. Betw
 
 When a patch matches two lines, Delta knows which one the model meant.
 
-2026-09-24T13:12:04.033167 image/svg+xml Matplotlib v3.11.2, https://matplotlib.org/
+After the teammate's import, the patch matches two lines. Most harnesses reject it and the model reads the file again; Delta applies it to the line the model read, now line 9.
 
 No retry, no re-read, no prompt guidance spent explaining any of it. And if the teammate had changed that line itself, Delta wouldn’t guess: it tells the model the content is stale and to read the file again.
 
@@ -310,26 +278,6 @@ Let’s look at the `count-dataset-tokens` task with GPT-6 Astra in Codex and De
 ### Same task, half the requests
 
 GPT-6 Astra on Terminal-Bench's count-dataset-tokens. Both runs passed.
-
-ChartData
-
-Codex
-
-110 seconds · 14 requests · 7 with several tool calls · 5 checking on commands
-
-Delta
-
-78 seconds · 7 requests · 2 with several tool calls
-
-tool call
-
-waiting on model
-
-checking on a command
-
-final answer
-
-Swipe horizontally to explore the full charts.
 
 Harness
 
@@ -631,16 +579,6 @@ Over the course of building Delta, I’ve spent a lot of my time using evals to 
 2.  Fable has fewer tasks because its security classifier is triggered on some of the tasks. [↩](#user-content-fnref-fable)
     
 
-On this page
-
-1.  [Pass rates can’t reflect how code looks](#pass-rates-cant-reflect-how-code-looks)
-2.  [(Tool calls) failing upwards](#tool-calls-failing-upwards)
-3.  [The art of arranging tool calls](#the-art-of-arranging-tool-calls)
-4.  [What’s next](#whats-next)
-5.  [Appendix](#appendix)
-    1.  [Why these evals?](#why-these-evals)
-    2.  [References](#references)
-
 ## More from the blog
 
 *   ### [Escaping the tyranny of worktrees](/blog/escaping-the-tyranny-of-worktrees)
@@ -656,8 +594,4 @@ On this page
     ![Joseph Lyons](https://avatars.githubusercontent.com/u/19867440?v=4 "Joseph Lyons")Oct 7, 2026
     
 
-[Download Delta NowD](/download)[Open DeltaD](/threads)
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)
+[Download Delta Now](/download)[Open Delta](/threads)

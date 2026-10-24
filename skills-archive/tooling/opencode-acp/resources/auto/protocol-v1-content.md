@@ -10,9 +10,9 @@ Content blocks represent displayable information that flows through the Agent Cl
 
 Content blocks appear in:
 
-* User prompts sent via [`session/prompt`](/protocol/v1/prompt-turn#1-user-message)
-* Language model output streamed through [`session/update`](/protocol/v1/prompt-turn#3-agent-reports-output) notifications
-* Progress updates and results from [tool calls](/protocol/v1/tool-calls)
+* User prompts sent via [`session/prompt`](https://agentclientprotocol.com/protocol/v1/prompt-turn#1-user-message)
+* Language model output streamed through [`session/update`](https://agentclientprotocol.com/protocol/v1/prompt-turn#3-agent-reports-output) notifications
+* Progress updates and results from [tool calls](https://agentclientprotocol.com/protocol/v1/tool-calls.md)
 
 ## Content Types
 
@@ -33,16 +33,16 @@ Plain text messages form the foundation of most interactions.
 
 All Agents **MUST** support text content blocks when included in prompts.
 
-<ParamField path="text" type="string" required>
-  The text content to display
-</ParamField>
+**text** `string` *required*
 
-<ParamField path="annotations" type="Annotations">
-  Optional metadata about how the content should be used or displayed. [Learn
-  more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
-</ParamField>
+The text content to display
 
-### Image Content <Icon icon="asterisk" size="14" />
+**annotations** `Annotations`
+
+Optional metadata about how the content should be used or displayed. [Learn
+more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
+
+### Image Content 
 
 Images can be included for visual context or analysis.
 
@@ -54,28 +54,28 @@ Images can be included for visual context or analysis.
 }
 ```
 
-<Icon icon="asterisk" size="14" /> Requires the `image` [prompt
-capability](/protocol/v1/initialization#prompt-capabilities) when included in
+ Requires the `image` [prompt
+capability](https://agentclientprotocol.com/protocol/v1/initialization.md#prompt-capabilities) when included in
 prompts.
 
-<ParamField path="data" type="string" required>
-  Base64-encoded image data
-</ParamField>
+**data** `string` *required*
 
-<ParamField path="mimeType" type="string" required>
-  The MIME type of the image (e.g., "image/png", "image/jpeg")
-</ParamField>
+Base64-encoded image data
 
-<ParamField path="uri" type="string">
-  Optional URI reference for the image source
-</ParamField>
+**mimeType** `string` *required*
 
-<ParamField path="annotations" type="Annotations">
-  Optional metadata about how the content should be used or displayed. [Learn
-  more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
-</ParamField>
+The MIME type of the image (e.g., "image/png", "image/jpeg")
 
-### Audio Content <Icon icon="asterisk" size="14" />
+**uri** `string`
+
+Optional URI reference for the image source
+
+**annotations** `Annotations`
+
+Optional metadata about how the content should be used or displayed. [Learn
+more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
+
+### Audio Content 
 
 Audio data for transcription or analysis.
 
@@ -87,24 +87,24 @@ Audio data for transcription or analysis.
 }
 ```
 
-<Icon icon="asterisk" size="14" /> Requires the `audio` [prompt
-capability](/protocol/v1/initialization#prompt-capabilities) when included in
+ Requires the `audio` [prompt
+capability](https://agentclientprotocol.com/protocol/v1/initialization.md#prompt-capabilities) when included in
 prompts.
 
-<ParamField path="data" type="string" required>
-  Base64-encoded audio data
-</ParamField>
+**data** `string` *required*
 
-<ParamField path="mimeType" type="string" required>
-  The MIME type of the audio (e.g., "audio/wav", "audio/mp3")
-</ParamField>
+Base64-encoded audio data
 
-<ParamField path="annotations" type="Annotations">
-  Optional metadata about how the content should be used or displayed. [Learn
-  more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
-</ParamField>
+**mimeType** `string` *required*
 
-### Embedded Resource <Icon icon="asterisk" size="14" />
+The MIME type of the audio (e.g., "audio/wav", "audio/mp3")
+
+**annotations** `Annotations`
+
+Optional metadata about how the content should be used or displayed. [Learn
+more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
+
+### Embedded Resource 
 
 Complete resource contents embedded directly in the message.
 
@@ -123,46 +123,46 @@ This is the preferred way to include context in prompts, such as when using @-me
 
 By embedding the content directly in the request, Clients can include context from sources that the Agent may not have direct access to.
 
-<Icon icon="asterisk" size="14" /> Requires the `embeddedContext` [prompt
-capability](/protocol/v1/initialization#prompt-capabilities) when included in
+ Requires the `embeddedContext` [prompt
+capability](https://agentclientprotocol.com/protocol/v1/initialization.md#prompt-capabilities) when included in
 prompts.
 
-<ParamField path="resource" type="EmbeddedResourceResource" required>
-  The embedded resource contents, which can be either:
+**resource** `EmbeddedResourceResource` *required*
 
-  <Expandable title="Text Resource">
-    <ParamField path="uri" type="string" required>
-      The URI identifying the resource
-    </ParamField>
+The embedded resource contents, which can be either:
 
-    <ParamField path="text" type="string" required>
-      The text content of the resource
-    </ParamField>
+**Text Resource**
 
-    <ParamField path="mimeType" type="string">
-      Optional MIME type of the text content
-    </ParamField>
-  </Expandable>
+**uri** `string` *required*
 
-  <Expandable title="Blob Resource">
-    <ParamField path="uri" type="string" required>
-      The URI identifying the resource
-    </ParamField>
+The URI identifying the resource
 
-    <ParamField path="blob" type="string" required>
-      Base64-encoded binary data
-    </ParamField>
+**text** `string` *required*
 
-    <ParamField path="mimeType" type="string">
-      Optional MIME type of the blob
-    </ParamField>
-  </Expandable>
-</ParamField>
+The text content of the resource
 
-<ParamField path="annotations" type="Annotations">
-  Optional metadata about how the content should be used or displayed. [Learn
-  more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
-</ParamField>
+**mimeType** `string`
+
+Optional MIME type of the text content
+
+**Blob Resource**
+
+**uri** `string` *required*
+
+The URI identifying the resource
+
+**blob** `string` *required*
+
+Base64-encoded binary data
+
+**mimeType** `string`
+
+Optional MIME type of the blob
+
+**annotations** `Annotations`
+
+Optional metadata about how the content should be used or displayed. [Learn
+more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
 
 ### Resource Link
 
@@ -178,34 +178,34 @@ References to resources that the Agent can access.
 }
 ```
 
-<ParamField path="uri" type="string" required>
-  The URI of the resource
-</ParamField>
+**uri** `string` *required*
 
-<ParamField path="name" type="string" required>
-  A human-readable name for the resource
-</ParamField>
+The URI of the resource
 
-<ParamField path="mimeType" type="string">
-  The MIME type of the resource
-</ParamField>
+**name** `string` *required*
 
-<ParamField path="title" type="string">
-  Optional display title for the resource
-</ParamField>
+A human-readable name for the resource
 
-<ParamField path="description" type="string">
-  Optional description of the resource contents
-</ParamField>
+**mimeType** `string`
 
-<ParamField path="size" type="integer">
-  Optional size of the resource in bytes
-</ParamField>
+The MIME type of the resource
 
-<ParamField path="annotations" type="Annotations">
-  Optional metadata about how the content should be used or displayed. [Learn
-  more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
-</ParamField>
+**title** `string`
+
+Optional display title for the resource
+
+**description** `string`
+
+Optional description of the resource contents
+
+**size** `integer`
+
+Optional size of the resource in bytes
+
+**annotations** `Annotations`
+
+Optional metadata about how the content should be used or displayed. [Learn
+more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

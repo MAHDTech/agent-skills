@@ -152,12 +152,43 @@ Secrets are stored as note items. The vault defaults to `secretspec`, and the it
 
 ## Use existing secrets
 
-A secret’s [`ref`](/reference/configuration/#secret-references) field names an existing item instead: `item` is the exact item title, whose note is read (`field` is not supported). Reads and writes target that item in place.
+A secret’s [`ref`](/reference/configuration/#secret-references) field names an existing item instead: `item` is the exact item title, whose note is read. Reads and writes target that item in place.
 
 ```toml
 [profiles.production]
 DATABASE_URL = { description = "DB", ref = { item = "Production Database" }, providers = ["protonpass://Work"] }
 ```
+
+### Read a specific field
+
+**New in version 0.22**
+
+Add `field` to read any field of an item of any type (login, note, custom, and so on) instead of its note. SecretSpec passes the name to `pass-cli item view --field`, so it accepts the same names: `password`, `username`, `email`, `url`, `note`, `totp` (the current code), custom field names, and `Section.field` for fields in a named section. Field names are case-insensitive.
+
+```toml
+[profiles.production]
+DB_PASSWORD = { description = "DB password", ref = { item = "Production Database", field = "password" }, providers = ["protonpass://Work"] }
+DB_USER = { description = "DB user", ref = { item = "Production Database", field = "username" }, providers = ["protonpass://Work"] }
+```
+
+This is equivalent to:
+
+```bash
+$ pass-cli item view --vault-name Work --item-title "Production Database" --field password
+```
+
+`pass-cli` reports an empty field the same way as a missing one, so both count as an unset secret.
+
+Refs with `field` are read-only: `secretspec set` refuses them before prompting for a value. Update the field in a Proton Pass app instead. Refs without `field`, and the default note storage, remain writable.
+
+> **Why field refs are read-only**
+>
+> This follows from how `pass-cli` works. Its only way to change a field is `pass-cli item update --field name=value`:
+>
+> * The value must be passed as a command-line argument, with no stdin or template form, so other local users can read it in the process list (for example with `ps`) while the command runs. Note writes do not have this problem: SecretSpec sends them to `pass-cli item create note --from-template -` on stdin.
+> * A field name the item does not already have is added as a new custom field in plain text, with no way to make it hidden.
+>
+> SecretSpec will support writing fields once `pass-cli` can accept a field value without putting it on the command line.
 
 ## CI/CD
 

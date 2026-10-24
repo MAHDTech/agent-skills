@@ -19,7 +19,7 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 **Published:** July 24, 2026
 
-The [Elicitation RFD](/rfds/elicitation) has moved to Completed, stabilizing
+The [Elicitation RFD](https://agentclientprotocol.com/rfds/elicitation.md) has moved to Completed, stabilizing
 `elicitation/create` and the optional `elicitation/complete` notification.
 
 Agents can now ask users for structured, non-sensitive information through form
@@ -28,7 +28,7 @@ Clients advertise each supported mode explicitly during initialization.
 The protocol also defines explicit session, tool-call, and request
 scopes.
 
-For the protocol documentation, see [Elicitation](/protocol/v1/elicitation).
+For the protocol documentation, see [Elicitation](https://agentclientprotocol.com/protocol/v1/elicitation.md).
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

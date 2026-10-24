@@ -14,6 +14,7 @@ trivy-results.sarif
 
 # Node and build output
 node_modules/
+.cache/
 dist/
 
 # Env & Config

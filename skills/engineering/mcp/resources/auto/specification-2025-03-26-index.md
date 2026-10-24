@@ -122,15 +122,13 @@ implementors **SHOULD**:
 
 Explore the detailed specification for each protocol component:
 
-<CardGroup cols={5}>
-  <Card title="Architecture" icon="sitemap" href="/specification/2025-03-26/architecture" />
+> **[Architecture](https://modelcontextprotocol.io/specification/2025-03-26/architecture.md)**
 
-  <Card title="Base Protocol" icon="code" href="/specification/2025-03-26/basic" />
+> **[Base Protocol](https://modelcontextprotocol.io/specification/2025-03-26/basic.md)**
 
-  <Card title="Server Features" icon="server" href="/specification/2025-03-26/server" />
+> **[Server Features](https://modelcontextprotocol.io/specification/2025-03-26/server.md)**
 
-  <Card title="Client Features" icon="user" href="/specification/2025-03-26/client" />
+> **[Client Features](https://modelcontextprotocol.io/specification/2025-03-26/client)**
 
-  <Card title="Contributing" icon="pencil" href="/community/contributing" />
-</CardGroup>
+> **[Contributing](https://modelcontextprotocol.io/community/contributing.md)**
 

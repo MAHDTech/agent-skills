@@ -19,7 +19,7 @@ The terminal methods allow Agents to execute shell commands within the Client's 
 
 ## Checking Support
 
-Before attempting to use terminal methods, Agents **MUST** verify that the Client supports this capability by checking the [Client Capabilities](/protocol/v1/initialization#client-capabilities) field in the Client's `initialize` request:
+Before attempting to use terminal methods, Agents **MUST** verify that the Client supports this capability by checking the [Client Capabilities](https://agentclientprotocol.com/protocol/v1/initialization.md#client-capabilities) field in the Client's `initialize` request:
 
 ```json highlight={8} theme={null}
 {
@@ -62,42 +62,42 @@ The `terminal/create` method starts a command in a new terminal:
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  The [Session ID](/protocol/v1/session-setup#session-id) for this request
-</ParamField>
+**sessionId** `SessionId` *required*
 
-<ParamField path="command" type="string" required>
-  The command to execute
-</ParamField>
+The [Session ID](https://agentclientprotocol.com/protocol/v1/session-setup.md#session-id) for this request
 
-<ParamField path="args" type="string[]">
-  Array of command arguments
-</ParamField>
+**command** `string` *required*
 
-<ParamField path="env" type="EnvVariable[]">
-  Environment variables for the command.
+The command to execute
 
-  Each variable has:
+**args** `string[]`
 
-  * `name`: The environment variable name
-  * `value`: The environment variable value
-</ParamField>
+Array of command arguments
 
-<ParamField path="cwd" type="string">
-  Working directory for the command. Must be an absolute path.
-</ParamField>
+**env** `EnvVariable[]`
 
-<ParamField path="outputByteLimit" type="number">
-  Maximum number of output bytes to retain. Once exceeded, earlier output is
-  truncated to stay within this limit.
+Environment variables for the command.
 
-  When the limit is exceeded, the Client truncates from the beginning of the output
-  to stay within the limit.
+Each variable has:
 
-  The Client **MUST** ensure truncation happens at a character boundary to maintain valid
-  string output, even if this means the retained output is slightly less than the
-  specified limit.
-</ParamField>
+* `name`: The environment variable name
+* `value`: The environment variable value
+
+**cwd** `string`
+
+Working directory for the command. Must be an absolute path.
+
+**outputByteLimit** `number`
+
+Maximum number of output bytes to retain. Once exceeded, earlier output is
+truncated to stay within this limit.
+
+When the limit is exceeded, the Client truncates from the beginning of the output
+to stay within the limit.
+
+The Client **MUST** ensure truncation happens at a character boundary to maintain valid
+string output, even if this means the retained output is slightly less than the
+specified limit.
 
 The Client returns a Terminal ID immediately without waiting for completion:
 
@@ -115,14 +115,14 @@ This allows the command to run in the background while the Agent performs other 
 
 After creating the terminal, the Agent can use the `terminal/wait_for_exit` method to wait for the command to complete.
 
-\<Note\>
-  The Agent **MUST** release the terminal using `terminal/release` when it's no
-  longer needed.
-</Note>
+> [!NOTE]
+>
+> The Agent **MUST** release the terminal using `terminal/release` when it's no
+> longer needed.
 
 ## Embedding in Tool Calls
 
-Terminals can be embedded directly in [tool calls](/protocol/v1/tool-calls) to provide real-time output to users:
+Terminals can be embedded directly in [tool calls](https://agentclientprotocol.com/protocol/v1/tool-calls.md) to provide real-time output to users:
 
 ```json theme={null}
 {
@@ -182,20 +182,20 @@ The Client responds with the current output and exit status (if the command has 
 }
 ```
 
-<ResponseField name="output" type="string" required>
-  The terminal output captured so far
-</ResponseField>
+**output** `string` *required*
 
-<ResponseField name="truncated" type="boolean" required>
-  Whether the output was truncated due to byte limits
-</ResponseField>
+The terminal output captured so far
 
-<ResponseField name="exitStatus" type="TerminalExitStatus">
-  Present only if the command has exited. Contains:
+**truncated** `boolean` *required*
 
-  * `exitCode`: The process exit code (may be null)
-  * `signal`: The signal that terminated the process (may be null)
-</ResponseField>
+Whether the output was truncated due to byte limits
+
+**exitStatus** `TerminalExitStatus`
+
+Present only if the command has exited. Contains:
+
+* `exitCode`: The process exit code (may be null)
+* `signal`: The signal that terminated the process (may be null)
 
 ## Waiting for Exit
 
@@ -226,13 +226,13 @@ The Client responds once the command exits:
 }
 ```
 
-<ResponseField name="exitCode" type="number">
-  The process exit code (may be null if terminated by signal)
-</ResponseField>
+**exitCode** `number`
 
-<ResponseField name="signal" type="string">
-  The signal that terminated the process (may be null if exited normally)
-</ResponseField>
+The process exit code (may be null if terminated by signal)
+
+**signal** `string`
+
+The signal that terminated the process (may be null if exited normally)
 
 ## Killing Commands
 

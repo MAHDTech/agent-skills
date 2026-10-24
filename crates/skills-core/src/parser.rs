@@ -452,7 +452,24 @@ impl SkillParser {
             .and_then(|n| n.to_str())
             .unwrap_or("");
 
-        Self::validate_skill_name(&fm.name, dir_name)?;
+        if path
+            .and_then(crate::models::vendor_source_from_path)
+            .is_some()
+        {
+            if fm.name != dir_name
+                || !fm
+                    .name
+                    .bytes()
+                    .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-')
+            {
+                return Err(SkillError::validation(
+                    target_path,
+                    "Vendor skill name must match its directory and use lowercase letters, digits, or hyphens",
+                ));
+            }
+        } else {
+            Self::validate_skill_name(&fm.name, dir_name)?;
+        }
 
         Ok(())
     }
@@ -771,7 +788,9 @@ impl SkillParser {
             .to_string();
 
         let (tree, inferred_category) = Self::infer_tree_and_category_from_path(path)?;
-        let category = if let Some(ref cat) = parsed.frontmatter.category {
+        let category = if inferred_category.as_str().starts_with("vendor/") {
+            inferred_category
+        } else if let Some(ref cat) = parsed.frontmatter.category {
             cat.clone()
         } else {
             inferred_category
@@ -860,6 +879,12 @@ impl SkillParser {
                     return Ok((SkillTree::Archive, category));
                 }
             } else if components[i] == "skills" && i + 1 < components.len() {
+                if components[i + 1] == "vendor" && i + 2 < components.len() {
+                    return Ok((
+                        SkillTree::Live,
+                        SkillCategory::Custom(format!("vendor/{}", components[i + 2])),
+                    ));
+                }
                 let cat_str = &components[i + 1];
                 return Ok((SkillTree::Live, SkillCategory::from_str(cat_str).unwrap()));
             }

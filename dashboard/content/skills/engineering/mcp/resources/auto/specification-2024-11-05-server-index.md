@@ -33,12 +33,10 @@ Each primitive can be summarized in the following control hierarchy:
 
 Explore these key primitives in more detail below:
 
-<CardGroup cols={3}>
-  <Card title="Prompts" icon="message" href="/specification/2024-11-05/server/prompts" />
+> **[Prompts](https://modelcontextprotocol.io/specification/2024-11-05/server/prompts.md)**
 
-  <Card title="Resources" icon="file-lines" href="/specification/2024-11-05/server/resources" />
+> **[Resources](https://modelcontextprotocol.io/specification/2024-11-05/server/resources.md)**
 
-  <Card title="Tools" icon="wrench" href="/specification/2024-11-05/server/tools" />
-</CardGroup>
+> **[Tools](https://modelcontextprotocol.io/specification/2024-11-05/server/tools.md)**
 
 

@@ -7,12 +7,10 @@
 > Authenticating with agents and logging out
 
 ACP authentication is negotiated during
-[initialization](/protocol/v1/initialization). Agents advertise available
+[initialization](https://agentclientprotocol.com/protocol/v1/initialization.md). Agents advertise available
 authentication methods in `authMethods`. Each authentication method type defines
 the flow a Client uses. Agents that support ending an authenticated state
 advertise the `logout` capability.
-
-<br />
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -41,8 +39,6 @@ sequenceDiagram
 
     Note over Client,Agent: New sessions require authentication again
 ```
-
-<br />
 
 ## Advertising Authentication
 
@@ -130,9 +126,9 @@ A Client advertises this capability only when it can reproduce the configured
 Agent invocation in an interactive terminal. An Agent may advertise a
 `terminal` method only when this capability is `true`.
 
-See the [schema](/protocol/v1/schema#authmethod) for the full
+See the [schema](https://agentclientprotocol.com/protocol/v1/schema.md#authmethod) for the full
 `AuthMethod` definitions and the [Terminal Authentication
-RFD](/rfds/auth-methods) for the design.
+RFD](https://agentclientprotocol.com/rfds/auth-methods.md) for the design.
 
 ## Protocol-driven authentication
 
@@ -151,10 +147,10 @@ authentication method ID:
 }
 ```
 
-<ParamField path="methodId" type="string" required>
-  The ID of an advertised authentication method whose type defines the
-  `authenticate` flow. Clients MUST NOT pass a `terminal` method.
-</ParamField>
+**methodId** `string` *required*
+
+The ID of an advertised authentication method whose type defines the
+`authenticate` flow. Clients MUST NOT pass a `terminal` method.
 
 On success, the Agent returns an empty result:
 

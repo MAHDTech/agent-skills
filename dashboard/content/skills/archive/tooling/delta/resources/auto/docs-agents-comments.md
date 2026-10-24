@@ -27,7 +27,7 @@ On this page
 1.  [Add a comment](#add-a-comment)
 2.  [Comment on files and diffs](#comment-on-files-and-diffs)
 3.  [When comments reach the agent](#when-comments-reach-the-agent)
-    1.  [Send one comment chain to a subthread](#send-one-comment-chain-to-a-subthread)
+    1.  [Send one comment chain to a fork](#send-one-comment-chain-to-a-fork)
 4.  [How the agent responds](#how-the-agent-responds)
 5.  [When to use comments](#when-to-use-comments)
 6.  [What’s next](#whats-next)
@@ -51,9 +51,9 @@ To edit a file directly instead, click the speech-bubble toggle in the file tool
 
 Sending a comment follows the same keys as sending a message: `Cmd+Enter` on macOS or `Ctrl+Enter` on Linux and Windows by default, or `Enter` if you turned the [Send With Modifier setting](/docs/configuration/settings) off. Sending from a file or diff comment delivers it without returning to the composer. Once delivered, these comments collapse into indicators in the gutter; click an indicator, or press `Cmd+Shift+M` on macOS or `Ctrl+Shift+M` on Linux and Windows, to reopen the discussion.
 
-In a file tab, right-click the comment-mode button and toggle **Show Comments**. In Changes, open **Display Options** and choose **Hide Comments** or **Show Comments**. On a phone or tablet, toggle **Comments** in **Display Options**.
+In a file tab on a computer, right-click the comment-mode button and toggle **Show Comments**. In Changes, open **Display Options** and choose **Hide Comments** or **Show Comments**. On a phone, open **More** in the thread header and toggle **Comments** while viewing Changes. In a file tab, use **Comment Mode** there to switch between commenting and editing.
 
-You can also press `Cmd+Option+V` on macOS or `Ctrl+Alt+V` on Linux and Windows while the file or diff tab is focused. Visibility applies to that tab; it does not change your comment-mode preference.
+On a computer, you can also press `Cmd+Option+V` on macOS or `Ctrl+Alt+V` on Linux and Windows while the file or diff tab is focused. Visibility applies to that tab; it does not change your comment-mode preference.
 
 ## [When comments reach the agent](#when-comments-reach-the-agent)
 
@@ -61,9 +61,9 @@ Comments you write are pending until you next submit: they are delivered togethe
 
 You can reply directly in a pending comment summary. Click inside a teammate’s comment and type to start a reply without returning to the original passage. Typing in your own pending comment edits that draft.
 
-### [Send one comment chain to a subthread](#send-one-comment-chain-to-a-subthread)
+### [Send one comment chain to a fork](#send-one-comment-chain-to-a-fork)
 
-With the cursor in an unsent comment, press `Cmd+Shift+Enter` on macOS or `Ctrl+Shift+Enter` on Linux and Windows to send that comment chain to a new subthread. If **Send With Modifier** is off, use `Cmd+Enter` or `Ctrl+Enter` instead. This lets you handle that feedback separately from the main conversation.
+With the cursor in an unsent comment, press `Cmd+Shift+Enter` on macOS or `Ctrl+Shift+Enter` on Linux and Windows to send that comment chain to a new fork. If **Send With Modifier** is off, use `Cmd+Enter` or `Ctrl+Enter` instead. This lets you handle that feedback separately from the main conversation. The keymap lists this action as **Send Comment to Fork**.
 
 ## [How the agent responds](#how-the-agent-responds)
 

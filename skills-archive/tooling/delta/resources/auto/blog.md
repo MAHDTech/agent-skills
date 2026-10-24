@@ -8,29 +8,23 @@ description: "News, product updates, and ideas from the team building Delta."
 
 News, product updates, and ideas from the team building Delta.
 
-*   ![](https://images.zed.dev/cdn-cgi/image/width=960,quality=75,format=auto/blog/future-of-version-control/thumbnail-l.webp)![](https://images.zed.dev/cdn-cgi/image/width=960,quality=75,format=auto/blog/future-of-version-control/thumbnail-d.webp)
-    
-    ### [DeltaDB: The Future of Version Control](/blog/future-of-version-control)
+*   ### [DeltaDB: The Future of Version Control](/blog/future-of-version-control)
     
     What if you never had to lose work again?
     
-    ![](https://avatars.githubusercontent.com/u/94272?v=4)Conrad IrwinOct 15, 2026
+    Conrad Irwin Oct 15, 2026
     
-*   ![](https://images.zed.dev/cdn-cgi/image/width=960,quality=75,format=auto/blog/please-stop-sending-me-google-docs/thumbnail-l.webp)![](https://images.zed.dev/cdn-cgi/image/width=960,quality=75,format=auto/blog/please-stop-sending-me-google-docs/thumbnail-d.webp)
-    
-    ### [Please Stop Sending Me Google Docs](/blog/please-stop-sending-me-google-docs)
+*   ### [Please Stop Sending Me Google Docs](/blog/please-stop-sending-me-google-docs)
     
     In Delta, my teammates and I work with the agent together, and it feels so much better.
     
-    ![](https://avatars.githubusercontent.com/u/10458212?v=4)Franciska DethlefsenOct 8, 2026
+    Franciska Dethlefsen Oct 8, 2026
     
-*   ![](https://images.zed.dev/cdn-cgi/image/width=960,quality=75,format=auto/blog/the-diff/2026-09/thumbnail-l.webp)![](https://images.zed.dev/cdn-cgi/image/width=960,quality=75,format=auto/blog/the-diff/2026-09/thumbnail-d.webp)
-    
-    ### [The Diff: September 2026](/blog/the-diff-2026-09)
+*   ### [The Diff: September 2026](/blog/the-diff-2026-09)
     
     More provider options, orchestrating threads with threads, and more.
     
-    ![](https://avatars.githubusercontent.com/u/19867440?v=4)Joseph LyonsOct 7, 2026
+    Joseph Lyons Oct 7, 2026
     
 
 ## All posts
@@ -76,8 +70,4 @@ News, product updates, and ideas from the team building Delta.
     ![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4 "Nathan Sobo")Jun 11, 2026
     
 
-[Download Delta NowD](/download)[Open DeltaD](/threads)
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)
+[Download Delta Now](/download)[Open Delta](/threads)

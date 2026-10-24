@@ -27,7 +27,7 @@ On this page
 1.  [Start a thread](#start-a-thread)
     1.  [Attach text and insert symbols](#attach-text-and-insert-symbols)
     2.  [Ask the agent to start or fork a thread](#ask-the-agent-to-start-or-fork-a-thread)
-2.  [Send a message to a subthread](#send-a-message-to-a-subthread)
+2.  [Send a message to a fork](#send-a-message-to-a-fork)
     1.  [Find and open child threads](#find-and-open-child-threads)
 3.  [Resume work on a feature](#resume-work-on-a-feature)
 4.  [Organize threads](#organize-threads)
@@ -66,29 +66,29 @@ Type `:` followed by a name in a message or comment to choose an emoji or mathem
 
 In the desktop app, ask the agent to start a separate thread and describe its task. The new thread uses isolated Delta worktrees, so you can work on independent tasks in parallel. It starts with a fresh conversation and does not inherit this thread’s edits. To disable this capability, turn off **Agent Thread Creation** in **Settings > Thread > Rules**; subagent delegation remains separate.
 
-To continue from an existing conversation, explicitly ask the agent to fork it and provide its thread ID or shared link. The fork starts from the source thread’s recorded conversation and worktree state, then advances independently. It does not merge its changes back automatically.
+To continue from an existing conversation, explicitly ask the agent to fork it and provide its thread ID or shared link. The fork starts from the source thread’s recorded conversation and worktree state, then advances independently. Unlike a fork you create with `/fork`, it appears as a separate top-level thread rather than under the source thread. It does not merge its changes back automatically.
 
-## [Send a message to a subthread](#send-a-message-to-a-subthread)
+## [Send a message to a fork](#send-a-message-to-a-fork)
 
-To work on a task in a separate conversation, write your message in a thread or an existing subthread, then press `Cmd+Shift+Enter` on macOS or `Ctrl+Shift+Enter` on Linux and Windows. Delta opens a new subthread and runs the request there, not in the parent. The sent request stays in the parent’s history.
+To work on a task in a separate conversation, write your message in a thread or an existing fork, then press `Cmd+Shift+Enter` on macOS or `Ctrl+Shift+Enter` on Linux and Windows. Delta opens a new fork and runs the request there, not in the parent. The sent request stays in the parent’s history. You can also choose **File > Send Message to Fork**.
 
-The subthread inherits the parent’s conversation at the point it starts. That context is background for your new request, not an instruction to finish the parent’s tasks. To continue work from the parent, ask for it explicitly.
+The fork inherits the parent’s conversation at the point it starts. That context is background for your new request, not an instruction to finish the parent’s tasks. To continue work from the parent, ask for it explicitly.
 
 If you turned [Send With Modifier](/docs/configuration/settings#thread) off, use `Cmd+Enter` on macOS or `Ctrl+Enter` on Linux and Windows instead. You can also hold the same modifier keys while clicking the send button. These gestures work in the desktop app and on the web.
 
-Use the same shortcut with an empty composer, or type `/subthread` and select the command, to open a blank subthread. Write your task in the new conversation. Click the subthread’s title in its tab toolbar to rename it.
+Use the same shortcut with an empty composer, or type `/fork` and select the command, to open a fork with the parent’s conversation history without starting an agent turn. You can still find `/fork` by typing `/subthread` in the command picker. Write your task in the new conversation. Click the fork’s title in its tab toolbar to rename it.
 
-In the desktop sidebar, use **Open in Tab** to open a subthread alongside its parent. Closing its tab does not stop its running work. You can also right-click a subthread to **Rename**, **Mark as Read**, or **Mark as Unread**. Press `Cmd+1` on macOS or `Ctrl+1` on Linux and Windows to return focus to the parent conversation without closing the subthread tab.
+In the desktop sidebar, use **Open in Tab** to open a fork alongside its parent. Closing its tab does not stop its running work. You can also right-click a fork to **Rename**, **Mark as Read**, or **Mark as Unread**. Press `Cmd+1` on macOS or `Ctrl+1` on Linux and Windows to return focus to the parent conversation without closing the fork’s tab.
 
-You can include a [skill](/docs/agents/skills) in the message. If the skill picker is open, the subthread shortcut accepts the highlighted skill and sends the complete draft to the new conversation. Pressing `Enter` in the picker only inserts the skill.
+You can include a [skill](/docs/agents/skills) in the message. If the skill picker is open, the **Send in Fork** shortcut accepts the highlighted skill and sends the complete draft to the new conversation. Pressing `Enter` in the picker only inserts the skill.
 
-Subthreads you create this way do not automatically post progress, success, or blockers in the parent conversation. Ask the child agent to [send a message to the parent](#send-information-to-another-agent) when you need an update. Agent-created [subagents](/docs/agents/subagents) return their final result automatically, and Land thread results also appear in the parent.
+Forks you create this way do not automatically post progress, success, or blockers in the parent conversation. Ask the child agent to [send a message to the parent](#send-information-to-another-agent) when you need an update. Agent-created [subagents](/docs/agents/subagents) return their final result automatically, and Land thread results also appear in the parent.
 
-The child’s [Delta worktrees](/docs/concepts/delta-and-git) start as copies of the parent’s. After that, the parent and child can advance independently; file changes do not sync automatically in either direction. To bring the child’s edits back, ask the parent agent to merge that subthread’s changes, as with a [review thread](/docs/agents/review-and-sync#review-in-a-review-thread). Finishing the child conversation does not merge its edits automatically. New [isolated subagents](/docs/agents/subagents#profiles) also require an explicit merge.
+The fork’s [Delta worktrees](/docs/concepts/delta-and-git) start as copies of the parent’s. After that, the parent and fork can advance independently; file changes do not sync automatically in either direction. To bring the fork’s edits back, ask the parent agent to merge that fork’s changes, as with a [review thread](/docs/agents/review-and-sync#review-in-a-review-thread). Finishing the fork’s conversation does not merge its edits automatically. New [isolated subagents](/docs/agents/subagents#profiles) also require an explicit merge.
 
 To give a subthread the main conversation area, focus its tab and run **Open as Primary** from the command palette. This works on desktop and web. On desktop, you can also open a subagent as primary.
 
-New subthreads include a link back to the point where they forked from the parent.
+New subthreads start with a **Forked from** row that links back to the point where they forked from the parent.
 
 Subthreads can contain nested subthreads. A browser turn still has the [browser’s tool limitations](/docs/collaboration/delta-on-the-web#choose-where-to-run-a-request).
 
@@ -112,15 +112,19 @@ Start a new isolated thread for independent work. To collaborate on the existing
 
 In the desktop sidebar’s filter menu, choose **Group by** to group threads by **Project**, **Time**, **State**, or **Owner**. Under **Sort by**, choose **Creation Time**, **Last Prompted**, or **Manual**. Manual sorting is not available with Time grouping or in thread history. Time grouping and thread history group older threads by month.
 
-Under **Subthreads**, choose which children to show: **Plain**, **Reviews**, **Land**, and **Subagents**. An expanded parent shows the six newest matching children across these kinds. Choose **Show N more** to reveal the rest.
+Under **Subthreads**, choose which children to show: **Plain**, **Reviews**, **Land**, and **Subagents**. **Plain** includes forks and new subagents; **Subagents** shows older attached subagents. An expanded parent shows the six newest matching children across these kinds. Choose **Show N more** to reveal the rest.
 
 To bookmark the current thread on desktop, press `Cmd+D` on macOS or `Ctrl+D` on Linux and Windows. Choose **Show Bookmarked Threads** from the sidebar or menu bar to find bookmarked threads, including archived ones. On macOS, you can also press `Cmd+Option+B`; Linux and Windows have no default shortcut for this view.
 
-Right-click a thread and choose a color from its context menu to make it easier to recognize. You can also set or clear a color for several selected threads at once. Nested threads and subagents inherit their parent’s color. Colors organize your local sidebar; they are not shared with collaborators.
+Right-click a thread and choose a color from its context menu to make it easier to recognize. Choosing a color adds its associated tag; choosing it again removes that tag. You can also apply or remove a color tag for several selected threads at once. Subthreads and subagents can have colors independent of their parents. Colors organize your sidebar; they are not shared with collaborators.
 
 ### [Tag and filter threads](#tag-and-filter-threads)
 
 On desktop, right-click a thread and open **Tags**, or run **Edit Thread Tags** from the command palette. Assign tags to organize related work, then use **Tags** in the sidebar filter menu to narrow the list. The Bookmarks view also has filters for tags, ownership, and which subthreads to show.
+
+Colored tags control a thread’s color. If a thread has several colored tags, the first one assigned determines its color.
+
+To add a thread’s tags to its existing subthreads, right-click the parent and choose **Apply Tag to Subthreads**. This also adds the tags to nested descendants without removing their existing tags. The command appears when a descendant is missing one of the parent’s tags.
 
 ## [Send information to another agent](#send-information-to-another-agent)
 

@@ -6,7 +6,7 @@
 
 > Advertise available slash commands to clients
 
-Agents can advertise a set of slash commands that users can invoke. These commands provide quick access to specific agent capabilities and workflows. Commands are run as part of regular [prompt](/protocol/v1/prompt-turn) requests where the Client includes the command text in the prompt.
+Agents can advertise a set of slash commands that users can invoke. These commands provide quick access to specific agent capabilities and workflows. Commands are run as part of regular [prompt](https://agentclientprotocol.com/protocol/v1/prompt-turn.md) requests where the Client includes the command text in the prompt.
 
 ## Advertising commands
 
@@ -45,31 +45,31 @@ After creating a session, the Agent **MAY** send a list of available commands vi
 }
 ```
 
-<ResponseField name="availableCommands" type="AvailableCommand[]">
-  The list of commands available in this session
-</ResponseField>
+**availableCommands** `AvailableCommand[]`
+
+The list of commands available in this session
 
 ### AvailableCommand
 
-<ResponseField name="name" type="string" required>
-  The command name (e.g., "web", "test", "plan")
-</ResponseField>
+**name** `string` *required*
 
-<ResponseField name="description" type="string" required>
-  Human-readable description of what the command does
-</ResponseField>
+The command name (e.g., "web", "test", "plan")
 
-<ResponseField name="input" type="AvailableCommandInput">
-  Optional input specification for the command
-</ResponseField>
+**description** `string` *required*
+
+Human-readable description of what the command does
+
+**input** `AvailableCommandInput`
+
+Optional input specification for the command
 
 ### AvailableCommandInput
 
 Currently supports unstructured text input:
 
-<ResponseField name="hint" type="string" required>
-  A hint to display when the input hasn't been provided yet
-</ResponseField>
+**hint** `string` *required*
+
+A hint to display when the input hasn't been provided yet
 
 ## Dynamic updates
 

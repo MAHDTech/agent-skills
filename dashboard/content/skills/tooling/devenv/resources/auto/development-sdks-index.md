@@ -11,7 +11,7 @@ skill_name = "devenv"
 
 > How the language SDKs are built, packaged, and released, and which platforms each one supports
 
-SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript, Haskell, PHP, C#, Swift (0.18+), and JVM languages (0.20+). This page is for contributors: how the SDKs are put together, how each one is packaged and released, which platforms each artifact covers, and what to update when adding a platform or a new SDK. For the user-facing architecture and API, see the [SDK overview](/sdk/overview).
+SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript, Haskell, PHP, C#, Swift (0.18+), JVM languages (0.20+), and Elixir (0.22+). This page is for contributors: how the SDKs are put together, how each one is packaged and released, which platforms each artifact covers, and what to update when adding a platform or a new SDK. For the user-facing architecture and API, see the [SDK overview](/sdk/overview).
 
 > **Native library name**
 >
@@ -37,17 +37,22 @@ Package versions for the non-Rust SDKs are not hand-edited: release workflows ru
 
 Each SDK has a dedicated distribution workflow that builds artifacts per platform and publishes on a version tag:
 
-| SDK           | Package                                                                                    | Workflow                                         |
-| ------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| Rust          | `secretspec` on crates.io (source)                                                         | `publish.yml`                                    |
-| Python        | `secretspec` wheels on PyPI                                                                | `python-wheels.yml`                              |
-| Node.js       | `secretspec` + per-platform packages on npm                                                | `node-addon.yml`                                 |
-| Go            | Go module (source) + `libsecretspec` release assets                                        | `go-embed.yml`, `go-static.yml`, `ffi-build.yml` |
-| Ruby          | `secretspec` platform gems on RubyGems                                                     | `ruby-gems.yml`                                  |
-| C#            | `Cachix.SecretSpec` on NuGet                                                               | `dotnet-package.yml`                             |
-| Swift (0.18+) | SwiftPM source package + XCFramework release asset                                         | `swift-package.yml`                              |
-| PHP           | Composer package (source) + prebuilt extension binaries and `libsecretspec` release assets | `php-ext.yml`, `ffi-build.yml`                   |
-| Haskell       | `secretspec` on Hackage (source)                                                           | `haskell-build.yml`                              |
+| SDK            | Package                                                                                    | Workflow                                         |
+| -------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| Rust           | `secretspec` on crates.io (source)                                                         | `publish.yml`                                    |
+| Python         | `secretspec` wheels on PyPI                                                                | `python-wheels.yml`                              |
+| Node.js        | `secretspec` + per-platform packages on npm                                                | `node-addon.yml`                                 |
+| Go             | Go module (source) + `libsecretspec` release assets                                        | `go-embed.yml`, `go-static.yml`, `ffi-build.yml` |
+| Ruby           | `secretspec` platform gems on RubyGems                                                     | `ruby-gems.yml`                                  |
+| C#             | `Cachix.SecretSpec` on NuGet                                                               | `dotnet-package.yml`                             |
+| Swift (0.18+)  | SwiftPM source package + XCFramework release asset                                         | `swift-package.yml`                              |
+| PHP            | Composer package (source) + prebuilt extension binaries and `libsecretspec` release assets | `php-ext.yml`, `ffi-build.yml`                   |
+| Haskell        | `secretspec` on Hackage (source)                                                           | `haskell-build.yml`                              |
+| Elixir (0.22+) | `secretspec` on Hex.pm, using `secretspec serve`                                           | `elixir-package.yml`                             |
+
+**New in version 0.22**
+
+The Elixir SDK is available from SecretSpec 0.22 and uses the shared resolver IPC protocol.
 
 ## Platform support
 
@@ -65,6 +70,7 @@ Platforms each released artifact covers. Windows support for the Python wheel, t
 | PHP                 | ✓                        | ✓                        | —           | ✓                   | ✓ (0.17+)             | —             |
 | Haskell (source)    | ✓ (CI-covered)           | —                        | —           | —                   | ✓ (CI-covered, 0.17+) | —             |
 | JVM (0.20+)         | ✓                        | ✓                        | ✓           | ✓                   | ✓                     | ✓             |
+| Elixir (0.22+)      | ✓                        | ✓                        | —           | ✓                   | ✓                     | —             |
 
 Notes:
 

@@ -19,9 +19,7 @@ The `session/list` method allows Clients to discover sessions known to an Agent.
 
 Agents can also push session metadata updates to Clients in real-time via the `session_info_update` notification, keeping session titles and metadata in sync without polling.
 
-Before listing sessions, Clients **MUST** first complete the [initialization](/protocol/v1/initialization) phase to verify the Agent supports this capability.
-
-<br />
+Before listing sessions, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v1/initialization.md) phase to verify the Agent supports this capability.
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -41,8 +39,6 @@ sequenceDiagram
 
     Note over Client,Agent: Ready for prompts
 ```
-
-<br />
 
 ## Checking Support
 
@@ -69,11 +65,11 @@ Agents that also advertise `sessionCapabilities.additionalDirectories` may
 include `additionalDirectories` in returned `SessionInfo` objects to report
 additional workspace roots for listed sessions.
 
-\<Note\>
-  If the Agent advertises the `sessionCapabilities.delete` capability, Clients
-  can remove sessions from future `session/list` results with
-  [`session/delete`](/protocol/v1/session-delete).
-</Note>
+> [!NOTE]
+>
+> If the Agent advertises the `sessionCapabilities.delete` capability, Clients
+> can remove sessions from future `session/list` results with
+> [`session/delete`](https://agentclientprotocol.com/protocol/v1/session-delete).
 
 ## Listing Sessions
 
@@ -93,15 +89,15 @@ Clients discover existing sessions by calling the `session/list` method with opt
 
 All parameters are optional. A request with an empty `params` object returns the first page of sessions.
 
-<ParamField path="cwd" type="string">
-  Filter sessions by working directory. Must be an absolute path. Only sessions
-  with a matching `cwd` are returned.
-</ParamField>
+**cwd** `string`
 
-<ParamField path="cursor" type="string">
-  Opaque cursor token from a previous response's `nextCursor` field for
-  cursor-based pagination. See [Pagination](#pagination).
-</ParamField>
+Filter sessions by working directory. Must be an absolute path. Only sessions
+with a matching `cwd` are returned.
+
+**cursor** `string`
+
+Opaque cursor token from a previous response's `nextCursor` field for
+cursor-based pagination. See [Pagination](#pagination).
 
 The Agent **MUST** respond with a list of sessions and optional pagination metadata:
 
@@ -138,45 +134,45 @@ The Agent **MUST** respond with a list of sessions and optional pagination metad
 }
 ```
 
-<ResponseField name="sessions" type="SessionInfo[]" required>
-  Array of session information objects.
+**sessions** `SessionInfo[]` *required*
 
-  <Expandable title="SessionInfo">
-    <ResponseField name="sessionId" type="string" required>
-      Unique identifier for the session.
-    </ResponseField>
+Array of session information objects.
 
-    <ResponseField name="cwd" type="string" required>
-      Working directory for the session. Always an absolute path.
-    </ResponseField>
+**SessionInfo**
 
-    <ResponseField name="additionalDirectories" type="string[]">
-      If the Agent advertises `sessionCapabilities.additionalDirectories`, it
-      MAY include this field to report the complete ordered additional-root list
-      associated with the listed session. Omitted and empty values are
-      equivalent: this `SessionInfo` response reports no additional roots.
-      Clients MUST NOT merge this field with prior values or infer additional
-      roots from agent-specific state.
-    </ResponseField>
+**sessionId** `string` *required*
 
-    <ResponseField name="title" type="string">
-      Human-readable title for the session. May be auto-generated from the first prompt.
-    </ResponseField>
+Unique identifier for the session.
 
-    <ResponseField name="updatedAt" type="string">
-      ISO 8601 timestamp of the last activity in the session.
-    </ResponseField>
+**cwd** `string` *required*
 
-    <ResponseField name="_meta" type="object">
-      Agent-specific metadata. See [Extensibility](/protocol/v1/extensibility).
-    </ResponseField>
-  </Expandable>
-</ResponseField>
+Working directory for the session. Always an absolute path.
 
-<ResponseField name="nextCursor" type="string">
-  Opaque cursor token. If present, pass this in the next request's `cursor`
-  parameter to fetch the next page. If absent, there are no more results.
-</ResponseField>
+**additionalDirectories** `string[]`
+
+If the Agent advertises `sessionCapabilities.additionalDirectories`, it
+MAY include this field to report the complete ordered additional-root list
+associated with the listed session. Omitted and empty values are
+equivalent: this `SessionInfo` response reports no additional roots.
+Clients MUST NOT merge this field with prior values or infer additional
+roots from agent-specific state.
+
+**title** `string`
+
+Human-readable title for the session. May be auto-generated from the first prompt.
+
+**updatedAt** `string`
+
+ISO 8601 timestamp of the last activity in the session.
+
+**\_meta** `object`
+
+Agent-specific metadata. See [Extensibility](https://agentclientprotocol.com/protocol/v1/extensibility.md).
+
+**nextCursor** `string`
+
+Opaque cursor token. If present, pass this in the next request's `cursor`
+parameter to fetch the next page. If absent, there are no more results.
 
 When no sessions match the criteria, the Agent **MUST** return an empty `sessions` array.
 
@@ -191,7 +187,7 @@ When no sessions match the criteria, the Agent **MUST** return an empty `session
 
 ## Updating Session Metadata
 
-Agents can update session metadata in real-time by sending a `session_info_update` notification via `session/update`. This follows the same pattern as other session notifications like [`available_commands_update`](/protocol/v1/slash-commands) and [`current_mode_update`](/protocol/v1/session-modes).
+Agents can update session metadata in real-time by sending a `session_info_update` notification via `session/update`. This follows the same pattern as other session notifications like [`available_commands_update`](https://agentclientprotocol.com/protocol/v1/slash-commands) and [`current_mode_update`](https://agentclientprotocol.com/protocol/v1/session-modes).
 
 ```json theme={null}
 {
@@ -213,17 +209,17 @@ Agents can update session metadata in real-time by sending a `session_info_updat
 
 All fields are optional. Only include fields that have changed — omitted fields are left unchanged.
 
-<ResponseField name="title" type="string | null">
-  Human-readable title for the session. Set to `null` to clear.
-</ResponseField>
+**title** `string | null`
 
-<ResponseField name="updatedAt" type="string | null">
-  ISO 8601 timestamp of last activity. Set to `null` to clear.
-</ResponseField>
+Human-readable title for the session. Set to `null` to clear.
 
-<ResponseField name="_meta" type="object">
-  Agent-specific metadata. See [Extensibility](/protocol/v1/extensibility).
-</ResponseField>
+**updatedAt** `string | null`
+
+ISO 8601 timestamp of last activity. Set to `null` to clear.
+
+**\_meta** `object`
+
+Agent-specific metadata. See [Extensibility](https://agentclientprotocol.com/protocol/v1/extensibility.md).
 
 The `sessionId`, `cwd`, and `additionalDirectories` fields are **not** included
 in the update. `sessionId` is already in the notification's `params`, `cwd` is
@@ -237,7 +233,7 @@ after the first meaningful exchange to auto-generate a title.
 
 1. Client calls `session/list` to discover available sessions
 2. User selects a session from the list
-3. Client calls [`session/load`](/protocol/v1/session-setup#loading-sessions) with the chosen `sessionId` to resume the conversation
+3. Client calls [`session/load`](https://agentclientprotocol.com/protocol/v1/session-setup#loading-sessions) with the chosen `sessionId` to resume the conversation
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -6,9 +6,9 @@
 
 > Understanding the core conversation flow
 
-A prompt turn represents a complete interaction cycle between the [Client](/protocol/v1/overview#client) and [Agent](/protocol/v1/overview#agent), starting with a user message and continuing until the Agent completes its response. This may involve multiple exchanges with the language model and tool invocations.
+A prompt turn represents a complete interaction cycle between the [Client](https://agentclientprotocol.com/protocol/v1/overview.md#client) and [Agent](https://agentclientprotocol.com/protocol/v1/overview.md#agent), starting with a user message and continuing until the Agent completes its response. This may involve multiple exchanges with the language model and tool invocations.
 
-Before sending prompts, Clients **MUST** first complete the [initialization](/protocol/v1/initialization) phase and [session setup](/protocol/v1/session-setup).
+Before sending prompts, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v1/initialization.md) phase and [session setup](https://agentclientprotocol.com/protocol/v1/session-setup.md).
 
 ## Session Updates
 
@@ -19,27 +19,25 @@ Agents send `session/update` notifications to report streamed content, tool acti
 | `user_message_chunk` | A streamed chunk of a user message. |
 | `agent_message_chunk` | A streamed chunk of the Agent's response. |
 | `agent_thought_chunk` | A streamed chunk of the Agent's reasoning. |
-| `tool_call` | A new [tool call](/protocol/v1/tool-calls#creating). |
-| `tool_call_update` | A change to a [tool call's status or results](/protocol/v1/tool-calls#updating). |
-| `plan` | The Agent's [execution plan](/protocol/v1/agent-plan). |
-| `available_commands_update` | The set of [available slash commands](/protocol/v1/slash-commands) is ready or has changed. |
-| `current_mode_update` | The current [session mode](/protocol/v1/session-modes#from-the-agent) has changed. |
-| `config_option_update` | The session's [configuration options](/protocol/v1/session-config-options#from-the-agent) have changed. |
-| `session_info_update` | [Session metadata](/protocol/v1/session-list#updating-session-metadata), such as the title or last update time, has changed. |
+| `tool_call` | A new [tool call](https://agentclientprotocol.com/protocol/v1/tool-calls.md#creating). |
+| `tool_call_update` | A change to a [tool call's status or results](https://agentclientprotocol.com/protocol/v1/tool-calls.md#updating). |
+| `plan` | The Agent's [execution plan](https://agentclientprotocol.com/protocol/v1/agent-plan.md). |
+| `available_commands_update` | The set of [available slash commands](https://agentclientprotocol.com/protocol/v1/slash-commands.md) is ready or has changed. |
+| `current_mode_update` | The current [session mode](https://agentclientprotocol.com/protocol/v1/session-modes.md#from-the-agent) has changed. |
+| `config_option_update` | The session's [configuration options](https://agentclientprotocol.com/protocol/v1/session-config-options.md#from-the-agent) have changed. |
+| `session_info_update` | [Session metadata](https://agentclientprotocol.com/protocol/v1/session-list.md#updating-session-metadata), such as the title or last update time, has changed. |
 | `usage_update` | The session's [context window usage and cumulative cost](#session-usage-updates). |
 | `notice` | A live [user-facing notice](#session-notices) that is not part of session history. Requires the Client's `session.notices` capability. |
 | `compaction_update` | Creates or updates a [context compaction](#session-compaction). Requires the Client's `session.compaction` capability. |
 | `compaction_summary_chunk` | Appends content to a [compaction's retained summary](#session-compaction). Requires the Client's `session.compaction` capability. |
 
-This is the complete set of variants defined in the current [`SessionUpdate` schema](/protocol/v1/schema#sessionupdate), which describes each payload in detail. The walkthrough below illustrates common uses of these updates.
+This is the complete set of variants defined in the current [`SessionUpdate` schema](https://agentclientprotocol.com/protocol/v1/schema#sessionupdate), which describes each payload in detail. The walkthrough below illustrates common uses of these updates.
 
-Session updates are not limited to active prompt turns. For example, Agents may advertise commands after creating a session, and replay user and Agent messages when [loading a session](/protocol/v1/session-setup#loading-sessions).
+Session updates are not limited to active prompt turns. For example, Agents may advertise commands after creating a session, and replay user and Agent messages when [loading a session](https://agentclientprotocol.com/protocol/v1/session-setup.md#loading-sessions).
 
 ## The Prompt Turn Lifecycle
 
 A prompt turn follows a structured flow that enables rich interactions between the user, Agent, and any connected tools.
-
-<br />
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -111,19 +109,19 @@ The turn begins when the Client sends a `session/prompt`:
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  The [ID](/protocol/v1/session-setup#session-id) of the session to send this message to.
-</ParamField>
+**sessionId** `SessionId` *required*
 
-<ParamField path="prompt" type="ContentBlock[]" required>
-  The contents of the user message, e.g. text, images, files, etc.
+The [ID](https://agentclientprotocol.com/protocol/v1/session-setup.md#session-id) of the session to send this message to.
 
-  Clients **MUST** restrict types of content according to the [Prompt Capabilities](/protocol/v1/initialization#prompt-capabilities) established during [initialization](/protocol/v1/initialization).
+**prompt** `ContentBlock[]` *required*
 
-  <Card icon="comments" horizontal href="/protocol/v1/content">
-    Learn more about Content
-  </Card>
-</ParamField>
+The contents of the user message, e.g. text, images, files, etc.
+
+Clients **MUST** restrict types of content according to the [Prompt Capabilities](https://agentclientprotocol.com/protocol/v1/initialization.md#prompt-capabilities) established during [initialization](https://agentclientprotocol.com/protocol/v1/initialization.md).
+
+> Learn more about Content
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/content.md)
 
 ### 2. Agent Processing
 
@@ -168,9 +166,9 @@ The Agent reports the model's output to the Client via `session/update` notifica
 }
 ```
 
-<Card icon="lightbulb" horizontal href="/protocol/v1/agent-plan">
-  Learn more about Agent Plans
-</Card>
+> Learn more about Agent Plans
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/agent-plan.md)
 
 The Agent then reports text responses from the model:
 
@@ -340,7 +338,7 @@ future ACP statuses. Clients preserve unknown strings and present a generic
 state without inferring lifecycle or control behavior.
 
 If the retained summary is available incrementally, the Agent may append one
-[content block](/protocol/v1/content) at a time:
+[content block](https://agentclientprotocol.com/protocol/v1/content.md) at a time:
 
 ```json theme={null}
 {
@@ -415,7 +413,7 @@ instructions. Text blocks may contain Markdown. Agents should omit it when no
 unencrypted summary is available or when disclosure would reveal context that
 was not otherwise user-visible.
 
-During [history replay](/protocol/v1/session-setup#loading-sessions),
+During [history replay](https://agentclientprotocol.com/protocol/v1/session-setup.md#loading-sessions),
 compaction updates and summary chunks follow the same semantics as live delivery.
 
 Replay does not implicitly reset omitted patch fields. Agents use replacement
@@ -519,9 +517,9 @@ When the tool completes, the Agent sends another update with the final status an
 }
 ```
 
-<Card icon="hammer" horizontal href="/protocol/v1/tool-calls">
-  Learn more about Tool Calls
-</Card>
+> Learn more about Tool Calls
+>
+> [Open](https://agentclientprotocol.com/protocol/v1/tool-calls.md)
 
 ### 6. Continue Conversation
 
@@ -533,21 +531,25 @@ The cycle returns to [step 2](#2-agent-processing), continuing until the languag
 
 When an Agent stops a turn, it must specify the corresponding `StopReason`:
 
-<ResponseField name="end_turn">
-  The language model finishes responding without requesting more tools
-</ResponseField>
+**end\_turn**
 
-<ResponseField name="max_tokens">
-  The maximum token limit is reached
-</ResponseField>
+The language model finishes responding without requesting more tools
 
-<ResponseField name="max_turn_requests">
-  The maximum number of model requests in a single turn is exceeded
-</ResponseField>
+**max\_tokens**
 
-<ResponseField name="refusal">The Agent refuses to continue</ResponseField>
+The maximum token limit is reached
 
-<ResponseField name="cancelled">The Client cancels the turn</ResponseField>
+**max\_turn\_requests**
+
+The maximum number of model requests in a single turn is exceeded
+
+**refusal**
+
+The Agent refuses to continue
+
+**cancelled**
+
+The Client cancels the turn
 
 ## Cancellation
 
@@ -571,13 +573,13 @@ When the Agent receives this notification, it **SHOULD** stop all language model
 
 After all ongoing operations have been successfully aborted and pending updates have been sent, the Agent **MUST** respond to the original `session/prompt` request with the `cancelled` [stop reason](#stop-reasons).
 
-\<Warning\>
-  API client libraries and tools often throw an exception when their operation is aborted, which may propagate as an error response to `session/prompt`.
-
-  Clients often display unrecognized errors from the Agent to the user, which would be undesirable for cancellations as they aren't considered errors.
-
-  Agents **MUST** catch these errors and return the semantically meaningful `cancelled` stop reason, so that Clients can reliably confirm the cancellation.
-</Warning>
+> [!WARNING]
+>
+> API client libraries and tools often throw an exception when their operation is aborted, which may propagate as an error response to `session/prompt`.
+>
+> Clients often display unrecognized errors from the Agent to the user, which would be undesirable for cancellations as they aren't considered errors.
+>
+> Agents **MUST** catch these errors and return the semantically meaningful `cancelled` stop reason, so that Clients can reliably confirm the cancellation.
 
 The Agent **MAY** send `session/update` notifications with content or tool call updates after receiving the `session/cancel` notification, but it **MUST** ensure that it does so before responding to the `session/prompt` request.
 

@@ -15,11 +15,11 @@ Document `params._meta` as the convention for propagating metadata from clients 
 
 ACP clients already propagate context to agents via `_meta`. For example, `requestId` is used for request correlation in [AionUi](https://github.com/iOfficeAI/AionUi/blob/main/src/common/codex/types/eventData.ts#L12-L16).
 
-However, the [extensibility](/protocol/v1/extensibility) documentation does not specify the `_meta` type or document its use for propagation. Without documentation, parties must coordinate ad hoc, which can lead to portability accidents (such as one side using `_meta.traceparent` and the other `_meta.otel.traceparent`). Documenting that propagated fields are root keys in `_meta` prevents this.
+However, the [extensibility](https://agentclientprotocol.com/protocol/v1/extensibility.md) documentation does not specify the `_meta` type or document its use for propagation. Without documentation, parties must coordinate ad hoc, which can lead to portability accidents (such as one side using `_meta.traceparent` and the other `_meta.otel.traceparent`). Documenting that propagated fields are root keys in `_meta` prevents this.
 
 ## What we propose to do about it
 
-Update the [extensibility](/protocol/v1/extensibility#the-_meta-field) documentation with two changes:
+Update the [extensibility](https://agentclientprotocol.com/protocol/v1/extensibility.md#the-_meta-field) documentation with two changes:
 
 1. Add the type `{ [key: string]: unknown }` to the existing summary sentence. This type is compatible with MCP SDKs.
 2. Add a new paragraph after the JSON example about propagation conventions.
@@ -31,7 +31,7 @@ Update the [extensibility](/protocol/v1/extensibility#the-_meta-field) documenta
 
 ## Implementation details
 
-**Change 1**: Update the existing summary sentence in [extensibility](/protocol/v1/extensibility#the-_meta-field):
+**Change 1**: Update the existing summary sentence in [extensibility](https://agentclientprotocol.com/protocol/v1/extensibility.md#the-_meta-field):
 
 ```diff theme={null}
 -All types in the protocol include a `_meta` field that implementations can use to attach custom information.

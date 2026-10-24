@@ -21,7 +21,7 @@ Author(s): [nikomatsakis](https://github.com/nikomatsakis)
 
 > What are you proposing to change?
 
-Replace the current ACP Rust SDK with a new implementation based on SACP (Symposium ACP). The new SDK provides a component-based architecture with builder patterns, explicit message ordering guarantees, and first-class support for [Proxy Chains](./proxy-chains) and [MCP-over-ACP](./mcp-over-acp).
+Replace the current ACP Rust SDK with a new implementation based on SACP (Symposium ACP). The new SDK provides a component-based architecture with builder patterns, explicit message ordering guarantees, and first-class support for [Proxy Chains](https://agentclientprotocol.com/rfds/proxy-chains.md) and [MCP-over-ACP](https://agentclientprotocol.com/rfds/mcp-over-acp.md).
 
 ## Status quo
 
@@ -29,11 +29,11 @@ Replace the current ACP Rust SDK with a new implementation based on SACP (Sympos
 
 The current `agent-client-protocol` crate has a straightforward design with trait-based callbacks for common ACP methods and well-typed requests and responses. It's convenient for simple purposes but quickly becomes awkward when attempting more complex designs.
 
-Two examples that we found pushed the limits of the design are the *conductor* (from the [proxy chains](./proxy-chains) RFD) and the [patchwork-rs](https://patchwork-lang.github.io/patchwork-rs/) project:
+Two examples that we found pushed the limits of the design are the *conductor* (from the [proxy chains](https://agentclientprotocol.com/rfds/proxy-chains.md) RFD) and the [patchwork-rs](https://patchwork-lang.github.io/patchwork-rs/) project:
 
 The Conductor is an orchestrator that routes messages between proxies, agents, and MCP servers. It must adapt messages as they flow through the system and maintain the correct ordering.
 
-Patchwork is a programmatic interface for working with agents. It allows Rust programs to run prompts that provide custom tools (implemented using [MCP-over-ACP](./mcp-over-acp)) and messages:
+Patchwork is a programmatic interface for working with agents. It allows Rust programs to run prompts that provide custom tools (implemented using [MCP-over-ACP](https://agentclientprotocol.com/rfds/mcp-over-acp.md)) and messages:
 
 ```rust theme={null}
 let mut results = Vec::new();
@@ -93,7 +93,7 @@ In the current SDK, every incoming request or notification results is handled in
 
 ### Limitation: Confusing naming and 1:1 assumption
 
-`AgentSideConnection` is ambiguous - does this represent the agent, or the connection *to* an agent? What's more, the SDK currently assumes that each connection has a single peer, but [proxies](./proxy-chains) may wish to send/receive messages from multiple peers (client or agent). This was a constant source of confusion in early versions of the conductor and frequently required the author to get out a pencil and paper and work things out very carefully.
+`AgentSideConnection` is ambiguous - does this represent the agent, or the connection *to* an agent? What's more, the SDK currently assumes that each connection has a single peer, but [proxies](https://agentclientprotocol.com/rfds/proxy-chains.md) may wish to send/receive messages from multiple peers (client or agent). This was a constant source of confusion in early versions of the conductor and frequently required the author to get out a pencil and paper and work things out very carefully.
 
 **Goal:** Use directional naming like `ClientToAgent` that makes relationships explicit: "I am the client, the remote peer is an agent." Enable multiple peers.
 
@@ -162,7 +162,7 @@ The following table summarizes the key API concepts and which goals they address
 
 We have validated the design by implementing a number of use cases:
 
-* **sacp-conductor** (to be renamed **agent-client-protocol-conductor**) - implementation of the conductor from the [proxy chains](./proxy-chains) RFD
+* **sacp-conductor** (to be renamed **agent-client-protocol-conductor**) - implementation of the conductor from the [proxy chains](https://agentclientprotocol.com/rfds/proxy-chains.md) RFD
 * [Patchwork](https://patchwork-lang.github.io/patchwork-rs/) - programmatic agent orchestration
 * **elizacp** - agent implementing the classic ELIZA program
 * **agent-client-protocol-tee** - proxy that logs messages before forwarding
@@ -911,7 +911,7 @@ We would like to try and adapt these ideas to other languages. It would be good 
 
 ### How does this relate to the Proxy Chains and MCP-over-ACP RFDs?
 
-This expanded SDK design is motivated by working through the use cases enabled by [proxy chains](./proxy-chains) and [MCP-over-ACP](./mcp-over-acp).
+This expanded SDK design is motivated by working through the use cases enabled by [proxy chains](https://agentclientprotocol.com/rfds/proxy-chains.md) and [MCP-over-ACP](https://agentclientprotocol.com/rfds/mcp-over-acp.md).
 
 ### How well-tested is this design?
 

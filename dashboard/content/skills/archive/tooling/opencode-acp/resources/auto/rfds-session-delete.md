@@ -28,7 +28,7 @@ Add a capability-gated `session/delete` method so clients can remove sessions fr
 
 > How do things work today and what problems does this cause? Why would we change things?
 
-The [`session/list` RFD](/rfds/session-list) introduced the ability for clients to enumerate sessions. However, there's no standard way to remove sessions from this list. Without `session/delete`, users have no control over their session history—old sessions accumulate, and clients must implement non-standard deletion mechanisms or rely on agent-specific cleanup policies.
+The [`session/list` RFD](https://agentclientprotocol.com/rfds/session-list) introduced the ability for clients to enumerate sessions. However, there's no standard way to remove sessions from this list. Without `session/delete`, users have no control over their session history—old sessions accumulate, and clients must implement non-standard deletion mechanisms or rely on agent-specific cleanup policies.
 
 ## What we propose to do about it
 
@@ -146,7 +146,7 @@ Agents may reject deletion of active sessions or handle it however they choose. 
 
 ### Why is this a separate RFD from session/list?
 
-The [`session/list` RFD](/rfds/session-list#what-about-session-deletion) explicitly deferred deletion to keep scope focused. Now that `session/list` is established, `session/delete` is a natural complement.
+The [`session/list` RFD](https://agentclientprotocol.com/rfds/session-list#what-about-session-deletion) explicitly deferred deletion to keep scope focused. Now that `session/list` is established, `session/delete` is a natural complement.
 
 ## Revision history
 

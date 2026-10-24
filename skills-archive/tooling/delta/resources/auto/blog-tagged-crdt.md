@@ -13,8 +13,3 @@ Blog
 *   ## [DeltaDB: The Future of Version Control](/blog/future-of-version-control)
     
     ![Conrad Irwin](https://avatars.githubusercontent.com/u/94272?v=4 "Conrad Irwin")Oct 15, 2026
-    
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)

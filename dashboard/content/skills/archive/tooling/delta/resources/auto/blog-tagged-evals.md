@@ -24,8 +24,3 @@ Blog
 *   ## [Beyond Pass Rate: Harness Evals, and Their Blind Spots](/blog/beyond-pass-rate)
     
     ![Anant Goel](https://avatars.githubusercontent.com/u/3103248?v=4 "Anant Goel")Sep 24, 2026
-    
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)

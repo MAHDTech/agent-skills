@@ -22,11 +22,11 @@ session lifecycle, prompt turns, cancellation, error handling, and transport
 hygiene), and reports which requirements pass, fail, don't apply, or were never
 exercised.
 
-\<Warning\>
-  The TCK is experimental and does not cover the full protocol. Its
-  requirements, options, and report format may change, and a passing run is not
-  an official statement of ACP conformance.
-</Warning>
+> [!WARNING]
+>
+> The TCK is experimental and does not cover the full protocol. Its
+> requirements, options, and report format may change, and a passing run is not
+> an official statement of ACP conformance.
 
 Each requirement is reported with its spec citation and a tier: mandatory
 behavior, behavior that applies only to capabilities the agent advertises,

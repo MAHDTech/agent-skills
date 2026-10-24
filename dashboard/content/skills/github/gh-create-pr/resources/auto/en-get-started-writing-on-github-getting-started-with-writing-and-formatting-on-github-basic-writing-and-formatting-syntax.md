@@ -56,7 +56,7 @@ Quoted text is indented with a vertical line on the left and displayed using gra
 
 ![Screenshot of rendered GitHub Markdown showing the difference between normal and quoted text.](/assets/images/help/writing/quoted-text-rendered.png)
 
-> \[!NOTE]
+> [!NOTE]
 > When viewing a conversation, you can automatically quote text in a comment by highlighting the text, then typing \<kbd\>R</kbd>. You can quote an entire comment by clicking <svg version="1.1" width="16" height="16" viewBox="0 0 16 16" class="octicon octicon-kebab-horizontal" aria-label="The horizontal kebab icon" role="img"><path d="M8 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm13 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path></svg>, then **Quote reply**. For more information about keyboard shortcuts, see [Keyboard shortcuts](/en/get-started/accessibility/keyboard-shortcuts).
 
 ## Quoting code
@@ -104,7 +104,7 @@ Here are the currently supported color models.
 | RGB   | <code>\`rgb(R,G,B)\`</code> | <code>\`rgb(9, 105, 218)\`</code>   | ![Screenshot of rendered GitHub Markdown showing how RGB value 9, 105, 218 appears with a blue circle.](/assets/images/help/writing/supported-color-models-rgb-rendered.png)   |
 | HSL   | <code>\`hsl(H,S,L)\`</code> | <code>\`hsl(212, 92%, 45%)\`</code> | ![Screenshot of rendered GitHub Markdown showing how HSL value 212, 92%, 45% appears with a blue circle.](/assets/images/help/writing/supported-color-models-hsl-rendered.png) |
 
-> \[!NOTE]
+> [!NOTE]
 >
 > * A supported color model cannot have any leading or trailing spaces within the backticks.
 > * The visualization of the color is only supported in issues, pull requests, and discussions.
@@ -119,7 +119,7 @@ You can also create a Markdown hyperlink by highlighting the text and using the 
 
 ![Screenshot of rendered GitHub Markdown showing how text within brackets, "GitHub Pages," appears as a blue hyperlink.](/assets/images/help/writing/link-rendered.png)
 
-> \[!NOTE]
+> [!NOTE]
 > GitHub automatically creates links when valid URLs are written in a comment. For more information, see [Autolinked references and URLs](/en/get-started/writing-on-github/working-with-advanced-formatting/autolinked-references-and-urls).
 
 ## Section links
@@ -167,7 +167,7 @@ Link to the first non-unique section: [Link Text](#this-heading-is-not-unique-in
 Link to the second non-unique section: [Link Text](#this-heading-is-not-unique-in-the-file-1).
 ```
 
-> \[!NOTE]
+> [!NOTE]
 > If you edit a heading, or if you change the order of headings with "identical" anchors, you will also need to update any links to those headings as the anchors will change.
 
 ## Relative links
@@ -195,7 +195,7 @@ Relative links are easier for users who clone your repository. Absolute links ma
 
 You can use standard HTML anchor tags (`<a name="unique-anchor-name"></a>`) to create navigation anchor points for any location in the document. To avoid ambiguous references, use a unique naming scheme for anchor tags, such as adding a prefix to the `name` attribute value.
 
-> \[!NOTE]
+> [!NOTE]
 > Custom anchors will not be included in the document outline/Table of Contents.
 
 You can link to a custom anchor using the value of the `name` attribute you gave the anchor. The syntax is exactly the same as when you link to an anchor that is automatically generated for a heading.
@@ -215,7 +215,7 @@ Some text I want to provide a direct link to, but which doesn't have its own hea
 [A link to that custom anchor](#my-custom-anchor-point)
 ```
 
-> \[!TIP]
+> [!TIP]
 > Custom anchors are not considered by the automatic naming and numbering behavior of automatic heading links.
 
 ## Line breaks
@@ -267,7 +267,7 @@ You can display an image by adding \<kbd\>!</kbd> and wrapping the alt text in `
 
 GitHub supports embedding images into your issues, pull requests, discussions, comments and `.md` files. You can display an image from your repository, add a link to an online image, or upload an image. For more information, see [Uploading assets](#uploading-assets).
 
-> \[!NOTE]
+> [!NOTE]
 > When you want to display an image that is in your repository, use relative links instead of absolute links.
 
 Here are some examples for using relative links to display an image.
@@ -280,7 +280,7 @@ Here are some examples for using relative links to display an image.
 | In a `.md` file in another repository                       | `/../../../../github/docs/blob/main/assets/images/electrocat.png`      |
 | In issues, pull requests and comments of another repository | `../../../github/docs/blob/main/assets/images/electrocat.png?raw=true` |
 
-> \[!NOTE]
+> [!NOTE]
 > The last two relative links in the table above will work for images in a private repository only if the viewer has at least read access to the private repository that contains these images.
 
 For more information, see [Relative Links](#relative-links).
@@ -323,7 +323,7 @@ To create a nested list using the web editor on GitHub or a text editor that use
      - Second nested list item
 ```
 
-> \[!NOTE]
+> [!NOTE]
 > In the web-based editor, you can indent or dedent one or more lines of text by first highlighting the desired lines and then using \<kbd\>Tab</kbd> or \<kbd\>Shift</kbd>+\<kbd\>Tab</kbd> respectively.
 
 ![Screenshot of Markdown in Visual Studio Code showing indentation of nested numbered lines and bullets.](/assets/images/help/writing/nested-list-alignment.png)
@@ -375,7 +375,7 @@ For more information, see [About tasklists](/en/get-started/writing-on-github/wo
 
 You can mention a person or [team](/en/organizations/organizing-members-into-teams) on GitHub by typing \<kbd\>@</kbd> plus their username or team name. This will trigger a notification and bring their attention to the conversation. People will also receive a notification if you edit a comment to mention their username or team name. For more information about notifications, see [About notifications](/en/subscriptions-and-notifications/concepts/about-notifications).
 
-> \[!NOTE]
+> [!NOTE]
 > A person will only be notified about a mention if the person has read access to the repository and, if the repository is owned by an organization, the person is a member of the organization.
 
 `@github/support What do you think about these updates?`
@@ -436,7 +436,7 @@ The footnote will render like this:
 
 ![Screenshot of rendered Markdown showing superscript numbers used to indicate footnotes, along with optional line breaks inside a note.](/assets/images/help/writing/footnote-rendered.png)
 
-> \[!NOTE]
+> [!NOTE]
 > The position of a footnote in your Markdown does not influence where the footnote will be rendered. You can write a footnote right after your reference to the footnote, and the footnote will still render at the bottom of the Markdown. Footnotes are not supported in wikis.
 
 ## Alerts
@@ -486,7 +486,7 @@ You can tell GitHub to ignore (or escape) Markdown formatting by using \<kbd\>\\
 
 For more information on backslashes, see Daring Fireball's [Markdown Syntax](https://daringfireball.net/projects/markdown/syntax#backslash).
 
-> \[!NOTE]
+> [!NOTE]
 > The Markdown formatting will not be ignored in the title of an issue or a pull request.
 
 ## Disabling Markdown rendering

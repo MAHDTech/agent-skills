@@ -15,13 +15,13 @@ skill_name = "acp"
 
 > Advertise available slash commands to clients
 
-Agents can advertise a set of slash commands that users can invoke. These commands provide quick access to specific agent capabilities and workflows. Commands are run as part of regular [prompt](/protocol/v2/prompt-lifecycle) requests where the Client includes the command text in the prompt.
+Agents can advertise a set of slash commands that users can invoke. These commands provide quick access to specific agent capabilities and workflows. Commands are run as part of regular [prompt](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md) requests where the Client includes the command text in the prompt.
 
 ## Advertising commands
 
 ### Initial commands
 
-The Agent **MAY** include `availableCommands` in the `session/new` and `session/resume` responses, alongside `configOptions` when supported. This lets the Client display commands as soon as [session setup](/protocol/v2/session-setup#initial-session-state) completes, without requiring an `available_commands_update` notification before the `session/new` response.
+The Agent **MAY** include `availableCommands` in the `session/new` and `session/resume` responses, alongside `configOptions` when supported. This lets the Client display commands as soon as [session setup](https://agentclientprotocol.com/protocol/v2/session-setup.md#initial-session-state) completes, without requiring an `available_commands_update` notification before the `session/new` response.
 
 For example, a `session/new` response can advertise a command with text input:
 
@@ -45,11 +45,11 @@ For example, a `session/new` response can advertise a command with text input:
 }
 ```
 
-<ResponseField name="availableCommands" type="AvailableCommand[]">
-  Optional initial list of commands available in this session. Omission or `[]`
-  means no initial commands are advertised. Empty lists are omitted when
-  serializing setup responses.
-</ResponseField>
+**availableCommands** `AvailableCommand[]`
+
+Optional initial list of commands available in this session. Omission or `[]`
+means no initial commands are advertised. Empty lists are omitted when
+serializing setup responses.
 
 `null` is not a valid outbound value for this field. Consistent with v2's tolerant deserialization rules, receivers treat `null` or a malformed non-array value like omission and skip invalid command items within an array.
 
@@ -96,25 +96,25 @@ The notification's `availableCommands` array is the complete replacement list, n
 
 ### AvailableCommand
 
-<ResponseField name="name" type="string" required>
-  The command name (e.g., "web", "test", "plan")
-</ResponseField>
+**name** `string` *required*
 
-<ResponseField name="description" type="string" required>
-  Human-readable description of what the command does
-</ResponseField>
+The command name (e.g., "web", "test", "plan")
 
-<ResponseField name="input" type="AvailableCommandInput">
-  Optional input specification for the command
-</ResponseField>
+**description** `string` *required*
+
+Human-readable description of what the command does
+
+**input** `AvailableCommandInput`
+
+Optional input specification for the command
 
 ### AvailableCommandInput
 
 Currently supports text input with `type: "text"`:
 
-<ResponseField name="hint" type="string" required>
-  A hint to display when the input hasn't been provided yet
-</ResponseField>
+**hint** `string` *required*
+
+A hint to display when the input hasn't been provided yet
 
 Command input specifications can add custom or future `type` values. Custom input types **MUST** begin with `_`; unknown non-underscore input types are reserved for future ACP variants. Clients that cannot render an input specification should preserve it when storing, replaying, proxying, or forwarding command metadata, and otherwise display the command without structured input.
 
@@ -145,14 +145,14 @@ Commands are included as regular user messages in prompt requests:
 
 The Agent recognizes the command prefix and processes it accordingly. Commands may be accompanied by any other user message content types (images, audio, etc.) in the same prompt array.
 
-The same [prompt insertion contract](/protocol/v2/prompt-lifecycle#2-prompt-accepted) applies to commands: the successful response returns the inserted user message's `messageId`, and the Agent reports that message through a `user_message` update or `user_message_chunk` updates with the same ID.
+The same [prompt insertion contract](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#2-prompt-accepted) applies to commands: the successful response returns the inserted user message's `messageId`, and the Agent reports that message through a `user_message` update or `user_message_chunk` updates with the same ID.
 
 If a command is handled locally and the runtime does not record it, the adapter inserts a live-only user message into the ACP conversation. It need not wait for a runtime insertion event or keep a permanent transcript entry. If the command is retained and replayed later, it uses the same message ID and is not executed again.
 
 For example, an adapter can report a locally handled `/compact` as a live-only user message containing `/compact`, even if the runtime records only a summary. The ACP user message represents the command invocation; it need not match the runtime's transcript or expanded instructions.
 
 Local handling still uses the
-[foreground lifecycle](/protocol/v2/prompt-lifecycle#work-boundaries-and-local-commands).
+[foreground lifecycle](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#work-boundaries-and-local-commands).
 From idle, the Agent **MUST** report an active state for command handling and
 `idle` when no foreground work remains, even if no model call or tool invocation
 occurs. A command with no user-action wait uses `running` → `idle`, and

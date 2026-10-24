@@ -13,9 +13,9 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 Delta is a collaborative AI coding app. This is a product reference for AI assistants and people answering questions about Delta, not a system prompt or instructions governing an assistant's behavior.
 
-**Release scope:** Public Delta **v0.20.1**, checked on **October 14, 2026**. Menu paths, settings, and shortcuts below describe the desktop app unless stated otherwise. Browser clients do not have all desktop capabilities. Account-gated features are called out separately; their presence in source code or a staff build does not mean they are generally available.
+**Release scope:** Public Delta **v0.21.0**, checked on **October 21, 2026**. Menu paths, settings, and shortcuts below describe the desktop app unless stated otherwise. Browser clients do not have all desktop capabilities. Account-gated features are called out separately; their presence in source code or a staff build does not mean they are generally available.
 
-**Source basis:** The Delta implementation and generated release notes at the v0.20.1 release, applied to the v0.20.0 edition of this guide. This reference describes released behavior, not an upcoming-release changelog.
+**Source basis:** The Delta implementation and generated release notes at the v0.21.0 release, applied to the v0.20.1 edition of this guide. This reference describes released behavior, not an upcoming-release changelog.
 
 Canonical Markdown: https://delta.dev/docs/delta-101.md
 
@@ -25,7 +25,7 @@ A thread is a conversation with the agent. Threads appear in the left sidebar, g
 
 Create one with **New Thread** (attached to the current project) or **New Empty Thread** (no project). A thread remembers its model choice, open files, and layout, including open file, diff, subthread, and subagent tabs across restarts.
 
-Editing an earlier message and sending it replaces the conversation after that message: later responses are discarded and the agent answers the edited message again. **Edit > Revert Conversation to Cursor** rewinds the conversation and the thread's files together to the cursor position.
+Editing an earlier message and sending it replaces the conversation after that message: later responses are discarded and the agent answers the edited message again. While you edit, a notice warns that sending will remove later messages, and an in-progress response keeps running until you send the edit. Press `Escape` to cancel editing; on phones, use **Cancel Edit**. **Edit > Revert Conversation to Cursor** rewinds the conversation and the thread's files together to the cursor position.
 
 Tool activity is grouped into expandable summaries. Turning on **Collapse All Tools** under **Settings > Thread > Messages** also folds file edits and single actions, including while the agent is working; conversation text stays visible.
 
@@ -33,17 +33,17 @@ Threads get titles automatically. A subthread's title is based on its own reques
 
 ### Organizing, archiving, and deleting
 
-Right-click a thread to pin it, assign a color, add or remove personal tags from its **Tags** submenu, or mark it read or unread. Select multiple threads to set or clear their colors together. **File > Edit Thread Tags…** tags the current thread, and **File > Manage Tags…** configures tags. Tags are desktop-only; the browser client does not show them. `Cmd+Shift+U` on macOS or `Ctrl+Shift+U` on Linux and Windows toggles the current thread's unread state.
+Right-click a thread to pin it, mark it read or unread, copy its title with **Copy Title**, or add or remove personal tags from its **Tags…** submenu. **Edit > Copy Thread Title** also copies the current thread's title. Thread colors come from colored tags: a thread takes the color of the first colored tag added to it, and a subthread's color comes from its own tags rather than its parent's. The color dots in the thread's context menu add or remove a color tag, creating one named after the color if none exists. Select multiple threads to tag or untag them together with the same dots. When a thread has tags that some of its subthreads lack, **Apply Tag to Subthreads** copies them to its existing subthreads. **File > Edit Thread Tags…** tags the current thread, and **File > Manage Tags…** configures tags, including their names and colors. Tags are desktop-only; the browser client does not show them. `Cmd+Shift+U` on macOS or `Ctrl+Shift+U` on Linux and Windows toggles the current thread's unread state.
 
 **File > Toggle Thread Bookmark** (`Cmd+D` on macOS, `Ctrl+D` on Linux and Windows) bookmarks a thread so it can be found again, even after archiving. **File > Show Bookmarked Threads**, the sidebar's bookmarks button, or `Cmd+Option+B` on macOS lists bookmarked threads. The Bookmarks view's filter button, shown when hovering its header, offers the **Owned by**, **Subthreads**, and **Tags** filters described below.
 
 To bookmark a particular sent user message instead, `Cmd`-click its marker in the thread's navigation rail on macOS, or `Ctrl`-click on Linux and Windows. Repeat to remove it. Message bookmarks persist after closing the thread and are shared with everyone in it; any participant can add or remove them. They are separate from thread bookmarks.
 
-The sidebar header menus control grouping, filtering, and sorting. Threads can be sorted manually by dragging or by creation date. Projects can be hidden through the filter menu. Its **Owned by** section shows threads owned by **Anyone** or only **Me**, its **Subthreads** section chooses whether **Plain** subthreads, **Reviews**, **Land** subthreads, and **Subagents** appear, and its **Tags** submenu filters by tag. **View > Fold All Sidebar Groups** collapses visible groups. Collapsing a section or parent thread hides every thread inside it, including the open one; a collapsed section shows a running indicator while a thread inside it is working.
+The sidebar header menus control grouping, filtering, and sorting. Threads can be sorted manually by dragging or by creation date. Projects can be hidden through the filter menu. Its **Owned by** section shows threads owned by **Anyone** or only **Me**, its **Subthreads** section chooses whether **Plain** subthreads, **Reviews**, **Land** subthreads, and **Subagents** appear, and its **Tags** submenu filters by tag. **View > Fold All Sidebar Groups** collapses visible groups, and **View > Collapse Child Threads** hides the current thread's child rows. Collapsing a section or parent thread hides every thread inside it, including the open one; a collapsed section shows a running indicator while a thread inside it is working.
 
 **Archive Thread** (`Cmd+W` on macOS, `Ctrl+W` on Linux and Windows) hides a thread from active threads without deleting it. Archiving the open thread switches to a neighbor. To find it again, group the sidebar by **State** to reveal **Archive**, or search with **Go to Thread**. Archiving a parent thread also archives its subthreads and cleans up their worktrees; reopening the parent restores the subthreads that were active before, but not ones archived individually. **Reopen Archived Thread** (`Cmd+Shift+T` or `Ctrl+Shift+T`) reopens the most recently archived thread.
 
-Once the server holds a full copy, Delta removes an archived thread's local history three days after it was archived or last opened. Reopening then needs a connection to download it. **Delete Locally** in the thread's context menu removes only the copy on that machine, not already-synced server copies.
+Once the server holds a full copy, Delta removes an archived thread's local history three days after it was archived or last opened. Reopening then needs a connection to download it. **Delete** in the thread's context menu removes only the copy on that machine, not already-synced server copies.
 
 ## Projects, worktrees, and checkouts
 
@@ -55,17 +55,17 @@ Use **Add Project** to register a project, **Add Project to Thread** to attach a
 
 Adding or attaching a project requires a configured Git remote, even in a private thread. Delta uses it to identify the repository. With one source remote, its name can be anything; with several, one must be named `origin`. Delta's managed-checkout `local` backlink is separate. If a repository has no remote, add one and push your branch, then retry. See [Git remote troubleshooting](/docs/troubleshooting#delta-says-my-project-needs-a-git-remote).
 
-To tell projects apart, right-click a project's sidebar header and choose **Rename Project**. The name is a local display name on that device; Git metadata, checkout paths, and what the agent sees keep the repository's original name.
+To tell projects apart, right-click a project's sidebar header and choose **Rename Project**. The name is a local display name on that device; Git metadata, checkout paths, and what the agent sees keep the repository's original name. When projects share a default name, the sidebar adds a muted prefix from the remote's owner or path, or from the local checkout path, to tell them apart; renamed projects show their custom name without a prefix.
 
 Managed checkouts live under `.delta/worktrees/` inside the repository, or in Delta's storage when joining a thread without that project. The project panel's **Reveal in Finder** on macOS or **Reveal in File Manager** on Linux and Windows locates the checkout.
 
-**File > Open in Zed** opens the thread's checkouts in Zed and reveals the active file. The action is unavailable while Delta prepares the worktrees. Preparation failures show an error with **Retry**, rather than staying in a preparing state.
+**File > Open in Zed** opens the thread's checkouts in Zed, along with the active file at the cursor, or the file and cursor position from the active **Review Changes** view when no file tab is active. The action is unavailable while Delta prepares the worktrees. Preparation failures show an error with **Retry**, rather than staying in a preparing state.
 
-The status bar's **Project Settings** control switches the active project or branch and checks whether a branch is up to date, ahead, behind, or diverged from its configured remote branch. The project picker shortcut is `Cmd+Option+O` on macOS or `Ctrl+Alt+O` on Linux and Windows; the branch picker is `Cmd+Ctrl+B` or `Ctrl+Alt+B`.
+The status bar's **Project Settings** control switches the active project or branch and checks whether a branch is up to date, ahead, behind, or diverged from its configured remote branch. While a worktree is being prepared, the control reads **Preparing…** and its tooltip shows the current preparation step. The project picker shortcut is `Cmd+Option+O` on macOS or `Ctrl+Alt+O` on Linux and Windows; the branch picker is `Cmd+Ctrl+B` or `Ctrl+Alt+B`.
 
 The same control chooses where the thread works on a project: **Isolated Delta Worktree** (the default), **Existing Local Checkout**, or **Existing Git Worktree**, which lists linked Git worktrees already created with Git, an editor, or another agent. The choice locks once the thread's first message is sent. A new thread created from the current one keeps its selected checkout.
 
-In the same menu, **Make default branch for Delta worktrees** sets the branch new Delta worktrees for that repository start from; once set, the row reads **Default for Delta worktrees** with the branch name and offers **Reset**. New Delta worktrees keep the repository's additional Git remotes, such as both a fork and its upstream.
+New isolated Delta worktrees start from the repository's default branch unless **Settings > General > Delta Worktrees > Customize Starting Branch** chooses another branch for a project open in the sidebar. This setting is desktop-only. Hovering **Isolated Delta Worktree** in the **Project Settings** menu shows the starting branch and links to the setting. New Delta worktrees keep the repository's additional Git remotes, such as both a fork and its upstream.
 
 Delta imports files Git does not ignore. Ignored `.env` files and build output stay on their original machine. Entirely untracked folders are skipped until something in them is added with `git add`.
 
@@ -94,7 +94,7 @@ Pushing to `local` can target the branch checked out in that repository: a clean
 
 Ordinary desktop turns run locally. Terminal commands, tools, files, credentials, and environment variables belong to the machine executing the turn.
 
-**Cloud Runner is staff-only in v0.20.1**, not a generally available desktop feature. For accounts with access, a runner selector beside the send controls chooses **Local** or **Cloud** per turn. Cloud execution uses Delta-hosted models and shares the thread if it is not already shared. A cloud machine cannot read files or credentials that exist only on your computer.
+**Cloud Runner is account-gated in v0.21.0**, not a generally available desktop feature; Delta enables it for individual accounts. For accounts with access, a runner selector beside the send controls chooses **Local** or **Cloud** per turn. Cloud execution uses Delta-hosted models and shares the thread if it is not already shared. A cloud machine cannot read files or credentials that exist only on your computer.
 
 **Cross-device account thread sync and connectivity indicators are also staff-gated in this release.** This reference does not describe them as standard public UI. Shared-thread collaboration is separate from the gated cross-device account thread-sync feature.
 
@@ -104,13 +104,15 @@ The browser can open shared threads, including review threads. Agents running in
 
 **Share Thread** (`Cmd+Shift+S` on macOS, `Ctrl+Shift+S` on Linux and Windows), **File > Share Thread**, or the upper-right share icon opens sharing controls.
 
-The owner chooses **Only people invited**, **Everyone in your organization**, or **Anyone with the link**. Only the owner can change access. The share popover copies the link and can invite up to ten people by email at a time; invitations expire after fourteen days.
+The owner chooses **Only people invited**, **Everyone in your organization**, or **Anyone with the link**. Only the owner can change access. The share popover copies the link and can invite up to ten people by email at a time; invitations expire after fourteen days. A thread is shared in the organization that was selected when it was created, even if you switch organizations before sharing.
 
 **File > Join Thread**, also available in the command palette, accepts a join link or bare share ID. Delta creates checkouts for the shared worktrees without a manual clone, preferring an existing local checkout of the repository as the source and fetching from the same remote it uses, so a checkout that uses SSH is not asked for a GitHub username and password. If the thread's history cannot be downloaded, Delta shows an error with **Retry** instead of waiting indefinitely. If a repository fetch needs credentials, a modal identifies the repository and prompts for them, including SSH key passphrases and hardware-key PINs.
 
 Each participant has an attributed draft. Sending submits all trailing drafts under their respective authors, and model usage is charged to the person who sends. Collaborators see the same conversation and can contribute while work continues.
 
-To mention a teammate in a message or comment, type `@` followed by their username; the `@` menu's **Users** section, or a `user:` query, lists people. Mentioned people are notified in their **Inbox**, opened with the sidebar's inbox button or `Cmd+Shift+J` on macOS (`Ctrl+Shift+J` on Linux and Windows). The Inbox lists mentions and thread invitations, filters between **Unread** and **All**, and offers **Mark All As Read**. Delta also shows a system notification for mentions and invitations unless **Settings > General > Notifications > Mention and Invitation Notifications** is off. Clicking a notification for a mention in a file or diff comment opens that comment. On desktop, opening a thread however you reach it marks your mentions in it as read.
+**Open in Claude Code**, in the command palette on desktop and in the browser and in the desktop Edit menu, opens a shared thread in Claude Code with a `/delta join` command ready to send; joining requires the Delta plugin for Claude Code, and an unshared thread must be shared first. Collaborators connected through a supported external tool such as Claude Code appear in the thread's participant bar with a badge, and their tooltip names the tool, while none of their Delta apps has the thread open.
+
+To mention a teammate in a message or comment, type `@` followed by their username; the `@` menu's **Users** section, or a `user:` query, lists people. Mentioned people are notified in their **Inbox**, opened with the sidebar's inbox button or `Cmd+Shift+J` on macOS (`Ctrl+Shift+J` on Linux and Windows). The Inbox lists mentions and thread invitations, filters between **Unread** and **All**, and offers **Mark All As Read**. Delta also shows a system notification for mentions and invitations unless **Settings > General > Notifications > Mention and Invitation Notifications** is off. Mention notifications are skipped only while you are actively viewing the thread in an active window, so a thread that is open but not focused still notifies you. Mentions written by an agent do not notify anyone; hovering the mentioned person explains this. Clicking a notification for a mention in a file or diff comment opens that comment. On desktop, opening a thread however you reach it marks your mentions in it as read.
 
 The browser client also has an Inbox, opened with `Alt+Shift+J` or the inbox button in the sidebar header on wider screens (the conversation header on narrow screens). It and its unread indicator update automatically. In the browser, a mention is marked read when opened from the Inbox or a notification, not when its thread is opened another way. Turning on **Settings > General > Notifications > Desktop notifications** in the browser shows desktop alerts for mentions and invitations while Delta Web is open.
 
@@ -134,7 +136,7 @@ Repositories can add PNG or SVG images directly under `.delta/emoji/` for custom
 
 With **Send With Modifier** on, `Cmd+Shift+Enter` on macOS or `Ctrl+Shift+Enter` on Linux and Windows sends the message to a new subthread, also available as **File > Send Message to Subthread**. The subthread starts from an isolated copy of the parent's context and changes, and the agent can be asked to merge its changes back into the parent at any time; a one-time notice in new subthreads explains this. The agent can also merge selected worktrees from several related threads at once: a top-level thread, its subthreads, and their forks. Independently created threads cannot be merged this way. With the setting off, use `Cmd+Enter` or `Ctrl+Enter`. The same modifiers on the send button have the same effect; an unmodified click sends in the current thread.
 
-With the cursor in a comment, in the composer or in a file or diff, the same subthread shortcut sends only that comment chain to a new subthread instead of the whole submission.
+With the cursor in a comment, in the composer or in a file or diff, the same subthread shortcut sends only that comment chain to a new subthread instead of the whole submission. The subthread's comment summary quotes the original text, and its links open that location in the parent thread.
 
 This works with ordinary messages and skill invocations, from a top-level thread or from inside a subthread, so subthreads can be nested; an attached subagent from an earlier release cannot create one. On desktop it uses local execution; in the browser it uses the browser execution runtime and requires a signed-in session and a loaded shared parent thread.
 
@@ -168,7 +170,9 @@ Compaction summarizes older conversation content so a long thread can continue w
 
 Click the circular context-usage indicator beside the send controls to open **Context Window**, inspect usage, toggle **Automatic Compaction**, and set **Compact at**. With automatic compaction enabled on a supporting model, the indicator fills toward that threshold and reports usage until compaction. Otherwise it reports usage against the model's context window.
 
-Support depends on the provider and model. Some support automatic but not manual compaction. **Compact Now** in the command palette requests manual compaction and explains when the current model, platform, or thread state does not allow it.
+With automatic compaction on, models without built-in compaction also summarize earlier work during a long agent turn once usage reaches the **Compact at** threshold, keeping the original request and the latest tool activity.
+
+Support depends on the provider and model. Some support automatic but not manual compaction. **Compact Now** in the command palette requests manual compaction and explains when the current model, platform, or thread state does not allow it. It also works while the agent is running on your client: the request waits for the current step to finish. While another client or a Cloud Runner is running the agent, compact from that client or wait for it to finish. A failed compaction appears in the thread under a **Compaction failed** heading, with an explanation and any available recovery actions, rather than as a pop-up notification.
 
 ## Subagents and profiles
 
@@ -221,9 +225,9 @@ metadata:
 
 Only lowercase `land` is supported. The field identifies eligibility, not an execution location; a skill's name or path alone does not make it eligible.
 
-**Land Changes** (`Cmd+L` on macOS, `Alt+L` on Linux and Windows) opens a fresh Land subthread and leaves a clickable event in the parent without changing the parent's input or generation. It works from a top-level thread or from a subthread at any depth, including a subagent, and Land from a subthread covers everything in it, including changes inherited from its parent threads; it is unavailable inside Review and Land subthreads and attached subagents from earlier releases. With one eligible skill, the child runs it. With several, the agent lists them and asks for an explicit slash-menu invocation. There is no default remembered selection or Land chooser. With none, a setup skill offers to configure one; after the newly created project Land skill first lands successfully, Delta shows how to use it in the parent thread. Selecting a skill applies it in the existing Land subthread rather than creating another child. A skill file that fails to load stops Land only when it is, or might be, a Land skill.
+**Land Changes** (`Cmd+L` on macOS, `Alt+L` on Linux and Windows) opens a fresh Land subthread and leaves a clickable event in the parent without changing the parent's input or generation. It works from a top-level thread or from a subthread at any depth, including a subagent, and Land from a subthread covers everything in it, including changes inherited from its parent threads; it is unavailable inside Review and Land subthreads and attached subagents from earlier releases. With one eligible skill, the child runs it. With several, the agent lists them and asks for an explicit slash-menu invocation. There is no default remembered selection or Land chooser. With none, a setup skill offers to configure one; after the newly created project Land skill first lands successfully, Delta shows how to use it in the parent thread. Selecting a skill applies it in the existing Land subthread rather than creating another child. Skill files that fail to load are skipped and listed in the agent's first response, so a working Land skill still runs; if none can be loaded, the setup skill offers to help create a working one. Land stops only when Delta cannot read the skill files at all.
 
-The result appears as a card in both the Land subthread and its immediate parent, showing whether the change landed, with its target branch, commit, and CI status.
+When the Land skill finishes, a card in both the Land subthread and its immediate parent shows **Landed** or **Land Failed**, with the target branch, commit, and CI status. Intermediate steps, such as preparing the change, pushing a branch, or waiting on CI, are reported as plain text rather than as a result card.
 
 ## Files, comments, and review
 
@@ -231,7 +235,9 @@ The right sidebar contains the file pane (files touched by the agent or opened b
 
 Markdown files open rendered. The pencil button after search in the file toolbar, labelled **Show Markdown Source** or **Show Markdown Preview**, switches that tab between source and the rendered view without losing edits or undo history.
 
-Open an image file to view it in a zoomable workspace tab rather than as text. Use **Zoom In**, **Zoom Out**, or **Fit to View**, and drag the image to pan. In text files, drag the file-pane line numbers to select whole lines.
+Open an image file to view it in a zoomable workspace tab rather than as text. Use **Zoom In**, **Zoom Out**, or **Fit to View**, and drag the image to pan. Hovering an image in a thread shows **Open Image in Tab**, which opens it in the same viewer, and **Copy Image**; both work in the browser too, and Copy Image is unavailable in the Linux desktop app.
+
+On desktop, a GitHub file link pinned to a full commit SHA opens in the thread's file pane instead of the browser when one attached project has that repository as a remote, the file exists at that commit, and the linked lines are unchanged. In text files, drag the file-pane line numbers to select whole lines.
 
 ### Comments
 
@@ -255,7 +261,7 @@ As you select code in **Review Changes**, symbol breadcrumbs beside the file nam
 
 **Toggle Changes Panel Focus** focuses the changed-file list, which marks each file as added, modified, or deleted in the selected comparison and has a draggable scrollbar for long lists. Each file's **Seen** checkbox folds it until it changes again (`Cmd+Option+Y` or `Ctrl+Alt+Y`), and the Review header counts files marked as seen, such as `3/17`. The review's options menu offers **Collapse All Files** or **Expand All Files** (`Shift+Tab`) and **Mark All as Seen** or **Mark All as Unseen** (`Cmd+Shift+Y` on macOS, `Ctrl+Shift+Y` on Linux and Windows) for the files currently shown. `Cmd+[` and `Cmd+]` on macOS, or `Alt+[` and `Alt+]` on Linux and Windows, move between files.
 
-**Create Review Thread**, `/review`, or `Cmd+Shift+R` on macOS (`Ctrl+Shift+R` elsewhere) opens a separate review conversation, from a top-level thread or from any subthread other than a Review or Land subthread; a review started in a subthread covers everything in it, including changes inherited from its parent threads. Comments and revision requests there do not interrupt the parent. `/approve` or `/request-changes` submits a verdict shown in the parent. Review threads can be shared and opened in the browser.
+**Create Review Thread**, `/review`, or `Cmd+Shift+R` on macOS (`Ctrl+Shift+R` elsewhere) opens a separate review conversation, from a top-level thread or from any subthread other than a Review or Land subthread; a review started in a subthread covers everything in it, including changes inherited from its parent threads. Comments and revision requests there do not interrupt the parent. `/approve` or `/request-changes` submits a verdict shown in the parent. Edits made in a review, including one started from a subthread, can be pulled into the thread it reviews with **Pull Changes**. Review threads can be shared and opened in the browser.
 
 When an agent opens a pull request from a shared thread, an **Open in Delta** link can let reviewers open the conversation. **Settings > Thread > Rules > Open in Delta Links** controls this behavior.
 
@@ -279,22 +285,23 @@ File edits made through terminal scripts can appear as navigable diffs in the co
 
 The palette searches commands and threads. `Tab` switches to **Ask Delta** for natural-language command suggestions, and `Tab` again returns to search. `Ctrl+P` and `Ctrl+N`, or `Ctrl+K` and `Ctrl+J`, move through menus and pickers alongside the arrow keys.
 
-`Option+Enter` on macOS or `Alt+Enter` on Linux and Windows opens the link under the cursor in a draft or agent output, with either send setting.
+`Option+Enter` on macOS or `Alt+Enter` on Linux and Windows opens the link under the cursor in a draft or agent output, with either send setting. In a read-only table in a thread, `Tab` and `Shift+Tab` move between cells.
 
 - **Go to Thread**: `Cmd+T` or `Ctrl+T`, including archived threads.
 - **Previous Thread** / **Next Thread**: cycle in sidebar order.
-- **Most Recent Thread**: `Ctrl+Tab` and `Ctrl+Shift+Tab` cycle recently viewed threads.
+- **File > Go to File…**: `Cmd+P` on macOS or `Ctrl+P` on Linux and Windows, including while a thread or editor has focus.
+- **Most Recent Thread**: `Ctrl+Tab` and `Ctrl+Shift+Tab` cycle recently viewed threads, including visible subthreads, and the switcher shows which threads are running or unread.
 - **Toggle Sidebar**: collapse or reveal the thread list.
 - **Focus Thread Editor**: focus the composer.
 - **Toggle Thread/File Pane Focus**: `Cmd+?` or `Ctrl+?`.
 - **View > Zoom In**, **Zoom Out**, **Reset Zoom**: adjust interface scale.
-- **Help > Keymap** / **View Keymap**: `Cmd+/` or `Ctrl+/`, showing live bindings.
+- **Keymap** / **View Keymap**: `Cmd+/` or `Ctrl+/`, also in the user menu and the macOS Help menu, lists shortcuts from across Delta and searches by action or key combination.
 
 The Edit menu offers **Copy Thread Content** (`Cmd+Option+C` or `Ctrl+Alt+C`), **Copy Thread as JSON**, **Copy This Agent Response**, and **Copy Share Link** (`Cmd+Option+L` or `Ctrl+Alt+L`). Copy Thread Content gives readable conversation text; JSON gives structured replay data. Code blocks in threads show a **Copy Code** button on hover or while the cursor is inside them.
 
 ## Settings and account
 
-**Settings** (`Cmd+,` on macOS, `Ctrl+,` on Linux and Windows) has searchable categories and keyboard navigation. Clicking a category selects it; its chevron, a double-click, or a search match expands its sections.
+**Settings** (`Cmd+,` on macOS, `Ctrl+,` on Linux and Windows) has searchable categories and keyboard navigation. Clicking a category selects it; its chevron, a double-click, or a search match expands its sections. Hovering a page heading or setting shows **Copy Page Link** or **Copy Link**, which copies a `delta://settings/…` link; clicking such a link in a thread, on desktop or in the browser, opens that page or scrolls to and highlights the setting without changing it. The Settings sidebar also has **View Docs** and, in the desktop app, **Share Feedback**.
 
 Public pages include **General**, **Appearance**, **Thread**, **Subagents**, **Pane**, and **LLM Providers**, plus **Skills** and **MCP** in the desktop app. They cover updates and terminal settings; themes, diff colors, and UI/prose/code fonts; message layout, sharing, and rules; delegation; skills; and file-pane preferences. **Settings > MCP** connects MCP servers so agents can use tools from your connected services; the browser has no MCP page. Number fields accept typed values. Additional pages and controls can be account-gated.
 
@@ -304,13 +311,17 @@ Application settings belong to the signed-in account. They sync between desktop 
 
 **Settings > Appearance > App Icon > Change Build Icon** overrides the icon for the current build. This section is desktop-only. On macOS, the Dock icon changes immediately.
 
+On macOS, **Settings > General > Notifications > System Notifications** shows whether Delta is allowed to show notifications. **Send Test Notification** sends one, asking for permission first if macOS has not asked yet, and **Open System Settings** appears when notifications are denied or banners are off.
+
 On macOS, **Delta > Sign In** opens browser sign-in with a Zed (GitHub) account and saves the session in the system keychain; **Delta > Sign Out** signs out. Opening a workspace requires being online and signed in. **Check for Updates** and **About Delta** are in the same menu. **Create Organization**, in the user menu and the command palette, opens the Zed dashboard to create an organization. **Invite Members…** in the user menu invites people to the selected team organization; it is disabled when a personal organization is selected.
 
 The `delta` command-line tool works with the Delta app from a terminal. On macOS, **Delta > Install CLI…** makes it available in terminals; the Windows installer adds it to PATH for new terminals; on Linux, `install.sh` installs it as `delta` and prints PATH instructions when needed. `delta auth status`, `delta auth login`, and `delta auth logout` report or change the account the app is signed in with. `delta org list`, `delta org current`, and `delta org switch` list your organizations, show the current selection, and switch it. `delta org create "My organization"` creates a team organization without selecting it, and `delta org invite` invites people by email to the current organization, or to another with `--org`. Running `delta` commands or another Delta build from Delta's built-in terminal uses that build's own data rather than the running app's.
 
-When Delta is not already running, most CLI commands start it without a window, and that windowless app keeps running after the command finishes. Bare `delta`, `delta PATH_OR_URL`, and `delta open` instead start Delta with a window, or show a window in the app that is already running. `delta daemon status` reports whether the app is running, `delta daemon start` starts it without a window, and `delta daemon stop` shuts it down, including its windows. If Delta is already running after being started with a window, `delta daemon start` fails; quit Delta, then run it again.
+`delta update --check` reports whether a newer release is available without downloading anything. `delta update` downloads and installs it on macOS and Linux, showing progress, without starting the app; quit Delta first, since it refuses while Delta is running. On Windows, installing from the CLI is not supported, so `delta update` points to a manual download instead.
 
-How Delta was started decides whether it outlives its windows; there is no setting for this. An app started without a window, by `delta daemon start` or another CLI command, keeps running after windows opened in it close, until `delta daemon stop`. An app started with a window quits when its last window closes on Linux and Windows, so relaunching it after an update starts the new version; on macOS it stays running until quit. Closing a window can still stop that window's local agent work. **Settings > General > Notifications > Keep Computer Awake** prevents sleep only while a thread is running and a Delta window is open. This setting does not appear in the browser.
+When Delta is not already running, a CLI command starts it without a window, and that app exits once no command or window still needs it. Bare `delta` and `delta open PATH_OR_URL` start Delta with a window, or show a window in the app that is already running; opening a path or URL requires `open`. There are no `delta daemon` commands.
+
+There is no setting for whether Delta outlives its windows. Quitting closes it, as does closing the last window on Linux and Windows, so relaunching after an update starts the new version; if a `delta` command is still using the app, it keeps running without windows until the command finishes. On macOS the app stays running until quit. Closing a window can still stop that window's local agent work. **Settings > General > Notifications > Keep Computer Awake** prevents sleep only while a thread is running and a Delta window is open. This setting does not appear in the browser.
 
 **What's New** shows release changes and **Restart Welcome Guide** starts the introduction again. They are in the macOS Help menu and the command palette.
 
@@ -318,7 +329,7 @@ How Delta was started decides whether it outlives its windows; there is no setti
 
 Delta replaces known secret values from environment variables, `.env` and mise files, and home-folder credential files with `[REDACTED]` before thread content is stored, synced, or sent to a model. Matching is exact-value based, not a guarantee that every secret will be detected.
 
-**Send Feedback** or `/delta-feedback` opens the feedback form; on macOS it is also **Help > Send Feedback**. Attachments are opt-in, including a screenshot, recent logs, performance data, and conversation context/tool output. Conversation context is limited to 100 KiB of recent messages, system instructions, and tool activity, excluding reasoning and images.
+**Send Feedback** or `/send-feedback` opens the feedback form; on macOS it is also **Help > Send Feedback**. Attachments are opt-in, including a screenshot, recent logs, performance data, and conversation context/tool output. Conversation context is limited to 100 KiB of recent messages, system instructions, and tool activity, excluding reasoning and images.
 
 **Open Log Viewer** (`Cmd+Shift+L` on macOS, `Ctrl+Shift+L` on Linux and Windows) shows logs. Files are also stored as `delta.log` and `delta.log.old` in Delta's data folder. Logs and screenshots may contain sensitive information and need review before sharing.
 

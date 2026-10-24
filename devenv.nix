@@ -124,19 +124,35 @@ in
       "CHANGELOG.md"
     ];
     hooks = {
-      action-validator.enable = true;
-      actionlint.enable = true;
+      action-validator = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
+      actionlint = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
       cargo-check.enable = true;
-      check-json.enable = true;
-      check-merge-conflicts.enable = true;
+      check-json = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
+      check-merge-conflicts = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
       check-shebang-scripts-are-executable = {
         enable = true;
         excludes = [
+          "^skills/vendor/"
           "\\.rs$"
         ];
       };
       check-symlinks.enable = true;
-      check-yaml.enable = true;
+      check-yaml = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
       clippy.enable = true;
       commitizen.enable = true;
       convco = {
@@ -148,6 +164,7 @@ in
       cspell = {
         enable = true;
         excludes = [
+          "^skills/vendor/"
           "skills(-archive)?/tooling/opencode-acp/.*\\.md$"
           "^README\\.md$"
           "^agents/AGENTS\\.md$"
@@ -169,15 +186,20 @@ in
         require_serial = true;
       };
       deadnix.enable = true;
-      editorconfig-checker.enable = true;
+      editorconfig-checker = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
       lychee = {
         enable = true;
         excludes = [
+          "^skills/vendor/"
         ];
       };
       markdownlint = {
         enable = true;
         excludes = [
+          "^skills/vendor/"
           "^README\\.md$"
           "^agents/AGENTS\\.md$"
         ];
@@ -220,11 +242,18 @@ in
           };
         };
       };
-      mixed-line-endings.enable = true;
-      nixfmt.enable = true;
+      mixed-line-endings = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
+      nixfmt = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
       prettier = {
         enable = true;
         excludes = [
+          "^skills/vendor/"
           "\\.html$"
           "README\\.md$"
           "^agents/AGENTS\\.md$"
@@ -234,9 +263,18 @@ in
         ];
       };
       ripsecrets.enable = true;
-      rustfmt.enable = true;
-      shellcheck.enable = true;
-      shfmt.enable = true;
+      rustfmt = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
+      shellcheck = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
+      shfmt = {
+        enable = true;
+        excludes = [ "^skills/vendor/" ];
+      };
       skills-test = {
         enable = true;
         name = "Skills Lint";
@@ -255,6 +293,7 @@ in
       trim-trailing-whitespace = {
         enable = true;
         excludes = [
+          "^skills/vendor/"
         ];
       };
       trufflehog = {
@@ -264,6 +303,7 @@ in
       };
       yamllint = {
         enable = true;
+        excludes = [ "^skills/vendor/" ];
         settings = {
           configuration = ''
             extends: relaxed

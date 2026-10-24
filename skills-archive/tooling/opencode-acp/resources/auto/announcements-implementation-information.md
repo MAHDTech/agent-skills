@@ -10,7 +10,7 @@
 
 ACP now allows agents and clients to provide information about themselves to the other party during initialization.
 
-The [InitializeRequest](/protocol/v1/schema#initializerequest) message now includes an optional clientInfo field, and the [InitializeResponse](/protocol/v1/schema#initializeresponse) message includes an optional agentInfo field.
+The [InitializeRequest](https://agentclientprotocol.com/protocol/v1/schema.md#initializerequest) message now includes an optional clientInfo field, and the [InitializeResponse](https://agentclientprotocol.com/protocol/v1/schema.md#initializeresponse) message includes an optional agentInfo field.
 
 This information can be used by clients to show users which agent is running and what version, by both sides to track usage metrics for which agents and clients are most popular among their users, and to help track down issues tied to particular implementation versions.
 
@@ -18,7 +18,7 @@ This follows the existing pattern laid out in the [Model Context Protocol](https
 
 This is being introduced as an optional field for now for backwards compatibility. It is possible it will be made required in a future version of the protocol, like MCP, so that both sides can count on this information being available.
 
-For the user-facing protocol guide, see [Implementation Information](/protocol/v1/initialization#implementation-information).
+For the user-facing protocol guide, see [Implementation Information](https://agentclientprotocol.com/protocol/v1/initialization.md#implementation-information).
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

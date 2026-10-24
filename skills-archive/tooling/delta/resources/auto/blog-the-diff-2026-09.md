@@ -8,7 +8,7 @@ Blog
 
 # The Diff: September 2026
 
-![](https://avatars.githubusercontent.com/u/19867440?v=4)Joseph LyonsOctober 7, 2026
+Joseph LyonsOctober 7, 2026
 
 Welcome to The Diff, our new monthly Delta newsletter. Things move quickly at Zed Industries, and it’s easy to miss an update here and there, so each issue distills everything that happened around Delta into a single read. Each month, you can expect coverage of the biggest features that landed, along with links to any new videos and other blog posts.
 
@@ -74,18 +74,6 @@ Pass rates only tell part of the story, though. In [Beyond Pass Rate](https://de
 
 We’ve been working on DeltaDB and Delta in private for over a year now, and we’re thrilled to finally share them with everyone. There’s plenty more on the way, from MCP and ACP support to persistent cloud environments for your agents; [the roadmap](https://delta.dev/roadmap) has the details. In the meantime, if you’ve been using Delta, we’d love to hear about your experience: type `/delta-feedback` in any thread, or choose **Send Feedback** from the user menu. If you haven’t tried Delta yet, go give it a [download](https://delta.dev/download). See you in October’s edition! 🍂🎃👻
 
-On this page
-
-1.  [Highlights](#highlights)
-    1.  [More provider options](#more-provider-options)
-    2.  [Use threads to orchestrate other top-level threads](#use-threads-to-orchestrate-other-top-level-threads)
-    3.  [More ways to organize your work](#more-ways-to-organize-your-work)
-    4.  [Start threads in existing git worktrees](#start-threads-in-existing-git-worktrees)
-    5.  [Create an organization from Delta](#create-an-organization-from-delta)
-2.  [Honorable feature mentions](#honorable-feature-mentions)
-3.  [How Delta’s harness measures up](#how-deltas-harness-measures-up)
-4.  [Wrapping up](#wrapping-up)
-
 ## More from the blog
 
 *   ### [Please Stop Sending Me Google Docs](/blog/please-stop-sending-me-google-docs)
@@ -101,8 +89,4 @@ On this page
     ![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4 "Nathan Sobo")Oct 1, 2026
     
 
-[Download Delta NowD](/download)[Open DeltaD](/threads)
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)
+[Download Delta Now](/download)[Open Delta](/threads)

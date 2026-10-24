@@ -25,8 +25,3 @@ Blog
 *   ## [Introducing Delta](https://zed.dev/blog/introducing-delta)
     
     Featured![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4 "Nathan Sobo")Aug 12, 2026
-    
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)

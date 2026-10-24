@@ -27,7 +27,7 @@ understand what is requested and why.
 ## Checking support
 
 Clients advertise elicitation support in `capabilities.elicitation` during
-[initialization](/protocol/v2/initialization#client-capabilities).
+[initialization](https://agentclientprotocol.com/protocol/v2/initialization.md#client-capabilities).
 
 ```json theme={null}
 {
@@ -76,7 +76,7 @@ connection and, when authentication exists, the verified user identity. A
 ### Foreground State
 
 A session-scoped elicitation follows the aggregate
-[foreground-state contract](/protocol/v2/prompt-lifecycle#waiting-for-user-action).
+[foreground-state contract](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#waiting-for-user-action).
 When foreground work cannot progress without user action, the Agent **SHOULD**
 report `requires_action`. Once reported, it **MUST** report `running` when
 progress resumes, or `idle` if the work ends without resuming.
@@ -192,13 +192,13 @@ Requests using a mode the Client has not advertised produce JSON-RPC `-32602`
 
 ## Session Cancellation
 
-[`session/cancel`](/protocol/v2/prompt-lifecycle#cancellation) does not
+[`session/cancel`](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#cancellation) does not
 automatically cancel every elicitation scoped to the session. `sessionId` and
 `toolCallId` identify context, not a cancellation instruction.
 
 When cancelling work makes a pending elicitation no longer relevant, the Agent
 **SHOULD** cancel that individual request using
-[`$/cancel_request`](/protocol/v2/cancellation).
+[`$/cancel_request`](https://agentclientprotocol.com/protocol/v2/cancellation).
 An elicitation can depend on the affected work with or without a `toolCallId`.
 Clients handle individual cancellation using the existing request-cancellation
 rules rather than infer it from session scope. Request-scoped elicitations
@@ -240,7 +240,7 @@ rules to ACP.
 * The Agent **MUST** verify that the authenticated user who started the
   elicitation is the same user who completes the external interaction.
 
-See the [schema reference](/protocol/v2/schema#elicitation%2Fcreate) for the
+See the [schema reference](https://agentclientprotocol.com/protocol/v2/schema.md#elicitation%2Fcreate) for the
 complete request and response types.
 
 

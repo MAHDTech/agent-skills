@@ -552,61 +552,42 @@ impl SkillSyncer {
         }
 
         let mut skills = HashMap::new();
-        let entries = fs::read_dir(&self.catalog_dir).map_err(|e| SyncError::Io {
-            path: self.catalog_dir.clone(),
-            source: e,
-        })?;
-
+        let entries = walkdir::WalkDir::new(&self.catalog_dir)
+            .follow_links(false)
+            .into_iter()
+            .filter_entry(|entry| {
+                entry.depth() == 0
+                    || (!is_excluded(&entry.file_name().to_string_lossy(), &self.exclude_patterns)
+                        && !entry
+                            .path()
+                            .parent()
+                            .is_some_and(|p| p.join("SKILL.md").is_file()))
+            });
         for entry in entries {
-            let entry = entry.map_err(|e| SyncError::Io {
+            let entry = entry.map_err(|error| SyncError::InvalidCatalog {
                 path: self.catalog_dir.clone(),
-                source: e,
+                reason: error.to_string(),
             })?;
             let path = entry.path();
-            if !path.is_dir() {
+            if !entry.file_type().is_dir() || !path.join("SKILL.md").is_file() {
                 continue;
             }
-
-            let name_lossy = path.file_name().unwrap_or_default().to_string_lossy();
-            if is_excluded(&name_lossy, &self.exclude_patterns) {
-                continue;
-            }
-
-            // Check if flat layout: <catalog>/<skill_id>/SKILL.md
-            if path.join("SKILL.md").is_file() {
-                let (skill_id, _, _) = extract_skill_info(&path);
-                PathValidator::validate_skill_id(&skill_id).map_err(|e| {
-                    SyncError::InvalidCatalog {
-                        path: path.clone(),
-                        reason: e.to_string(),
-                    }
-                })?;
-                skills.insert(skill_id, path);
-            } else {
-                // Check categorized layout: <catalog>/<category>/<skill_id>/SKILL.md
-                let sub_entries_res = fs::read_dir(&path);
-                if let Ok(sub_entries) = sub_entries_res {
-                    for sub_entry in sub_entries.flatten() {
-                        let sub_path = sub_entry.path();
-                        if !sub_path.is_dir() {
-                            continue;
-                        }
-                        let sub_name = sub_path.file_name().unwrap_or_default().to_string_lossy();
-                        if is_excluded(&sub_name, &self.exclude_patterns) {
-                            continue;
-                        }
-                        if sub_path.join("SKILL.md").is_file() {
-                            let (skill_id, _, _) = extract_skill_info(&sub_path);
-                            PathValidator::validate_skill_id(&skill_id).map_err(|e| {
-                                SyncError::InvalidCatalog {
-                                    path: sub_path.clone(),
-                                    reason: e.to_string(),
-                                }
-                            })?;
-                            skills.insert(skill_id, sub_path);
-                        }
-                    }
+            let (skill_id, _, _) = extract_skill_info(path);
+            PathValidator::validate_skill_id(&skill_id).map_err(|error| {
+                SyncError::InvalidCatalog {
+                    path: path.to_path_buf(),
+                    reason: error.to_string(),
                 }
+            })?;
+            if let Some(previous) = skills.insert(skill_id.clone(), path.to_path_buf()) {
+                return Err(SyncError::InvalidCatalog {
+                    path: path.to_path_buf(),
+                    reason: format!(
+                        "Duplicate skill '{skill_id}' at {} and {}",
+                        previous.display(),
+                        path.display()
+                    ),
+                });
             }
         }
 

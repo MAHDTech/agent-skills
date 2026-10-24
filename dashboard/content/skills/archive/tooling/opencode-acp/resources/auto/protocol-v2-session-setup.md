@@ -17,11 +17,9 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 > Creating and resuming sessions
 
-Sessions represent a specific conversation or thread between the [Client](/protocol/v2/overview#client) and [Agent](/protocol/v2/overview#agent). Each session maintains its own context, conversation history, and state, allowing multiple independent interactions with the same Agent.
+Sessions represent a specific conversation or thread between the [Client](https://agentclientprotocol.com/protocol/v2/overview.md#client) and [Agent](https://agentclientprotocol.com/protocol/v2/overview.md#agent). Each session maintains its own context, conversation history, and state, allowing multiple independent interactions with the same Agent.
 
-Before creating a session, Clients **MUST** first complete the [initialization](/protocol/v2/initialization) phase to establish protocol compatibility and capabilities.
-
-<br />
+Before creating a session, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v2/initialization.md) phase to establish protocol compatibility and capabilities.
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -51,8 +49,6 @@ sequenceDiagram
 
     Note over Client,Agent: Session attached. Foreground state synchronized
 ```
-
-<br />
 
 ## Creating a Session
 
@@ -103,7 +99,7 @@ initial idle notification is a snapshot, not a completed turn.
 `session/resume` does not imply idle: an existing session may still be running
 or waiting for user action. See [Current-State Synchronization](#current-state-synchronization).
 
-Agents **MAY** include initial [configuration options](/protocol/v2/session-config-options) in `configOptions` and [available slash commands](/protocol/v2/slash-commands) in `availableCommands` in both `session/new` and `session/resume` responses. For example, a new session can return both:
+Agents **MAY** include initial [configuration options](https://agentclientprotocol.com/protocol/v2/session-config-options.md) in `configOptions` and [available slash commands](https://agentclientprotocol.com/protocol/v2/slash-commands.md) in `availableCommands` in both `session/new` and `session/resume` responses. For example, a new session can return both:
 
 ```json theme={null}
 {
@@ -215,11 +211,11 @@ any minimum period. Live-only messages, including locally handled commands, may
 be absent from replay. A successful prompt response confirms insertion, not
 future availability in history; absence from replay does not contradict it.
 
-[Session compactions](/protocol/v2/prompt-lifecycle#session-compaction)
+[Session compactions](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#session-compaction)
 are replayed using the same update, chunk, and patch semantics as live delivery.
 No Client capability is required.
 
-Live-only [notices](/protocol/v2/prompt-lifecycle#session-notices) are not
+Live-only [notices](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#session-notices) are not
 conversation history and **SHOULD NOT** be replayed. If the underlying condition
 is still relevant after resuming finishes, the Agent may emit a new notice as a
 new live event.
@@ -270,7 +266,7 @@ Followed by the agent's response:
 
 During replay, the Agent **MUST** include an opaque `messageId` for each
 replayed message, unique among messages of the same
-[type](/protocol/v2/prompt-lifecycle#entity-ids). A retained user message
+[type](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#entity-ids). A retained user message
 inserted by `session/prompt` **MUST** use the ID returned in that prompt
 response, including after reconnecting or restarting the Agent. Replaying a command reports its message; it does not
 execute the command again.
@@ -302,7 +298,7 @@ Message updates that omit `content` can update other optional fields without
 changing the current content.
 
 Replay also applies top-level `_meta` as a
-[metadata patch](/protocol/v2/extensibility#metadata-patches) and does not reset it.
+[metadata patch](https://agentclientprotocol.com/protocol/v2/extensibility.md#metadata-patches) and does not reset it.
 A message update that replaces `content` leaves `_meta` keys it does not
 mention. When the Client may already hold metadata for an entity, the Agent
 removes stale keys by setting them to `null`, or sends `_meta: null` before the
@@ -327,7 +323,7 @@ history replay was requested.
 ### Current-State Synchronization
 
 For every successful resume, the Agent **MUST** send a current
-[`state_update`](/protocol/v2/prompt-lifecycle#session-states) after any requested
+[`state_update`](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#session-states) after any requested
 history replay and before the resume response. This is required even when
 `replayFrom` is omitted or `null`. The snapshot reports the current foreground
 state after resuming: `idle`, `running`, or `requires_action`.
@@ -361,15 +357,15 @@ To close an active session, Clients **MUST** call the `session/close` method wit
 }
 ```
 
-<ParamField path="sessionId" type="SessionId" required>
-  The ID of the active session to close.
-</ParamField>
+**sessionId** `SessionId` *required*
 
-The Agent **MUST** cancel any ongoing work for that session as if [`session/cancel`](/protocol/v2/prompt-lifecycle#cancellation) had been called, then free the resources associated with the session.
+The ID of the active session to close.
+
+The Agent **MUST** cancel any ongoing work for that session as if [`session/cancel`](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#cancellation) had been called, then free the resources associated with the session.
 
 When closing cancels active foreground work, the Agent **MUST** send the final updates for that work and the idle `state_update` with `stopReason: "cancelled"` before responding successfully to `session/close`. Closing an idle session does not itself require another idle update.
 
-Closing may also cancel pending `session/prompt` requests, including queued prompts. If closing prevents a prompt's user message from being inserted, the Agent **MUST** answer that request with `-32800` (Request Cancelled). If the message has already been inserted, the Agent **MUST** respond successfully with its `messageId`, as described in [Prompt Accepted](/protocol/v2/prompt-lifecycle#2-prompt-accepted). Prompt responses need not precede the close response.
+Closing may also cancel pending `session/prompt` requests, including queued prompts. If closing prevents a prompt's user message from being inserted, the Agent **MUST** answer that request with `-32800` (Request Cancelled). If the message has already been inserted, the Agent **MUST** respond successfully with its `messageId`, as described in [Prompt Accepted](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#2-prompt-accepted). Prompt responses need not precede the close response.
 
 On success, the Agent responds with an empty result object:
 
@@ -451,37 +447,37 @@ Every MCP server object has a `type` discriminator that identifies its transport
 
 When the Agent supports `session.mcp.stdio`, Clients can specify MCP servers configurations using the stdio transport.
 
-<ParamField path="type" type="string" required>
-  Must be `"stdio"` to indicate stdio transport
-</ParamField>
+**type** `string` *required*
 
-<ParamField path="name" type="string" required>
-  A human-readable identifier for the server
-</ParamField>
+Must be `"stdio"` to indicate stdio transport
 
-<ParamField path="command" type="string" required>
-  The absolute path to the MCP server executable
-</ParamField>
+**name** `string` *required*
 
-<ParamField path="args" type="array">
-  Command-line arguments to pass to the server. Omitted and empty values are
-  equivalent.
-</ParamField>
+A human-readable identifier for the server
 
-<ParamField path="env" type="EnvVariable[]">
-  Environment variables to set when launching the server. Omitted and empty
-  values are equivalent.
+**command** `string` *required*
 
-  <Expandable title="EnvVariable">
-    <ParamField path="name" type="string">
-      The name of the environment variable.
-    </ParamField>
+The absolute path to the MCP server executable
 
-    <ParamField path="value" type="string">
-      The value of the environment variable.
-    </ParamField>
-  </Expandable>
-</ParamField>
+**args** `array`
+
+Command-line arguments to pass to the server. Omitted and empty values are
+equivalent.
+
+**env** `EnvVariable[]`
+
+Environment variables to set when launching the server. Omitted and empty
+values are equivalent.
+
+**EnvVariable**
+
+**name** `string`
+
+The name of the environment variable.
+
+**value** `string`
+
+The value of the environment variable.
 
 Example stdio transport configuration:
 
@@ -504,32 +500,32 @@ Example stdio transport configuration:
 
 When the Agent supports `session.mcp.http`, Clients can specify MCP servers configurations using the HTTP transport.
 
-<ParamField path="type" type="string" required>
-  Must be `"http"` to indicate HTTP transport
-</ParamField>
+**type** `string` *required*
 
-<ParamField path="name" type="string" required>
-  A human-readable identifier for the server
-</ParamField>
+Must be `"http"` to indicate HTTP transport
 
-<ParamField path="url" type="string" required>
-  The URL of the MCP server
-</ParamField>
+**name** `string` *required*
 
-<ParamField path="headers" type="HttpHeader[]">
-  HTTP headers to include in requests to the server. Omitted and empty values are
-  equivalent.
+A human-readable identifier for the server
 
-  <Expandable title="HttpHeader">
-    <ParamField path="name" type="string">
-      The name of the HTTP header.
-    </ParamField>
+**url** `string` *required*
 
-    <ParamField path="value" type="string">
-      The value to set for the HTTP header.
-    </ParamField>
-  </Expandable>
-</ParamField>
+The URL of the MCP server
+
+**headers** `HttpHeader[]`
+
+HTTP headers to include in requests to the server. Omitted and empty values are
+equivalent.
+
+**HttpHeader**
+
+**name** `string`
+
+The name of the HTTP header.
+
+**value** `string`
+
+The value to set for the HTTP header.
 
 Example HTTP transport configuration:
 

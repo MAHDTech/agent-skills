@@ -17,11 +17,11 @@ skill_name = "acp"
 
 **Published:** June 1, 2026
 
-The [Additional Workspace Roots RFD](/rfds/additional-directories) has moved to Completed and `additionalDirectories` is stabilized for session lifecycle requests.
+The [Additional Workspace Roots RFD](https://agentclientprotocol.com/rfds/additional-directories.md) has moved to Completed and `additionalDirectories` is stabilized for session lifecycle requests.
 
 Clients can provide an ordered list of absolute additional workspace roots when the Agent advertises support. The existing `cwd` remains the primary working directory, while the additional roots expand the session's filesystem scope.
 
-For the protocol documentation, see [Additional Workspace Roots](/protocol/v1/session-setup#additional-workspace-roots).
+For the protocol documentation, see [Additional Workspace Roots](https://agentclientprotocol.com/protocol/v1/session-setup.md#additional-workspace-roots).
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

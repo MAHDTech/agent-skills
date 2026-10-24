@@ -17,13 +17,6 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 > Announcing the new Transports Working Group, to stabilize new transport formats.
 
-export const Author = ({name, role, github}) => <div className="mt-8 border-t border-gray-200 pt-4 dark:border-gray-800">
-    <div className="font-semibold">
-      {github ? <a href={github}>{name}</a> : name}
-    </div>
-    {role ? <div className="mt-1 text-sm opacity-80">{role}</div> : null}
-  </div>;
-
 **Published:** April 22, 2026
 
 I'm excited to announce that we have a new Transports working group!
@@ -34,7 +27,9 @@ We have started work on a Draft RFD for how this could work both via WebSockets 
 
 A big thanks to both of you for starting this and I look forward to seeing what is next!
 
-<Author name="Ben Brandt" role="Zed Industries / ACP Lead Maintainer" github="https://github.com/benbrandt" />
+[Ben Brandt](https://github.com/benbrandt)
+
+Zed Industries / ACP Lead Maintainer
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

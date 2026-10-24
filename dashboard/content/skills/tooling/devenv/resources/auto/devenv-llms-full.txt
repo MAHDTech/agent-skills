@@ -4198,26 +4198,32 @@ If you enter the `frontend` directory, the environment will activate based on wh
 
 If you enter the top-level project, the environment is combined with what’s defined in `backend/devenv.nix` and `frontend/devenv.nix`. For example, `devenv up` will start both the frontend and backend processes.
 
-**New in version 1.10**
+**New in version 2.4.1**
 
-Composing `devenv.yaml` files is now supported for local files (relative and absolute paths). Remote inputs are not yet supported for `devenv.yaml` imports.
+Local `devenv.yaml` composition was added in 1.10. Remote input composition is supported in 2.4.1 and later.
 
 ## Sharing configuration from another repository
 
-To keep your devenv configuration in a separate repository, for example when working on a team that doesn’t use devenv, declare it as a `path:` input and import it:
+To keep your devenv configuration in a separate repository, declare it as an input and import the directory containing its `devenv.yaml` and `devenv.nix`:
 
 **devenv.yaml**
 
 ```yaml
 inputs:
   shared-config:
-    url: path:../shared-config/
+    url: github:my-org/shared-devenv-config
     flake: false
 imports:
-- shared-config
+- shared-config/profiles/backend
 ```
 
-The sibling `shared-config` repository only needs a `devenv.nix` file. Combine this with [profiles](/profiles/) to define one shared configuration that adapts to each project.
+This uses the existing input import syntax; no additional YAML option is required. Imports inside the remote `devenv.yaml` are composed recursively, and relative `path:` inputs declared there resolve inside the fetched source.
+
+The importing project’s `devenv.lock` is the single lock file for the composed environment. A `devenv.lock` in the imported repository is not merged. Input declarations use the same precedence as local YAML composition, so a declaration in the root project wins when both configurations use the same name. In particular, when the shared configuration also declares `nixpkgs`, the root project’s pinned `nixpkgs` is reused instead of creating a second one. Use distinct input names when the versions must remain independent.
+
+`devenv update shared-config` also discovers configuration from the updated revision and locks any inputs it adds or changes before writing `devenv.lock`. An update without an input name updates dependencies declared by imported YAML as well. Configuration discovery writes no intermediate lock files; a failed import leaves the previous lock unchanged.
+
+For a sibling checkout, use `url: path:../shared-config/` in the same example. The shared repository may also contain only a `devenv.nix` file. Combine this with [profiles](/profiles/) to define one shared configuration that adapts to each project.
 
 **Changed in version 2.2**
 
@@ -4719,7 +4725,6 @@ If you’re searching for an example but can’t find it, [let us know](https://
 * [lean4](https://github.com/cachix/devenv/tree/main/examples/lean4)
 * [mailpit](https://github.com/cachix/devenv/tree/main/examples/mailpit)
 * [meilisearch](https://github.com/cachix/devenv/tree/main/examples/meilisearch)
-* [minio](https://github.com/cachix/devenv/tree/main/examples/minio)
 * [mkcert](https://github.com/cachix/devenv/tree/main/examples/mkcert)
 * [modern-c](https://github.com/cachix/devenv/tree/main/examples/modern-c)
 * [mongodb](https://github.com/cachix/devenv/tree/main/examples/mongodb)
@@ -5110,6 +5115,57 @@ Add a badge to your project’s README to show it’s built with devenv:
 ```markdown
 [![Built with devenv](https://devenv.sh/assets/devenv-badge.svg)](https://devenv.sh)
 ```
+
+# Git
+
+Configure Git for a development environment with `git.config`:
+
+```nix
+{
+  git.config = {
+    merge.conflictStyle = "diff3";
+    merge.tool = "vimdiff";
+    diff.algorithm = "histogram";
+  };
+}
+```
+
+Sections and subsections use nested attribute sets. Values may be strings, booleans, numbers, or lists for repeated keys. These settings apply to Git commands inside the devenv environment. Git still reads your existing configuration, but these settings take precedence over configuration files, including repository configuration. Explicit `git -c key=value` options take precedence over devenv.
+
+The implementation uses `GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_0`, and `GIT_CONFIG_VALUE_0` to include a generated configuration file. Do not configure those environment variables separately. Generated files are stored in the Nix store, so configuration must not contain secrets.
+
+Use `git.attributes` to select merge drivers, diff drivers, and other file-specific behavior. For example, this configuration registers a custom merge driver and selects it for generated text files:
+
+```nix
+{
+  git.config.merge.keepCurrent = {
+    name = "Keep the current version";
+    driver = "true";
+  };
+  git.attributes = [
+    "generated/*.txt merge=keepCurrent"
+    "*.png binary"
+  ];
+}
+```
+
+Attribute rules are written to a generated file selected by `core.attributesFile`. When configured, this replaces your global attributes file for the environment. Repository `.gitattributes` files and `.git/info/attributes` retain their higher precedence. Devenv does not modify those files or your Git configuration files.
+
+The defaults are empty and leave Git’s configuration and attributes unchanged. Install any tools referenced by your settings through `packages`.
+
+## Mergiraf
+
+Enable [Mergiraf](https://mergiraf.org/) to use syntax-aware merging during Git merges, rebases, and cherry-picks:
+
+```nix
+{
+  mergiraf.enable = true;
+}
+```
+
+This installs Mergiraf, registers its merge driver through `git.config`, and selects it for all files through `git.attributes`. Unsupported formats fall back to text merging. Repository attributes can override the selected driver.
+
+The integration defaults `merge.conflictStyle` to `diff3`, which includes the base revision needed by `mergiraf solve path/to/file` for existing conflicts. Use `mergiraf review` to inspect syntax-aware resolutions when prompted. To temporarily use Git’s text merging, run `mergiraf=0 git merge <branch>`.
 
 # Git Hooks
 
@@ -22411,6 +22467,170 @@ Substituters to fetch debuginfo from.
 
 * <https://github.com/cachix/devenv/blob/main/src/modules/services/nixseparatedebuginfod.nix>
 
+# ollama
+
+## Options
+
+### services.ollama.enable
+
+Whether to enable Ollama server for local large language models.
+
+*Type:* boolean
+
+*Default:*
+
+```nix
+false
+```
+
+*Example:*
+
+```nix
+true
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/services/ollama.nix>
+
+### services.ollama.package
+
+Which package of Ollama to use.
+
+Hardware acceleration depends on the package: use `pkgs.ollama-cuda`, `pkgs.ollama-rocm` or `pkgs.ollama-vulkan` for GPU support on Linux. On macOS, `pkgs.ollama` uses Metal.
+
+*Type:* package
+
+*Default:*
+
+```nix
+pkgs.ollama
+```
+
+*Example:*
+
+```nix
+pkgs.ollama-cuda
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/services/ollama.nix>
+
+### services.ollama.environmentVariables
+
+Additional environment variables for the Ollama server process. See `ollama serve --help` for available options.
+
+*Type:* attribute set of string
+
+*Default:*
+
+```nix
+{ }
+```
+
+*Example:*
+
+```nix
+{
+  OLLAMA_CONTEXT_LENGTH = "8192";
+  OLLAMA_KEEP_ALIVE = "10m";
+}
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/services/ollama.nix>
+
+### services.ollama.host
+
+The host address the Ollama HTTP server listens on. Wrap IPv6 addresses in brackets.
+
+*Type:* string
+
+*Default:*
+
+```nix
+"127.0.0.1"
+```
+
+*Example:*
+
+```nix
+"[::]"
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/services/ollama.nix>
+
+### services.ollama.loadModels
+
+Models to download with `ollama pull` once the server is ready. Models that are already present are not downloaded again.
+
+Search for models at <https://ollama.com/library>.
+
+*Type:* list of string
+
+*Default:*
+
+```nix
+[ ]
+```
+
+*Example:*
+
+```nix
+[
+  "gemma3"
+  "qwen3:0.6b"
+]
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/services/ollama.nix>
+
+### services.ollama.modelsDir
+
+The directory Ollama reads models from and downloads new models to.
+
+Point this at a shared location (such as `~/.ollama/models`, as an absolute path) to reuse models across projects instead of downloading them per project.
+
+*Type:* string
+
+*Default:*
+
+```nix
+"${config.devenv.state}/ollama/models"
+```
+
+*Example:*
+
+```nix
+"/home/user/.ollama/models"
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/services/ollama.nix>
+
+### services.ollama.port
+
+The base port the Ollama HTTP server listens on. The actual port is allocated by devenv and may differ; `OLLAMA_HOST` and `OLLAMA_BASE_URL` point to it.
+
+*Type:* 16 bit unsigned integer; between 0 and 65535 (both inclusive)
+
+*Default:*
+
+```nix
+11434
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/services/ollama.nix>
+
 # opensearch
 
 ## Options
@@ -22632,6 +22852,28 @@ The port to listen on for transport traffic.
 
 # opentelemetry-collector
 
+## Automatic port allocation
+
+Settings-generated configurations allocate free ports for the `health_check` extension, OTLP gRPC/HTTP receivers, and internal Prometheus metrics readers. Configured ports are allocation bases, not guaranteed listening ports. This lets collectors in separate devenv projects run concurrently.
+
+Use resolved ports when configuring applications or scrapers:
+
+```nix
+{ config, ... }:
+{
+  env.OTEL_EXPORTER_OTLP_ENDPOINT =
+    "http://localhost:${toString config.processes.opentelemetry-collector.ports.http.value}";
+}
+```
+
+The standard port names are `health` (base 13133), `metrics` (8888), `grpc` (4317), and `http` (4318). Only configured, enabled listeners are allocated. Named receivers such as `otlp/app` use `otlp-app-grpc` and `otlp-app-http`. The first allocated internal Prometheus reader uses `metrics`; additional readers use `metrics-<zero-based reader index>`. An omitted Prometheus reader port uses 8888. Explicit reader lists replace the default reader; push exporters are unchanged.
+
+Bind hosts and other collector settings are preserved. Disabled protocols, disabled internal metrics, Unix sockets, port zero, and templated endpoints are not automatically allocated. Other receivers, extensions, and listening exporters remain manually configured.
+
+### Raw configuration files
+
+`configFile` overrides are passed through unchanged, without inferred port allocations. When generating raw YAML in Nix, declare process ports and reference their resolved values explicitly. Also override `processes.opentelemetry-collector.ready` to match the raw file’s health endpoint, or set it to `lib.mkForce null` if health checks are disabled.
+
 ## Options
 
 ### services.opentelemetry-collector.enable
@@ -22676,6 +22918,8 @@ pkgs.opentelemetry-collector-contrib
 
 Override the configuration file used by OpenTelemetry Collector. By default, a configuration is generated from `services.opentelemetry-collector.settings`.
 
+Raw configuration files are not rewritten and their ports are not automatically allocated. Declare process ports and reference their resolved values when generating a raw file, and override the readiness probe to match its health endpoint.
+
 If overriding, enable the `health_check` extension to allow the readiness probe to check whether the Collector is ready. Otherwise, disable the readiness probe by setting `processes.opentelemetry-collector.ready = lib.mkForce null;`.
 
 *Type:* null or absolute path
@@ -22698,7 +22942,7 @@ pkgs.writeTextFile { name = "otel-config.yaml"; text = "..."; }
 
 ### services.opentelemetry-collector.settings
 
-OpenTelemetry Collector configuration. Refer to <https://opentelemetry.io/docs/collector/configuration/> for more information on how to configure the Collector.
+OpenTelemetry Collector configuration. Literal TCP ports in the health\_check extension, OTLP receivers, and internal Prometheus metrics readers are used as allocation bases. The generated configuration uses the resolved values from `processes.opentelemetry-collector.ports`. Refer to <https://opentelemetry.io/docs/collector/configuration/> for more information on how to configure the Collector.
 
 *Type:* open submodule of (YAML 1.1 value)
 

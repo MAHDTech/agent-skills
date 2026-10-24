@@ -43,6 +43,8 @@ Delta currently supports:
 *   Linux with glibc on Intel, AMD, or ARM64 processors.
 *   Windows on Intel, AMD, or ARM64 processors.
 
+To install Delta Web on iOS or Android, see [Install Delta Web](/docs/collaboration/delta-on-the-web#install-delta-web).
+
 Delta is in public beta. You need a Zed account to use it. [Sign in](/docs/account/authenticate) or create an account on the [Zed dashboard](https://dashboard.zed.dev/delta-beta), then accept the Delta Early Access Agreement. You can use Delta as soon as you accept.
 
 ## [Download Delta](#download-delta)
@@ -160,18 +162,10 @@ The **Welcome to Delta** introduction is complete after you follow its final pro
 
 ## [Run without a window](#run-without-a-window)
 
-CLI commands that need Delta can start its background process without opening a window. To start, inspect, or stop that process explicitly:
-
-```
-delta daemon start
-delta daemon status
-delta daemon stop
-```
-
-`delta daemon stop` quits the running Delta app, including any open windows. To open a window in the same running app, run:
+CLI commands that need Delta start its background process without opening a window, and the process exits when no command needs it. To open a window in the running app, run:
 
 ```
 delta open
 ```
 
-Closing the last window keeps Delta running by default. Change **Settings > General > Advanced > Stay Open When Window Closed** to quit when the last window closes. This setting does not stop a process that started without any windows. See [Keep Computer Awake](/docs/configuration/settings#notifications) for the sleep behavior of background work.
+After you quit Delta, it keeps running only until `delta` commands still in progress finish. See [Keep Computer Awake](/docs/configuration/settings#notifications) for the sleep behavior of background work.

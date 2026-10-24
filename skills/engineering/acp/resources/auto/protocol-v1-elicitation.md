@@ -27,7 +27,7 @@ understand what is requested and why.
 ## Checking support
 
 Clients advertise elicitation support in `clientCapabilities.elicitation`
-during [initialization](/protocol/v1/initialization#client-capabilities).
+during [initialization](https://agentclientprotocol.com/protocol/v1/initialization.md#client-capabilities).
 
 ```json theme={null}
 {
@@ -193,7 +193,7 @@ rules to ACP.
 * The Agent **MUST** verify that the authenticated user who started the
   elicitation is the same user who completes the external interaction.
 
-See the [schema reference](/protocol/v1/schema#elicitation%2Fcreate) for the
+See the [schema reference](https://agentclientprotocol.com/protocol/v1/schema.md#elicitation%2Fcreate) for the
 complete request and response types.
 
 

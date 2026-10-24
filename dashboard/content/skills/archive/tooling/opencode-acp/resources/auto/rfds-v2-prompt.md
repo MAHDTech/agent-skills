@@ -69,7 +69,7 @@ Insertion is a logical conversation event, not a durable-storage guarantee or a 
 }
 ```
 
-This extends the [Message ID RFD](/rfds/message-id) without changing ID ownership: the agent still generates opaque message IDs, but now returns the accepted user message's ID to the submitting client as well as including it in session updates. No client-generated `promptId` is added to the request or updates.
+This extends the [Message ID RFD](https://agentclientprotocol.com/rfds/message-id.md) without changing ID ownership: the agent still generates opaque message IDs, but now returns the accepted user message's ID to the submitting client as well as including it in session updates. No client-generated `promptId` is added to the request or updates.
 
 The response confirms insertion and establishes the submitting client's association with the message. The corresponding message updates report its content and placement; `state_update` notifications report foreground work. These are reports of insertion and processing, not separate acceptance and insertion phases.
 
@@ -104,7 +104,7 @@ The question then turns to what makes up this notification. Which brings us to:
 
 **Who owns the user message id?**
 
-The [Message ID RFD](/rfds/message-id) defines that the agent owns message IDs. The client sends the prompt without a message ID, and the agent returns the ID when acknowledging insertion.
+The [Message ID RFD](https://agentclientprotocol.com/rfds/message-id.md) defines that the agent owns message IDs. The client sends the prompt without a message ID, and the agent returns the ID when acknowledging insertion.
 
 The corresponding user-message update reports the agent-owned content and placement under that same ID. The response does not add content to the conversation a second time; it establishes the submitting client's association with the inserted message.
 
@@ -163,7 +163,7 @@ And reports the user message with the notification:
 
 The submitting client uses the response's `messageId` to reconcile its optimistic message with the agent-reported message. If the notification arrives first, the response later establishes that association. Other clients simply render the message under the same ID. The response does not determine the message's position in the feed.
 
-This is a new message type as well. Not a `user_message_chunk` but just a `user_message` that allows for sending the entire message at once. The [Message Updates and Chunks](./message-updates.mdx) RFD defines the corresponding whole-message update and streamed-chunk patterns for user messages, agent messages, and agent thoughts.
+This is a new message type as well. Not a `user_message_chunk` but just a `user_message` that allows for sending the entire message at once. The [Message Updates and Chunks](https://agentclientprotocol.com/rfds/v2/message-updates.md) RFD defines the corresponding whole-message update and streamed-chunk patterns for user messages, agent messages, and agent thoughts.
 
 ##### Correlation and replay
 
@@ -175,7 +175,7 @@ Live correlation and history retention are separate:
 
 Clients **MUST NOT** assume that every acknowledged message will appear after resuming a session. Adapters do not need a separate permanent transcript for messages their underlying runtime does not retain, or to reconstruct cleared or discarded messages solely for correlation. This does not change v1's replay rules.
 
-A client that received the response and retained its `(sessionId, messageId)` association can recognize the message if it is replayed. It requests retained history with `session/resume` and `replayFrom: { "type": "start" }`, as described in the [Session Resume Replay RFD](./session-resume-replay.mdx). Omitting `replayFrom` resumes without replay.
+A client that received the response and retained its `(sessionId, messageId)` association can recognize the message if it is replayed. It requests retained history with `session/resume` and `replayFrom: { "type": "start" }`, as described in the [Session Resume Replay RFD](https://agentclientprotocol.com/rfds/v2/session-resume-replay.md). Omitting `replayFrom` resumes without replay.
 
 **A lost response remains an ambiguous outcome.** The agent may have accepted the input, but the client does not know its ID. Replay can restore retained conversation history, but cannot reliably associate a message with that uncertain submission. Clients must not guess from content or order, or assume retrying cannot create a second submission. A client-generated correlation token could address this limitation for retained messages separately.
 
@@ -267,7 +267,7 @@ We could explore adding which permission or elicitation it is waiting on if we w
 
 #### Foreground state contract
 
-The v2 [Session States](/protocol/v2/prompt-lifecycle#session-states) guide
+The v2 [Session States](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#session-states) guide
 defines the normative transition table and provides lifecycle examples. States are
 snapshots of aggregate foreground activity, not events for individual requests:
 
@@ -340,14 +340,14 @@ The `error` stop reason is only for failures that end foreground work:
 | Rejected before the user message is inserted | JSON-RPC error response to `session/prompt` |
 | Request cancelled after the user message is inserted | Success response with the `messageId`; the work is stopped with `session/cancel` |
 | Fails after insertion, and foreground work stops | Idle `state_update` with `stopReason: "error"` and `error` |
-| Fails, and work continues (a retried request, a failed tool) | A [`notice`](/rfds/session-notices) or a tool call with status `failed`; the state does not change |
+| Fails, and work continues (a retried request, a failed tool) | A [`notice`](https://agentclientprotocol.com/rfds/session-notices) or a tool call with status `failed`; the state does not change |
 | Work is cancelled, even if aborting raises errors | Idle `state_update` with `stopReason: "cancelled"`, as the cancellation rules already require |
 | Background activity fails while the Agent is `idle` | Not a stop reason, since no foreground work ended |
 | The Agent process exits or the connection is lost | Detected by the Client; no update can report it |
 
 A v2 Client that predates the `error` stop reason handles it like any unknown stop reason: foreground work has ended, and it shows a generic stopped state. It does not need `error` to know that the work ended. Because the error is part of the idle snapshot, anything that carries that snapshot carries the failure too, including an exposed subagent's `subagent_update.state` and any later mechanism for synchronizing current state on resume.
 
-v1's `session/prompt` is unchanged; it already reports these failures as an error response. The one v1 surface that carries this idle snapshot, the draft [subagent](/rfds/subagents#current-work-state) `subagent_update.state`, gains the same `error` stop reason, because a v1 child has no prompt response that could report its failure. A bridge from a v1 Agent to a v2 Client maps an error response that arrives after the bridge reported the message inserted to an idle `state_update` with the `error` stop reason and the same error object. A bridge from a v2 Agent to a v1 Client maps that update to an error response for the pending v1 prompt, using `-32603` (internal error) when `error` is absent.
+v1's `session/prompt` is unchanged; it already reports these failures as an error response. The one v1 surface that carries this idle snapshot, the draft [subagent](https://agentclientprotocol.com/rfds/subagents.md#current-work-state) `subagent_update.state`, gains the same `error` stop reason, because a v1 child has no prompt response that could report its failure. A bridge from a v1 Agent to a v2 Client maps an error response that arrives after the bridge reported the message inserted to an idle `state_update` with the `error` stop reason and the same error object. A bridge from a v2 Agent to a v1 Client maps that update to an error response for the pending v1 prompt, using `-32603` (internal error) when `error` is absent.
 
 ## Shiny future
 

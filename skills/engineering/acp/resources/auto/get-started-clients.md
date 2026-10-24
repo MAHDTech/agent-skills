@@ -42,6 +42,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
     * VS Code–compatible IDEs (Cursor, Windsurf, Trae,..): [ACP Pro Extension](https://open-vsx.org/extension/duclvz/acp-pro)
   * [Multicoder](https://marketplace.visualstudio.com/items?itemName=multicoder.multicoder) extension
   * [Poolside Assistant](https://marketplace.visualstudio.com/items?itemName=poolside-ai.acp-assistant)
+* [Volt](https://github.com/LeulAria/volt) — open-source (MIT) agent workspace built on the VS Code core; runs Claude Code, Codex, OpenCode and other ACP agents next to the editor, Git, terminal and an in-app browser, with hunk-by-hunk keep/undo of agent edits and a Git checkpoint every turn (macOS, Windows, Linux)
 * [Zed](https://zed.dev/docs/ai/external-agents)
 
 ## CLI and TUI
@@ -77,6 +78,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [CompozyOS](https://github.com/compozy/compozy) — open-source agent OS: runs ACP agents as a team on loops and schedules, with shared memory and approvals (Web, CLI)
 * [DeepChat](https://github.com/ThinkInAIXYZ/deepchat)
 * [Devin Desktop](https://devin.ai/desktop)
+* [Eleven](https://github.com/Zfinix/eleven) — open-source reverse-engineering app where any ACP agent reads, renames and patches binaries, Android apps and GPU kernels next to you (macOS, Windows, Linux)
 * [fabriqa.ai](https://fabriqa.ai)
 * [gemini-cli-desktop](https://github.com/Piebald-AI/gemini-cli-desktop)
 * [Ghosty Teams](https://ghosty.studio) — multi-tenant team workspace where ACP agents work alongside chat, collaborative documents, artifacts, forms, and live calls (Web)
@@ -118,7 +120,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [ClawX](https://github.com/ValueCell-ai/ClawX) — desktop GUI for OpenClaw agents, with a chat UI that talks to them over ACP
 * [OmniGet](https://github.com/tonhowtf/omniget) — desktop app for local coding agents with permissions, undo, jobs, and a built-in MCP server (Windows, macOS, Linux)
 * [Paca](https://github.com/Paca-AI/paca) — self-hosted, AI-native project management where humans and ACP agents share the same board and sprints
-* [Threadlines](https://github.com/Threadlines/threadlines) - open-source desktop workspace for coding agents, with a live browser, terminal, and source control beside each thread. Runs Cursor Agent and fx over ACP alongside Codex and Claude Code, and several agents can share one thread (macOS, Windows, Linux)
+* [Threadlines](https://github.com/Threadlines/threadlines) - open-source desktop app for coding agents, with a live browser, terminal, and source control beside each thread. Runs Cursor, Antigravity and fx over ACP, plus agents from the ACP registry, alongside Codex and Claude Code, and several agents can share one thread (macOS, Windows, Linux)
 
 ## Notebook and data tools
 
@@ -131,6 +133,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
 
 These mobile-first tools bring ACP and related coding-agent workflows to phones and tablets:
 
+* [acpantenna](https://github.com/fboldo/acpantenna) ([latch.im](https://latch.im)) (Web) — one command connects a running Claude Code, Codex or OpenCode session to a one-time link and QR code you open on a phone or another browser; the relay forwards ciphertext it cannot read, and permission requests are answered on the device you moved to
 * [AgentDeck](https://github.com/mantou132/AgentDeck) (Android) — start, steer and approve ACP agents running on your own computer from your phone: a background daemon (`agentdeckd`) pairs by QR code over an end-to-end encrypted, self-hostable relay, with a built-in free agent that needs no login
 * [Agmente](https://agmente.halliharp.com) ([GitHub](https://github.com/rebornix/Agmente)) (iOS)
 * [Ferngeist](https://github.com/arafatamim/Ferngeist) (Android)
@@ -162,6 +165,7 @@ These mobile-first tools bring ACP and related coding-agent workflows to phones 
 * [VibeAround](https://github.com/jazzenchen/VibeAround) (Telegram, Feishu/Lark, Discord, Slack, WeChat, WhatsApp, DingTalk, WeCom, QQ) — continue desktop/CLI agent sessions from messaging apps through channel plugins
 * [cc-connect](https://github.com/chenhg5/cc-connect) (Feishu/Lark, DingTalk, Slack, Telegram, Discord, LINE, WeCom) — bridges local coding agents to messaging platforms
 * [Gonggong Space](https://github.com/yoqu/gonggong-space) (self-hosted web chat, Feishu/Lark) — group chat where teammates @ each other's Claude Code / Codex agents running on their own machines, with live process, diffs, owner approvals and in-chat previews of the apps they start
+* [acpantenna](https://github.com/fboldo/acpantenna) (Matrix, Discord, Telegram, IRC, webhooks) — the same session driven from a chat platform through channel plugins, with permission requests answered in the chat
 
 ## Frameworks
 
@@ -184,6 +188,7 @@ These connectors bridge ACP into other environments and transport layers:
 * [acp\_rpc\_bridge](https://github.com/Intellexie/acp_rpc_bridge) — terminal binary that bridges stdio-based agents to HTTP, giving non-network agents network capability; supports ACP and Pi RPC protocols with ACP Streamable HTTP and OpenCode REST API endpoints
 * [ACP to AG-UI](https://github.com/namanrajpal/acp-to-agui) — bridges any ACP agent to web frontends via [AG-UI](https://docs.ag-ui.com) events over SSE; works with CopilotKit, AG-UI HttpAgent, or custom UIs (Web)
 * [AgentRQ](https://github.com/agentrq/acp-gateway) — bridges stdio-based ACP agents to the AgentRQ - Human-in-the-loop task collaboration service using MCP server.
+* [AHP-ACP Gateway](https://github.com/formulahendry/ahp-acp-gateway) — bridges AHP clients to configured ACP agents through a persistent WebSocket host, with model and configuration mapping, replay and reconnect, permission handling, and cross-platform lazy agent startup
 * [Aptove Bridge](https://github.com/aptove/bridge) — bridges stdio-based ACP agents to the Aptove mobile client over WebSocket
 * [ACP Remote](https://github.com/vcoderun/acpkit/tree/main/packages/transports/acpremote) - remote WebSocket transport for ACP agents and clients.
 * [OpenClaw](https://docs.openclaw.ai/cli/acp) — through the [`openclaw acp`](https://docs.openclaw.ai/cli/acp) bridge to an OpenClaw Gateway

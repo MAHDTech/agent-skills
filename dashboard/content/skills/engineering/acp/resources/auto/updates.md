@@ -15,219 +15,219 @@ skill_name = "acp"
 
 > Updates and announcements about the Agent Client Protocol
 
-This page is for larger ACP announcements and project updates. For lifecycle changes to Requests for Dialog, see [RFD Updates](/rfds/updates).
+This page is for larger ACP announcements and project updates. For lifecycle changes to Requests for Dialog, see [RFD Updates](https://agentclientprotocol.com/rfds/updates.md).
 
-<Update label="September 17, 2026" tags={["Protocol"]}>
-  ## Tool Call Names are Stabilized
+**September 17, 2026**
 
-  The Tool Call Name RFD has moved to Completed, and optional programmatic names
-  for tool calls are now stabilized in ACP v1 and the v2 baseline.
+## Tool Call Names are Stabilized
 
-  Agents can identify the invoked tool separately from its human-readable title
-  without introducing capability or authorization semantics.
+The Tool Call Name RFD has moved to Completed, and optional programmatic names
+for tool calls are now stabilized in ACP v1 and the v2 baseline.
 
-  [Read the full announcement](/announcements/tool-call-name-stabilized).
-</Update>
+Agents can identify the invoked tool separately from its human-readable title
+without introducing capability or authorization semantics.
 
-<Update label="July 22, 2026" tags={["Protocol"]}>
-  ## Elicitation is Stabilized
+[Read the full announcement](https://agentclientprotocol.com/announcements/tool-call-name-stabilized.md).
 
-  The Elicitation RFD has moved to Completed, and structured form and URL-mode
-  user interactions are now stabilized in ACP.
+**July 22, 2026**
 
-  Agents can request structured non-sensitive input or direct users to secure
-  out-of-band flows, while Clients explicitly advertise the modes they support.
+## Elicitation is Stabilized
 
-  [Read the full announcement](/announcements/elicitation-stabilized).
-</Update>
+The Elicitation RFD has moved to Completed, and structured form and URL-mode
+user interactions are now stabilized in ACP.
 
-<Update label="July 20, 2026" tags={["Protocol"]}>
-  ## ACP v2 is Available in Draft
+Agents can request structured non-sensitive input or direct users to secure
+out-of-band flows, while Clients explicitly advertise the modes they support.
 
-  The ACP v2 protocol documentation and schema are now published in Draft form.
+[Read the full announcement](https://agentclientprotocol.com/announcements/elicitation-stabilized.md).
 
-  [Read the full announcement](/announcements/acp-v2-draft).
-</Update>
+**July 20, 2026**
 
-<Update label="July 6, 2026" tags={["Protocol"]}>
-  ## Boolean Config Options are Stabilized
+## ACP v2 is Available in Draft
 
-  The Boolean Config Option Type RFD has moved to Completed and boolean session configuration options are stabilized.
+The ACP v2 protocol documentation and schema are now published in Draft form.
 
-  Agents can now expose native on/off controls, while v1 clients explicitly opt in through the `session.configOptions.boolean` capability.
+[Read the full announcement](https://agentclientprotocol.com/announcements/acp-v2-draft.md).
 
-  [Read the full announcement](/announcements/boolean-config-option-stabilized).
-</Update>
+**July 6, 2026**
 
-<Update label="June 29, 2026" tags={["Protocol"]}>
-  ## Request Cancellation is Stabilized
+## Boolean Config Options are Stabilized
 
-  The Request Cancellation RFD has moved to Completed and the `$/cancel_request` notification is stabilized.
+The Boolean Config Option Type RFD has moved to Completed and boolean session configuration options are stabilized.
 
-  Either side can now request cancellation of an outstanding JSON-RPC request by ID without relying on method-specific cancellation.
+Agents can now expose native on/off controls, while v1 clients explicitly opt in through the `session.configOptions.boolean` capability.
 
-  [Read the full announcement](/announcements/request-cancellation-stabilized).
-</Update>
+[Read the full announcement](https://agentclientprotocol.com/announcements/boolean-config-option-stabilized.md).
 
-<Update label="June 25, 2026" tags={["SDKs"]}>
-  ## Rust and TypeScript SDKs Reach 1.0
+**June 29, 2026**
 
-  The Rust SDK based on SACP RFD has moved to Completed after both the Rust and TypeScript ACP SDKs reached version 1.0.0.
+## Request Cancellation is Stabilized
 
-  The releases provide stable foundations for building ACP clients, agents, and protocol adapters in both ecosystems.
+The Request Cancellation RFD has moved to Completed and the `$/cancel_request` notification is stabilized.
 
-  [Read the full announcement](/announcements/sdk-1-0-releases).
-</Update>
+Either side can now request cancellation of an outstanding JSON-RPC request by ID without relying on method-specific cancellation.
 
-<Update label="June 24, 2026" tags={["Protocol"]}>
-  ## Model Config Category is Stabilized
+[Read the full announcement](https://agentclientprotocol.com/announcements/request-cancellation-stabilized.md).
 
-  The Model Config Option Category RFD has moved to Completed and the `model_config` category is stabilized.
+**June 25, 2026**
 
-  Agents can classify model-related parameters such as context size or speed and quality trade-offs so clients can present them alongside the main model selector.
+## Rust and TypeScript SDKs Reach 1.0
 
-  [Read the full announcement](/announcements/model-config-category-stabilized).
-</Update>
+The Rust SDK based on SACP RFD has moved to Completed after both the Rust and TypeScript ACP SDKs reached version 1.0.0.
 
-<Update label="June 5, 2026" tags={["Protocol"]}>
-  ## Message IDs are Stabilized
+The releases provide stable foundations for building ACP clients, agents, and protocol adapters in both ecosystems.
 
-  The Message ID RFD has moved to Completed and optional Agent-generated `messageId` fields are stabilized in ACP v1.
+[Read the full announcement](https://agentclientprotocol.com/announcements/sdk-1-0-releases.md).
 
-  Message IDs let clients group streamed chunks into individual messages and detect when a new message begins.
+**June 24, 2026**
 
-  [Read the full announcement](/announcements/message-id-stabilized).
-</Update>
+## Model Config Category is Stabilized
 
-<Update label="June 5, 2026" tags={["Protocol"]}>
-  ## Session Usage Updates are Stabilized
+The Model Config Option Category RFD has moved to Completed and the `model_config` category is stabilized.
 
-  The Session Context Size and Cost RFD has moved to Completed and `usage_update` session notifications are stabilized.
+Agents can classify model-related parameters such as context size or speed and quality trade-offs so clients can present them alongside the main model selector.
 
-  Agents can now report current context-window utilization and optional cumulative session cost so clients can keep usage displays up to date.
+[Read the full announcement](https://agentclientprotocol.com/announcements/model-config-category-stabilized.md).
 
-  [Read the full announcement](/announcements/session-usage-stabilized).
-</Update>
+**June 5, 2026**
 
-<Update label="June 5, 2026" tags={["Protocol"]}>
-  ## Session Delete is Stabilized
+## Message IDs are Stabilized
 
-  The Session Delete RFD has moved to Completed and the `session/delete` method is stabilized.
+The Message ID RFD has moved to Completed and optional Agent-generated `messageId` fields are stabilized in ACP v1.
 
-  This gives users a standard way to remove sessions from session history while leaving storage and retention policy to the Agent.
+Message IDs let clients group streamed chunks into individual messages and detect when a new message begins.
 
-  [Read the full announcement](/announcements/session-delete-stabilized).
-</Update>
+[Read the full announcement](https://agentclientprotocol.com/announcements/message-id-stabilized.md).
 
-<Update label="June 1, 2026" tags={["Protocol"]}>
-  ## Additional Workspace Roots are Stabilized
+**June 5, 2026**
 
-  The Additional Workspace Roots RFD has moved to Completed and `additionalDirectories` is stabilized for session lifecycle requests.
+## Session Usage Updates are Stabilized
 
-  Clients can declare absolute additional workspace roots while `cwd` remains the primary working directory.
+The Session Context Size and Cost RFD has moved to Completed and `usage_update` session notifications are stabilized.
 
-  [Read the full announcement](/announcements/additional-directories-stabilized).
-</Update>
+Agents can now report current context-window utilization and optional cumulative session cost so clients can keep usage displays up to date.
 
-<Update label="May 21, 2026" tags={["Protocol"]}>
-  ## Logout Method is Stabilized
+[Read the full announcement](https://agentclientprotocol.com/announcements/session-usage-stabilized.md).
 
-  The Logout Method RFD has moved to Completed and the `logout` method is stabilized.
+**June 5, 2026**
 
-  This gives clients a standard way to end an authenticated state and let users authenticate again without restarting the ACP connection.
+## Session Delete is Stabilized
 
-  [Read the full announcement](/announcements/logout-method-stabilized).
-</Update>
+The Session Delete RFD has moved to Completed and the `session/delete` method is stabilized.
 
-<Update label="April 23, 2026" tags={["Protocol"]}>
-  ## Session Close is Stabilized
+This gives users a standard way to remove sessions from session history while leaving storage and retention policy to the Agent.
 
-  The Session Close RFD has moved to Completed and the `session/close` method is stabilized.
+[Read the full announcement](https://agentclientprotocol.com/announcements/session-delete-stabilized.md).
 
-  This gives clients a way to tell agents to cancel in-flight work for a session and free the resources tied to it without tearing down the whole ACP process.
+**June 1, 2026**
 
-  [Read the full announcement](/announcements/session-close-stabilized).
-</Update>
+## Additional Workspace Roots are Stabilized
 
-<Update label="April 22, 2026" tags={["Protocol"]}>
-  ## Session Resume is Stabilized
+The Additional Workspace Roots RFD has moved to Completed and `additionalDirectories` is stabilized for session lifecycle requests.
 
-  The Session Resume RFD has moved to Completed and the `session/resume` method is stabilized.
+Clients can declare absolute additional workspace roots while `cwd` remains the primary working directory.
 
-  This gives clients a way to reconnect to an existing session without replaying conversation history, and lets proxies and adapters build `session/load` semantics on top of the simpler primitive.
+[Read the full announcement](https://agentclientprotocol.com/announcements/additional-directories-stabilized.md).
 
-  [Read the full announcement](/announcements/session-resume-stabilized).
-</Update>
+**May 21, 2026**
 
-<Update label="April 22, 2026" tags={["Working Groups"]}>
-  ## Transports Working Group
+## Logout Method is Stabilized
 
-  A new Transports Working Group has been formed to standardize remote agent transports like WebSockets and HTTP.
+The Logout Method RFD has moved to Completed and the `logout` method is stabilized.
 
-  Anna Zhdan (JetBrains / Core Maintainer) and Alex Hancock (Block / Goose) are leading the effort, with a Draft RFD already underway.
+This gives clients a standard way to end an authenticated state and let users authenticate again without restarting the ACP connection.
 
-  [Read the full announcement](/announcements/transports-working-group).
-</Update>
+[Read the full announcement](https://agentclientprotocol.com/announcements/logout-method-stabilized.md).
 
-<Update label="March 9, 2026" tags={["Protocol"]}>
-  ## ACP Registry is Released
+**April 23, 2026**
 
-  The ACP Registry RFD has moved to Completed and the initial version of the registry is released.
+## Session Close is Stabilized
 
-  The registry gives ACP clients a standard way to discover, install, and configure compatible agents without inventing custom integration metadata.
+The Session Close RFD has moved to Completed and the `session/close` method is stabilized.
 
-  [Read the full announcement](/announcements/acp-agent-registry-stabilized).
-</Update>
+This gives clients a way to tell agents to cancel in-flight work for a session and free the resources tied to it without tearing down the whole ACP process.
 
-<Update label="March 9, 2026" tags={["Protocol"]}>
-  ## Session Info Update is Stabilized
+[Read the full announcement](https://agentclientprotocol.com/announcements/session-close-stabilized.md).
 
-  The Session Info Update RFD has moved to Completed and the session\_info\_update notification is stabilized.
+**April 22, 2026**
 
-  This lets agents push session metadata updates to clients in real time so titles and related metadata stay current without polling.
+## Session Resume is Stabilized
 
-  [Read the full announcement](/announcements/session-info-update-stabilized).
-</Update>
+The Session Resume RFD has moved to Completed and the `session/resume` method is stabilized.
 
-<Update label="March 9, 2026" tags={["Protocol"]}>
-  ## Session List is Stabilized
+This gives clients a way to reconnect to an existing session without replaying conversation history, and lets proxies and adapters build `session/load` semantics on top of the simpler primitive.
 
-  The Session List RFD has moved to Completed and the session/list method is stabilized.
+[Read the full announcement](https://agentclientprotocol.com/announcements/session-resume-stabilized.md).
 
-  This gives clients a standard way to discover existing sessions from an agent for features like history, switching, and cleanup.
+**April 22, 2026**
 
-  [Read the full announcement](/announcements/session-list-stabilized).
-</Update>
+## Transports Working Group
 
-<Update label="February 18, 2026" tags={["Governance"]}>
-  ## Sergey Ignatov joins ACP as Lead Maintainer
+A new Transports Working Group has been formed to standardize remote agent transports like WebSockets and HTTP.
 
-  Sergey Ignatov from JetBrains is now a Lead Maintainer for ACP.
+Anna Zhdan (JetBrains / Core Maintainer) and Alex Hancock (Block / Goose) are leading the effort, with a Draft RFD already underway.
 
-  This reflects the growing collaboration between Zed and JetBrains around ACP and recognizes Sergey’s significant contributions to the protocol.
+[Read the full announcement](https://agentclientprotocol.com/announcements/transports-working-group.md).
 
-  [Read the full announcement](/announcements/sergey-ignatov-lead-maintainer).
-</Update>
+**March 9, 2026**
 
-<Update label="February 4, 2026" tags={["Protocol"]}>
-  ## Session Config Options are now Stabilized
+## ACP Registry is Released
 
-  The Session Config Options RFD has moved to Completed and is stabilized.
+The ACP Registry RFD has moved to Completed and the initial version of the registry is released.
 
-  This gives agents a flexible way to expose session-level configuration such as models, modes, reasoning levels, and other selectors.
+The registry gives ACP clients a standard way to discover, install, and configure compatible agents without inventing custom integration metadata.
 
-  [Read the full announcement](/announcements/session-config-options-stabilized).
-</Update>
+[Read the full announcement](https://agentclientprotocol.com/announcements/acp-agent-registry-stabilized.md).
 
-<Update label="October 24, 2025" tags={["Protocol"]}>
-  ## Implementation information for agents and clients
+**March 9, 2026**
 
-  ACP now allows agents and clients to share implementation details during initialization using the optional clientInfo and agentInfo fields.
+## Session Info Update is Stabilized
 
-  This makes it easier to identify which implementation is running, improve compatibility diagnostics, and understand adoption across the ecosystem.
+The Session Info Update RFD has moved to Completed and the session\_info\_update notification is stabilized.
 
-  [Read the full announcement](/announcements/implementation-information).
-</Update>
+This lets agents push session metadata updates to clients in real time so titles and related metadata stay current without polling.
+
+[Read the full announcement](https://agentclientprotocol.com/announcements/session-info-update-stabilized.md).
+
+**March 9, 2026**
+
+## Session List is Stabilized
+
+The Session List RFD has moved to Completed and the session/list method is stabilized.
+
+This gives clients a standard way to discover existing sessions from an agent for features like history, switching, and cleanup.
+
+[Read the full announcement](https://agentclientprotocol.com/announcements/session-list-stabilized.md).
+
+**February 18, 2026**
+
+## Sergey Ignatov joins ACP as Lead Maintainer
+
+Sergey Ignatov from JetBrains is now a Lead Maintainer for ACP.
+
+This reflects the growing collaboration between Zed and JetBrains around ACP and recognizes Sergey’s significant contributions to the protocol.
+
+[Read the full announcement](https://agentclientprotocol.com/announcements/sergey-ignatov-lead-maintainer.md).
+
+**February 4, 2026**
+
+## Session Config Options are now Stabilized
+
+The Session Config Options RFD has moved to Completed and is stabilized.
+
+This gives agents a flexible way to expose session-level configuration such as models, modes, reasoning levels, and other selectors.
+
+[Read the full announcement](https://agentclientprotocol.com/announcements/session-config-options-stabilized.md).
+
+**October 24, 2025**
+
+## Implementation information for agents and clients
+
+ACP now allows agents and clients to share implementation details during initialization using the optional clientInfo and agentInfo fields.
+
+This makes it easier to identify which implementation is running, improve compatibility diagnostics, and understand adoption across the ecosystem.
+
+[Read the full announcement](https://agentclientprotocol.com/announcements/implementation-information.md).
 
 
 This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -137,6 +137,31 @@
         "tars-goal",
         "tars-run-factory"
       ]
+    },
+    {
+      "title": "Vendor Skills / cloudflare",
+      "description": "Skills maintained by this vendor.",
+      "skills": [
+        "agents-sdk",
+        "basin",
+        "cf-cli",
+        "cloudflare",
+        "cloudflare-email-service",
+        "cloudflare-one",
+        "cloudflare-one-migrations",
+        "durable-objects",
+        "gateway-workers",
+        "k2",
+        "nextjs-on-cloudflare",
+        "sandbox-migrate-to-next",
+        "sandbox-next",
+        "sandbox-stable",
+        "turnstile-spin",
+        "web-perf",
+        "workers-best-practices",
+        "workers-profiling",
+        "wrangler"
+      ]
     }
   ]
 }

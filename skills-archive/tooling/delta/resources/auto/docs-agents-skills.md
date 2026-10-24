@@ -74,7 +74,7 @@ A skill folder can also carry supporting files, such as scripts or templates, an
 
 ## [Invoke a skill directly](#invoke-a-skill-directly)
 
-Type `/` in the composer to pick a skill by name. The same menu also lists built-in commands such as `/compact`, `/model`, `/thinking`, `/fast`, `/add-project`, `/subthread`, and `/review`. Typing or pasting a full skill command such as `/release-checklist` attaches that skill when you confirm it or type a space after the name; until then the picker stays open so you can check the match. When there’s room, the selected skill’s description appears beside the picker.
+Type `/` in the composer to pick a skill by name. The same menu also lists built-in commands such as `/compact`, `/change-model`, `/set-thinking-level`, `/toggle-fast`, `/add-project`, `/fork`, and `/review`. Typing or pasting a full skill command such as `/release-checklist` attaches that skill when you confirm it or type a space after the name; until then the picker stays open so you can check the match. When there’s room, the selected skill’s description appears beside the picker.
 
 With [Send With Modifier](/docs/configuration/settings#messages) enabled, press `Cmd+Enter` on macOS or `Ctrl+Enter` on Linux and Windows to accept the highlighted skill and send your message. Press `Enter` to insert the skill without sending.
 

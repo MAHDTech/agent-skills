@@ -19,7 +19,7 @@ Blog
 
 # DeltaDB: The Future of Version Control
 
-![](https://avatars.githubusercontent.com/u/94272?v=4)Conrad IrwinOctober 15, 2026
+Conrad IrwinOctober 15, 2026
 
 [![Building a Distributed CRDT Layer for Git](https://images.zed.dev/blog/future-of-version-control/youtube-thumbnail.jpg)This post is based on a talk by Conrad IrwinBuilding a Distributed CRDT Layer for GitWatch it on YouTube•22 min](https://www.youtube.com/watch?v=yif2rday2bw)
 
@@ -78,7 +78,7 @@ To avoid relying on a distributed clock, we identify each change by its parent i
 
 Let’s go through a contrived example. We both start with the string `TIVITY` and I insert `REA` at the same time as you insert a `C`. There are two possible end results: REACTIVITY, or CREATIVITY. The invariant we need to maintain is that regardless of which order these insertions were observed, they end up resolving the same way.
 
-over the networkinsert REA at 0..0 of git-aaainsert C at 0..0 of git-aaainsert C at 0..0 of git-aaainsert REA at 0..0 of git-aaalook up fragment indexlook up fragment indexVersion git-aaaTIVITYgit-aaaYou (a) · version a3REAaTIVITYgit-aaaMe (b) · version b1CbTIVITYgit-aaaBoth · version \[a3, b1\]REAaCbTIVITYgit-aaa
+TIVITY at version git-aaa. You insert REA and I insert C, both at 0..0 of git-aaa. We exchange the edits, each look up the fragment index, and both end up with REACTIVITY at version \[a3, b1\].
 
 We both start from `TIVITY` and we know it’s version `git-aaa`: the file as it is in the git commit we’re working from. I insert my `C` and tell you: insert `C` at `0..0` of `git-aaa`. You insert your `REA` and tell me the same thing: insert `REA` at `0..0` of `git-aaa`.
 
@@ -94,7 +94,7 @@ We do this with one more data-structure.
 
 Internally, each string is stored as two things: the text itself, and a fragment index. The fragment index is a B-tree that mirrors the text and records, for every position, which delta created that character.
 
-Version \[a3, b1\]root10 chars0..3REAa3..4Cb4..10TIVITYgit-aaa
+The fragment index for REACTIVITY at version \[a3, b1\]: a root over three fragments. REA, created by a, covers positions 0..3. C, created by b, covers 3..4. TIVITY, from git-aaa, covers 4..10.
 
 Back to the example. In your version `a3`, the fragment index has two fragments: the `REA` you inserted, and the `TIVITY` from `git-aaa`. (The figure shows the index after both edits have merged, with my `C` as a third fragment.) When my `C` arrives, you look up position zero of `git-aaa`: it’s the start of the `TIVITY` fragment, and your `REA` fragment was inserted at that same spot, concurrently with my `C`. So we use the same actor ID tiebreak as before. `a` comes before `b`, and you get `REACTIVITY`.
 
@@ -104,13 +104,13 @@ The same thing happens on my side. I look up position zero of `git-aaa` in my fr
 
 Naively, this would mean that we need a fragment index for every version of the document. To keep the one-to-one correspondence between characters and fragments, every insertion means rebuilding the part of the tree that covers it.
 
-Version \[a3, b1\]Version b2root a10 charsroot a′11 charsREAaCbTIVITYgit-aaaREAaCbTIVITYgit-aaa!bnew in version b2from version \[a3, b1\]9 nodes stored
+Two separate fragment indexes. Version \[a3, b1\] has root a over three leaves: REA from a, C from b, and TIVITY from git-aaa. Version b2 appends ! as a new fragment from b and has its own root a′ over copies of all three leaves plus a new leaf for !. Nine nodes are stored.
 
 A B-tree roughly the size of the string, for every version of the string, is an n-squared-shaped problem.
 
 But we have one more trick up our sleeves. Because these trees are immutable, we can copy an optimization from Haskell: instead of building a completely new tree for each version, the new version only creates the nodes on one path from the root to the changed leaf, and shares everything else with the previous version.
 
-Version \[a3, b1\]Version b2root a10 charsroot a′11 charsREAaCbTIVITYgit-aaa!bnew in version b2from version \[a3, b1\]6 nodes stored
+The same two versions with structural sharing. Root a points to the REA, C, and TIVITY leaves. The new root a′ points to those same three leaves and to a new leaf for !. Only a′ and the ! leaf are new, so six nodes are stored.
 
 So the tree grows only linearithmicly with the size of the edits, instead of with the number of edits squared. We end up with a kind of multi-headed Medusa tree: each version has its own head, pointing into mostly shared nodes.
 
@@ -128,14 +128,6 @@ So think back: when was the last time that your tooling let you down, that you l
 
 I hope that will be the last time that ever happens.
 
-On this page
-
-1.  [Enter DeltaDB](#enter-deltadb)
-2.  [How DeltaDB’s CRDTs work](#how-deltadbs-crdts-work)
-    1.  [The fragment index](#the-fragment-index)
-    2.  [Structural sharing](#structural-sharing)
-3.  [What this unlocks](#what-this-unlocks)
-
 ## More from the blog
 
 *   ### [Replace PRs with Delta – Now in Public Beta](https://zed.dev/blog/delta-public-beta)
@@ -151,8 +143,4 @@ On this page
     Featured![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4 "Nathan Sobo")Aug 12, 2026
     
 
-[Download Delta NowD](/download)[Open DeltaD](/threads)
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)
+[Download Delta Now](/download)[Open Delta](/threads)

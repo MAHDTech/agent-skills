@@ -8,7 +8,7 @@ Blog
 
 # Please Stop Sending Me Google Docs
 
-![](https://avatars.githubusercontent.com/u/10458212?v=4)Franciska DethlefsenOctober 8, 2026
+Franciska DethlefsenOctober 8, 2026
 
 I have to admit I can’t do anything without an agent anymore. But why should I? Agents give me superpowers. Whether I’m working on our roadmap, triaging issues, digging through funnel numbers, or writing positioning docs and blog posts like this one, I have an agent by my side from start to finish.
 
@@ -72,12 +72,6 @@ You don’t have to be an engineer to use an agentic coding tool. And if you wor
 
 If you’re a developer, you might already be in Delta. Next time your PM sends you a Google Doc, copy-paste it into a thread and [invite them in](https://delta.dev/docs/collaboration/collaborate-thread#share-a-thread). Make that the last copy-paste. They’ll thank you later.
 
-On this page
-
-1.  [How we work now](#how-we-work-now)
-2.  [Your teammates can see your prompts. Get over it.](#your-teammates-can-see-your-prompts-get-over-it)
-3.  [Goodbye, Google Docs](#goodbye-google-docs)
-
 ## More from the blog
 
 *   ### [Your plan.md is missing the conversation](/blog/planning-together-in-delta)
@@ -93,8 +87,4 @@ On this page
     ![Joseph Lyons](https://avatars.githubusercontent.com/u/19867440?v=4 "Joseph Lyons")Oct 7, 2026
     
 
-[Download Delta NowD](/download)[Open DeltaD](/threads)
-
-Zed Industries © 2026
-
-[Terms](https://zed.dev/terms)[Privacy](https://zed.dev/privacy)[Brand](/brand)
+[Download Delta Now](/download)[Open Delta](/threads)

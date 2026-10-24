@@ -13,8 +13,6 @@ skill_name = "mcp"
 
 # Specification
 
-<div id="enable-section-numbers" />
-
 [Model Context Protocol](https://modelcontextprotocol.io) (MCP) is an open protocol that
 enables seamless integration between LLM applications and external data sources and
 tools. Whether you're building an AI-powered IDE, enhancing a chat interface, or creating
@@ -85,16 +83,16 @@ Clients may offer the following features to servers:
 
 ### Extensions
 
-Beyond the core protocol, MCP defines optional [extensions](/extensions/overview)
+Beyond the core protocol, MCP defines optional [extensions](https://modelcontextprotocol.io/extensions/overview.md)
 that add modular, specialized, or experimental functionality. Extensions
 are always opt-in and require explicit support from both client and server, negotiated
 during initialization. Notable extensions include:
 
-* **[Tasks](/extensions/tasks/overview)**: Asynchronous execution of long-running
+* **[Tasks](https://modelcontextprotocol.io/extensions/tasks/overview.md)**: Asynchronous execution of long-running
   operations, with polling, mid-flight input, and durable handles
-* **[Skills over MCP](/community/working-groups/skills-over-mcp)**: Rich, structured
+* **[Skills over MCP](https://modelcontextprotocol.io/community/working-groups/skills-over-mcp.md)**: Rich, structured
   instructions for agent workflows, discovered and consumed through MCP
-* **[MCP Apps](/extensions/apps/overview)**: Interactive UI elements (charts, forms,
+* **[MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview.md)**: Interactive UI elements (charts, forms,
   video players) rendered inline within conversations
 
 ## Security and Trust & Safety
@@ -138,16 +136,14 @@ implementors **SHOULD**:
 
 Explore the detailed specification for each protocol component:
 
-<CardGroup cols={5}>
-  <Card title="Architecture" icon="sitemap" href="/specification/draft/architecture" />
+> **[Architecture](https://modelcontextprotocol.io/specification/draft/architecture.md)**
 
-  <Card title="Base Protocol" icon="code" href="/specification/draft/basic" />
+> **[Base Protocol](https://modelcontextprotocol.io/specification/draft/basic.md)**
 
-  <Card title="Server Features" icon="server" href="/specification/draft/server" />
+> **[Server Features](https://modelcontextprotocol.io/specification/draft/server.md)**
 
-  <Card title="Client Features" icon="user" href="/specification/draft/client" />
+> **[Client Features](https://modelcontextprotocol.io/specification/draft/client)**
 
-  <Card title="Contributing" icon="pencil" href="/community/contributing" />
-</CardGroup>
+> **[Contributing](https://modelcontextprotocol.io/community/contributing.md)**
 
 

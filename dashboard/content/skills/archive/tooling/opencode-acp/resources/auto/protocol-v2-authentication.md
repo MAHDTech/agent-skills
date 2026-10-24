@@ -18,12 +18,10 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 > Authenticating with agents and logging out
 
 ACP authentication is negotiated during
-[initialization](/protocol/v2/initialization). Agents advertise available
+[initialization](https://agentclientprotocol.com/protocol/v2/initialization.md). Agents advertise available
 authentication methods in `authMethods`. A non-empty list makes `auth/login`
 and `auth/logout` available, while each authentication method type defines
 whether the Client invokes `auth/login`.
-
-<br />
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -52,8 +50,6 @@ sequenceDiagram
 
     Note over Client,Agent: Authentication-gated requests require authentication again
 ```
-
-<br />
 
 ## Advertising Authentication
 
@@ -167,9 +163,9 @@ advertise support. Supplying `{}` means the Client can reproduce the configured
 Agent invocation in an interactive terminal. An Agent may advertise a
 `terminal` method only when this capability is present.
 
-See the [schema](/protocol/v2/schema#authmethod) for the full
+See the [schema](https://agentclientprotocol.com/protocol/v2/schema.md#authmethod) for the full
 `AuthMethod` definitions and the [Terminal Authentication
-RFD](/rfds/auth-methods) for the design.
+RFD](https://agentclientprotocol.com/rfds/auth-methods.md) for the design.
 
 ## Agent-handled authentication
 
@@ -188,10 +184,10 @@ method's ID:
 }
 ```
 
-<ParamField path="methodId" type="string" required>
-  The ID of an advertised authentication method whose type defines the
-  `auth/login` flow. Clients MUST NOT pass a `terminal` method.
-</ParamField>
+**methodId** `string` *required*
+
+The ID of an advertised authentication method whose type defines the
+`auth/login` flow. Clients MUST NOT pass a `terminal` method.
 
 On success, the Agent returns an empty result:
 
@@ -247,7 +243,7 @@ Successful authentication does not itself restart work that already ended.
 Resending the prompt inserts a new message and does not undo the original
 insertion or any tool side effects. Clients **SHOULD NOT** automatically resubmit
 an inserted prompt as though it had been rejected. See
-[Failures](/protocol/v2/prompt-lifecycle#failures).
+[Failures](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle.md#failures).
 
 ## Logging Out
 

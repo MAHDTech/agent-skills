@@ -17,11 +17,11 @@ The `mcp-inspector` binary is a launcher: it reads two flags of its own and forw
 
 Everything below belongs to a client.
 
-\<Note\>
-  The package also installs a second, separate bin, `mcpdo`, the experimental
-  [connection client](/docs/2026-07-28/tools/inspector/mcpdo). It is not reached
-  through the launcher and takes no mode flag.
-</Note>
+> [!NOTE]
+>
+> The package also installs a second, separate bin, `mcpdo`, the experimental
+> [connection client](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/mcpdo.md). It is not reached
+> through the launcher and takes no mode flag.
 
 ## Choosing servers
 
@@ -39,40 +39,40 @@ The CLI and TUI resolve `--catalog` and `--config` through the same shared code,
 
 The two are **mutually exclusive**, and neither combines with an ad-hoc target. Passing both is rejected identically by all three clients. The web client is stricter in one respect: it also rejects `--header` and `--protocol-era` alongside a file, where the CLI and TUI apply them on top of the file's settings.
 
-\<Note\>
-  **What a freshly seeded catalog contains depends on the client.** The web backend seeds three sample servers, so a first launch has something to connect to immediately:
+> [!NOTE]
+>
+> **What a freshly seeded catalog contains depends on the client.** The web backend seeds three sample servers, so a first launch has something to connect to immediately:
+>
+> ```json theme={null}
+> {
+>   "mcpServers": {
+>     "filesystem-server-default": {
+>       "type": "stdio",
+>       "command": "npx",
+>       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+>     },
+>     "everything-server-default": {
+>       "type": "stdio",
+>       "command": "npx",
+>       "args": ["-y", "@modelcontextprotocol/server-everything"]
+>     },
+>     "example-server-default": {
+>       "type": "streamable-http",
+>       "url": "https://example-server.modelcontextprotocol.io/mcp"
+>     }
+>   }
+> }
+> ```
+>
+> The CLI and TUI seed an empty `{ "mcpServers": {} }` instead: they are non-interactive or list-driven, so sample entries would be noise rather than a starting point.
+>
+> Either way, seeding happens only when the file does not exist yet, and a read-only `--config` is never seeded at all.
 
-  ```json theme={null}
-  {
-    "mcpServers": {
-      "filesystem-server-default": {
-        "type": "stdio",
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
-      },
-      "everything-server-default": {
-        "type": "stdio",
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-everything"]
-      },
-      "example-server-default": {
-        "type": "streamable-http",
-        "url": "https://example-server.modelcontextprotocol.io/mcp"
-      }
-    }
-  }
-  ```
-
-  The CLI and TUI seed an empty `{ "mcpServers": {} }` instead: they are non-interactive or list-driven, so sample entries would be noise rather than a starting point.
-
-  Either way, seeding happens only when the file does not exist yet, and a read-only `--config` is never seeded at all.
-</Note>
-
-\<Note\>
-  `--config` is what you want when pointing the Inspector at a config file you
-  didn't write: a coworker's, a client application's, or one checked into a
-  repo. It guarantees the Inspector will not touch the file.
-</Note>
+> [!NOTE]
+>
+> `--config` is what you want when pointing the Inspector at a config file you
+> didn't write: a coworker's, a client application's, or one checked into a
+> repo. It guarantees the Inspector will not touch the file.
 
 ### Ad-hoc targets
 
@@ -97,7 +97,7 @@ Defined **separately by each of web, CLI, and TUI**, so they're available in all
 | `--cwd \<path\>` | Working directory for a stdio server process. | None |
 | `-e <KEY=VALUE>` | Environment variables for a stdio server. Repeatable. | None |
 | `--header "Name: Value"` | HTTP headers for an HTTP/SSE server. Repeatable. | Requires an ad-hoc HTTP/SSE server on the web client. |
-| `--protocol-era \<era\>` | `legacy`, `auto`, or `modern`: the [protocol era](/docs/2026-07-28/tools/inspector/protocol-eras) to negotiate. | Requires an ad-hoc target on the web client. The CLI and TUI also let it override a file's `protocolEra`. |
+| `--protocol-era \<era\>` | `legacy`, `auto`, or `modern`: the [protocol era](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/protocol-eras.md) to negotiate. | Requires an ad-hoc target on the web client. The CLI and TUI also let it override a file's `protocolEra`. |
 | `--skill-catalog-max-skills \<n\>` / `--skill-catalog-max-bytes \<n\>` | Budget for a skills verification run (most skills, most bytes read). | **CLI and TUI only.** Overrides the file's `skillCatalogMaxSkills` / `skillCatalogMaxBytes`. |
 | `[target...]` | Positional command/URL for one ad-hoc server. | None |
 
@@ -137,7 +137,7 @@ These five are defined by the **CLI and TUI** only. The web client obtains the s
 
 ## CLI-only flags
 
-The whole scripting surface belongs to the CLI. See [CLI client](/docs/2026-07-28/tools/inspector/cli) for usage.
+The whole scripting surface belongs to the CLI. See [CLI client](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/cli.md) for usage.
 
 | Group | Flags |
 | - | - |
@@ -153,7 +153,7 @@ Environment variables split the same way as flags: two are read by the launcher 
 
 | Variable | Effect |
 | - | - |
-| `MCP_DEBUG` | Append the error stack to a top-level `--web` or `--tui` failure (a `--cli` failure always prints its [JSON error envelope](/docs/2026-07-28/tools/inspector/cli#exit-codes-and-error-envelopes) instead). Only when set to a meaningful value: `0`, `false`, and empty read as off. |
+| `MCP_DEBUG` | Append the error stack to a top-level `--web` or `--tui` failure (a `--cli` failure always prints its [JSON error envelope](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/cli.md#exit-codes-and-error-envelopes) instead). Only when set to a meaningful value: `0`, `false`, and empty read as off. |
 | `DEBUG` | Same, with the same meaningful-value rule, so a stray `DEBUG=0` doesn't turn stack traces on and `DEBUG` still works as the npm `debug` package's namespace filter. |
 
 ### CLI and TUI
@@ -173,7 +173,7 @@ Some of these are read by the web backend too, as the **Read by** column shows.
 
 | Variable | Effect |
 | - | - |
-| `MCP_INSPECTOR_API_TOKEN` | Pin the [session token](/docs/2026-07-28/tools/inspector/web#the-session-token) instead of generating a random one per launch. |
+| `MCP_INSPECTOR_API_TOKEN` | Pin the [session token](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/web.md#the-session-token) instead of generating a random one per launch. |
 | `DANGEROUSLY_OMIT_AUTH` | Disable the `/api/*` token check entirely. Only `true` or `1` turn it off. |
 | `HOST` | Bind host. Defaults to `127.0.0.1`. |
 | `CLIENT_PORT` | Web UI port. Defaults to `6274`. |
@@ -190,17 +190,17 @@ Some of these are read by the web backend too, as the **Read by** column shows.
 | `MCP_CATALOG_PATH`, `MCP_STORAGE_DIR` | As described under [CLI and TUI](#cli-and-tui). |
 | `HTTPS_PROXY` / `HTTP_PROXY` / `NO_PROXY` | Standard proxy routing for outbound MCP connections. |
 
-\<Warning\>
-  Never combine `DANGEROUSLY_OMIT_AUTH` and `DANGEROUSLY_BIND_ALL_INTERFACES`.
-  The web backend spawns processes and holds OAuth tokens, so anyone who can
-  reach it can drive it.
-</Warning>
+> [!WARNING]
+>
+> Never combine `DANGEROUSLY_OMIT_AUTH` and `DANGEROUSLY_BIND_ALL_INTERFACES`.
+> The web backend spawns processes and holds OAuth tokens, so anyone who can
+> reach it can drive it.
 
-What the token does and does not protect is laid out under [The web backend and its API token](/docs/2026-07-28/tools/inspector/security#the-web-backend-and-its-api-token).
+What the token does and does not protect is laid out under [The web backend and its API token](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/security.md#the-web-backend-and-its-api-token).
 
 ### Secret store variables
 
-Read by **every** client: web, CLI, TUI, and [mcpdo](/docs/2026-07-28/tools/inspector/mcpdo). How they combine is described under [Where secrets are stored](#where-secrets-are-stored).
+Read by **every** client: web, CLI, TUI, and [mcpdo](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/mcpdo.md). How they combine is described under [Where secrets are stored](#where-secrets-are-stored).
 
 | Variable | Effect |
 | - | - |
@@ -239,19 +239,19 @@ Each process picks one store, once, the first time it needs it: the web backend 
 | Container with **no volume** on the secrets directory | Memory | No, this session only |
 | Container **with** a volume on the secrets directory | File | Yes |
 
-\<Warning\>
-  **With no keychain, secrets go to a plaintext file, and you did not have to ask for it.** On a host where the keychain probe fails (Linux without libsecret or a running Secret Service, a headless server or SSH session with no D-Bus session, Android/Termux), the Inspector **automatically** stores secrets in `~/.mcp-inspector/secrets.json`. Unless you supply a key, that file is **unencrypted**. Mode `0600` keeps out other non-root users, but not root, not backups or copies of your home directory, and not any program running as you, including the stdio servers the Inspector starts.
+> [!WARNING]
+>
+> **With no keychain, secrets go to a plaintext file, and you did not have to ask for it.** On a host where the keychain probe fails (Linux without libsecret or a running Secret Service, a headless server or SSH session with no D-Bus session, Android/Termux), the Inspector **automatically** stores secrets in `~/.mcp-inspector/secrets.json`. Unless you supply a key, that file is **unencrypted**. Mode `0600` keeps out other non-root users, but not root, not backups or copies of your home directory, and not any program running as you, including the stdio servers the Inspector starts.
+>
+> Pick one:
+>
+> * **Get a keychain back:** install libsecret and run a Secret Service (for example `gnome-keyring`), or run the Inspector inside a desktop session. On the next start the Inspector moves the file's secrets into the keychain and deletes the file.
+> * **Encrypt the file:** supply a generated key with `MCP_INSPECTOR_SECRET_KEY_FILE` (preferred) or `MCP_INSPECTOR_SECRET_KEY`.
+> * **Don't write secrets to disk at all:** `MCP_INSPECTOR_SECRET_STORE=memory`, and re-enter them each session.
+>
+> Even encrypted, secrets on disk carry moderate risk. See [what the file store protects against](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/security.md#what-the-file-store-protects-against).
 
-  Pick one:
-
-  * **Get a keychain back:** install libsecret and run a Secret Service (for example `gnome-keyring`), or run the Inspector inside a desktop session. On the next start the Inspector moves the file's secrets into the keychain and deletes the file.
-  * **Encrypt the file:** supply a generated key with `MCP_INSPECTOR_SECRET_KEY_FILE` (preferred) or `MCP_INSPECTOR_SECRET_KEY`.
-  * **Don't write secrets to disk at all:** `MCP_INSPECTOR_SECRET_STORE=memory`, and re-enter them each session.
-
-  Even encrypted, secrets on disk carry moderate risk. See [what the file store protects against](/docs/2026-07-28/tools/inspector/security#what-the-file-store-protects-against).
-</Warning>
-
-[mcpdo](/docs/2026-07-28/tools/inspector/mcpdo) never falls back to `memory`: its commands and its daemon are separate processes, so it uses the file store instead.
+[mcpdo](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/mcpdo.md) never falls back to `memory`: its commands and its daemon are separate processes, so it uses the file store instead.
 
 ### The file store
 
@@ -296,7 +296,7 @@ A catalog or config file is the familiar MCP client config shape (a `mcpServers`
 }
 ```
 
-Fields that equal their default are omitted when the Inspector writes the file back, keeping diffs minimal. `protocolEra` (see [Protocol eras](/docs/2026-07-28/tools/inspector/protocol-eras)) defaults to `legacy` and `modernLogLevel` to `debug`.
+Fields that equal their default are omitted when the Inspector writes the file back, keeping diffs minimal. `protocolEra` (see [Protocol eras](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/protocol-eras.md)) defaults to `legacy` and `modernLogLevel` to `debug`.
 
-You do not have to hand-write these; the web client can [import an existing client config](/docs/2026-07-28/tools/inspector/recipes#importing-an-existing-client-config) from Claude Desktop, Cursor, Cline, or VS Code, or a registry `server.json`.
+You do not have to hand-write these; the web client can [import an existing client config](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/recipes.md#importing-an-existing-client-config) from Claude Desktop, Cursor, Cline, or VS Code, or a registry `server.json`.
 

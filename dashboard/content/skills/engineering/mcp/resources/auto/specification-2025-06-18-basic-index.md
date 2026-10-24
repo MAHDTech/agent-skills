@@ -13,8 +13,6 @@ skill_name = "mcp"
 
 # Overview
 
-<div id="enable-section-numbers" />
-
 The Model Context Protocol consists of several key components that work together:
 
 * **Base Protocol**: Core JSON-RPC message types
@@ -105,7 +103,7 @@ The receiver **MUST NOT** send a response.
 
 ## Auth
 
-MCP provides an [Authorization](/specification/2025-06-18/basic/authorization) framework for use with HTTP.
+MCP provides an [Authorization](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization.md) framework for use with HTTP.
 Implementations using an HTTP-based transport **SHOULD** conform to this specification,
 whereas implementations using STDIO transport **SHOULD NOT** follow this specification,
 and instead retrieve credentials from the environment.

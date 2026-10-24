@@ -167,6 +167,7 @@ Values can be resolved from: keyring (default), KeePass KDBX (0.17+), dotenv fil
 - [Providers Reference](https://secretspec.dev/reference/providers/index.md): Complete reference for SecretSpec storage providers and their URI configurations
 - [Secret Resolution Protocol](https://secretspec.dev/reference/resolver-protocol/index.md): Version 1 IPC contract between an SDK or application and the SecretSpec resolver
 - [C# SDK](https://secretspec.dev/sdk/csharp/index.md): Resolve SecretSpec secrets from C# and .NET
+- [Elixir SDK](https://secretspec.dev/sdk/elixir/index.md): Resolve SecretSpec secrets from Elixir
 - [Go SDK](https://secretspec.dev/sdk/go/index.md): Resolve SecretSpec secrets from Go
 - [Haskell SDK](https://secretspec.dev/sdk/haskell/index.md): Resolve SecretSpec secrets from Haskell
 - [JVM SDK](https://secretspec.dev/sdk/jvm/index.md): Resolve SecretSpec secrets from Java Virtual Machine languages

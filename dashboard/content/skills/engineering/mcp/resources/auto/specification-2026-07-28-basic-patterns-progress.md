@@ -13,8 +13,6 @@ skill_name = "mcp"
 
 # Progress
 
-<div id="enable-section-numbers" />
-
 The Model Context Protocol (MCP) supports optional progress tracking for long-running
 operations through notification messages. The server **MAY** send progress notifications
 to report the status of requests the client has issued.

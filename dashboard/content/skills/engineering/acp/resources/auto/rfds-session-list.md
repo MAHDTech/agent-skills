@@ -284,7 +284,7 @@ No, for several reasons:
 
 ### What about session deletion?
 
-Session deletion is intentionally left out of this RFD to keep scope focused. It is covered separately by the [Session Delete RFD](/rfds/session-delete) and the [`session/delete`](/protocol/v1/session-delete) method.
+Session deletion is intentionally left out of this RFD to keep scope focused. It is covered separately by the [Session Delete RFD](https://agentclientprotocol.com/rfds/session-delete.md) and the [`session/delete`](https://agentclientprotocol.com/protocol/v1/session-delete) method.
 
 ### How should pagination work for large session lists?
 

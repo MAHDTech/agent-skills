@@ -13,8 +13,6 @@ skill_name = "mcp"
 
 # Ping
 
-<div id="enable-section-numbers" />
-
 The Model Context Protocol includes an optional ping mechanism that allows either party
 to verify that their counterpart is still responsive and the connection is alive.
 

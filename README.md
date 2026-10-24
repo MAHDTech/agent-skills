@@ -103,6 +103,7 @@ devenv --no-tui test
 - [dashboard](docs/dashboard.md)
 - [install](docs/install.md)
 - [usage](docs/usage.md)
+- [vendor-skills](docs/vendor-skills.md)
 
 ## Available Skills
 
@@ -231,3 +232,29 @@ Autonomous software factory and persistent goal workflows.
 
 - **[tars-goal](skills/tars/tars-goal/SKILL.md)** - Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly asks to establish or resume a persistent goal.
 - **[tars-run-factory](skills/tars/tars-run-factory/SKILL.md)** - Run the TARS software factory unattended over one repository's backlog. The agent becomes the foreman: it drives the Antigravity CLI (agy) headlessly through batch runs, peer reviews, and rework until the backlog drains or a human is needed.
+
+### Vendor Skills
+
+#### cloudflare
+
+Skills maintained by this vendor.
+
+- **[agents-sdk](skills/vendor/cloudflare/agents-sdk/SKILL.md)** - Build, debug, or review Cloudflare Agents SDK applications using the agents package.
+- **[basin](skills/vendor/cloudflare/basin/SKILL.md)** - Build and troubleshoot Cloudflare Basin analytics workflows with Basin Pipelines, Basin Catalog, and Basin SQL. Use for streaming data into R2 Iceberg tables, managing catalogs, or querying those tables; also use for requests using the former Data Platform, Pipelines, R2 Data Catalog, or R2 SQL names.
+- **[cf-cli](skills/vendor/cloudflare/cf-cli/SKILL.md)** - Cloudflare's official cf CLI (beta) for the public Cloudflare API and Workers projects. Use for finding and running Cloudflare commands from the terminal — sign-in and profiles, cf cli search, cf schema, cf deploy/dev/build, resource commands for DNS, zones, D1, KV, and R2 — and for choosing between cf and Wrangler in a project.
+- **[cloudflare](skills/vendor/cloudflare/cloudflare/SKILL.md)** - Discover and choose Cloudflare products for apps, APIs, AI agents, storage, networking, and security. Use for architecture and product selection, including when the user describes a need without naming a Cloudflare product; then find the relevant skill or documentation.
+- **[cloudflare-email-service](skills/vendor/cloudflare/cloudflare-email-service/SKILL.md)** - Implement or troubleshoot Cloudflare Email Sending and Email Routing integrations and their delivery configuration.
+- **[cloudflare-one](skills/vendor/cloudflare/cloudflare-one/SKILL.md)** - Design, configure, troubleshoot, or review Cloudflare One Zero Trust and SASE deployments. Use cloudflare-one-migrations for migration planning from other vendors.
+- **[cloudflare-one-migrations](skills/vendor/cloudflare/cloudflare-one-migrations/SKILL.md)** - Assess and plan migrations from existing VPN, SWG, or SASE platforms to Cloudflare One, including policy mapping, parity gaps, and rollout.
+- **[durable-objects](skills/vendor/cloudflare/durable-objects/SKILL.md)** - Build, debug, or review Cloudflare Durable Objects code for persistent state and coordination.
+- **[gateway-workers](skills/vendor/cloudflare/gateway-workers/SKILL.md)** - Build, debug, or review Cloudflare Workers invoked by the Forward action in Gateway HTTP policies, including the GatewayMiddleware entrypoint, Gateway types, context, and continuation.
+- **[k2](skills/vendor/cloudflare/k2/SKILL.md)** - Build and troubleshoot Cloudflare K2 or K2 Streams durable logs. Use for stream setup, producing from Workers or HTTP, configuring retention and inputs, and consuming through subscriptions.
+- **[nextjs-on-cloudflare](skills/vendor/cloudflare/nextjs-on-cloudflare/SKILL.md)** - Build, migrate, and deploy Next.js apps on Cloudflare Workers with vinext. Use when starting a Next.js project on Cloudflare, moving an existing app to Workers, choosing between vinext and OpenNext, or setting up vinext for Workers. For setup, migration, or deployment, install vinext's upstream skills with `npx skills add cloudflare/vinext` if missing, then read and follow the applicable skill and docs.
+- **[sandbox-migrate-to-next](skills/vendor/cloudflare/sandbox-migrate-to-next/SKILL.md)** - Migrate Cloudflare Sandbox apps from stable @cloudflare/sandbox to @cloudflare/sandbox@next (SDK 1.0 preview). Use sandbox-next for apps already on the preview.
+- **[sandbox-next](skills/vendor/cloudflare/sandbox-next/SKILL.md)** - Build or maintain Cloudflare Sandbox apps on @cloudflare/sandbox@next (SDK 1.0 preview). Use sandbox-migrate-to-next when porting a stable app.
+- **[sandbox-stable](skills/vendor/cloudflare/sandbox-stable/SKILL.md)** - Build or maintain Cloudflare Sandbox apps on the stable @cloudflare/sandbox package. Use sandbox-next for preview apps and sandbox-migrate-to-next for stable-to-preview migrations.
+- **[turnstile-spin](skills/vendor/cloudflare/turnstile-spin/SKILL.md)** - Set up, repair, or migrate to Cloudflare Turnstile bot verification in an existing frontend and backend, including server-side Siteverify.
+- **[web-perf](skills/vendor/cloudflare/web-perf/SKILL.md)** - Audit, diagnose, or optimize website loading and interaction performance, Core Web Vitals, and Lighthouse performance scores.
+- **[workers-best-practices](skills/vendor/cloudflare/workers-best-practices/SKILL.md)** - Cloudflare Workers best practices for production applications. Use when writing, reviewing, or configuring Workers.
+- **[workers-profiling](skills/vendor/cloudflare/workers-profiling/SKILL.md)** - Profile or debug CPU usage and memory allocation in deployed Cloudflare Workers and Durable Objects. Then use this information to optimize your code.
+- **[wrangler](skills/vendor/cloudflare/wrangler/SKILL.md)** - Run or troubleshoot Wrangler CLI commands in projects that have a wrangler.jsonc, wrangler.json, or wrangler.toml file, including local development, Previews, deployment, and resource management. For new projects and projects without a Wrangler configuration file, use the cf CLI instead.

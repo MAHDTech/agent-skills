@@ -39,38 +39,38 @@ We have had a fairly successful time adding new features via new capabilities an
 
 Current RFDs with active maintainer focus that are targeting the v2 release:
 
-* [Remote Transports](../streamable-http-websocket-transport.mdx)
-* [New Prompt Lifecycle](./prompt.mdx)
-* [Enum Variant Extension](./enum-variant-extension.mdx)
-* [Client Filesystem and Terminal Execution Surface](./client-filesystem-terminal-capabilities.mdx)
-* [Plan Variants](./plan-variants.mdx)
-* [Tool Call Updates](./tool-call-updates.mdx)
-* [Message Updates and Chunks](./message-updates.mdx)
-* [Permission Requests](./permission-requests.mdx)
-* [Required Session Methods](./required-session-methods.mdx)
-* [Session Resume Replay](./session-resume-replay.mdx)
-* [Diff File States](./diff-file-states.mdx)
-* [Terminal Output](./terminal-output.mdx)
-* [Metadata Patches](./meta-patches.mdx)
+* [Remote Transports](https://agentclientprotocol.com/rfds/streamable-http-websocket-transport.md)
+* [New Prompt Lifecycle](https://agentclientprotocol.com/rfds/v2/prompt.md)
+* [Enum Variant Extension](https://agentclientprotocol.com/rfds/v2/enum-variant-extension.md)
+* [Client Filesystem and Terminal Execution Surface](https://agentclientprotocol.com/rfds/v2/client-filesystem-terminal-capabilities.md)
+* [Plan Variants](https://agentclientprotocol.com/rfds/v2/plan-variants.md)
+* [Tool Call Updates](https://agentclientprotocol.com/rfds/v2/tool-call-updates.md)
+* [Message Updates and Chunks](https://agentclientprotocol.com/rfds/v2/message-updates.md)
+* [Permission Requests](https://agentclientprotocol.com/rfds/v2/permission-requests.md)
+* [Required Session Methods](https://agentclientprotocol.com/rfds/v2/required-session-methods.md)
+* [Session Resume Replay](https://agentclientprotocol.com/rfds/v2/session-resume-replay.md)
+* [Diff File States](https://agentclientprotocol.com/rfds/v2/diff-file-states.md)
+* [Terminal Output](https://agentclientprotocol.com/rfds/v2/terminal-output.md)
+* [Metadata Patches](https://agentclientprotocol.com/rfds/v2/meta-patches.md)
 
 Other RFDs will progress separately and are not dependent on breaking changes (specifically the new prompt lifecycle) and can land in either or both v1 and v2.
 
 ### v2 Changes
 
 * Remove the dedicated session modes API from v2. This includes the `modes` session response fields, `session/set_mode`, `current_mode_update`, and the `SessionMode*` types.
-* Agents should expose mode-like and model-related state through [Session Config Options](../session-config-options.mdx) instead of dedicated mode or model selector APIs.
+* Agents should expose mode-like and model-related state through [Session Config Options](https://agentclientprotocol.com/rfds/session-config-options.md) instead of dedicated mode or model selector APIs.
 * Remove the v1 Client filesystem and terminal execution surface from v2. This includes `clientCapabilities.fs`, the top-level `clientCapabilities.terminal` field, `fs/*` methods, `terminal/*` methods, and the Client-owned semantics of v1 terminal tool-call content. Terminal authentication remains separate under `capabilities.auth.terminal`.
-* Add [Agent-owned, display-only terminal output](./terminal-output.mdx). Tool calls reference terminals by `terminalId`; terminal upserts carry `command`, absolute `cwd`, replay snapshots, and exit status; terminal output chunks append independently base64-encoded bytes. The display surface is baseline v2 and does not add Client execution or control methods.
-* Make [plan variants](./plan-variants.mdx) the default v2 plan shape by replacing the old `plan` session update with item-based `plan_update`.
-* Replace the v1 split between `tool_call` and `tool_call_update` with a single [tool-call update](./tool-call-updates.mdx) upsert shape keyed by `toolCallId`.
-* Add [tool-call content chunks](./tool-call-updates.mdx) so Agents can stream individual `ToolCallContent` items that append to a tool call.
-* Replace the v1 `Diff` `oldText` / `newText` shape with [diff file states](./diff-file-states.mdx): optional Git `--patch` text (`git_patch`) plus structured file operations for add, delete, modify, move, copy, and non-text changes.
-* Make [permission requests](./permission-requests.mdx) carry a required prompt `title` and optional extensible `subject` tagged union. Tool-call permissions use `subject.type: "tool_call"` with the same `ToolCallUpdate` payload shape as session updates, command permissions use `subject.type: "command"` with the command, required absolute working directory, and optional display associations, and subject-less permissions rely on the common prompt fields.
-* Add [whole-message updates](./message-updates.mdx) for `user_message`, `agent_message`, and `agent_thought` alongside streamed chunks. Message updates are upserts keyed by `messageId`; their `content` arrays replace current message content, while chunks append to the current content.
-* Apply the top-level `_meta` of upsert updates as a [metadata patch](./meta-patches.mdx): omission leaves it unchanged, `null` clears it, and an object patches stored metadata by top-level key, where a key set to `null` is removed and any other value replaces that key whole.
-* Require [message IDs](../message-id.mdx) on streamed message chunks.
-* Acknowledge [prompt insertion](./prompt.mdx) by returning the inserted user message's `messageId` from `session/prompt`, without waiting for foreground work to finish. Live user-message updates use the same ID; retention remains optional.
-* Report [failures after prompt insertion](./prompt.mdx#report-failures-after-insertion) by ending foreground work with an idle `state_update` whose `stopReason` is `error`, carrying an optional JSON-RPC error object. A JSON-RPC error on `session/prompt` always means the message was not inserted.
+* Add [Agent-owned, display-only terminal output](https://agentclientprotocol.com/rfds/v2/terminal-output.md). Tool calls reference terminals by `terminalId`; terminal upserts carry `command`, absolute `cwd`, replay snapshots, and exit status; terminal output chunks append independently base64-encoded bytes. The display surface is baseline v2 and does not add Client execution or control methods.
+* Make [plan variants](https://agentclientprotocol.com/rfds/v2/plan-variants.md) the default v2 plan shape by replacing the old `plan` session update with item-based `plan_update`.
+* Replace the v1 split between `tool_call` and `tool_call_update` with a single [tool-call update](https://agentclientprotocol.com/rfds/v2/tool-call-updates.md) upsert shape keyed by `toolCallId`.
+* Add [tool-call content chunks](https://agentclientprotocol.com/rfds/v2/tool-call-updates.md) so Agents can stream individual `ToolCallContent` items that append to a tool call.
+* Replace the v1 `Diff` `oldText` / `newText` shape with [diff file states](https://agentclientprotocol.com/rfds/v2/diff-file-states.md): optional Git `--patch` text (`git_patch`) plus structured file operations for add, delete, modify, move, copy, and non-text changes.
+* Make [permission requests](https://agentclientprotocol.com/rfds/v2/permission-requests.md) carry a required prompt `title` and optional extensible `subject` tagged union. Tool-call permissions use `subject.type: "tool_call"` with the same `ToolCallUpdate` payload shape as session updates, command permissions use `subject.type: "command"` with the command, required absolute working directory, and optional display associations, and subject-less permissions rely on the common prompt fields.
+* Add [whole-message updates](https://agentclientprotocol.com/rfds/v2/message-updates.md) for `user_message`, `agent_message`, and `agent_thought` alongside streamed chunks. Message updates are upserts keyed by `messageId`; their `content` arrays replace current message content, while chunks append to the current content.
+* Apply the top-level `_meta` of upsert updates as a [metadata patch](https://agentclientprotocol.com/rfds/v2/meta-patches.md): omission leaves it unchanged, `null` clears it, and an object patches stored metadata by top-level key, where a key set to `null` is removed and any other value replaces that key whole.
+* Require [message IDs](https://agentclientprotocol.com/rfds/message-id.md) on streamed message chunks.
+* Acknowledge [prompt insertion](https://agentclientprotocol.com/rfds/v2/prompt.md) by returning the inserted user message's `messageId` from `session/prompt`, without waiting for foreground work to finish. Live user-message updates use the same ID; retention remains optional.
+* Report [failures after prompt insertion](https://agentclientprotocol.com/rfds/v2/prompt.md#report-failures-after-insertion) by ending foreground work with an idle `state_update` whose `stopReason` is `error`, carrying an optional JSON-RPC error object. A JSON-RPC error on `session/prompt` always means the message was not inserted.
 * Follow JSON-RPC 2.0 batch request and notification behavior.
 * Clean up capability naming and organization:
   * Use a single `capabilities` field in both `initialize` params and results, replacing the v1-style `clientCapabilities` and `agentCapabilities` fields.
@@ -79,7 +79,7 @@ Other RFDs will progress separately and are not dependent on breaking changes (s
   * Use concise capability group names such as `session` and `auth`, replacing names like `sessionCapabilities`.
   * Make `session` optional so Agents that only expose non-session method surfaces can omit it.
   * Require the baseline session lifecycle methods when `session` is present: `session/new`, `session/list`, `session/resume`, `session/close`, `session/prompt`, `session/cancel`, and `session/update`.
-  * Remove `session/load` from v2. `session/resume` handles both no-replay resume and full replay by using the optional `replayFrom` cursor from the [Session Resume Replay](./session-resume-replay.mdx) RFD.
+  * Remove `session/load` from v2. `session/resume` handles both no-replay resume and full replay by using the optional `replayFrom` cursor from the [Session Resume Replay](https://agentclientprotocol.com/rfds/v2/session-resume-replay.md) RFD.
   * Move optional session-scoped capability groups under `session`, including `prompt` and `mcp` as `session.prompt` and `session.mcp`.
   * Represent support markers as capability objects instead of booleans. Supplying `{}` means supported, while omission or `null` means unsupported. Booleans remain appropriate for actual data or configuration inside an already-advertised capability.
 * Align MCP server transports with the current MCP transport model:

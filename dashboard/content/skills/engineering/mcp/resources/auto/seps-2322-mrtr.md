@@ -15,23 +15,17 @@ skill_name = "mcp"
 
 > Multi Round-Trip Requests
 
-<div className="flex items-center gap-2 mb-4">
-  <Badge color="green" shape="pill">
-    Final
-  </Badge>
+Final
 
-  <Badge color="gray" shape="pill">
-    Standards Track
-  </Badge>
-</div>
+Standards Track
 
-\<Note\>
-  This SEP has reached Final status and is preserved as a historical record of
-  the design as accepted. Changes made to the protocol after finalization are
-  not reflected here. Refer to the [current
-  specification](/specification/latest) and its changelog for authoritative
-  requirements.
-</Note>
+> [!NOTE]
+>
+> This SEP has reached Final status and is preserved as a historical record of
+> the design as accepted. Changes made to the protocol after finalization are
+> not reflected here. Refer to the [current
+> specification](https://modelcontextprotocol.io/specification/latest.md) and its changelog for authoritative
+> requirements.
 
 | Field | Value |
 | - | - |
@@ -389,7 +383,7 @@ tools and another for persistent tools.
 ### Server-Initiated Request Support for Client Requests
 
 Many `ClientRequest` don't have clear use cases where a Server would need to
-request more information from the Client. This SEP builds upon [SEP-2260](https://modelcontextprotocol.io/seps/2260-Require-Server-requests-to-be-associated-with-Client-requests) and further restricts when a Server can send a Server-Initiated Request to the Client.
+request more information from the Client. This SEP builds upon [SEP-2260](https://modelcontextprotocol.io/seps/2260-Require-Server-requests-to-be-associated-with-Client-requests.md) and further restricts when a Server can send a Server-Initiated Request to the Client.
 
 Servers MAY send `InputRequiredResult` responses on the following Client Requests:
 
@@ -474,7 +468,7 @@ be used for any other request that the client may be sending in parallel
 
 \<details\>
   \<summary\>Click to expand Example Flow for Ephemeral Tools</summary>
-  <b>Example Flow for Ephemeral Tools</b>
+  **Example Flow for Ephemeral Tools**
 
   Note: This is a contrived example, just to illustrate the flow.
 
@@ -944,7 +938,7 @@ The above workflow and below example do not leverage any of the optional Task St
 
   The below example walks through the entire Task Message flow for a Echo Tool which can request additional information from the client via Elicitation.
 
-  1. <b>Client Request</b> to invoke EchoTool.
+  1. **Client Request** to invoke EchoTool.
 
   ```json theme={null}
   {
@@ -960,7 +954,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  2. <b>Server Response</b> with a `Task`
+  2. **Server Response** with a `Task`
 
   ```json theme={null}
   {
@@ -980,7 +974,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  3. <b>Client Request</b> periodically checks the status of the `Task` using
+  3. **Client Request** periodically checks the status of the `Task` using
      `tasks/get`.
 
   ```json theme={null}
@@ -994,7 +988,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  4. <b>Server Response</b> with Task status `input_required`
+  4. **Server Response** with Task status `input_required`
 
   ```json theme={null}
   {
@@ -1012,7 +1006,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  5. <b>Client Request</b> sends message `tasks/result` to discover what input is
+  5. **Client Request** sends message `tasks/result` to discover what input is
      required to proceed.
 
   ```json theme={null}
@@ -1026,7 +1020,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  6. <b>Server Response</b> returns `inputRequests` to request additional input
+  6. **Server Response** returns `inputRequests` to request additional input
 
   ```json theme={null}
   {
@@ -1059,7 +1053,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  7. <b>Client Request</b> presents the Elicitation to the user and collects the
+  7. **Client Request** presents the Elicitation to the user and collects the
      input, then sends message to the server.
 
   ```json theme={null}
@@ -1085,7 +1079,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  8. <b>Server Response</b> Server should acknowledge the receipt of the
+  8. **Server Response** Server should acknowledge the receipt of the
      'tasks/input\_response' message by sending a 'JSONRPCResponse'. If the message
      was successfully received a `JSONRPCResultResponse` is sent including the
      `taskId`. If an error occurs, a `JSONRPCErrorResponse` is sent. The server
@@ -1106,7 +1100,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  9. <b>Client Request</b> continues to poll the input status using `tasks/get`
+  9. **Client Request** continues to poll the input status using `tasks/get`
      until server responds with Task Status of `Completed`
 
   ```json theme={null}
@@ -1120,7 +1114,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  10. <b>Server Response</b> with Task status `completed`
+  10. **Server Response** with Task status `completed`
 
   ```json theme={null}
   {
@@ -1138,7 +1132,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  11. <b>Client Request</b> calls `tasks/result` to get the final result of the
+  11. **Client Request** calls `tasks/result` to get the final result of the
       `Task` from the server.
 
   ```json theme={null}
@@ -1152,7 +1146,7 @@ The above workflow and below example do not leverage any of the optional Task St
   }
   ```
 
-  12. <b>Server Response</b> with the final result of the `Task`
+  12. **Server Response** with the final result of the `Task`
 
   ```json theme={null}
   {
@@ -1287,7 +1281,7 @@ In the ephemeral workflow, this would look like the following:
 2. The Server responds with an incomplete response, indicating that the client needs to provide missing information for the request to succeed.
 
 In the persistent workflow, this would look like the following:
-Step 7 from above: <b>Client Request</b> The client mistakenly or maliciously sends unexpected, but well-formed data to the server in response to the input request.
+Step 7 from above: **Client Request** The client mistakenly or maliciously sends unexpected, but well-formed data to the server in response to the input request.
 
 ```json theme={null}
 {
@@ -1312,7 +1306,7 @@ Step 7 from above: <b>Client Request</b> The client mistakenly or maliciously se
 }
 ```
 
-Step 8 from above. <b>Server Response</b> Server acknowledges the receipt of the response by sending a `JSONRPCResultResponse`. However, since the response is missing required information, the server does not proceed with processing the task and leaves the Task status as `input_required`. The next time the client calls `tasks/result`, the server responds with a new `inputRequest` requesting the necessary information again.
+Step 8 from above. **Server Response** Server acknowledges the receipt of the response by sending a `JSONRPCResultResponse`. However, since the response is missing required information, the server does not proceed with processing the task and leaves the Task status as `input_required`. The next time the client calls `tasks/result`, the server responds with a new `inputRequest` requesting the necessary information again.
 
 ```json theme={null}
 {

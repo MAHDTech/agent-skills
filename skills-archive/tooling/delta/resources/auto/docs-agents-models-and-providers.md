@@ -153,7 +153,7 @@ If a connection fails:
 *   **Check the model ID and limits.** Use the identifier and token limits supported by your endpoint.
 *   **For local servers, check that the server is running** and reachable from the computer running Delta.
 
-If model discovery finds nothing, try adding the model manually.
+Delta discovers models when you change the connection settings. To retry discovery, click **Fetch Models** next to **Add model**. To start over with an empty list, click **Clear All Models**. Both changes take effect when you save the provider. If discovery finds nothing, add the model manually.
 
 ## [Model roles](#model-roles)
 
@@ -169,6 +169,8 @@ You can switch which model a thread uses at any point; the conversation continue
 
 For models that support extended thinking, the model picker has a **Thinking** toggle and a **Thinking Effort** menu. Thinking starts enabled in new threads. Higher effort suits harder problems at the cost of speed. Delta remembers the default you choose for each model and applies it to new threads too.
 
+Some models require thinking at certain effort levels. At those levels, the **Thinking** toggle stays on, and hovering over it explains why. Select a lower effort level to make thinking optional.
+
 [In a shared thread](/docs/collaboration/collaborate-thread), each participant reaches the thread’s model through their own providers: if you lack the exact provider a collaborator chose, Delta uses the equivalent model from a provider you do have when one is available. Otherwise, the selector marks the recorded model as unavailable. You can keep reading and commenting, but sending asks you to select an available model first.
 
 ### [Automatic fallback](#automatic-fallback)
@@ -183,7 +185,9 @@ Click the circular context-usage indicator beside the send controls to open **Co
 
 Choose **View Context Breakdown** to inspect how much of the prompt is used by instructions, messages, thinking, and tools when that information is available. The breakdown shows sizes in bytes and their share of the prompt, not token counts or cost.
 
-Choose **Compact Now** from **Context Window** to compact the current thread. On desktop, it is also available from the command palette. Delta explains when manual compaction is unavailable, for example while a response is generating or when there is too little conversation to compact. If compaction fails, use **Retry** to try again without losing the conversation.
+Choose **Compact Now** from **Context Window** to compact the current thread. On desktop, it is also available from the command palette. You can request compaction while Delta’s agent is responding on your computer; Delta queues the request for the running turn.
+
+Delta explains when manual compaction is unavailable, for example when the agent is running elsewhere, you are editing an earlier message, or there is too little conversation to compact. If compaction fails, use **Retry** to try again without losing the conversation.
 
 If the provider does not support native compaction, Delta asks the model to write a portable conversation summary. Native compaction behaves differently across providers:
 
