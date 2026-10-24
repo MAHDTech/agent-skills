@@ -23,6 +23,7 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 ## Development
 
+- Use Conventional Commits for both PR titles and commit messages: `type(scope): description`, with an optional scope and `!` before the colon for breaking changes. Use lowercase types such as `feat`, `fix`, `docs`, `refactor`, `test`, `ci`, or `chore`. For example: `fix: Enable CRAP baseline and badge recording`. Apply this format to automated PRs as well.
 - Environment: This project requires `devenv`. Always check if `devenv` is active. Run ad-hoc commands inside the devenv shell with `devenv --no-tui shell -- <command>`.
 - ⚠️ **CRITICAL WARNING**: Always pass the `--no-tui` flag when running `devenv` commands (e.g., `devenv --no-tui shell`, `devenv --no-tui test`) in automated or AI agent environments to disable the interactive terminal interface and prevent commands from getting stuck.
 - **CRITICAL LINTING RULE:** NEVER run individual linters directly (e.g., `devenv --no-tui shell -- markdownlint .`). All linters and pre-commit hooks (managed via `prek`, see the [prek](skills/tooling/prek/SKILL.md) skill) MUST be configured and run inside `devenv.nix`.

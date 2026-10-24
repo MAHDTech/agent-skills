@@ -54,7 +54,7 @@ jobs:
           token: ${{ steps.token.outputs.token }}
           branch: automation/vendor-skills
           base: ${{ github.event.repository.default_branch }}
-          title: "[CHORE] Update vendor skills"
+          title: "chore(skills): Update vendor skills"
           commit-message: "chore(skills): refresh vendor snapshots"
           body-path: ${{ runner.temp }}/vendor-update.md
           add-paths: |
