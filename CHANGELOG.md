@@ -1,9 +1,17 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.53](https://github.com/MAHDTech/agent-skills/compare/v0.1.52...10f4d6c17e77a4a5dd30ec3398d422235348c5e5) (2026-10-23)
+## [v0.1.54](https://github.com/MAHDTech/agent-skills/compare/v0.1.53...ac4dbfdedec9d915b23d932dab3b4fe762084a39) (2026-10-24)
 
-### Fixes
+### Features
+
+* Add declarative vendor skills (#240)
+([ac4dbfd](https://github.com/MAHDTech/agent-skills/commit/ac4dbfdedec9d915b23d932dab3b4fe762084a39)),
+closes [#240](https://github.com/MAHDTech/agent-skills/issues/240)
+
+### [v0.1.53](https://github.com/MAHDTech/agent-skills/compare/v0.1.52...v0.1.53) (2026-10-24)
+
+#### Fixes
 
 * upgrade Rust dependencies and support sha2 0.11 (#238)
 ([10f4d6c](https://github.com/MAHDTech/agent-skills/commit/10f4d6c17e77a4a5dd30ec3398d422235348c5e5)),
