@@ -188,7 +188,10 @@ in
       deadnix.enable = true;
       editorconfig-checker = {
         enable = true;
-        excludes = [ "^skills/vendor/" ];
+        excludes = [
+          "\\.lock$"
+          "^skills/vendor/"
+        ];
       };
       lychee = {
         enable = true;
