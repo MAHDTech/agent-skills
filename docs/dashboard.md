@@ -23,3 +23,22 @@ devenv --no-tui shell -- ask dashboard css
 # Verify dashboard content matches skill source files
 devenv --no-tui shell -- ask dashboard lint
 ```
+
+## Validation
+
+Run the full local CI check before pushing changes, including dependency updates:
+
+```bash
+devenv --no-tui test
+```
+
+This runs the configured hooks and all workspace tests through `scripts/run-tests.sh`.
+The CLI integration tests build the dashboard, including its templates and Pagefind index.
+CI uses the same test wrapper with the committed Cargo lockfile.
+
+Commit hooks run Cargo Check and Clippy across all workspace crates and test targets
+when Rust source, Cargo manifests, lockfiles, or toolchain configuration change.
+These checks compile tests; `devenv --no-tui test` executes them.
+
+The theme uses Zola 0.23 components. Documentation is rendered as literal Markdown
+so template examples such as GitHub Actions expressions remain readable.

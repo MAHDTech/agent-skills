@@ -1,8 +1,8 @@
-{% macro render_section(section_path, current_path="") %}
+{% component render_section(section_path, current_path="") %}
   {% set s = get_section(path=section_path) %}
 
   {# A skill is a section (so its reference files can be sub-pages), but the
-     sidebar navigates skills only — render skills as leaf links and never list
+     sidebar navigates skills only, so render skills as leaf links and never list
      their sibling reference pages here. #}
   {% set is_skill = s.extra.skill | default(value=false) %}
 
@@ -68,23 +68,20 @@
         {% endif %}
 
         {% if s.subsections | length > 0 %}
-          {% set_global _macro_subs = [] %}
-          {% for subpath in s.subsections %}
-            {% set_global _macro_subs = _macro_subs | concat(with=get_section(path=subpath)) %}
-          {% endfor %}
-          {% set sorted_subs = _macro_subs | sort(attribute="title") %}
+          {% set _section_subs = [get_section(path=subpath) for subpath in s.subsections] %}
+          {% set sorted_subs = _section_subs | sort(attribute="title") %}
           <div class="space-y-1 mt-1">
             {% for sub in sorted_subs %}
-              {{ self::render_section(section_path=sub.relative_path, current_path=current_path) }}
+              {{ <render_section section_path={sub.relative_path} current_path={current_path} /> }}
             {% endfor %}
           </div>
         {% endif %}
       </div>
     </details>
   {% else %}
-    {# Leaf section with no children — render as a simple link #}
+    {# Leaf section with no children: render as a simple link #}
     <div class="mb-2">
       <a href="{{ s.permalink }}" class="transition-colors block mb-1 px-2 py-1 -ml-2 rounded {% if is_section_active %}text-[var(--color-primary)] font-bold bg-[#00f0ff1a] border-l-2 border-[var(--color-primary)]{% else %}text-[var(--color-text-main)] font-bold hover:text-[var(--color-primary)]{% endif %}" {% if is_section_active %}id="sidebar-active-item"{% endif %}>{{ s.title }}</a>
     </div>
   {% endif %}
-{% endmacro render_section %}
+{% endcomponent render_section %}
