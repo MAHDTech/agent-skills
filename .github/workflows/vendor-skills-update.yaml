@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Set Up Consumer
-        uses: tars-cloud/actions/composite/setup-consumer@7de448c14a4bbbacbef27eae08501126d4db80be # v3.10.0
+        uses: tars-cloud/actions/composite/setup-consumer@26ffb67cc8d374672f646d6dd8829befa844b0e9 # v3.12.0
         with:
           fetch-depth: 0
 
@@ -27,13 +27,13 @@ jobs:
         id: token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
-          app-id: ${{ secrets.UPDATE_APP_ID || secrets.APP_ID }}
-          private-key: ${{ secrets.UPDATE_APP_PRIVATE_KEY || secrets.APP_PRIVATE_KEY }}
+          client-id: ${{ secrets.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
 
       - name: Refresh Vendor Snapshots
-        uses: tars-cloud/actions/composite/run-devenv@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
+        uses: tars-cloud/actions/composite/run-devenv@26ffb67cc8d374672f646d6dd8829befa844b0e9 # v3.12.0
         with:
           run: |
             ask skills download-resources --vendors-only \
@@ -42,7 +42,7 @@ jobs:
             cat "$RUNNER_TEMP/vendor-update.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Validate Catalog
-        uses: tars-cloud/actions/composite/run-devenv@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
+        uses: tars-cloud/actions/composite/run-devenv@26ffb67cc8d374672f646d6dd8829befa844b0e9 # v3.12.0
         with:
           run: |
             prek run --all-files

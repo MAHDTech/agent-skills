@@ -210,7 +210,7 @@ jobs:
       post-comment: true
       update-records-pr: true
     secrets:
-      app-id: ${{ secrets.APP_ID }}
+      client-id: ${{ secrets.APP_CLIENT_ID }}
       app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
 ```
 

@@ -54,4 +54,4 @@ ask skills download-resources --vendors-only --pending-ref origin/automation/ven
 
 The pending ref must already be available in the local checkout. A changed source declaration or newer base-branch edits take precedence over pending snapshots. No additional state file is needed.
 
-The workflow uses the repository's update GitHub App credentials, with the existing `UPDATE_APP_ID` / `APP_ID` and `UPDATE_APP_PRIVATE_KEY` / `APP_PRIVATE_KEY` fallbacks. Git access to vendor repositories uses existing Git authentication. Download failures appear in the run summary; validation still prevents publishing a conflicting catalog.
+The workflow uses the repository's GitHub App credentials (`APP_CLIENT_ID` and `APP_PRIVATE_KEY`). Git access to vendor repositories uses existing Git authentication. Download failures appear in the run summary; validation still prevents publishing a conflicting catalog.
