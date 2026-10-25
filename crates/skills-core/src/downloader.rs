@@ -146,11 +146,28 @@ impl SkillDownloader {
 
         fs::create_dir_all(&auto_dir).map_err(|e| SkillError::io(&auto_dir, e))?;
 
-        let mut all_urls_to_fetch: Vec<String> = Vec::new();
+        let all_urls_to_fetch = self.expand_resource_urls(resource_urls).await;
         let mut downloaded_files: Vec<ResourceFile> = Vec::new();
         let mut saved_filenames: HashSet<String> = HashSet::new();
 
-        // 1. Expand llms.txt index files if present
+        for url in &all_urls_to_fetch {
+            let content = match self.fetch_url(url).await {
+                Ok(c) => c,
+                Err(_) if all_urls_to_fetch.len() > 1 && !resource_urls.contains(url) => continue,
+                Err(err) => return Err(err),
+            };
+            let resource_file =
+                Self::save_downloaded_resource(url, &content, &auto_dir, &mut saved_filenames)?;
+            downloaded_files.push(resource_file);
+        }
+
+        Self::prune_orphaned_auto_files(&auto_dir, &saved_filenames);
+
+        Ok(downloaded_files)
+    }
+
+    async fn expand_resource_urls(&self, resource_urls: &[String]) -> Vec<String> {
+        let mut all_urls_to_fetch = Vec::new();
         for url in resource_urls {
             let clean_url = Self::strip_reader_proxy(url);
             if Self::is_non_text_url(clean_url) {
@@ -159,9 +176,8 @@ impl SkillDownloader {
 
             if Self::is_llms_index_url(clean_url) {
                 if let Ok(index_content) = self.fetch_url(clean_url).await {
-                    let child_links = Self::parse_llms_txt_links(&index_content, clean_url);
                     all_urls_to_fetch.push(clean_url.to_string());
-                    for child in child_links {
+                    for child in Self::parse_llms_txt_links(&index_content, clean_url) {
                         if !all_urls_to_fetch.contains(&child) {
                             all_urls_to_fetch.push(child);
                         }
@@ -171,65 +187,56 @@ impl SkillDownloader {
                 all_urls_to_fetch.push(clean_url.to_string());
             }
         }
+        all_urls_to_fetch
+    }
 
-        // 2. Download and write each URL
-        for url in &all_urls_to_fetch {
-            let content = match self.fetch_url(url).await {
-                Ok(c) => c,
-                Err(err) => {
-                    // Skip errors on dynamically discovered child links
-                    if all_urls_to_fetch.len() > 1 && !resource_urls.contains(url) {
-                        continue;
-                    }
-                    return Err(err);
-                }
+    fn save_downloaded_resource(
+        url: &str,
+        content: &str,
+        auto_dir: &Path,
+        saved_filenames: &mut HashSet<String>,
+    ) -> Result<ResourceFile> {
+        let sanitized = Self::sanitize_markdown(content);
+        let raw_slug = Self::smart_slugify(url, None);
+        let final_filename = if saved_filenames.contains(&raw_slug) {
+            format!("{}-{raw_slug}", Self::get_domain_prefix(url))
+        } else {
+            raw_slug
+        };
+
+        let dest_path = Self::check_path_traversal(auto_dir, &final_filename)?;
+        let mut file = File::create(&dest_path).map_err(|e| SkillError::io(&dest_path, e))?;
+        file.write_all(sanitized.as_bytes())
+            .map_err(|e| SkillError::io(&dest_path, e))?;
+
+        saved_filenames.insert(final_filename.clone());
+
+        let rel_path = PathBuf::from("resources/auto").join(&final_filename);
+        Ok(ResourceFile::builder()
+            .relative_path(rel_path)
+            .absolute_path(dest_path)
+            .kind(ResourceKind::Auto)
+            .content(Some(sanitized))
+            .build())
+    }
+
+    fn prune_orphaned_auto_files(auto_dir: &Path, saved_filenames: &HashSet<String>) {
+        let Ok(entries) = fs::read_dir(auto_dir) else {
+            return;
+        };
+        for entry in entries.flatten() {
+            let Ok(file_type) = entry.file_type() else {
+                continue;
             };
+            let filename = entry.file_name().to_string_lossy().to_string();
 
-            let sanitized = Self::sanitize_markdown(&content);
-            let raw_slug = Self::smart_slugify(url, None);
-            let domain_prefix = Self::get_domain_prefix(url);
-            let final_filename = if saved_filenames.contains(&raw_slug) {
-                format!("{domain_prefix}-{raw_slug}")
-            } else {
-                raw_slug
-            };
-
-            let dest_path = Self::check_path_traversal(&auto_dir, &final_filename)?;
-            let mut file = File::create(&dest_path).map_err(|e| SkillError::io(&dest_path, e))?;
-            file.write_all(sanitized.as_bytes())
-                .map_err(|e| SkillError::io(&dest_path, e))?;
-
-            saved_filenames.insert(final_filename.clone());
-
-            let rel_path = PathBuf::from("resources/auto").join(&final_filename);
-            downloaded_files.push(
-                ResourceFile::builder()
-                    .relative_path(rel_path)
-                    .absolute_path(dest_path)
-                    .kind(ResourceKind::Auto)
-                    .content(Some(sanitized))
-                    .build(),
-            );
-        }
-
-        // 3. Prune orphaned files in auto directory
-        if let Ok(entries) = fs::read_dir(&auto_dir) {
-            for entry in entries.flatten() {
-                let Ok(file_type) = entry.file_type() else {
-                    continue;
-                };
-                let filename = entry.file_name().to_string_lossy().to_string();
-
-                if file_type.is_file()
-                    && !filename.starts_with('.')
-                    && !saved_filenames.contains(&filename)
-                {
-                    let _ = fs::remove_file(entry.path());
-                }
+            if file_type.is_file()
+                && !filename.starts_with('.')
+                && !saved_filenames.contains(&filename)
+            {
+                let _ = fs::remove_file(entry.path());
             }
         }
-
-        Ok(downloaded_files)
     }
 
     /// Downloads resources across a collection of skills.
