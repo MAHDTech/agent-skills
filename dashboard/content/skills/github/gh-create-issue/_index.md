@@ -1,6 +1,6 @@
 +++
 title = "gh-create-issue"
-description = "Create structured GitHub issues from conversation context using gh CLI"
+description = "Create a structured GitHub issue from the current conversation with gh CLI. Use when asked to file an issue that preserves the problem, discussion, constraints, and agreed implementation plan."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -11,6 +11,8 @@ mermaid = false
 
 
 # Create GitHub Issue from Conversation
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Consult the [gh issue manual](@/skills/github/gh-create-issue/resources/auto/manual-gh_issue.md) for more details.
 

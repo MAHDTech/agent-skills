@@ -1,6 +1,6 @@
 +++
 title = "prioritize-backlog"
-description = "Groom and prioritise a backlog - order, cut, cluster, and sequence a pile of work by value against cost and risk so the next thing to do is obvious. Use when the user wants to prioritise or rank a backlog, decide what to build next, trim or triage a pile of ideas, apply a lens like value-vs-effort, RICE, or cost-of-delay/WSJF, or sequence work around dependencies."
+description = "Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use for generic backlog grooming with value-effort, RICE, or WSJF; excludes the automated .tars/issues backlog."
 sort_by = "title"
 template = "skill.html"
 [extra]

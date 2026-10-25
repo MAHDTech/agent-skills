@@ -1,6 +1,6 @@
 +++
 title = "productionize-app"
-description = "Harden and prepare an application for production deployment across configuration, reliability, security, observability, and target platforms."
+description = "Prepare an entire application for production when explicitly requested. Audit and fix configuration, reliability, security, observability, packaging, and deployment readiness."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -11,6 +11,8 @@ mermaid = false
 
 
 # Productionize App
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Prepare an application for production deployment across configuration, error handling, security, performance, and platform packaging.
 

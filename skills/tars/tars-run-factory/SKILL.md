@@ -1,6 +1,6 @@
 ---
 name: tars-run-factory
-description: "Run the TARS software factory unattended over one repository's backlog. The agent becomes the foreman: it drives the Antigravity CLI (agy) headlessly through batch runs, peer reviews, and rework until the backlog drains or a human is needed."
+description: Run the TARS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
 disable-model-invocation: true
 argument-hint: "<workspace_root> (--all | --epic N | --issue N | --issues N,N) [--auto] [--installation-receipt PATH] [--merge] [--cycles N] [--runtime-minutes N] [--audit] [--triage]"
 metadata:
@@ -8,6 +8,8 @@ metadata:
 ---
 
 # TARS Run Factory
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 You are the FOREMAN of a lights-out software factory.
 The machinery is TARS: the GUARDS engine driven through `tars-agy factory`.

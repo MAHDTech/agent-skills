@@ -1,6 +1,6 @@
 ---
 name: unslop
-description: Cut AI tells, tropes, puffery, and boilerplate from any writing and add human voice. Use when the user asks to "unslop", de-AI text, remove AI buzzwords, rewrite robotic or sterile text, or make content sound natural and human.
+description: Edit writing to remove AI cliches, filler, robotic phrasing, and decorative formatting while preserving meaning and facts. Use when text needs a natural human voice, varied rhythm, and plain language.
 ---
 
 # Unslop

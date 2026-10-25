@@ -1,6 +1,6 @@
 +++
 title = "handoff"
-description = "Compact the current conversation into a handoff document for another agent to pick up."
+description = "Summarize the current conversation into a temporary handoff for another agent or session. Use when transferring unfinished work; reference durable artifacts, suggest relevant skills, and redact secrets."
 sort_by = "title"
 template = "skill.html"
 [extra]

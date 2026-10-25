@@ -1,6 +1,6 @@
 +++
 title = "code-comments"
-description = "Write concise, high-signal code comments and prune comment bloat. Use when writing new code, editing existing files, or auditing code comments via /code-comments to keep comments minimal, explain non-obvious intent (\"why, not what\"), and avoid restating self-explanatory code."
+description = "Write or review code comments for non-obvious intent, constraints, and invariants. Use to trim redundant or stale comments and audit comment quality in a specified scope or diff."
 sort_by = "title"
 template = "skill.html"
 [extra]

@@ -1,6 +1,6 @@
 +++
 title = "gh-triage"
-description = "Triage a GitHub backlog - move issues and external PRs through a state machine of triage roles (categorise, verify, grill if needed, write agent-ready briefs) using the gh CLI and GitHub labels. Use when triaging your GitHub issues and PRs, deciding what's ready for an agent or a human, or turning a backlog into agent-ready briefs."
+description = "Triage GitHub issues and external PRs: categorize, verify claims, interview as needed, and post agent-ready briefs. Use when asked to change backlog states or run a maintainer triage session."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -11,6 +11,8 @@ mermaid = false
 
 
 # GitHub Backlog Triage
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Consult the [gh issue manual](@/skills/github/gh-triage/resources/auto/manual-gh_issue.md) for more details.
 

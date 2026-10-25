@@ -1,6 +1,6 @@
 ---
 name: nutanix-objects
-description: CLI commands, architecture reference, bucket lifecycle management, S3 API operations, streaming replication, IAM configuration, monitoring, and troubleshooting for Nutanix Objects (v5.3). Use when working with Nutanix Objects, S3 object storage, Nutanix Objects Browser, bucket policies, WORM storage, cloud tiering, or Nutanix Objects REST APIs.
+description: Configure or troubleshoot Nutanix Objects storage. Use for its S3 APIs, buckets, IAM, WORM policies, replication, cloud tiering, monitoring, or Objects Browser.
 metadata:
   group: nutanix
 ---

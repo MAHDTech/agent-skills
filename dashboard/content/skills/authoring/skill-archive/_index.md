@@ -1,6 +1,6 @@
 +++
 title = "skill-archive"
-description = "Retire a skill cleanly - move its directory from skills/<category>/ into skills-archive/<category>/, mark it archived in frontmatter with what replaced it, purge or redirect every inbound /skill-name reference (the router included), then re-run lint and sync. Use when you want to archive, deprecate, retire, remove, replace, or merge away a skill, or a /skill-audit flagged one for retirement. Covers when to archive vs delete vs merge and how to avoid dangling references. Cross-references /skill-creator and /skill-router."
+description = "Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -11,6 +11,8 @@ mermaid = false
 
 
 # Skill Archive
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Retire a skill without deleting it and without leaving a **dangling reference** behind. The collection has two trees with the same shape:
 

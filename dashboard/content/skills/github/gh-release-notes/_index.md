@@ -1,6 +1,6 @@
 +++
 title = "gh-release-notes"
-description = "Generate human-readable release notes for a version from the merged history and cut a GitHub release with the gh CLI - gather the commit and PR range since the last tag, group changes by type, write curated notes, and publish. Use when the user wants to cut a release, tag a version, write a changelog or release notes, or summarise what shipped since the last tag. Pairs well with conventional-commit history but does not require it."
+description = "Curate release notes from commits and merged PRs since the last tag, then create a GitHub release. Use when asked to cut or publish a versioned release, with draft and prerelease options."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -11,6 +11,8 @@ mermaid = false
 
 
 # Generate Release Notes and Cut a Release
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Turn the history merged since the last release into notes a human actually wants to read, then publish them as a GitHub release. The pairing skill for shipping is `/gh-create-pr` - this picks up after those PRs have merged.
 

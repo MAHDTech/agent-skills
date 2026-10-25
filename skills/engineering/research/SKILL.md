@@ -1,6 +1,6 @@
 ---
 name: research
-description: Investigate a question against high-trust primary sources - official docs, source code, specs, first-party APIs - and capture the findings as a cited Markdown file in the repo. Use when you want a topic researched, docs or API facts gathered and verified, or the reading legwork delegated to a background agent while you keep working.
+description: Research a technical question using primary sources and save cited findings in the repo. Use for documentation, API, specification, or source-code fact gathering.
 metadata:
   source: mattpocock/skills
   license: MIT

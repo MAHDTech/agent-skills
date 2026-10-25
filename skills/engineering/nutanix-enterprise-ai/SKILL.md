@@ -1,6 +1,6 @@
 ---
 name: nutanix-enterprise-ai
-description: Architecture reference, sizing guidelines, Helm deployment, fine-grained RBAC authorization, Hugging Face and NVIDIA NIM model management, local and unified inference endpoints, batch inference, security scanning, and MCP server configuration for Nutanix Enterprise AI (NAI v2.8). Use when configuring or troubleshooting Nutanix Enterprise AI, GPT-in-a-Box 2.0, LLM model serving, AI Gateway, or Model Context Protocol on Kubernetes.
+description: Configure or troubleshoot Nutanix Enterprise AI (NAI/GPT-in-a-Box). Use for platform deployment, model serving, inference gateways, RBAC, or NAI MCP connectors.
 metadata:
   group: nutanix
 ---

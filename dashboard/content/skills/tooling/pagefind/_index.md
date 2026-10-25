@@ -1,6 +1,6 @@
 +++
 title = "pagefind"
-description = "Use when configuring, indexing, or troubleshooting Pagefind static search for websites. Covers config options, CLI flags, and client integrations."
+description = "Configure, build, or troubleshoot Pagefind search for a static website. Use for indexing options, content exclusions or weighting, generated assets, and client integration."
 sort_by = "title"
 template = "skill.html"
 [extra]

@@ -1,6 +1,6 @@
 +++
 title = "upgrade-dependencies"
-description = "Safely upgrade dependencies, frameworks, or a language/runtime version across a codebase, including risky major-version bumps and framework migrations. Use when bumping a package, stepping a major version, migrating a framework, or updating a runtime - read the changelog first, move in small reversible steps behind a green safety net, handle transitive and lockfile changes, and stage the rollout. Lean on characterization tests for the net and bug diagnosis when an upgrade breaks something."
+description = "Upgrade packages, frameworks, or language/runtime versions using release notes and a green test baseline. Use for version bumps, breaking migrations, and lockfile changes."
 sort_by = "title"
 template = "skill.html"
 [extra]

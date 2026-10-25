@@ -1,6 +1,6 @@
 +++
 title = "cargo-crap"
-description = "Measure and gate Change Risk Anti-Patterns (CRAP) metric across Rust codebases by combining cyclomatic complexity with test coverage. Use when evaluating code maintainability, gating CI against complexity regressions, setting up cargo-llvm-cov with cargo-crap, or generating shields.io badges for Rust projects."
+description = "Measure Rust change risk with cargo-crap and coverage data. Use for CRAP scores, cargo-llvm-cov integration, complexity regression gates, CI reports, or badges."
 sort_by = "title"
 template = "skill.html"
 [extra]

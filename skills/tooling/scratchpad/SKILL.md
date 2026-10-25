@@ -1,6 +1,6 @@
 ---
 name: scratchpad
-description: Keep one-off, experimental, or temporary scripts and files out of the source tree by writing them to a single, consistent session scratch location, then cleaning them up. Use when creating throwaway, experimental, or temporary scripts/files during a task.
+description: Manage temporary scripts, experiment files, and debugging artifacts during a task. Use one session scratch directory, keep the source tree clean, and remove temporary files afterward.
 ---
 
 # Scratchpad Policy

@@ -1,6 +1,6 @@
 ---
 name: sculpt-code
-description: Reshape code for readability, naming, structure, TODOs, and reduced surface area - and take on larger cleanups like removing engineering debt, untangling oversized modules, and collapsing duplicated logic - all without changing behaviour. Use when you want to clean up or refactor code, from a quick readability pass to a staged debt-reduction effort.
+description: Refactor a scoped diff or selected files for clearer naming, control flow, structure, and less duplication or dead code. Use for cleanup that preserves behavior.
 ---
 
 # Sculpt Code

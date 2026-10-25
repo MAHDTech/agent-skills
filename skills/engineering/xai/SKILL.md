@@ -1,6 +1,6 @@
 ---
 name: xai
-description: Build applications with xAI and Grok APIs, SDKs, model selection, function calling, vision, live web search, and OpenAI-compatible client configurations. Use when integrating Grok models or xAI API endpoints, querying xAI capabilities, or configuring xAI API SDKs.
+description: Integrate or debug xAI/Grok APIs and SDKs. Use for client configuration, model capabilities, streaming, tool calling, structured output, vision, or search integration.
 resources:
   - https://docs.x.ai/llms.txt
 ---

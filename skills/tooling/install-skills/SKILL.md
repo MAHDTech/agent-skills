@@ -1,9 +1,12 @@
 ---
 name: install-skills
-description: Install, update, and manage agent skills from a GitHub-hosted collection with the skills.sh CLI (`npx skills add <owner>/<repo>`), across every runtime the collection targets - Claude Code, OpenCode, Goose, and Antigravity CLI. Use when adding skills to an agent, updating a stale copy, verifying an install, wiring the same collection into another runtime, or troubleshooting a skill that will not show up or that collides by name.
+description: Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.
+disable-model-invocation: true
 ---
 
 # Install Skills
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 One collection, many runtimes. A `skills/<name>/SKILL.md` collection is Anthropic-style, so the same source installs into Claude Code, OpenCode, Goose, and Antigravity CLI. Install and manage it with the [skills.sh](https://skills.sh) CLI.
 

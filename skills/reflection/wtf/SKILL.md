@@ -1,6 +1,6 @@
 ---
 name: wtf
-description: Re-pitch your own last message in plain language when it did not land. Use when the user reacts to your previous response with confusion - "wtf", "what?", "huh", "in English?", "that made no sense", "I don't understand", "say that again properly". Not for "wtf is this error/output/regex", where the confusion is about a thing rather than about your message - that is debugging.
+description: Rewrite your own last response more briefly and plainly when the user signals confusion, such as "huh" or "in English". Use for confusion about your message, not requests to explain an error, output, or regex.
 ---
 
 # WTF

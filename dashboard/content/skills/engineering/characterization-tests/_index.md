@@ -1,6 +1,6 @@
 +++
 title = "characterization-tests"
-description = "Pin down the existing behaviour of untested or legacy code with characterization (golden-master / approval) tests before you change it, so refactors and upgrades stay safe. Use when you must modify, refactor, or upgrade code that has no tests, want to capture current behaviour as an oracle even where it looks wrong, or need a safety net before a risky change. Distinct from test-driven development, which specifies new behaviour test-first; this tests around existing behaviour. Pairs with code refactoring and dependency upgrades."
+description = "Capture existing behavior of untested or legacy code before a refactor or upgrade. Use for deterministic characterization tests or golden masters, including surprising current behavior."
 sort_by = "title"
 template = "skill.html"
 [extra]

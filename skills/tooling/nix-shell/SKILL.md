@@ -1,6 +1,6 @@
 ---
 name: nix-shell
-description: Run CLI utilities and diagnostic tools in ephemeral Nix shells when a required binary is missing from PATH. Use when a command or tool is not found, when running one-off inspection or data-processing tools (such as jq, ripgrep, ffmpeg, tree, pandoc, or curl) on systems with Nix installed, or when the user asks to run something in a nix shell.
+description: Run missing ad-hoc CLI utilities in ephemeral nix shell environments when Nix is installed. Use for one-off diagnostics or conversions, keeping project dependencies in its toolchain.
 ---
 
 # Ephemeral Nix Shells

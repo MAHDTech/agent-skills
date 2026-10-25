@@ -1,6 +1,6 @@
 +++
 title = "tars-goal"
-description = "Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly asks to establish or resume a persistent goal."
+description = "Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly requests a persistent goal."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -11,6 +11,8 @@ mermaid = false
 
 
 # TARS Goal
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Record the user's objective, then immediately work toward its full requested end state. The name `/tars-goal` avoids collisions with built-in goal commands. Use the capabilities exposed by the current harness; this skill requires no particular product, tool name, or background scheduler.
 

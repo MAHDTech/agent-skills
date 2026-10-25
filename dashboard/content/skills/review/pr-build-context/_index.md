@@ -1,6 +1,6 @@
 +++
 title = "pr-build-context"
-description = "Build high-signal context for a pull request before review - diff analysis, risk assessment, key files, and questions for the author. Use when you want a briefing on a PR (or the whole repo when on the base branch) before reviewing it."
+description = "Prepare a briefing before reviewing a pull request: explain the diff, key files, risks, and questions for the author. Use for PR context, or a whole-repository overview when on its default branch."
 sort_by = "title"
 template = "skill.html"
 [extra]

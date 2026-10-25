@@ -1,6 +1,6 @@
 ---
 name: herdr
-description: Control Herdr terminal multiplexer, manage workspaces, tabs, and panes, coordinate coding agents, or guide humans on installing, configuring, and troubleshooting Herdr. Use when working inside Herdr (HERDR_ENV=1), orchestrating agent terminal sessions, or assisting users with Herdr concepts, setup, and keybindings.
+description: Operate Herdr panes, workspaces, or agent sessions when HERDR_ENV=1. Also use for Herdr setup, configuration, keybindings, and troubleshooting questions.
 metadata:
   source: herdrdev/herdr
   license: MIT

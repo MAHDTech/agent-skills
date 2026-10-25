@@ -1,6 +1,6 @@
 +++
 title = "zola"
-description = "Reference and development guidelines for the Zola static site generator. Use when the user asks to modify, build, serve, or customize Zola sites, themes, templates, shortcodes, or Zola configuration files (such as config.toml)."
+description = "Build, serve, or customize an existing Zola site. Use for Tera templates, shortcodes, taxonomies, config.toml options, theme changes, or Zola build and link checks."
 sort_by = "title"
 template = "skill.html"
 [extra]

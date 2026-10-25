@@ -1,6 +1,6 @@
 +++
 title = "self-review"
-description = "Self-review after implementation - surface missed work, simplification opportunities, and idiomatic improvements"
+description = "Review your implementation diff for unfinished work, non-idiomatic code, duplication, and unnecessary complexity. Use after a task to apply focused fixes, with file-and-line evidence for each change."
 sort_by = "title"
 template = "skill.html"
 [extra]

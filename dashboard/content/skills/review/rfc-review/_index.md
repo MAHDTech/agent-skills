@@ -1,6 +1,6 @@
 +++
 title = "rfc-review"
-description = "Review an RFC or design doc for problem clarity (SCQA), compliance, security, and performance, and return the few most important issues. Use when reviewing someone's RFC or design proposal before it's approved."
+description = "Review an RFC or design document before approval for problem clarity, relevant compliance concerns, security, and performance. Use to return only the three to five most consequential issues with concrete suggestions."
 sort_by = "title"
 template = "skill.html"
 [extra]

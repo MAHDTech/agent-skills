@@ -1,6 +1,6 @@
 +++
 title = "wayfinder"
-description = "Plan a huge chunk of work - more than one agent session can hold - as a shared map of investigation tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear."
+description = "Chart a large, ambiguous effort as an issue-tracker map of investigation tickets. Use when asked to map unknown decisions or work one frontier ticket per session, rather than slice known implementation work."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -9,6 +9,8 @@ category = "planning"
 mermaid = false
 +++
 
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 A loose idea has arrived - too big for one agent session, and wrapped in fog: the way from here to the **destination** isn't visible yet. Wayfinding is about finding that way, not charging at the destination. This skill charts the way as a **shared map** on the repo's issue tracker, then works its tickets one at a time until the route is clear.
 

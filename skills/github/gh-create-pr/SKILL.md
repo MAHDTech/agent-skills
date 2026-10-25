@@ -1,6 +1,6 @@
 ---
 name: gh-create-pr
-description: Generate a PR title and description, then commit, create/update the PR on approval
+description: Draft a Conventional Commit PR title and description from a branch diff. Use when asked to create or update a PR, including committing, pushing, and publishing after approval.
 disable-model-invocation: true
 resources:
   - https://cli.github.com/manual/gh_pr
@@ -12,6 +12,8 @@ metadata:
 <!-- omit in toc -->
 
 # Quick PR Description
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Consult the [gh pr manual](resources/auto/manual-gh_pr.md) for more details.
 

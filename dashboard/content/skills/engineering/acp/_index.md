@@ -1,6 +1,6 @@
 +++
 title = "acp"
-description = "Build, integrate, and debug Agent Client Protocol (ACP) agents and clients, implementing JSON-RPC 2.0 schemas, session lifecycles, elicitation, tool calls, v1/v2 migration, and official SDKs (TypeScript, Rust, Python, Java, Kotlin). Use when working with ACP protocols, building ACP-compatible AI agent servers or client applications, or inspecting ACP specifications and RFDs."
+description = "Build, integrate, or debug Agent Client Protocol agents and clients with official SDKs. Use for ACP sessions, tool calls, schemas, transports, or protocol migrations."
 sort_by = "title"
 template = "skill.html"
 [extra]

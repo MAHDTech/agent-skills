@@ -1,6 +1,6 @@
 +++
 title = "prek"
-description = "Run pre-commit hooks using the prek CLI tool. Differentiates between 'pre-commit' (the git hooks concept/lifecycle stage) and 'prek' (the actual binary command; pre-commit CLI is deprecated, use prek). Use when you need to run, configure, check, or troubleshoot git pre-commit hooks."
+description = "Run, configure, or troubleshoot Git pre-commit hooks with prek. Use for hook execution, installation, validation, and cache management; distinguish the hook stage from its CLI."
 sort_by = "title"
 template = "skill.html"
 [extra]

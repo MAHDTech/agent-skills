@@ -1,6 +1,6 @@
 ---
 name: jj
-description: Operate Jujutsu (jj), the Git-compatible version control system built around working-copy commits, stable change IDs, revsets, bookmarks, first-class conflicts, and an undoable operation log. Use when working in a Jujutsu repository (.jj/ directory), running jj CLI commands (jj st, jj log, jj diff, jj new, jj describe, jj commit, jj edit, jj squash, jj split, jj absorb, jj rebase, jj bookmark, jj git, jj undo, jj op, jj evolog, jj workspace), writing revset or fileset expressions, resolving conflicts, or syncing with GitHub.
+description: Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.
 resources:
   - https://raw.githubusercontent.com/jj-vcs/jj/main/docs/tutorial.md
   - https://raw.githubusercontent.com/jj-vcs/jj/main/docs/git-comparison.md

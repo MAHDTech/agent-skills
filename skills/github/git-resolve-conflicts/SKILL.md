@@ -1,7 +1,6 @@
 ---
 name: git-resolve-conflicts
-description: Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol
-disable-model-invocation: true
+description: Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.
 context: fork
 agent: general-purpose
 metadata:

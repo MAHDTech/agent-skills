@@ -1,6 +1,6 @@
 ---
 name: to-spec
-description: Turn the current conversation into a spec (sometimes called a PRD) and publish it to your project's issue tracker - no interview, just synthesis of what you have already discussed.
+description: Synthesize the current conversation into a product spec or PRD and publish it to the project's issue tracker. Use when asked to formalize discussed requirements and testing decisions without a new interview.
 disable-model-invocation: true
 metadata:
   group: planning-pipeline
@@ -9,6 +9,8 @@ metadata:
 ---
 
 # To Spec
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Take the current conversation context and codebase understanding and produce a spec (you may know this document as a PRD). Do NOT interview the user - just synthesize what you already know.
 

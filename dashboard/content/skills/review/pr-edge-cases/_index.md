@@ -1,6 +1,6 @@
 +++
 title = "pr-edge-cases"
-description = "Review branch changes for test gaps, logic edge cases, failure modes, and integration risks. Use when you want the changes on a branch probed for what breaks - untested paths, boundary conditions, race conditions, and integration hazards - before merging."
+description = "Probe branch changes, uncommitted work, or specified files for logic errors, missing tests, boundary cases, races, and integration failures. Use to identify what could break before a merge, with file-line findings."
 sort_by = "title"
 template = "skill.html"
 [extra]

@@ -1,4 +1,7 @@
 interface:
   display_name: "Oak Version Control"
-  short_description: "Operate Oak version control, workspaces, agents, mounts, spaces, and CI"
+  short_description: "Manage Oak changes, workspaces, mounts, and CI"
   default_prompt: "Use $oak to manage Oak version control, workspaces, change stacks, mounts, spaces, and CI pipelines."
+
+policy:
+  allow_implicit_invocation: true

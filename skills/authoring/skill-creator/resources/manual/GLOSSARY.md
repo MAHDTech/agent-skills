@@ -36,7 +36,7 @@ _Avoid:_ publishing, listing, inclusion
 
 ### Canonical Frontmatter
 
-The YAML header a skill in this repo is allowed to carry: `name` and `description` always, plus the earned optional keys (`disable-model-invocation`, `argument-hint`, `context`/`agent`, `metadata`, `resources`). It excludes the legacy `custom:` block and the `triggers:`/`category:`/`type:` keys - **Category** comes from the directory and triggers live in the **description**.
+The YAML header a skill in this repo is allowed to carry: `name` and `description` always, plus the earned optional keys (`disable-model-invocation`, `argument-hint`, `context`/`agent`, `metadata`, `resources`). It excludes the legacy `custom:` block and the `triggers:`/`category:`/`type:` keys - **Category** comes from the directory and triggers live in the **description**. Promoted custom skills also require an explicit Codex sidecar policy that agrees with the shared invocation intent.
 
 _Avoid:_ header, metadata block, yaml
 
@@ -46,19 +46,19 @@ How a skill is reached - and the two loads you pay for the choice.
 
 ### Model-Invoked
 
-A skill that keeps its **description**, so the agent can see it and fire it autonomously - and the human can still type its name, so model-invocation always _includes_ user reach. Pays a permanent **context load** on every turn in exchange for that discoverability. Reachable by other skills, because the description that makes it agent-discoverable makes it invocable. Pick it only when the agent must reach the skill on its own; if it never fires except by hand, drop the description and pay no context load.
+A skill eligible for automatic selection when an authorized task matches its **description**. The host normally advertises metadata before loading the body; its catalog budget and settings determine the **context load**. Users can usually select it explicitly too. Choose this mode for focused references or bounded helpers needed within another workflow. Loading a skill does not authorize its actions.
 
 _Avoid:_ ability, tool, capability
 
 ### User-Invoked
 
-A skill with its **description** stripped - invisible to the agent and reachable only by the human typing its name (user-_only_, where **model-invoked** is user-_and-agent_). Set by `disable-model-invocation: true`. Trades agent-discoverability for zero **context load**. Because it has no description, nothing but the human can reach it: no other skill can fire it.
+A skill intended for explicit user initiation. Set `disable-model-invocation: true` and Codex's sidecar `policy.allow_implicit_invocation: false`, and keep that intent in its **description** and body. Supporting hosts restrict automatic selection; other hosts treat the text as advisory guidance. Its visibility and **context load** depend on the host. See [invocation compatibility](invocation-compatibility.md) for verified controls.
 
 _Avoid:_ procedure, workflow, command
 
 ### Description
 
-The skill's model-facing trigger, and the one **context pointer** a **model-invoked** skill is forced to keep loaded at all times. Its presence _is_ the invocation axis: keep it and the skill is model-invoked (and reachable by other skills); set `disable-model-invocation: true` and it becomes human-facing, the skill **user-invoked**. The source of a model-invoked skill's **context load**.
+The shared model-facing capability and trigger text in `SKILL.md` frontmatter. Keep it for both invocation modes. Host controls determine whether it is advertised; catalog budgets may shorten or omit it. Codex's user-facing `interface.short_description` is a separate UI field, not a replacement for this **context pointer**.
 
 _Avoid:_ frontmatter, summary
 
@@ -70,19 +70,19 @@ _Avoid:_ link, reference, import
 
 ### Context Load
 
-The cost a **model-invoked** skill imposes on the agent's context window - its **description**, always loaded, spending both tokens and attention. What **user-invoked** skills escape by having no description, and the brake on splitting into more model-invoked skills.
+The tokens and attention spent on advertised skill metadata and loaded instructions. Invocation controls and catalog budgets affect that cost differently across hosts. Explicit-only policy can reduce discovery context on supporting hosts, but it does not guarantee zero cost across runtimes. Consider this cost when splitting a catalog into more skills.
 
 _Avoid:_ token cost, context bloat
 
 ### Cognitive Load
 
-The cost a **user-invoked** skill imposes on the human - what they must hold in their head: which skills exist and when to reach for each (the human is the index). What **model-invocation** removes by being agent-discoverable, and the brake on splitting into more user-invoked skills. Not a cost to minimise: it is the price of human agency. Spend it where human judgement matters; remove it where it does not.
+The cost a **user-invoked** skill imposes on the human - what they must hold in their head: which skills exist and when to reach for each (the human is the index). **Model-invocation** can reduce that discovery burden. Consider it when splitting into more user-invoked skills. Spend it where deliberate user initiation matters.
 
 _Avoid:_ human index, burden, overhead
 
 ### Router Skill
 
-A **user-invoked** skill whose job is to point at your other user-invoked skills - naming each and when to reach for it - so the human has one skill to remember instead of many. In this repo, `/skill-router` plays that role and is updated whenever a skill is added or renamed. It can only hint, never fire them: user-invoked skills have no **description**. The cure for **cognitive load** when user-invoked skills multiply.
+A **user-invoked** catalog that names other skills and when to request them, so the human has one entry point to remember. In this repo, `/skill-router` plays that role and is updated whenever a skill is added or renamed. A recommendation does not bypass the destination skill's invocation policy or action authorization. It reduces **cognitive load** when user-invoked skills multiply.
 
 _Avoid:_ dispatcher, menu, registry, index
 
@@ -170,7 +170,7 @@ _Avoid:_ horizon, lookahead
 
 ### Premature Completion
 
-_Failure mode._ Ending the current step before it is genuinely done, because the agent's attention slips to being done rather than to the work. A between-steps failure: it needs **steps** to occur. A tug-of-war between visible **post-completion steps** (the pull forward) and the **completion criterion**'s clarity (the resistance). Reach for the two levers in order: **sharpen the bound first** - local and cheap. Only when the criterion is irreducibly fuzzy _and_ you observe the rush do you **hide the later steps** by splitting - and hiding works only across a real context boundary (a user-invoked hand-off or a `context: fork` subagent; an inline model-invoked call clears nothing).
+_Failure mode._ Ending the current step before it is genuinely done, because the agent's attention slips to being done rather than to the work. A between-steps failure: it needs **steps** to occur. A tug-of-war between visible **post-completion steps** (the pull forward) and the **completion criterion**'s clarity (the resistance). Reach for the two levers in order: **sharpen the bound first** - local and cheap. Only when the criterion is irreducibly fuzzy _and_ you observe the rush do you **hide the later steps** across a real context boundary, such as a new session or an isolated subagent on a supporting host. Explicit invocation alone does not clear earlier context.
 
 _Avoid:_ premature closure, the rush, rushing, shortcutting
 

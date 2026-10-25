@@ -1,6 +1,6 @@
 +++
 title = "gh-resolve-pr-comments"
-description = "Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution"
+description = "Address GitHub PR review feedback: collect and categorize comments, agree an action plan, apply fixes, and resolve threads. Use when asked to handle review comments on the current PR."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -13,6 +13,8 @@ mermaid = false
 <!-- omit in toc -->
 
 # Tend to GitHub PR Comments
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Consult the [gh pr manual](@/skills/github/gh-resolve-pr-comments/resources/auto/manual-gh_pr.md) for more details.
 

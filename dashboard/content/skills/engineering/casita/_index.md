@@ -1,6 +1,6 @@
 +++
 title = "casita"
-description = "Operate Casita, the verified content-addressed repository for immutable object graphs, source code, and build artifacts. Use when working with the casita CLI, Rust API (casita::Repository), content-addressed storage, BLAKE3 blob deduplication, canonical directory graphs, roots and retention policies, garbage collection, repository sync, Casitar archives, or importing filesystem, tar, Git, and OCI artifacts."
+description = "Use for Casita CLI or Rust API work: immutable object storage, imports, roots and retention, verified sync, Casitar archives, integrity checks, or garbage collection."
 sort_by = "title"
 template = "skill.html"
 [extra]

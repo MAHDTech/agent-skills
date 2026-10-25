@@ -1,6 +1,6 @@
 +++
 title = "store-plan"
-description = "Capture the current conversation's plan, decisions, and action items into a structured, reviewable markdown file in the project's docs/plans/ directory."
+description = "Save an agreed conversation plan, decisions, action items, and open questions to a reviewable Markdown file in docs/plans/. Use when a durable repository plan is needed rather than a temporary handoff."
 sort_by = "title"
 template = "skill.html"
 [extra]

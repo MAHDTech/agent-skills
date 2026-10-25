@@ -1,6 +1,6 @@
 +++
 title = "optimize-performance"
-description = "Improve the performance of a hot path with measurement-first discipline - profile to find the real bottleneck, set a target, change one thing, re-measure, and stop when the target is met. Use when code is too slow, memory-hungry, or throughput-bound and you want to make it deliberately faster without ever guessing at the cause. For a performance regression - code that was fast and got slow - run bug diagnosis instead, which treats the slowdown as a bug to bisect."
+description = "Improve an existing hot path using benchmarks and profiling. Use for latency, throughput, or memory targets; route newly introduced slowdowns to regression diagnosis."
 sort_by = "title"
 template = "skill.html"
 [extra]

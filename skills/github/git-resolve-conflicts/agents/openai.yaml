@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $git-resolve-conflicts to resolve merge conflicts safely."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

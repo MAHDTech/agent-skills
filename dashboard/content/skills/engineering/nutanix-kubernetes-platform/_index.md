@@ -1,6 +1,6 @@
 +++
 title = "nutanix-kubernetes-platform"
-description = "CLI commands, architecture reference, cluster lifecycle operations, air-gapped installation, image building, upgrades, and troubleshooting for Nutanix Kubernetes Platform (NKP v2.18), including Konvoy, Kommander, and NKP Insights. Use when working with NKP, Nutanix Kubernetes Platform, Konvoy, Kommander, nkp CLI commands, or Nutanix Kubernetes cluster management."
+description = "Configure, operate, or troubleshoot Nutanix Kubernetes Platform (NKP), Konvoy, or Kommander. Use for NKP cluster lifecycle, image builds, air-gapped installs, or Insights."
 sort_by = "title"
 template = "skill.html"
 [extra]

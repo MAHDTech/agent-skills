@@ -1,6 +1,6 @@
 +++
 title = "grilling"
-description = "Interview the user relentlessly, one question at a time, to stress-test a plan, design, or architecture before any code is written. Use when the user asks to 'grill me', 'poke holes in this', 'stress-test this plan', 'interview me about this design', or asks to grill with docs or ADRs. Walk every branch of the design tree, look up facts in the codebase, and put each real decision to the user with a recommended answer before proceeding."
+description = "Interview the user one decision at a time before coding. Use when explicitly asked to stress-test a design, or when an explicitly started software-factory or wayfinder workflow requires its planning interview."
 sort_by = "title"
 template = "skill.html"
 [extra]

@@ -1,6 +1,6 @@
 +++
 title = "codebase-design"
-description = "Shared vocabulary and principles for designing deep modules. Use when designing or improving a module's interface, hunting for deepening opportunities, deciding where a seam goes, making code more testable or easier for an agent to navigate, or when another skill needs the deep-module vocabulary."
+description = "Design or improve module interfaces and test seams. Use when simplifying caller requirements, reducing shallow abstractions, or making modules easier to test and maintain."
 sort_by = "title"
 template = "skill.html"
 [extra]

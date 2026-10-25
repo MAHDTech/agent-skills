@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $skill-audit to health-check and audit the skills catalog."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

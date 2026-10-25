@@ -1,6 +1,6 @@
 ---
 name: simplify-docs
-description: Simplify documentation for clarity and readability with approval-gated edits. Use when asked to simplify, rewrite, restructure, or de-clutter a doc - README, setup guide, reference or technical documentation - so it scans faster and leads with the shortest successful path.
+description: Simplify a README, setup guide, or technical reference for fast scanning and execution. Use for structural documentation rewrites that lead with the shortest successful path, previewing edits for approval.
 ---
 
 # Simple Docs for Humans and Agents
