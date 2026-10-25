@@ -1,6 +1,6 @@
 +++
 title = "zed"
-description = "Find, search, and manage Zed editor configuration settings, keybindings, and language server configurations. Use when configuring Zed settings, creating or updating ~/.config/zed/settings.json or .zed/settings.json, editing keymap.json, or searching for Zed options and documentation."
+description = "Configure or troubleshoot Zed editor settings, keybindings, and language servers. Use to verify Zed option names and update user or project settings in the correct scope."
 sort_by = "title"
 template = "skill.html"
 [extra]

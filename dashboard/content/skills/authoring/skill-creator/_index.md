@@ -1,6 +1,6 @@
 +++
 title = "skill-creator"
-description = "Use when creating a new skill or editing an existing one in this repo - how to name it, place it in the right category, write its frontmatter and description, and structure it with progressive disclosure. Covers model-invoked vs user-invoked skills, anti-slop conventions, failure modes, and the lint/sync workflow to run after adding or renaming a skill."
+description = "Create or update custom agent skills with concise discovery descriptions, matching invocation policies, supporting resources, and catalog checks."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -50,41 +50,48 @@ description: What the skill does AND when to reach for it, in the user's own wor
 
 `name` matches the directory (1 to 64 characters). `description` is **model-facing** and does the invocation work (1 to 1024 characters, see below). Optional keys, each added only when earned:
 
-- **`disable-model-invocation: true`** - makes the skill **user-invoked** (see below).
+- **`disable-model-invocation: true`** - requests explicit invocation in hosts that support this field (see below).
 - **`argument-hint`** - a short usage hint for a skill that takes an argument.
 - **`context: fork`** with **`agent: <type>`** (used together, e.g. `agent: general-purpose`) - runs the skill as a subagent in its own context, so a long or noisy run does not silt up the caller's window.
 - **`metadata:`** - a flat string→string map for provenance and grouping. Use `source` and `license` on any skill adapted from an outside project (as this one carries `source: mattpocock/skills`, `license: MIT`). Use `group: <group-name>` to declare membership in a cohesive cross-reference group (standard groups: `authoring`, `github`, `planning-pipeline`, `review`, `opencode`, `tars`, `nutanix`). Skills are self-contained by default; cross-references via `/skill-name` mentions or relative markdown links are only permitted between skills in the same group (`skill-router` is exempt).
 - **`resources:`** - a YAML **list** of source URLs. It is functional, not decorative: `ask skills download-resources` reads it (implemented in `crates/skills-core/src/downloader.rs`) to (re)fetch vendored docs into the skill's `resources/auto/` directory (see the structure rule below), and reference skills rely on it. Keep it intact; never strip it.
 
-That is the complete allowed set, so the frontmatter stays small. Distinct from the above are the **legacy** keys `custom:`, `triggers:`, `category:`, and `type:` - forbidden. Earlier skills carry them mid-migration; a new or edited skill drops them, putting triggers into the `description` prose and taking the category from the directory. Do not confuse these forbidden legacy keys with the real, functional `resources:` and `metadata:` keys above.
+That is the complete allowed set, so the frontmatter stays small. Every promoted custom skill also requires an `agents/openai.yaml` sidecar with an explicit invocation policy. These authoring requirements exclude vendor snapshots and archived skills. Distinct from the above are the **legacy** keys `custom:`, `triggers:`, `category:`, and `type:` - forbidden. Earlier skills carry them mid-migration; a new or edited skill drops them, putting triggers into the `description` prose and taking the category from the directory. Do not confuse these forbidden legacy keys with the real, functional `resources:` and `metadata:` keys above.
 
 ## Invocation
 
-One axis splits every skill - who can reach it:
+Choose how the skill should be selected, then encode the same choice for Claude Code and Codex:
 
-- A **model-invoked** skill keeps its **description**, so the agent can fire it autonomously _and_ other skills can reach it (you can still type its name too). It pays a permanent **context load**: the description sits in the window every turn. Mechanics: omit `disable-model-invocation`, and write a description with rich trigger phrasing ("Use when the user wants..., mentions..., asks for...").
-- A **user-invoked** skill strips the description from the agent's reach: only you, typing its name, can invoke it - and no other skill can. Zero context load, but it spends **cognitive load**: _you_ are the index that must remember it exists. Mechanics: set `disable-model-invocation: true`, and make the `description` a human-facing one-line summary with the trigger lists stripped.
+- **Automatic**: focused references and bounded task helpers that the agent needs during an authorized task. Omit `disable-model-invocation` or set it to `false`, and set `policy.allow_implicit_invocation: true` in `agents/openai.yaml`.
+- **Explicit only**: publishing, lifecycle operations, large orchestration workflows, and catalogs intended for deliberate user initiation. Set `disable-model-invocation: true` and `policy.allow_implicit_invocation: false`.
 
-Choose model-invocation only when the agent must reach the skill on its own, or another skill must. Set `disable-model-invocation: true` when a skill meets any of these operational criteria:
+Judge the entry point and its role, not just its length or interactivity. A design interview helper such as `grilling` can remain automatic for an explicitly requested design interview or a bounded interview step required by an authorized parent workflow. Likewise, `git-resolve-conflicts` can remain automatic when an authorized Git operation encounters conflicts. Give each a narrow description that names that trigger.
 
-1. **High blast-radius or destructive actions**: operations such as deleting branches, wiping worktrees, or resetting databases.
-2. **Coarse multi-phase pipelines**: heavy orchestration workflows that require explicit human initiation and oversight.
-3. **Interactive interview protocols**: question-and-answer interrogation flows (such as interactive design interviews).
-4. **Meta-catalogs and indexes**: reference maps and router indexes (such as `/skill-router`).
+Automatic selection loads guidance; it does not authorize publishing, deletion, messages, or other actions. Follow the user's authorized scope and the skill's action gates after loading it.
+
+Enforcement varies by host. Claude Code supports `disable-model-invocation`; Codex uses its sidecar policy; OpenCode V2 supports the Claude field as an alias. OpenCode 1 and the inspected native Goose loader do not enforce it. Antigravity has no documented equivalent for disabling implicit selection; its CLI `disable-slash-command` field hides explicit slash invocation while keeping model invocation available. See [provider evidence and limitations](@/skills/authoring/skill-creator/resources/manual/invocation-compatibility.md) when choosing host-specific controls.
+
+For explicit-only skills, keep the trigger in the shared description and add this standing instruction near the start of the body:
+
+```text
+Use this skill only when the user explicitly requests its workflow.
+```
+
+On hosts without an invocation control, that instruction and the description are advisory guidance, not an enforced restriction. Do not promise universal zero context cost, removal from every model's catalog, or that other workflows can never reach the skill.
 
 ## Writing the description
 
-A model-invoked **description** does two jobs: state what the skill is, and list the **branches** that should trigger it. Every word adds context load, so prune it harder than the body.
+A shared **description** tells the model what the skill does and when it applies. All supported hosts use it for discovery, subject to their invocation controls and catalog budgets. Codex's `interface.short_description` is separate user-facing UI text and does not replace it.
 
-Follow the canonical 3-part description pattern:
+Write one or two sentences, usually aiming for 100-220 characters. This is an editing guideline, not a new validation ceiling. Name the capability and its concrete trigger; include a boundary only when it resolves a likely ambiguity. Explicit-only skills should say that the user must request the workflow.
 
 ```yaml
-description: [1. Capability verb phrase]. Use when [2. Explicit triggers, symptoms, user keywords]. Do not use for [3. Negative boundary / disambiguation]; use /sibling-skill instead.
+description: Explain repository module boundaries and interface tradeoffs. Use when designing a module or reviewing where an abstraction should live.
 ```
 
-- **Front-load the skill's leading word** - the description is where it does its invocation work.
-- **One trigger per branch.** Synonyms that rename a single branch are **duplication** - collapse them and keep only genuinely distinct branches.
-- **Cut identity already stated in the body.** Keep the description to triggers plus any "when another skill needs..." reach clause.
+- **Front-load the capability and main trigger.** Hosts may shorten descriptions when many skills are installed.
+- **Avoid keyword inventories.** Collapse synonyms and feature lists into the task the user is trying to complete.
+- **Keep the boundary concrete.** Distinguish adjacent workflows by their inputs or intended result; keep implementation detail in the body.
 - **No frontmatter slop or puffery.** Never begin descriptions with "This skill provides...", "Expert guidance for...", "Expert reference...", or "Comprehensive guide...". Lead immediately with the capability verb phrase (e.g. `Build...`, `Audit...`, `Deploy...`). Avoid buzzwords like "comprehensive", "robust", or "seamless". `ask skills lint` checks for these forbidden patterns.
 - **No em-dashes.** Never use em-dashes (Unicode U+2014) in skill names, frontmatter descriptions, or skill bodies; use standard hyphens (`-`), colons, commas, or restructure sentences. `ask skills lint --fix` can automatically sanitize em-dashes.
 
@@ -101,7 +108,7 @@ A skill's content is ranked by how immediately the agent needs it - the **inform
 ```text
 skills/<category>/<name>/
   SKILL.md          # entry point - steps and top-tier reference
-  agents/           # optional; harness-specific configurations
+  agents/           # required for promoted custom skills
     openai.yaml     # OpenAI Codex / ChatGPT app UI metadata and policy
   resources/        # optional; holds ONLY these two subdirectories:
     auto/           # downloader-owned - (re)fetched from the `resources:` URLs; never hand-edit
@@ -152,7 +159,7 @@ A skill is an operational manual for an agent, not a corporate marketing deck, t
 
 ## Stay host-agnostic
 
-A skill runs across multiple agent runtimes - Claude Code, OpenCode, Goose, Antigravity CLI, and OpenAI Codex - so the core `SKILL.md` must bind to no single host's tooling. Name the **capability**, not the product: "your task-tracking tool", "your agent's subagent mechanism", never one runtime's command, tool name, or built-in. Never bake in a personal or absolute path; keep paths repo-relative. A skill that reads the same on every host stays predictable on every host. Harness-specific UI metadata or policies belong exclusively in sidecars like `agents/openai.yaml`, keeping `SKILL.md` pure and universal.
+A skill runs across multiple agent runtimes - Claude Code, OpenCode, Goose, Antigravity CLI and IDE, and OpenAI Codex. Keep its procedure independent of a host's tooling. Name the **capability**, not the product: "your task-tracking tool", "your agent's subagent mechanism", never one runtime's command, tool name, or built-in. Never bake in a personal or absolute path; keep paths repo-relative. Put Codex UI metadata and policy in `agents/openai.yaml`, and mirror invocation intent in the supported `SKILL.md` field. A shared file does not make every host honor every optional field.
 
 ## Harness compatibility: `agents/openai.yaml`
 
@@ -171,9 +178,9 @@ policy:
 Key rules for `agents/openai.yaml`:
 
 - **`display_name`**: Human-facing Title Case name for skill lists, pickers, and badges.
-- **`short_description`**: Strictly between 25 and 64 characters long. No HTML angle brackets (`<` or `>`), no em-dashes, and unslop.
+- **`short_description`**: User-facing UI summary, 25-64 characters under this repository's authoring convention. Keep routing triggers in `SKILL.md` description. No HTML angle brackets (`<` or `>`), no em-dashes, and unslop.
 - **`default_prompt`**: Suggested prompt template for user invocation; must reference the skill name using `$skill-name` syntax.
-- **`policy.allow_implicit_invocation`**: Set to `false` for user-invoked skills (`disable-model-invocation: true`), destructive operations, or specialized handoffs. Set to `true` (or omit) for standard model-invoked skills.
+- **`policy.allow_implicit_invocation`**: Required explicit YAML boolean for every promoted custom skill. Set to `false` exactly when `disable-model-invocation: true`; otherwise set to `true`. Codex defaults an omitted policy to `true`, but this repository requires the choice to be written down.
 - **`dependencies.tools`**: Optional list declaring external tools such as MCP servers (`type: "mcp"`, `value`, `description`, `transport: "streamable_http"`, `url`).
 - **Formatting**: Keys must be unquoted, all string values must be quoted in double quotes, and indentation must be 2 spaces.
 
@@ -181,8 +188,8 @@ Key rules for `agents/openai.yaml`:
 
 **Granularity** is how finely you divide skills; each cut spends one of the two loads, so split only when the cut earns it. Two cuts:
 
-- **By invocation** - split off a model-invoked skill when a distinct **leading word** should trigger it on its own, or another skill must reach it. You pay context load for the new always-loaded description, so that independent reach has to be worth it.
-- **By sequence** - split a run of **steps** when the steps still ahead (a step's **post-completion steps**) tempt the agent to rush the one in front of it. Hiding them behind a real context boundary - a user-invoked hand-off or a `context: fork` subagent - encourages more legwork on the current task.
+- **By invocation** - split off a model-invoked skill when a distinct task should trigger it on its own, or another authorized workflow needs it. The new description increases catalog context, so that independent reach has to be worth it.
+- **By sequence** - split a run of **steps** when the steps still ahead (a step's **post-completion steps**) tempt the agent to rush the one in front of it. Use a real context boundary, such as a new session or an isolated subagent on a supporting host. Explicit invocation alone does not clear earlier context.
 
 ## Failure modes
 
@@ -201,20 +208,20 @@ Diagnose a misbehaving skill against these:
 - **Tautological labeling** - bold list lead-ins that merely repeat the item name instead of adding distinct operational signal.
 - **Generic filler** - boilerplate roadmaps or platitudinous checklists that apply to any project.
 
-| Failure Mode              | Bad Pattern (Anti-Pattern)                                           | Good Pattern (Remedy)                                                                                                                                                                                                                    |
-| :------------------------ | :------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Premature Completion**  | "Make sure all files are properly formatted."                        | "Run `cargo fmt --check` and verify exit code is 0 before proceeding."                                                                                                                                                                   |
-| **Negation**              | "Do not use unwrap() or leave errors unhandled."                     | "Handle every Result branch explicitly using `match` or `?`."                                                                                                                                                                            |
-| **No-Op**                 | "Be thorough and pay close attention to detail."                     | "Inspect every caller across the workspace with search tools before changing the signature."                                                                                                                                             |
-| **Duplication**           | Defining the same review checklist in three different sub-steps.     | Extract the checklist into `resources/manual/CHECKLIST.md` and link via a context pointer.                                                                                                                                               |
-| **Sediment**              | Leaving references to deprecated tools or dead directories.          | Audit every line against current tooling; delete stale references aggressively.                                                                                                                                                          |
-| **Trigger Ambiguity**     | `description: Helps with tests.`                                     | `description: Write test-first unit and integration tests using red-green-refactor. Use when building a new feature test-first or fixing a bug with regression tests. Do not use for legacy untested code; use /characterization-tests.` |
-| **Host Leakage**          | "Run the OpenCode subagent tool with argument X."                    | "Delegate the subtask to your agent's subagent mechanism."                                                                                                                                                                               |
-| **Verification Absence**  | "Finish the task and notify the user."                               | "Run `devenv --no-tui test` and `ask skills lint`; confirm zero failures before reporting."                                                                                                                                              |
-| **AI Slop / Puffery**     | `description: Expert guidance for developing robust, scalable apps.` | `description: Build and test scalable web services. Use when configuring...`                                                                                                                                                             |
-| **Heading Bloat**         | `### 1. **Phase 1: Comprehensive Initial Discovery**`                | `### 1. Discover existing schema`                                                                                                                                                                                                        |
-| **Tautological Labeling** | `- **Security:** Implement proper security measures.`                | `- **Security:** Sanitize inputs and restrict CORS origins to authorized hosts.`                                                                                                                                                         |
-| **Generic Filler**        | Adding a 20-line 48-hour checklist of generic development steps.     | Define checkable invariants, command executions, and exact exit criteria.                                                                                                                                                                |
+| Failure Mode              | Bad Pattern (Anti-Pattern)                                           | Good Pattern (Remedy)                                                                                                                                      |
+| :------------------------ | :------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Premature Completion**  | "Make sure all files are properly formatted."                        | "Run `cargo fmt --check` and verify exit code is 0 before proceeding."                                                                                     |
+| **Negation**              | "Do not use unwrap() or leave errors unhandled."                     | "Handle every Result branch explicitly using `match` or `?`."                                                                                              |
+| **No-Op**                 | "Be thorough and pay close attention to detail."                     | "Inspect every caller across the workspace with search tools before changing the signature."                                                               |
+| **Duplication**           | Defining the same review checklist in three different sub-steps.     | Extract the checklist into `resources/manual/CHECKLIST.md` and link via a context pointer.                                                                 |
+| **Sediment**              | Leaving references to deprecated tools or dead directories.          | Audit every line against current tooling; delete stale references aggressively.                                                                            |
+| **Trigger Ambiguity**     | `description: Helps with tests.`                                     | `description: Write tests before implementation using red-green-refactor. Use when the user requests a test-first feature or a regression test for a bug.` |
+| **Host Leakage**          | "Run the OpenCode subagent tool with argument X."                    | "Delegate the subtask to your agent's subagent mechanism."                                                                                                 |
+| **Verification Absence**  | "Finish the task and notify the user."                               | "Run `devenv --no-tui test` and `ask skills lint`; confirm zero failures before reporting."                                                                |
+| **AI Slop / Puffery**     | `description: Expert guidance for developing robust, scalable apps.` | `description: Build and test scalable web services. Use when configuring...`                                                                               |
+| **Heading Bloat**         | `### 1. **Phase 1: Comprehensive Initial Discovery**`                | `### 1. Discover existing schema`                                                                                                                          |
+| **Tautological Labeling** | `- **Security:** Implement proper security measures.`                | `- **Security:** Sanitize inputs and restrict CORS origins to authorized hosts.`                                                                           |
+| **Generic Filler**        | Adding a 20-line 48-hour checklist of generic development steps.     | Define checkable invariants, command executions, and exact exit criteria.                                                                                  |
 
 Prune sentence by sentence: run the no-op test on each sentence in isolation, and when one fails, delete the whole sentence rather than trim words from it. Be aggressive - most prose that fails should go, not be rewritten.
 
@@ -227,14 +234,15 @@ Regenerate derived artifacts, verify conventions, and update the router:
    - Check headings: are all headings plain sentence case without bold markup (`**` or `__`)?
    - Check vocabulary: are AI crutch words like "comprehensive", "utilize", "seamlessly", "furthermore", or "properly" absent?
    - Check advice: does every rule name a concrete mechanism or verifiable invariant rather than a vague platitude?
-2. Create or update `agents/openai.yaml` with valid `display_name`, `short_description` (25-64 chars), and `policy`.
+2. Create or update `agents/openai.yaml` with valid `display_name`, `short_description` (25-64 chars), and an explicit boolean `policy.allow_implicit_invocation` that agrees with `SKILL.md`.
 3. `devenv --no-tui shell -- ask skills lint` - validate frontmatter, naming, placement, links, formatting, and anti-slop rules (run with `--fix` to sanitize em-dashes).
 4. `devenv --no-tui shell -- ask skills sync` - update machine target symlinks and synchronize repository catalogs.
 5. `devenv --no-tui shell -- ask dashboard build` - compile markdown, generate search indexes, and update dashboard artifacts.
 6. Update the `/skill-router` index so the new or renamed skill is reachable.
-7. `devenv --no-tui shell -- prek run --all-files` - run git pre-commit hooks (managed via `prek`, never standalone `pre-commit`).
+7. Inside the active devenv shell, run `scripts/run-tests.sh -E 'test(promoted_custom_skills_have_matching_explicit_invocation_policies)'` to verify policy presence and parity across the promoted custom catalog.
+8. `devenv --no-tui shell -- prek run --all-files` - run git pre-commit hooks (managed via `prek`, never standalone `pre-commit`).
 
-Done when lint passes, sync leaves no further diff, and the router names the skill.
+Done when lint and the invocation policy test pass, sync leaves no further diff, and the router names the skill. Leave vendor snapshots and archived historical files unchanged.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
 

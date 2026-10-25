@@ -1,6 +1,6 @@
 +++
 title = "to-tickets"
-description = "Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, and publish them to your project's issue tracker - as one file per ticket locally, or as native blocking links on a real tracker."
+description = "Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .tars/issues automation."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -11,6 +11,8 @@ mermaid = false
 
 
 # To Tickets
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Break a plan, spec, or conversation into a set of **tickets** - tracer-bullet vertical slices, each declaring the tickets that **block** it.
 

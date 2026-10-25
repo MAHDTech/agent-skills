@@ -1,6 +1,6 @@
 +++
 title = "model-context-protocol"
-description = "Design, build, and debug Model Context Protocol (MCP) servers - implementing tools, resources, and prompts, managing JSON-RPC 2.0 protocol lifecycles, configuring stdio and Streamable HTTP transports, and using official SDKs (TypeScript, Python, Kotlin, Go). Use when implementing or testing MCP servers, defining tool schemas, managing resource subscriptions, or debugging with the MCP Inspector."
+description = "Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing."
 sort_by = "title"
 template = "skill.html"
 [extra]

@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model as you design - pin down the ubiquitous language in a CONTEXT.md glossary and record hard-to-reverse architectural decisions as ADRs. Use when you want to nail down domain terminology, challenge fuzzy or conflicting terms, invent edge-case scenarios to stress-test the model, or record an architectural decision - or when another skill needs to maintain the domain model.
+description: Clarify domain terms and relationships while designing software. Use to resolve conflicting terminology, stress-test scenarios, update a glossary, or record a consequential ADR.
 metadata:
   source: mattpocock/skills
   license: MIT

@@ -1,6 +1,6 @@
 +++
 title = "nutanix-api-v4"
-description = "API endpoints, SDK usage, OData filtering and sorting, namespace specifications, release updates, and troubleshooting for Nutanix v4 APIs (AOS 7.0+, Prism Central pc.2024.3+). Use when developing, integrating, or troubleshooting with Nutanix v4 REST APIs, Python/Go/Java/JavaScript v4 SDKs, OData parameters, or migrating off deprecated legacy Nutanix APIs (v1, v2, v3)."
+description = "Integrate or debug Nutanix v4 REST APIs and official SDKs. Use for OData queries, namespaces, version compatibility, or migrating legacy Nutanix API integrations."
 sort_by = "title"
 template = "skill.html"
 [extra]

@@ -1,6 +1,6 @@
 ---
 name: gh-resolve-pr-comments
-description: Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution
+description: "Address GitHub PR review feedback: collect and categorize comments, agree an action plan, apply fixes, and resolve threads. Use when asked to handle review comments on the current PR."
 disable-model-invocation: true
 resources:
   - https://cli.github.com/manual/gh_pr
@@ -11,6 +11,8 @@ metadata:
 <!-- omit in toc -->
 
 # Tend to GitHub PR Comments
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Consult the [gh pr manual](resources/auto/manual-gh_pr.md) for more details.
 

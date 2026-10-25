@@ -1,6 +1,6 @@
 ---
 name: critical-thinking
-description: Analyze your own immediately preceding response with rigorous, skeptical critical thinking - surfacing flaws, hidden assumptions, logical gaps, and overlooked risks. Use when you want your last answer stress-tested for weaknesses before the user acts on it.
+description: Stress-test your immediately preceding response for hidden assumptions, weak evidence, logical gaps, and practical risks. Use to challenge your own advice before the user acts, in the response's language.
 ---
 
 # Critical Thinking

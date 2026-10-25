@@ -1,6 +1,6 @@
 +++
 title = "egui"
-description = "Build immediate-mode GUIs in Rust using egui - widgets, layout, containers, styling, custom painting, state retention, eframe apps, and testing. Use when building desktop or web interfaces in Rust, creating custom immediate-mode widgets or canvas painters, styling egui visuals, or querying docs.rs rustdoc without hallucination."
+description = "Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures."
 sort_by = "title"
 template = "skill.html"
 [extra]

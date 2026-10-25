@@ -1,6 +1,6 @@
 +++
 title = "git-resolve-conflicts"
-description = "Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol"
+description = "Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior."
 sort_by = "title"
 template = "skill.html"
 [extra]

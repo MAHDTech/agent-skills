@@ -1,6 +1,6 @@
 ---
 name: tailwind
-description: Use when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
+description: Style components or build CSS with Tailwind CSS v4. Use for utility classes, CSS-first theme variables, imports, and CLI stylesheet compilation.
 resources:
   - https://tailwindcss.com/docs
 ---

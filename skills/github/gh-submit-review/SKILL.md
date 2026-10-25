@@ -1,6 +1,7 @@
 ---
 name: gh-submit-review
-description: Post a completed code review to a GitHub PR via the gh CLI - pick the event (approve, request-changes, or comment), attach inline line comments, and a summary body. Use when you have finished reviewing someone else's PR and need to submit the verdict, when a review pass (such as code review or edge-case probing) produced findings to publish, or when the user asks to approve, request changes on, or leave review comments on a pull request.
+description: Publish a completed review to a GitHub PR with an approval, request-changes, or comment verdict and inline findings. Use when asked to submit review feedback, rather than merely review code.
+disable-model-invocation: true
 resources:
   - https://cli.github.com/manual/gh_pr
 metadata:
@@ -8,6 +9,8 @@ metadata:
 ---
 
 # Submit a PR Review
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Consult the [gh pr manual](resources/auto/manual-gh_pr.md) for more details.
 

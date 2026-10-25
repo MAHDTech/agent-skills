@@ -1,6 +1,6 @@
 +++
 title = "spacetime"
-description = "Develop, publish, and debug Spacetime (formerly SpacetimeDB) backend modules in Rust, C#, TypeScript, or C++ and connect real-time clients. Use when defining tables, reducers, procedures, views, HTTP handlers, schedules, or subscriptions, using the spacetime CLI, generating client bindings, or migrating SpacetimeDB applications."
+description = "Develop or debug Spacetime/SpacetimeDB modules and real-time clients in Rust, C#, TypeScript, or C++. Use for schemas, backend functions, subscriptions, CLI work, bindings, or migrations."
 sort_by = "title"
 template = "skill.html"
 [extra]

@@ -1,6 +1,6 @@
 +++
 title = "cargo-doc"
-description = "Generate, query, and navigate local Rust documentation and docs.rs with zero hallucination. Use when researching Rust crate APIs, verifying struct and trait signatures, inspecting conditionally compiled feature flags, finding methods on types, or searching offline docs when internet or llms.txt is unavailable."
+description = "Verify Rust crate APIs with local cargo doc output or docs.rs. Use to inspect exact signatures, methods, traits, and feature-gated items for the project version."
 sort_by = "title"
 template = "skill.html"
 [extra]

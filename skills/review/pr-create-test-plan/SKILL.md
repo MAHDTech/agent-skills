@@ -1,6 +1,6 @@
 ---
 name: pr-create-test-plan
-description: Generate a manual test plan for a branch's changes - hands-on verification of real user flows and integration behaviour, not unit-test edge cases. Use when you want a copy-paste test plan a reviewer can run by hand before merging a PR.
+description: Draft TEST_PLAN.md for a branch's real user flows and integration changes using the project's commands. Use when a reviewer needs manual verification steps and a quick smoke test before merging.
 context: fork
 agent: general-purpose
 metadata:

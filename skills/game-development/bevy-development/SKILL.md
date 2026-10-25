@@ -1,6 +1,6 @@
 ---
 name: bevy-development
-description: Build 2D and 3D games in Bevy 0.19, Rust's data-driven ECS game engine - components, systems, scheduling, states, queries, input, assets, messages, and performance. Use when writing or modernizing Bevy code, laying out ECS data and systems, scheduling or gating systems, handling input/assets/messages, or migrating off deprecated Bevy APIs like bundles, delta_seconds, EventReader, or Parent.
+description: Build or modernize Bevy games and simulations in Rust. Use for ECS design, scheduling, input, assets, messages, performance, or migration between Bevy APIs.
 resources:
   - https://bevy.org/learn/migration-guides/
 ---

@@ -1,6 +1,6 @@
 ---
 name: proofread
-description: Proofread posts before publishing for spelling, grammar, repetition, logic, weak arguments, broken links, and optionally reformat for skimmability
+description: Proofread a post before publication for spelling, grammar, repetition, links, and weak reasoning. Use for error correction that preserves the author's voice; ask before logic changes or a skimmability pass.
 ---
 
 # Proofread

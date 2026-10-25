@@ -1,6 +1,6 @@
 +++
 title = "tdd"
-description = "Test-driven development done red-green-refactor. Use when building a feature or fixing a bug test-first, writing integration tests, deciding what to test and where the test seams go, or avoiding brittle implementation-coupled tests. Covers what a good test is, the anti-patterns to avoid, and the rules of the red-green loop."
+description = "Build features or fixes test-first using a red-to-green loop. Use for behavior-focused integration tests, choosing public test seams, and avoiding tests coupled to internals."
 sort_by = "title"
 template = "skill.html"
 [extra]

@@ -1,6 +1,6 @@
 +++
 title = "skill-router"
-description = "Route to the right skill for the task at hand - a map of every skill in this collection and when to reach for it."
+description = "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -11,6 +11,8 @@ mermaid = false
 
 
 # Skill Router
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 You don't remember every skill, so ask.
 

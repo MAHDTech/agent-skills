@@ -1,6 +1,6 @@
 +++
 title = "oak"
-description = "Operate Oak (oak.space), the developer platform and version control system built around persistent change IDs, working-copy commits, and Git compatibility. Use when working in an Oak repository (.oak/ directory), running oak CLI commands (oak log, oak st, oak diff, oak desc, oak new, oak sync, oak push, oak pr, oak undo, oak op, oak ws, oak mount, oak space, oak ci), managing stacked changes, isolating parallel AI agents with Oak workspaces, mounting dependencies, or configuring .oak/ci/workflows.json."
+description = "Use Oak version control in repositories with .oak, or for oak.space tasks. Manage change stacks, conflicts, workspaces, dependency mounts, spaces, and Oak CI."
 sort_by = "title"
 template = "skill.html"
 [extra]

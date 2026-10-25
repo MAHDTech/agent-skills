@@ -1,6 +1,6 @@
 +++
 title = "scope-sweep"
-description = "Final pass to identify missed items, edge cases, and risks before considering a scope done. Use as a final breadth pass before calling a scope or task done - to catch missed items, overlooked requirements, edge cases, and risks after the core work is complete and reviewed."
+description = "Run a final breadth check after the core work and review to catch missed requirements, incomplete tasks, edge cases, and operational risks. Use before declaring a scope complete, with evidence for remaining gaps."
 sort_by = "title"
 template = "skill.html"
 [extra]

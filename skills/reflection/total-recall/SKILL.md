@@ -1,12 +1,15 @@
 ---
 name: total-recall
-description: Record a human-reviewable decision trail for long-running, autonomous, or high-risk tasks. Writes an append-only TSV decision log (ts, phase, decision, why, evidence, result) and audits it against runtime transcripts. Use when running multi-phase migrations, autonomous loops, risky refactors, or when requested via /total-recall.
+description: Maintain an append-only TSV decision trail and audit its evidence against the transcript. Use when explicitly requesting a persistent audit trail for autonomous work, multi-phase migrations, or risky refactors.
+disable-model-invocation: true
 metadata:
   source: mahdtech/agent-skills
   license: MIT
 ---
 
 # Total Recall
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Record a permanent, human-reviewable memory trail of what was decided, why, and on what evidence during autonomous or long-running work.
 

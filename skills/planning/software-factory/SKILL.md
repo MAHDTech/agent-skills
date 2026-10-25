@@ -1,12 +1,14 @@
 ---
 name: software-factory
-description: Run a feature through four approval gates - Product, Architecture, Program Design, Slices - so every decision that matters is made and signed off before implementation code exists.
+description: Guide a feature through Product, Architecture, Program Design, and Slice approval gates, then implement verified vertical slices. Use when asked for the full design-to-delivery factory workflow.
 disable-model-invocation: true
 metadata:
   group: planning-pipeline
 ---
 
 # Software Factory
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Make every decision that matters while changing it still costs a sentence. Once thousands of lines exist, the same change costs a rewrite - and the sessions that produce design docs are context-light, so that is where you get the most model intelligence.
 

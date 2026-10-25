@@ -1,4 +1,7 @@
 interface:
   display_name: "Jujutsu (jj) Version Control"
-  short_description: "Operate Jujutsu (jj) version control, revsets, bookmarks, conflicts, and Git workflows"
+  short_description: "Manage Jujutsu history, revsets, bookmarks, and conflicts"
   default_prompt: "Use $jj to manage Jujutsu (jj) version control, revsets, bookmarks, conflict resolution, and GitHub workflows."
+
+policy:
+  allow_implicit_invocation: true

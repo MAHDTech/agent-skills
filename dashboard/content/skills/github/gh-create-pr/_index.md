@@ -1,6 +1,6 @@
 +++
 title = "gh-create-pr"
-description = "Generate a PR title and description, then commit, create/update the PR on approval"
+description = "Draft a Conventional Commit PR title and description from a branch diff. Use when asked to create or update a PR, including committing, pushing, and publishing after approval."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -13,6 +13,8 @@ mermaid = false
 <!-- omit in toc -->
 
 # Quick PR Description
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Consult the [gh pr manual](@/skills/github/gh-create-pr/resources/auto/manual-gh_pr.md) for more details.
 
