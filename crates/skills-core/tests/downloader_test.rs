@@ -273,3 +273,98 @@ async fn test_fetch_url_nonexistent_fails() {
     let res = downloader.fetch_url("http://127.0.0.1:9/nonexistent").await;
     assert!(res.is_err());
 }
+
+#[tokio::test]
+async fn test_download_skill_resources_llms_expansion_collision_and_orphan_pruning() {
+    let mock_server = MockServer::start().await;
+    let base_uri = mock_server.uri();
+
+    let llms_body = format!(
+        "- [Guide]({base_uri}/docs/guide.md)\n- [Duplicate Guide]({base_uri}/docs/guide.md)\n- [Broken Child]({base_uri}/docs/missing.md)\n"
+    );
+
+    Mock::given(method("GET"))
+        .and(path("/llms.txt"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(llms_body))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/docs/guide.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_string("# Child Guide"))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/docs/missing.md"))
+        .respond_with(ResponseTemplate::new(404))
+        .mount(&mock_server)
+        .await;
+
+    let dir = tempdir().unwrap();
+    let skill_dir = dir.path().join("skills/engineering/llms-skill");
+    let auto_dir = skill_dir.join("resources/auto");
+    fs::create_dir_all(&auto_dir).unwrap();
+
+    // Seed an orphan file (should be pruned) and a hidden file (should be preserved)
+    let orphan_path = auto_dir.join("stale-orphan.md");
+    let hidden_path = auto_dir.join(".keep");
+    fs::write(&orphan_path, "old content").unwrap();
+    fs::write(&hidden_path, "keep").unwrap();
+
+    let skill_path = skill_dir.join("SKILL.md");
+    let fm = SkillFrontmatter::builder()
+        .name("llms-skill")
+        .description("Test llms expansion and pruning")
+        .resources(vec![
+            format!("{base_uri}/llms.txt"),
+            format!("{base_uri}/docs/guide.md?duplicate=1"),
+            format!("{base_uri}/assets/diagram.png"),
+        ])
+        .build();
+
+    let skill = Skill::builder()
+        .path(skill_path)
+        .dir_name("llms-skill".to_string())
+        .category(SkillCategory::Engineering)
+        .promoted(true)
+        .frontmatter(fm)
+        .content("# Content".to_string())
+        .raw("---\nname: llms-skill\n---".to_string())
+        .resources(Vec::new())
+        .build();
+
+    let downloader = SkillDownloader::builder().max_retries(0).build();
+    let files = downloader.download_skill_resources(&skill).await.unwrap();
+
+    // Expects llms.txt, child guide.md, and duplicate guide.md with domain prefix
+    assert_eq!(files.len(), 3);
+    assert!(!orphan_path.exists());
+    assert!(hidden_path.exists());
+}
+
+#[tokio::test]
+async fn test_download_skill_resources_skips_vendor_skill() {
+    let skill_path = std::path::PathBuf::from("skills/vendor/acme/vendor-skill/SKILL.md");
+
+    let fm = SkillFrontmatter::builder()
+        .name("vendor-skill")
+        .description("Vendor skill")
+        .resources(vec!["http://127.0.0.1:9/should-not-fetch.md".to_string()])
+        .build();
+
+    let skill = Skill::builder()
+        .path(skill_path)
+        .dir_name("vendor-skill".to_string())
+        .category(SkillCategory::Engineering)
+        .promoted(true)
+        .frontmatter(fm)
+        .content("# Vendor".to_string())
+        .raw("---\nname: vendor-skill\n---".to_string())
+        .resources(Vec::new())
+        .build();
+
+    let downloader = SkillDownloader::new();
+    let files = downloader.download_skill_resources(&skill).await.unwrap();
+    assert!(files.is_empty());
+}

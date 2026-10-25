@@ -6,6 +6,7 @@
 }:
 let
   isNative = !config.container.isBuilding;
+  rustInputs = "\\.rs$|(^|/)Cargo\\.(toml|lock)$|^rust-toolchain\\.toml$|^devenv\\.(nix|yaml|lock)$";
 
   # Packages are installed native and in containers.
   packages = with pkgs; [
@@ -132,7 +133,15 @@ in
         enable = true;
         excludes = [ "^skills/vendor/" ];
       };
-      cargo-check.enable = true;
+      cargo-check = {
+        enable = true;
+        files = rustInputs;
+        args = [
+          "--workspace"
+          "--all-targets"
+          "--locked"
+        ];
+      };
       check-json = {
         enable = true;
         excludes = [ "^skills/vendor/" ];
@@ -153,7 +162,11 @@ in
         enable = true;
         excludes = [ "^skills/vendor/" ];
       };
-      clippy.enable = true;
+      clippy = {
+        enable = true;
+        files = rustInputs;
+        settings.extraArgs = "--workspace --all-targets --locked";
+      };
       commitizen.enable = true;
       convco = {
         enable = true;
@@ -188,7 +201,10 @@ in
       deadnix.enable = true;
       editorconfig-checker = {
         enable = true;
-        excludes = [ "^skills/vendor/" ];
+        excludes = [
+          "\\.lock$"
+          "^skills/vendor/"
+        ];
       };
       lychee = {
         enable = true;
@@ -373,6 +389,6 @@ in
   };
 
   enterTest = ''
-    cargo nextest run --workspace --all-targets || cargo test --workspace --all-targets
+    ./scripts/run-tests.sh
   '';
 }

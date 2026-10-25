@@ -16,9 +16,10 @@ use thiserror::Error;
 
 use crate::error::SkillError;
 use crate::installer::{
-    InstallMode, InstallOptions, InstalledSkill, Installer, InstallerError, IntegrityStatus,
-    PathValidator, TargetEnvironment, UninstallOptions, collect_file_entries, compute_dir_checksum,
-    default_exclude_patterns, is_excluded, normalize_path, timestamp_now_iso,
+    InstallMode, InstallOptions, InstalledSkill, InstalledSkillsRegistry, Installer,
+    InstallerError, IntegrityStatus, PathValidator, TargetEnvironment, UninstallOptions,
+    collect_file_entries, compute_dir_checksum, default_exclude_patterns, is_excluded,
+    normalize_path, timestamp_now_iso,
 };
 use crate::models::SkillFrontmatter;
 use crate::parser::SkillParser;
@@ -595,7 +596,6 @@ impl SkillSyncer {
     }
 
     /// Computes a side-effect-free reconciliation plan across all configured targets.
-    #[allow(clippy::too_many_lines)]
     pub fn create_plan(&self) -> Result<SyncPlan, SyncError> {
         let catalog_skills = self.discover_catalog_skills()?;
         let owned_sources: Vec<PathBuf> = std::iter::once(&self.catalog_dir)
@@ -606,249 +606,339 @@ impl SkillSyncer {
         sorted_catalog_skills.sort_by_key(|(id, _)| *id);
 
         let mut actions = Vec::new();
-
         for target in &self.targets {
-            let registry = self.installer.read_registry(target)?;
-            let skills_dir = self.installer.resolve_target_dir(target)?;
-
-            // 1. Process catalog skills against target (in deterministic alphabetical order)
-            for (skill_id, source_path) in &sorted_catalog_skills {
-                let (_, _, source_version) = extract_skill_info(source_path);
-                let entries = collect_file_entries(source_path, &self.exclude_patterns)?;
-                let source_checksum = compute_dir_checksum(&entries);
-
-                if let Some(installed_skill) = registry.get(skill_id) {
-                    let target_path = skills_dir.join(skill_id);
-                    let link_destination = fs::read_link(&target_path).ok().map(|path| {
-                        if path.is_absolute() {
-                            path
-                        } else {
-                            skills_dir.join(path)
-                        }
-                    });
-                    let managed_link = installed_skill.mode == InstallMode::Symlink
-                        && link_destination.as_ref().is_some_and(|path| {
-                            crate::installer::normalize_path(path)
-                                == crate::installer::normalize_path(&installed_skill.source_path)
-                        });
-                    let source_link = managed_link
-                        && target_path.canonicalize().ok() == source_path.canonicalize().ok();
-                    let stale_link = managed_link && !source_link;
-                    if stale_link {
-                        actions.push(SyncAction {
-                            skill_id: (*skill_id).clone(),
-                            target_env: target.clone(),
-                            kind: SyncActionKind::Update,
-                            source_version: Some(source_version),
-                            target_version: Some(installed_skill.version.clone()),
-                            source_checksum: Some(source_checksum),
-                            target_checksum: Some(installed_skill.checksum.clone()),
-                            reason: "Point managed symlink at the authoritative catalog"
-                                .to_string(),
-                        });
-                        continue;
-                    }
-
-                    let integrity = self.installer.verify(skill_id, target)?;
-                    let is_tampered = (installed_skill.mode == InstallMode::Symlink
-                        && !managed_link)
-                        || (!source_link && !matches!(integrity, IntegrityStatus::Valid));
-
-                    if is_tampered {
-                        actions.push(SyncAction {
-                            skill_id: (*skill_id).clone(),
-                            target_env: target.clone(),
-                            kind: SyncActionKind::Conflict,
-                            source_version: Some(source_version),
-                            target_version: Some(installed_skill.version.clone()),
-                            source_checksum: Some(source_checksum),
-                            target_checksum: Some(installed_skill.checksum.clone()),
-                            reason: format!(
-                                "Target integrity verification failed for '{skill_id}': files modified or missing out-of-band"
-                            ),
-                        });
-                    } else {
-                        let version_cmp =
-                            compare_versions(&source_version, &installed_skill.version);
-
-                        match version_cmp {
-                            Ordering::Greater => {
-                                actions.push(SyncAction {
-                                    skill_id: (*skill_id).clone(),
-                                    target_env: target.clone(),
-                                    kind: SyncActionKind::Update,
-                                    source_version: Some(source_version.clone()),
-                                    target_version: Some(installed_skill.version.clone()),
-                                    source_checksum: Some(source_checksum),
-                                    target_checksum: Some(installed_skill.checksum.clone()),
-                                    reason: format!(
-                                        "Source has newer version ({source_version} > {})",
-                                        installed_skill.version
-                                    ),
-                                });
-                            }
-                            Ordering::Less => {
-                                actions.push(SyncAction {
-                                        skill_id: (*skill_id).clone(),
-                                        target_env: target.clone(),
-                                        kind: SyncActionKind::Conflict,
-                                        source_version: Some(source_version.clone()),
-                                        target_version: Some(installed_skill.version.clone()),
-                                        source_checksum: Some(source_checksum),
-                                        target_checksum: Some(installed_skill.checksum.clone()),
-                                        reason: format!(
-                                            "Local catalog version is older than target ({source_version} < {}) - downgrade hazard",
-                                            installed_skill.version
-                                        ),
-                                    });
-                            }
-                            Ordering::Equal => {
-                                if source_checksum == installed_skill.checksum {
-                                    actions.push(SyncAction {
-                                        skill_id: (*skill_id).clone(),
-                                        target_env: target.clone(),
-                                        kind: SyncActionKind::NoOp,
-                                        source_version: Some(source_version),
-                                        target_version: Some(installed_skill.version.clone()),
-                                        source_checksum: Some(source_checksum),
-                                        target_checksum: Some(installed_skill.checksum.clone()),
-                                        reason: "Skill is up to date (version and checksum match)"
-                                            .to_string(),
-                                    });
-                                } else {
-                                    actions.push(SyncAction {
-                                            skill_id: (*skill_id).clone(),
-                                            target_env: target.clone(),
-                                            kind: SyncActionKind::Update,
-                                            source_version: Some(source_version.clone()),
-                                            target_version: Some(installed_skill.version.clone()),
-                                            source_checksum: Some(source_checksum),
-                                            target_checksum: Some(installed_skill.checksum.clone()),
-                                            reason: format!(
-                                                "Content drift detected at version {source_version} (checksum mismatch)"
-                                            ),
-                                        });
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // Not in target registry
-                    let target_path = skills_dir.join(skill_id);
-                    let target_exists =
-                        target_path.exists() || target_path.symlink_metadata().is_ok();
-                    let reason = if target_exists {
-                        "Untracked target exists on disk".to_string()
-                    } else {
-                        "Skill not installed in target environment".to_string()
-                    };
-
-                    actions.push(SyncAction {
-                        skill_id: (*skill_id).clone(),
-                        target_env: target.clone(),
-                        kind: if target_exists {
-                            SyncActionKind::Conflict
-                        } else {
-                            SyncActionKind::Install
-                        },
-                        source_version: Some(source_version),
-                        target_version: None,
-                        source_checksum: Some(source_checksum),
-                        target_checksum: None,
-                        reason,
-                    });
-                }
-            }
-
-            // 2. Process orphaned installed skills in deterministic alphabetical order
-            let mut sorted_registry_skills: Vec<(&String, &InstalledSkill)> =
-                registry.skills.iter().collect();
-            sorted_registry_skills.sort_by_key(|(id, _)| *id);
-
-            for (installed_id, installed_skill) in sorted_registry_skills {
-                if !catalog_skills.contains_key(installed_id) {
-                    if self.prune_orphans
-                        && owns_orphan(installed_id, installed_skill, &skills_dir, &owned_sources)
-                    {
-                        actions.push(SyncAction {
-                            skill_id: installed_id.clone(),
-                            target_env: target.clone(),
-                            kind: SyncActionKind::Delete,
-                            source_version: None,
-                            target_version: Some(installed_skill.version.clone()),
-                            source_checksum: None,
-                            target_checksum: Some(installed_skill.checksum.clone()),
-                            reason: "Skill removed from catalog (orphan pruning enabled)"
-                                .to_string(),
-                        });
-                    } else {
-                        actions.push(SyncAction {
-                            skill_id: installed_id.clone(),
-                            target_env: target.clone(),
-                            kind: SyncActionKind::NoOp,
-                            source_version: None,
-                            target_version: Some(installed_skill.version.clone()),
-                            source_checksum: None,
-                            target_checksum: Some(installed_skill.checksum.clone()),
-                            reason: if self.prune_orphans {
-                                "Orphan retained: installation is not owned by this catalog"
-                                    .to_string()
-                            } else {
-                                "Orphan skill in target retained (prune_orphans = false)"
-                                    .to_string()
-                            },
-                        });
-                    }
-                }
-            }
-
-            if self.prune_orphans && skills_dir.is_dir() {
-                let mut entries = fs::read_dir(&skills_dir)
-                    .and_then(|entries| entries.collect::<std::io::Result<Vec<_>>>())
-                    .map_err(|source| SyncError::Io {
-                        path: skills_dir.clone(),
-                        source,
-                    })?;
-                entries.sort_by_key(std::fs::DirEntry::file_name);
-                for entry in entries {
-                    let Some(skill_id) = entry.file_name().to_str().map(str::to_owned) else {
-                        continue;
-                    };
-                    if catalog_skills.contains_key(&skill_id)
-                        || registry.skills.contains_key(&skill_id)
-                        || PathValidator::validate_skill_id(&skill_id).is_err()
-                    {
-                        continue;
-                    }
-                    let path = entry.path();
-                    let metadata = entry.file_type().map_err(|source| SyncError::Io {
-                        path: path.clone(),
-                        source,
-                    })?;
-                    if !metadata.is_symlink() {
-                        continue;
-                    }
-                    let source =
-                        fs::read_link(&path).map_err(|source| SyncError::Io { path, source })?;
-                    let source = skills_dir.join(source);
-                    if source_is_owned(&source, &owned_sources) {
-                        actions.push(SyncAction {
-                            skill_id,
-                            target_env: target.clone(),
-                            kind: SyncActionKind::Delete,
-                            source_version: None,
-                            target_version: None,
-                            source_checksum: None,
-                            target_checksum: None,
-                            reason: "Unregistered symlink points to an obsolete catalog skill"
-                                .to_string(),
-                        });
-                    }
-                }
-            }
+            self.plan_target(
+                target,
+                &catalog_skills,
+                &sorted_catalog_skills,
+                &owned_sources,
+                &mut actions,
+            )?;
         }
 
         Ok(SyncPlan::new(actions))
+    }
+
+    fn plan_target(
+        &self,
+        target: &TargetEnvironment,
+        catalog_skills: &HashMap<String, PathBuf>,
+        sorted_catalog_skills: &[(&String, &PathBuf)],
+        owned_sources: &[PathBuf],
+        actions: &mut Vec<SyncAction>,
+    ) -> Result<(), SyncError> {
+        let registry = self.installer.read_registry(target)?;
+        let skills_dir = self.installer.resolve_target_dir(target)?;
+
+        // 1. Process catalog skills against target (in deterministic alphabetical order)
+        for (skill_id, source_path) in sorted_catalog_skills {
+            let action =
+                self.plan_catalog_skill(target, &skills_dir, &registry, skill_id, source_path)?;
+            actions.push(action);
+        }
+
+        // 2. Process orphaned installed skills in deterministic alphabetical order
+        self.plan_registered_orphans(
+            target,
+            &skills_dir,
+            catalog_skills,
+            &registry,
+            owned_sources,
+            actions,
+        );
+
+        // 3. Process unregistered symlinks pointing to owned catalog sources
+        self.plan_unregistered_orphans(
+            target,
+            &skills_dir,
+            catalog_skills,
+            &registry,
+            owned_sources,
+            actions,
+        )
+    }
+
+    fn plan_catalog_skill(
+        &self,
+        target: &TargetEnvironment,
+        skills_dir: &Path,
+        registry: &InstalledSkillsRegistry,
+        skill_id: &str,
+        source_path: &Path,
+    ) -> Result<SyncAction, SyncError> {
+        let (_, _, source_version) = extract_skill_info(source_path);
+        let entries = collect_file_entries(source_path, &self.exclude_patterns)?;
+        let source_checksum = compute_dir_checksum(&entries);
+
+        if let Some(installed_skill) = registry.get(skill_id) {
+            return self.plan_installed_skill(
+                target,
+                skills_dir,
+                skill_id,
+                source_path,
+                source_version,
+                source_checksum,
+                installed_skill,
+            );
+        }
+
+        let target_path = skills_dir.join(skill_id);
+        let target_exists = target_path.exists() || target_path.symlink_metadata().is_ok();
+        let (kind, reason) = if target_exists {
+            (
+                SyncActionKind::Conflict,
+                "Untracked target exists on disk".to_string(),
+            )
+        } else {
+            (
+                SyncActionKind::Install,
+                "Skill not installed in target environment".to_string(),
+            )
+        };
+
+        Ok(SyncAction {
+            skill_id: skill_id.to_owned(),
+            target_env: target.clone(),
+            kind,
+            source_version: Some(source_version),
+            target_version: None,
+            source_checksum: Some(source_checksum),
+            target_checksum: None,
+            reason,
+        })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn plan_installed_skill(
+        &self,
+        target: &TargetEnvironment,
+        skills_dir: &Path,
+        skill_id: &str,
+        source_path: &Path,
+        source_version: String,
+        source_checksum: String,
+        installed_skill: &InstalledSkill,
+    ) -> Result<SyncAction, SyncError> {
+        let target_path = skills_dir.join(skill_id);
+        let link_destination = fs::read_link(&target_path).ok().map(|path| {
+            if path.is_absolute() {
+                path
+            } else {
+                skills_dir.join(path)
+            }
+        });
+        let managed_link = installed_skill.mode == InstallMode::Symlink
+            && link_destination.as_ref().is_some_and(|path| {
+                normalize_path(path) == normalize_path(&installed_skill.source_path)
+            });
+        let source_link =
+            managed_link && target_path.canonicalize().ok() == source_path.canonicalize().ok();
+        if managed_link && !source_link {
+            return Ok(SyncAction {
+                skill_id: skill_id.to_owned(),
+                target_env: target.clone(),
+                kind: SyncActionKind::Update,
+                source_version: Some(source_version),
+                target_version: Some(installed_skill.version.clone()),
+                source_checksum: Some(source_checksum),
+                target_checksum: Some(installed_skill.checksum.clone()),
+                reason: "Point managed symlink at the authoritative catalog".to_string(),
+            });
+        }
+
+        let integrity = self.installer.verify(skill_id, target)?;
+        let is_tampered = (installed_skill.mode == InstallMode::Symlink && !managed_link)
+            || (!source_link && !matches!(integrity, IntegrityStatus::Valid));
+
+        if is_tampered {
+            return Ok(SyncAction {
+                skill_id: skill_id.to_owned(),
+                target_env: target.clone(),
+                kind: SyncActionKind::Conflict,
+                source_version: Some(source_version),
+                target_version: Some(installed_skill.version.clone()),
+                source_checksum: Some(source_checksum),
+                target_checksum: Some(installed_skill.checksum.clone()),
+                reason: format!(
+                    "Target integrity verification failed for '{skill_id}': files modified or missing out-of-band"
+                ),
+            });
+        }
+
+        Ok(Self::plan_verified_skill(
+            target,
+            skill_id,
+            source_version,
+            source_checksum,
+            installed_skill,
+        ))
+    }
+
+    fn plan_verified_skill(
+        target: &TargetEnvironment,
+        skill_id: &str,
+        source_version: String,
+        source_checksum: String,
+        installed_skill: &InstalledSkill,
+    ) -> SyncAction {
+        let (kind, reason) = match compare_versions(&source_version, &installed_skill.version) {
+            Ordering::Greater => (
+                SyncActionKind::Update,
+                format!(
+                    "Source has newer version ({source_version} > {})",
+                    installed_skill.version
+                ),
+            ),
+            Ordering::Less => (
+                SyncActionKind::Conflict,
+                format!(
+                    "Local catalog version is older than target ({source_version} < {}) - downgrade hazard",
+                    installed_skill.version
+                ),
+            ),
+            Ordering::Equal if source_checksum == installed_skill.checksum => (
+                SyncActionKind::NoOp,
+                "Skill is up to date (version and checksum match)".to_string(),
+            ),
+            Ordering::Equal => (
+                SyncActionKind::Update,
+                format!("Content drift detected at version {source_version} (checksum mismatch)"),
+            ),
+        };
+
+        SyncAction {
+            skill_id: skill_id.to_owned(),
+            target_env: target.clone(),
+            kind,
+            source_version: Some(source_version),
+            target_version: Some(installed_skill.version.clone()),
+            source_checksum: Some(source_checksum),
+            target_checksum: Some(installed_skill.checksum.clone()),
+            reason,
+        }
+    }
+
+    fn plan_registered_orphans(
+        &self,
+        target: &TargetEnvironment,
+        skills_dir: &Path,
+        catalog_skills: &HashMap<String, PathBuf>,
+        registry: &InstalledSkillsRegistry,
+        owned_sources: &[PathBuf],
+        actions: &mut Vec<SyncAction>,
+    ) {
+        let mut sorted_registry_skills: Vec<(&String, &InstalledSkill)> =
+            registry.skills.iter().collect();
+        sorted_registry_skills.sort_by_key(|(id, _)| *id);
+
+        for (installed_id, installed_skill) in sorted_registry_skills {
+            if catalog_skills.contains_key(installed_id) {
+                continue;
+            }
+            let (kind, reason) = if self.prune_orphans
+                && owns_orphan(installed_id, installed_skill, skills_dir, owned_sources)
+            {
+                (
+                    SyncActionKind::Delete,
+                    "Skill removed from catalog (orphan pruning enabled)".to_string(),
+                )
+            } else if self.prune_orphans {
+                (
+                    SyncActionKind::NoOp,
+                    "Orphan retained: installation is not owned by this catalog".to_string(),
+                )
+            } else {
+                (
+                    SyncActionKind::NoOp,
+                    "Orphan skill in target retained (prune_orphans = false)".to_string(),
+                )
+            };
+
+            actions.push(SyncAction {
+                skill_id: installed_id.clone(),
+                target_env: target.clone(),
+                kind,
+                source_version: None,
+                target_version: Some(installed_skill.version.clone()),
+                source_checksum: None,
+                target_checksum: Some(installed_skill.checksum.clone()),
+                reason,
+            });
+        }
+    }
+
+    fn plan_unregistered_orphans(
+        &self,
+        target: &TargetEnvironment,
+        skills_dir: &Path,
+        catalog_skills: &HashMap<String, PathBuf>,
+        registry: &InstalledSkillsRegistry,
+        owned_sources: &[PathBuf],
+        actions: &mut Vec<SyncAction>,
+    ) -> Result<(), SyncError> {
+        if !self.prune_orphans || !skills_dir.is_dir() {
+            return Ok(());
+        }
+
+        let mut entries = fs::read_dir(skills_dir)
+            .and_then(|entries| entries.collect::<std::io::Result<Vec<_>>>())
+            .map_err(|source| SyncError::Io {
+                path: skills_dir.to_path_buf(),
+                source,
+            })?;
+        entries.sort_by_key(std::fs::DirEntry::file_name);
+
+        for entry in entries {
+            if let Some(skill_id) = Self::unregistered_orphan_id(
+                &entry,
+                skills_dir,
+                catalog_skills,
+                registry,
+                owned_sources,
+            )? {
+                actions.push(SyncAction {
+                    skill_id,
+                    target_env: target.clone(),
+                    kind: SyncActionKind::Delete,
+                    source_version: None,
+                    target_version: None,
+                    source_checksum: None,
+                    target_checksum: None,
+                    reason: "Unregistered symlink points to an obsolete catalog skill".to_string(),
+                });
+            }
+        }
+
+        Ok(())
+    }
+
+    fn unregistered_orphan_id(
+        entry: &fs::DirEntry,
+        skills_dir: &Path,
+        catalog_skills: &HashMap<String, PathBuf>,
+        registry: &InstalledSkillsRegistry,
+        owned_sources: &[PathBuf],
+    ) -> Result<Option<String>, SyncError> {
+        let Some(skill_id) = entry.file_name().to_str().map(str::to_owned) else {
+            return Ok(None);
+        };
+        if catalog_skills.contains_key(&skill_id)
+            || registry.skills.contains_key(&skill_id)
+            || PathValidator::validate_skill_id(&skill_id).is_err()
+        {
+            return Ok(None);
+        }
+        let path = entry.path();
+        let metadata = entry.file_type().map_err(|source| SyncError::Io {
+            path: path.clone(),
+            source,
+        })?;
+        if !metadata.is_symlink() {
+            return Ok(None);
+        }
+        let source = fs::read_link(&path).map_err(|source| SyncError::Io { path, source })?;
+        let source = skills_dir.join(source);
+        Ok(source_is_owned(&source, owned_sources).then_some(skill_id))
     }
 
     /// Executes a pre-computed synchronization plan, applying conflict policies and mutations.

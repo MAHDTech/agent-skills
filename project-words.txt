@@ -63,6 +63,7 @@ driveupload
 edgecase
 eframe
 egui
+endcomponent
 endmacro
 endraw
 esac

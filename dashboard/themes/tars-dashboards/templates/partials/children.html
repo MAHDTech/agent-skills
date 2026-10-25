@@ -1,19 +1,16 @@
 {#
-  Shared macro: renders the alphabetically-sorted child sections and pages
+  Shared component: renders the alphabetically-sorted child sections and pages
   of the current section. Used by both index.html and section.html to stay DRY.
 
   Usage:
-    {{ children_macros::render_children(section=section) }}
+    {{ <render_children section={section} /> }}
 #}
 
-{% macro render_children(section) %}
+{% component render_children(section) %}
   {% if section.subsections | length > 0 %}
     <h2>Sections</h2>
     <ul>
-      {% set_global _child_subs = [] %}
-      {% for path in section.subsections %}
-        {% set_global _child_subs = _child_subs | concat(with=get_section(path=path)) %}
-      {% endfor %}
+      {% set _child_subs = [get_section(path=path) for path in section.subsections] %}
       {% for subsection in _child_subs | sort(attribute="title") %}
         <li>
           <a href="{{ subsection.permalink }}">{{ subsection.title }}</a>
@@ -41,4 +38,4 @@
       {% endfor %}
     </ul>
   {% endif %}
-{% endmacro render_children %}
+{% endcomponent render_children %}

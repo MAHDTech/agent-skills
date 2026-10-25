@@ -416,7 +416,10 @@ fn test_cli_action_flag() {
         .code(0);
 
     assert!(output_dir.exists());
-    assert!(output_dir.join("index.html").exists());
+    let home = std::fs::read_to_string(output_dir.join("index.html")).unwrap();
+    assert!(home.contains("<h2>Sections</h2>"));
+    let skill = std::fs::read_to_string(output_dir.join("skills/tooling/zola/index.html")).unwrap();
+    assert!(skill.contains("id=\"sidebar-active-item\""));
 
     Command::cargo_bin("ask")
         .unwrap()

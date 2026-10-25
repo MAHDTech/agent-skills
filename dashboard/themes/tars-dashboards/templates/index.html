@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import "partials/children_macros.html" as children_macros %}
 
 {% block content %}
 <div class="prose max-w-none" data-pagefind-body>
@@ -13,6 +12,6 @@
 
   {{ section.content | safe }}
 
-  {{ children_macros::render_children(section=section) }}
+  {{ <render_children section={section} /> }}
 </div>
 {% endblock content %}

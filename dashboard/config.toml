@@ -4,6 +4,8 @@ title = "Agent Skills"
 description = "A collection of AI agent skills"
 theme = "tars-dashboards"
 output_dir = "public"
+# Skill documentation contains literal template and GitHub Actions examples.
+skip_content_templating = ["**/*.md"]
 
 [link_checker]
 internal_level = "warn"

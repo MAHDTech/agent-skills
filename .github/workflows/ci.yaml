@@ -27,6 +27,7 @@ jobs:
     with:
       job-name: validate
       lint-command: prek run --all-files
+      test-command: ./scripts/run-tests.sh
       cleanup-android: true
       cleanup-dotnet: true
       cleanup-haskell: true
