@@ -139,26 +139,27 @@ gh pr create --base "$BASE_BRANCH" --title "<generated title>" --body "$(cat PR_
 
 ## Title Format
 
-PR titles must follow this format:
+PR titles and commit messages must use Conventional Commits:
 
 ```text
-[KEYWORD] Summary
+type(scope): description
 ```
 
 **Rules:**
 
-- `KEYWORD` is an uppercase word that best categorizes the PR - not a fixed list. Common examples: `FEAT`, `FEATURE`, `FIX`, `BUG`, `REFACTOR`, `TECHDEBT`, `DOCS`, `TEST`, `CHORE`, `PERF`, `PERFORMANCE`, `CI`, `BUILD`, `STYLE`, `CLI`, `CONFIG`, `MIGRATION`, `SECURITY`, `API`, `UI`, `INFRA`
-- Pick whichever keyword most accurately describes the PR - invent a new one if none of the above fit
-- `Summary` is a concise imperative phrase (e.g., "Add session-based auth", "Fix null pointer in user lookup")
+- Use a lowercase type: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `style`, or `revert`
+- The scope is optional and names the affected area, such as `skills` or `ci`; omit its parentheses when there is no scope
+- For breaking changes, put `!` immediately before the colon, for example `feat(api)!: Require authentication`
+- Follow the colon with a space and a concise imperative description (e.g., "Add session-based auth", "Fix null pointer in user lookup")
 - Max 70 characters total
 - No period at the end
 
 **Examples:**
 
-- `[FEAT] Add session-based authentication`
-- `[FIX] Resolve race condition in queue worker`
-- `[REFACTOR] Simplify middleware chain`
-- `[DOCS] Update API reference for v2 endpoints`
+- `feat: Add session-based authentication`
+- `fix(queue): Resolve race condition in queue worker`
+- `refactor: Simplify middleware chain`
+- `docs(api): Update API reference for v2 endpoints`
 
 ## Output Format
 
