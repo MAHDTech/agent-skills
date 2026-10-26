@@ -114,6 +114,8 @@ in
     excludes = [
       ".agents/"
       ".devenv/"
+      "^\\.github/badges/"
+      "^\\.github/crap/"
       "^.vscode/"
       "^node_modules/"
       "^dashboard/content/"
