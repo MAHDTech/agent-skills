@@ -8,7 +8,7 @@ members = [
 default-members = ["crates/ask-cli"]
 
 [workspace.package]
-version = "0.1.53"
+version = "0.1.54"
 edition = "2024"
 authors = ["MAHDTech"]
 license = "MIT"
@@ -18,8 +18,8 @@ readme = "README.md"
 
 [workspace.dependencies]
 # Internal workspace crates
-skills-core = { path = "crates/skills-core", version = "0.1.53" }
-skills-tui = { path = "crates/skills-tui", version = "0.1.53" }
+skills-core = { path = "crates/skills-core", version = "0.1.54" }
+skills-tui = { path = "crates/skills-tui", version = "0.1.54" }
 
 # Serialization and data models
 serde = { version = "1.0.229", features = ["derive"] }

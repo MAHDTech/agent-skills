@@ -1,9 +1,29 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.53](https://github.com/MAHDTech/agent-skills/compare/v0.1.52...10f4d6c17e77a4a5dd30ec3398d422235348c5e5) (2026-10-23)
+## [v0.1.54](https://github.com/MAHDTech/agent-skills/compare/v0.1.53...d28c773243630ae56cb45b0f9cc5ee7ab9399e8e) (2026-10-26)
+
+### Features
+
+* **skills:** standardize invocation policies and descriptions (#248)
+([4966c6d](https://github.com/MAHDTech/agent-skills/commit/4966c6d05d41c5f90b8fc3b7127ff9ef5f0f13e9)),
+closes [#248](https://github.com/MAHDTech/agent-skills/issues/248)
+* Add declarative vendor skills (#240)
+([ac4dbfd](https://github.com/MAHDTech/agent-skills/commit/ac4dbfdedec9d915b23d932dab3b4fe762084a39)),
+closes [#240](https://github.com/MAHDTech/agent-skills/issues/240)
 
 ### Fixes
+
+* **ci:** exclude generated CRAP and badge records from prek (#252)
+([d28c773](https://github.com/MAHDTech/agent-skills/commit/d28c773243630ae56cb45b0f9cc5ee7ab9399e8e)),
+closes [#252](https://github.com/MAHDTech/agent-skills/issues/252)
+* Enable CRAP records and standardize PR titles (#247)
+([5bd3c2f](https://github.com/MAHDTech/agent-skills/commit/5bd3c2fec076cc3ffc37201e821edee4d09ed251)),
+closes [#247](https://github.com/MAHDTech/agent-skills/issues/247)
+
+### [v0.1.53](https://github.com/MAHDTech/agent-skills/compare/v0.1.52...v0.1.53) (2026-10-24)
+
+#### Fixes
 
 * upgrade Rust dependencies and support sha2 0.11 (#238)
 ([10f4d6c](https://github.com/MAHDTech/agent-skills/commit/10f4d6c17e77a4a5dd30ec3398d422235348c5e5)),
