@@ -1,0 +1,11 @@
+# Default owner for everything in the repository.
+* @MAHDTech
+
+# Primary repository trees.
+/crates/ @MAHDTech
+/skills/ @MAHDTech
+/skills-archive/ @MAHDTech
+/dashboard/ @MAHDTech
+/scripts/ @MAHDTech
+/.github/ @MAHDTech
+/docs/ @MAHDTech
