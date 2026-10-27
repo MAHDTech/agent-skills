@@ -18,33 +18,6 @@ fn vendor_cli_refreshes_a_local_source_without_fetching_its_documentation() {
         "Vendor content",
     )
     .unwrap();
-    for args in [
-        vec!["init"],
-        vec!["add", "."],
-        vec![
-            "-c",
-            "user.name=Tests",
-            "-c",
-            "user.email=tests@example.com",
-            "-c",
-            "commit.gpgsign=false",
-            "-c",
-            "core.hooksPath=/dev/null",
-            "commit",
-            "-m",
-            "fixture",
-        ],
-    ] {
-        assert!(
-            std::process::Command::new("git")
-                .args(args)
-                .current_dir(&upstream)
-                .output()
-                .unwrap()
-                .status
-                .success()
-        );
-    }
     std::fs::write(
         catalog.join("vendor-skills.yaml"),
         format!(
@@ -53,6 +26,35 @@ fn vendor_cli_refreshes_a_local_source_without_fetching_its_documentation() {
         ),
     )
     .unwrap();
+    for dir in [&upstream, &catalog] {
+        for args in [
+            vec!["init"],
+            vec!["add", "."],
+            vec![
+                "-c",
+                "user.name=Tests",
+                "-c",
+                "user.email=tests@example.com",
+                "-c",
+                "commit.gpgsign=false",
+                "-c",
+                "core.hooksPath=/dev/null",
+                "commit",
+                "-m",
+                "fixture",
+            ],
+        ] {
+            assert!(
+                std::process::Command::new("git")
+                    .args(args)
+                    .current_dir(dir)
+                    .output()
+                    .unwrap()
+                    .status
+                    .success()
+            );
+        }
+    }
     Command::cargo_bin("ask")
         .unwrap()
         .env("AGENT_SKILLS_HOME", &catalog)
@@ -66,6 +68,12 @@ fn vendor_cli_refreshes_a_local_source_without_fetching_its_documentation() {
         .assert()
         .success()
         .stdout(predicate::str::contains("example"));
+    Command::cargo_bin("ask")
+        .unwrap()
+        .env("AGENT_SKILLS_HOME", &catalog)
+        .args(["dashboard", "lint"])
+        .assert()
+        .success();
     Command::cargo_bin("ask")
         .unwrap()
         .env("AGENT_SKILLS_HOME", &catalog)

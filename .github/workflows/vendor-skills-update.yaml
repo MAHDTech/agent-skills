@@ -40,6 +40,7 @@ jobs:
               --pending-ref refs/remotes/origin/automation/vendor-skills \
               > "$RUNNER_TEMP/vendor-update.md"
             cat "$RUNNER_TEMP/vendor-update.md" >> "$GITHUB_STEP_SUMMARY"
+            ask dashboard build
 
       - name: Validate Catalog
         uses: tars-cloud/actions/composite/run-devenv@26ffb67cc8d374672f646d6dd8829befa844b0e9 # v3.12.0
