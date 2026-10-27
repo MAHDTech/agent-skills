@@ -30,8 +30,8 @@
       ]
     },
     {
-      "coverage": 87.5,
-      "crap": 14.3828125,
+      "coverage": 91.66666666666666,
+      "crap": 14.113425925925927,
       "crate": "ask-cli",
       "cyclomatic": 14.0,
       "file": "crates/ask-cli/src/commands/dashboard.rs",
@@ -39,7 +39,7 @@
       "line": 15,
       "uncovered": [
         {
-          "end": 44,
+          "end": 43,
           "start": 42
         }
       ]
