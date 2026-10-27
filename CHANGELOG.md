@@ -1,9 +1,18 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.54](https://github.com/MAHDTech/agent-skills/compare/v0.1.53...d28c773243630ae56cb45b0f9cc5ee7ab9399e8e) (2026-10-26)
+## [v0.1.55](https://github.com/MAHDTech/agent-skills/compare/v0.1.54...4c89235bf16cd2fcaf8b1b7cfc49eb5305507bac) (2026-10-28)
 
-### Features
+### Fixes
+
+* **ci:** build dashboard and stage generated artifacts on vendor refresh
+(#256)
+([7de6c1b](https://github.com/MAHDTech/agent-skills/commit/7de6c1b546c4bfcfd2af224e119957f826d14f2f)),
+closes [#256](https://github.com/MAHDTech/agent-skills/issues/256)
+
+### [v0.1.54](https://github.com/MAHDTech/agent-skills/compare/v0.1.53...v0.1.54) (2026-10-26)
+
+#### Features
 
 * **skills:** standardize invocation policies and descriptions (#248)
 ([4966c6d](https://github.com/MAHDTech/agent-skills/commit/4966c6d05d41c5f90b8fc3b7127ff9ef5f0f13e9)),
@@ -12,7 +21,7 @@ closes [#248](https://github.com/MAHDTech/agent-skills/issues/248)
 ([ac4dbfd](https://github.com/MAHDTech/agent-skills/commit/ac4dbfdedec9d915b23d932dab3b4fe762084a39)),
 closes [#240](https://github.com/MAHDTech/agent-skills/issues/240)
 
-### Fixes
+#### Fixes
 
 * **ci:** exclude generated CRAP and badge records from prek (#252)
 ([d28c773](https://github.com/MAHDTech/agent-skills/commit/d28c773243630ae56cb45b0f9cc5ee7ab9399e8e)),
