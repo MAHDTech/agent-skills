@@ -597,7 +597,7 @@ async fn run_download_resources(
     ArtifactsEngine::with_options(
         &root,
         ArtifactsOptions {
-            no_stage: true,
+            no_stage: std::env::var("SKILLS_NO_STAGE").is_ok(),
             ..Default::default()
         },
     )
