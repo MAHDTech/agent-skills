@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Takeover"
+  short_description: "Finish an inherited PR or branch with preserved credit"
+  default_prompt: "Use $gh-takeover to adopt and finish an inherited pull request or branch."
+
+policy:
+  allow_implicit_invocation: false

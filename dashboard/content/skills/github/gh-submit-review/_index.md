@@ -1,6 +1,6 @@
 +++
 title = "gh-submit-review"
-description = "Publish a completed review to a GitHub PR with an approval, request-changes, or comment verdict and inline findings. Use when asked to submit review feedback, rather than merely review code."
+description = "Publish a GitHub PR review with verdict, inline findings, secret scanning, and human-account attribution. Use when asked to submit a completed PR review."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -43,20 +43,24 @@ Etiquette: one blocking finding is enough to request changes - do not soften it 
 
 ## 3. Draft the body and inline comments
 
-- **Summary body**: lead with the verdict and its reason. For request-changes, list the blocking items up front so the author sees them without scrolling.
-- **Inline comments**: anchor each specific finding to its file and line rather than describing locations in prose. Use `RIGHT` for the new version of the diff, `LEFT` for the old. The line must appear in the PR diff or the API rejects the comment.
+Apply `/gh-pr-comments` formatting and preflight checks across the review summary and every inline comment:
+
+- **Account-aware attribution:** Check `gh api user -q '.login, .type'`. When posting from a human user's login (`type == "User"` and not a dedicated automation account), prefix the summary body and each inline comment with the `[!NOTE]` `🤖 **<model> responding on behalf of <user>**` callout (skipping `responding on behalf of <user>` when authenticated as a dedicated bot or automation account).
+- **Summary body:** Lead with the verdict and its reason. For request-changes, list the blocking items up front with concrete `file:line`, behavior, or check citations so the author sees them without scrolling.
+- **Inline comments:** Anchor each specific finding to its file and line rather than describing locations in prose. Use `RIGHT` for the new version of the diff, `LEFT` for the old. The line must appear in the PR diff or the API rejects the comment.
+- **Secret and privacy preflight scan:** Before submitting, scan the summary body, every inline comment, and all quoted code or command output for secrets, tokens, internal hostnames or paths, and private details.
 
 ## 4. Submit
 
-**Summary only** (no inline comments) - use `gh pr review` directly:
+**Summary only** (no inline comments) - use `gh pr review` directly and capture the printed review URL:
 
 ```bash
-gh pr review <pr> --request-changes --body "Two blocking issues inline; see comments."
+gh pr review <pr> --request-changes --body-file review-body.md
 ```
 
-Swap in `--approve` or `--comment` as chosen. Use `--body-file` for a long body.
+Swap in `--approve` or `--comment` as chosen.
 
-**With inline comments** - build a single JSON payload and post it to the reviews endpoint so the event, body, and all inline comments land as one review:
+**With inline comments** - build a single JSON payload and post it to the reviews endpoint so the event, body, and all inline comments land as one review, extracting `html_url` to confirm publication:
 
 ```json
 {
@@ -81,12 +85,14 @@ Swap in `--approve` or `--comment` as chosen. Use `--body-file` for a long body.
 ```
 
 ```bash
-gh api repos/{owner}/{repo}/pulls/<pr>/reviews --input review.json
+gh api "repos/{owner}/{repo}/pulls/<pr>/reviews" --input review.json --jq '.html_url'
 ```
 
 `event` must be `APPROVE`, `REQUEST_CHANGES`, or `COMMENT`. Omit `event` to leave the review `PENDING` (a draft only you can see) when you want to eyeball it on GitHub before publishing. Use `start_line` with `line` for a multi-line comment.
 
 ## 5. Confirm
 
-Report the submitted event, the summary, and the count of inline comments, plus the PR URL. Done when the review appears on the PR with its event and every intended inline comment attached.
+Verify that GitHub returned the published review URL (`html_url` from the REST response or the URL printed by `gh pr review`). Report the submitted event, the verified review URL, the summary, the count of inline comments, and the PR URL. Done when the published review URL is confirmed and every intended inline comment is attached.
+
+> Adapted from [t3dotgg/tstack](https://github.com/t3dotgg/tstack) (MIT).
 

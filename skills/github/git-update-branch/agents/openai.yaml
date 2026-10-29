@@ -1,6 +1,6 @@
 interface:
   display_name: "Git Update Branch"
-  short_description: "Bring a feature branch up to date with its base branch"
+  short_description: "Assess stale PRs and update branches against their base"
   default_prompt: "Use $git-update-branch to update a branch against its base."
 
 policy:

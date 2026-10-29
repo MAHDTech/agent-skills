@@ -1,6 +1,6 @@
 interface:
   display_name: "GitHub Submit Review"
-  short_description: "Submit code reviews and comments to a pull request"
+  short_description: "Submit attributed PR reviews with verified review URLs"
   default_prompt: "Use $gh-submit-review to submit a review to a pull request."
 
 policy:

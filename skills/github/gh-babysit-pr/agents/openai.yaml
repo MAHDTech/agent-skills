@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Babysit PR"
+  short_description: "Monitor a pull request through CI checks and reviews"
+  default_prompt: "Use $gh-babysit-pr to monitor an open pull request through CI checks and reviews."
+
+policy:
+  allow_implicit_invocation: false

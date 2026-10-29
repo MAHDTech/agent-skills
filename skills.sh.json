@@ -68,11 +68,14 @@
       "title": "GitHub",
       "description": "GitHub and git workflows via the gh CLI.",
       "skills": [
+        "gh-babysit-pr",
         "gh-create-issue",
         "gh-create-pr",
+        "gh-pr-comments",
         "gh-release-notes",
         "gh-resolve-pr-comments",
         "gh-submit-review",
+        "gh-takeover",
         "gh-triage",
         "git-resolve-conflicts",
         "git-update-branch"

@@ -57,14 +57,17 @@ description: Single source of truth for agent instructions
 
 ## GitHub
 
+- **gh-babysit-pr**: Monitor an open pull request through CI checks, review bots, and base-branch updates with pr-wait. Use only when the user explicitly asks to watch, monitor, or babysit a PR.
 - **gh-create-issue**: Create a structured GitHub issue from the current conversation with gh CLI. Use when asked to file an issue that preserves the problem, discussion, constraints, and agreed implementation plan.
-- **gh-create-pr**: Draft a Conventional Commit PR title and description from a branch diff. Use when asked to create or update a PR, including committing, pushing, and publishing after approval.
+- **gh-create-pr**: Draft a problem-first Conventional Commit PR title and description with secret scanning and REST fallback. Use when asked to create or update a PR after approval.
+- **gh-pr-comments**: Format and preflight-scan GitHub comments posted on a user's behalf with account-aware attribution. Use when posting PR comments, inline review notes, or thread replies.
 - **gh-release-notes**: Curate release notes from commits and merged PRs since the last tag, then create a GitHub release. Use when asked to cut or publish a versioned release, with draft and prerelease options.
-- **gh-resolve-pr-comments**: Address GitHub PR review feedback: collect and categorize comments, agree an action plan, apply fixes, and resolve threads. Use when asked to handle review comments on the current PR.
-- **gh-submit-review**: Publish a completed review to a GitHub PR with an approval, request-changes, or comment verdict and inline findings. Use when asked to submit review feedback, rather than merely review code.
+- **gh-resolve-pr-comments**: Triage and address human and AI bot PR review comments, push back on false positives, and reply before resolving threads. Use when asked to handle PR feedback.
+- **gh-submit-review**: Publish a GitHub PR review with verdict, inline findings, secret scanning, and human-account attribution. Use when asked to submit a completed PR review.
+- **gh-takeover**: Adopt and finish an inherited pull request, branch, or agent handoff while preserving contributor credit. Use only when the user explicitly asks to take over existing work.
 - **gh-triage**: Triage GitHub issues and external PRs: categorize, verify claims, interview as needed, and post agent-ready briefs. Use when asked to change backlog states or run a maintainer triage session.
 - **git-resolve-conflicts**: Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.
-- **git-update-branch**: Update a feature branch against its detected base: fetch, choose rebase or merge, resolve conflicts, and push safely. Use when asked to bring a branch or PR up to date with its base.
+- **git-update-branch**: Assess stale or diverged PRs for conceptual conflicts and update a branch against its base via rebase or merge. Use when asked to modernize or update a branch or PR.
 
 ## Reflection
 

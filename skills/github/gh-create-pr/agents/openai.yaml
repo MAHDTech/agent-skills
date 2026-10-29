@@ -1,6 +1,6 @@
 interface:
   display_name: "GitHub Create PR"
-  short_description: "Create or update pull requests with generated notes"
+  short_description: "Draft problem-first pull requests with secret preflight"
   default_prompt: "Use $gh-create-pr to create or update a pull request."
 
 policy:

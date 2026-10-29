@@ -100,10 +100,13 @@ Beyond `/code-review` on the main flow:
 
 - `/gh-create-issue` - reach for this when conversation context should become a structured GitHub issue.
 - `/gh-create-pr` - reach for this to ship: generate a PR title and description, then commit and open the PR on approval.
+- `/gh-pr-comments` - reach for this when posting PR comments, inline review notes, or thread replies on a user's behalf with secret preflight scanning and account-aware attribution.
+- `/gh-babysit-pr` - reach for this when you want to monitor an open PR through CI checks, review bots, and base-branch updates with `pr-wait`.
+- `/gh-takeover` - reach for this when adopting an unfinished PR, branch, or agent handoff to completion while preserving contributor credit.
 - `/gh-submit-review` - reach for this when a finished review should be posted to a GitHub PR (approve / request-changes / comment) with inline notes.
 - `/gh-resolve-pr-comments` - reach for this when PR review comments need triaging and resolving behind an approval gate.
 - `/git-resolve-conflicts` - reach for this when a merge or rebase leaves conflicts to resolve.
-- `/git-update-branch` - reach for this when a branch has fallen behind its base and needs a deliberate rebase or merge.
+- `/git-update-branch` - reach for this when a branch or stale PR has diverged from its base and needs conceptual-conflict checks before a deliberate rebase or merge.
 - `/gh-release-notes` - reach for this when you want release notes or a changelog for a version and to cut a GitHub release.
 
 ## Game and database development
