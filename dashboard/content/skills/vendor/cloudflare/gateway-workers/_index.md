@@ -44,3 +44,7 @@ Check the [response and streaming rules](https://developers.cloudflare.com/cloud
 - [workers-best-practices](@/skills/vendor/cloudflare/workers-best-practices/_index.md): streaming, bindings, generated environment types, background work, observability, and runtime tests.
 - [CLI selection](@/skills/vendor/cloudflare/cloudflare/_index.md#choose-the-cli): choose the existing `cf-cli` or `wrangler` skill for project setup and deployment.
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/gateway-workers/references/skill-feedback.md).
+

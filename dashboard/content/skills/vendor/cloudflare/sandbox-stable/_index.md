@@ -116,3 +116,7 @@ This path does **not** switch you to `@next`.
 - If using deprecated transports/helpers, finish or track [2026 deprecation](https://developers.cloudflare.com/sandbox/sdk/migrate/index.md) cleanup  
 - When the team is ready for 1.0, use **`sandbox-migrate-to-next`**—do not force cutover unprompted  
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/sandbox-stable/references/skill-feedback.md).
+

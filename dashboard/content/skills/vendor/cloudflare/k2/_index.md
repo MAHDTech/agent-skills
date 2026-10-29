@@ -29,3 +29,7 @@ Retrieve the matching pages above for each task and use their current examples. 
 
 For SQL transformation and delivery to R2 Iceberg tables, use the `basin` skill. For task processing, consult [Queues](https://developers.cloudflare.com/queues/index.md).
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/k2/references/skill-feedback.md).
+

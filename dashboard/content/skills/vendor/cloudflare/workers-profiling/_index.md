@@ -50,3 +50,7 @@ Return a concise report with:
 - Evidence for each finding: file, function, source location, and metric with units, where available.
 - The smallest actionable change and how to check its effect.
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/workers-profiling/references/skill-feedback.md).
+

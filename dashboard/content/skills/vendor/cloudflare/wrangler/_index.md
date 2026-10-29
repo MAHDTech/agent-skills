@@ -77,3 +77,7 @@ For Previews, a returned URL does not validate behavior that depends on bindings
 
 Report what changed, the target environment, checks performed, and any unresolved validation gaps. Link the documentation used when the result depends on current command or configuration behavior.
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/wrangler/references/skill-feedback.md).
+

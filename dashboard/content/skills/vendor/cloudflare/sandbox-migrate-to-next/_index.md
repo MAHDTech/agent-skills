@@ -191,3 +191,7 @@ Then day-to-day work uses **`sandbox-next`**.
 - Forcing production cutover without user agreement  
 - Putting live secrets in `setEnvVars` / launch `env`  
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/sandbox-migrate-to-next/references/skill-feedback.md).
+

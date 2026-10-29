@@ -186,3 +186,7 @@ For writing or reviewing Workers invoked by the HTTP Forward action, use the [ga
 - Never guess category IDs, application IDs, wirefilter fields, or API request bodies. Retrieve the current schema/docs and existing account objects.
 - Do not enable broad production policies without explicit approval.
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/cloudflare-one/references/skill-feedback.md).
+
