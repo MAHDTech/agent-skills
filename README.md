@@ -169,14 +169,17 @@ Review diffs, pull requests, and test plans.
 
 GitHub and git workflows via the gh CLI.
 
+- **[gh-babysit-pr](skills/github/gh-babysit-pr/SKILL.md)** - Monitor an open pull request through CI checks, review bots, and base-branch updates with pr-wait. Use only when the user explicitly asks to watch, monitor, or babysit a PR.
 - **[gh-create-issue](skills/github/gh-create-issue/SKILL.md)** - Create a structured GitHub issue from the current conversation with gh CLI. Use when asked to file an issue that preserves the problem, discussion, constraints, and agreed implementation plan.
-- **[gh-create-pr](skills/github/gh-create-pr/SKILL.md)** - Draft a Conventional Commit PR title and description from a branch diff. Use when asked to create or update a PR, including committing, pushing, and publishing after approval.
+- **[gh-create-pr](skills/github/gh-create-pr/SKILL.md)** - Draft a problem-first Conventional Commit PR title and description with secret scanning and REST fallback. Use when asked to create or update a PR after approval.
+- **[gh-pr-comments](skills/github/gh-pr-comments/SKILL.md)** - Format and preflight-scan GitHub comments posted on a user's behalf with account-aware attribution. Use when posting PR comments, inline review notes, or thread replies.
 - **[gh-release-notes](skills/github/gh-release-notes/SKILL.md)** - Curate release notes from commits and merged PRs since the last tag, then create a GitHub release. Use when asked to cut or publish a versioned release, with draft and prerelease options.
-- **[gh-resolve-pr-comments](skills/github/gh-resolve-pr-comments/SKILL.md)** - Address GitHub PR review feedback: collect and categorize comments, agree an action plan, apply fixes, and resolve threads. Use when asked to handle review comments on the current PR.
-- **[gh-submit-review](skills/github/gh-submit-review/SKILL.md)** - Publish a completed review to a GitHub PR with an approval, request-changes, or comment verdict and inline findings. Use when asked to submit review feedback, rather than merely review code.
+- **[gh-resolve-pr-comments](skills/github/gh-resolve-pr-comments/SKILL.md)** - Triage and address human and AI bot PR review comments, push back on false positives, and reply before resolving threads. Use when asked to handle PR feedback.
+- **[gh-submit-review](skills/github/gh-submit-review/SKILL.md)** - Publish a GitHub PR review with verdict, inline findings, secret scanning, and human-account attribution. Use when asked to submit a completed PR review.
+- **[gh-takeover](skills/github/gh-takeover/SKILL.md)** - Adopt and finish an inherited pull request, branch, or agent handoff while preserving contributor credit. Use only when the user explicitly asks to take over existing work.
 - **[gh-triage](skills/github/gh-triage/SKILL.md)** - Triage GitHub issues and external PRs: categorize, verify claims, interview as needed, and post agent-ready briefs. Use when asked to change backlog states or run a maintainer triage session.
 - **[git-resolve-conflicts](skills/github/git-resolve-conflicts/SKILL.md)** - Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.
-- **[git-update-branch](skills/github/git-update-branch/SKILL.md)** - Update a feature branch against its detected base: fetch, choose rebase or merge, resolve conflicts, and push safely. Use when asked to bring a branch or PR up to date with its base.
+- **[git-update-branch](skills/github/git-update-branch/SKILL.md)** - Assess stale or diverged PRs for conceptual conflicts and update a branch against its base via rebase or merge. Use when asked to modernize or update a branch or PR.
 
 ### Reflection
 

@@ -1,6 +1,6 @@
 +++
 title = "gh-create-pr"
-description = "Draft a Conventional Commit PR title and description from a branch diff. Use when asked to create or update a PR, including committing, pushing, and publishing after approval."
+description = "Draft a problem-first Conventional Commit PR title and description with secret scanning and REST fallback. Use when asked to create or update a PR after approval."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -87,6 +87,11 @@ git log $BASE_BRANCH..HEAD --oneline
 
 Generate both a **PR title** (see [Title Format](#title-format)) and the full description body (see [Output Format](#output-format)).
 
+Before writing or displaying `PR_DESCRIPTION.md`:
+
+- Scan the title, `PR_DESCRIPTION.md` body, quoted snippets, command outputs, and any attachment links or files for secrets, tokens, credentials, internal hostnames or paths, and private details.
+- Never add `[!NOTE]` attribution banners (such as `responding on behalf of`) or `Created with <model> in <harness>` model or harness attribution footers to `PR_DESCRIPTION.md`.
+
 Write the description to `PR_DESCRIPTION.md` and display both the title and description to the user.
 
 ### 4. Ask user to approve, edit, or reject
@@ -101,7 +106,7 @@ Do NOT proceed to step 5 until the user explicitly approves.
 
 ### 5. On approval commit create update PR
 
-Once the user approves, execute the following steps in order:
+Once the user approves, re-run the secret and private-detail scan if any edits were made, then execute the following steps in order:
 
 **Step 5a - Commit unstaged changes (if any):**
 
@@ -122,23 +127,46 @@ git push -u origin HEAD
 
 **Step 5c - Create or update the PR:**
 
+Open a ready (non-draft) PR by default so CI workflows and review bots run immediately; pass `--draft` only when the user explicitly asks for a draft PR.
+
 Check if a PR already exists for the current branch:
 
 ```bash
-gh pr view --json number 2>/dev/null
+gh pr view --json number,url 2>/dev/null
 ```
 
-If a PR exists, update it:
+If a PR exists, update it and verify the returned PR URL:
 
 ```bash
-gh pr edit --title "<generated title>" --body "$(cat PR_DESCRIPTION.md)"
+gh pr edit --title "<generated title>" --body-file PR_DESCRIPTION.md
 ```
 
-If no PR exists, create one. Always pass `--base` so the PR targets the correct branch (especially important when the base is not the repo default):
+If no PR exists, create one and verify the returned PR URL. Always pass `--base` so the PR targets the correct branch (especially important when the base is not the repo default):
 
 ```bash
-gh pr create --base "$BASE_BRANCH" --title "<generated title>" --body "$(cat PR_DESCRIPTION.md)"
+gh pr create --base "$BASE_BRANCH" --title "<generated title>" --body-file PR_DESCRIPTION.md
 ```
+
+**GraphQL rate-limit fallback:** `gh pr create` and `gh pr edit` use GitHub's GraphQL API. If either fails because the GraphQL rate limit is exhausted, fall back to GitHub's separate REST quota and verify the returned `html_url`:
+
+```bash
+# Create a PR via REST when GraphQL quota is exhausted
+gh api "repos/$OWNER/$REPO/pulls" \
+  -f title="<generated title>" \
+  -f head="<head_branch>" \
+  -f base="$BASE_BRANCH" \
+  -F body=@PR_DESCRIPTION.md --jq '.html_url'
+
+# Update an existing PR via REST when GraphQL quota is exhausted
+gh api -X PATCH "repos/$OWNER/$REPO/pulls/$PR" \
+  -f title="<generated title>" \
+  -F body=@PR_DESCRIPTION.md --jq '.html_url'
+```
+
+**Post-filing handoffs:**
+
+- If the user also asked to monitor the PR through CI checks and reviews after filing, continue with `/gh-babysit-pr`.
+- Do not post a follow-up PR comment unless the user's request calls for one; format any requested comment with `/gh-pr-comments`.
 
 ## Title Format
 
@@ -153,7 +181,7 @@ type(scope): description
 - Use a lowercase type: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `style`, or `revert`
 - The scope is optional and names the affected area, such as `skills` or `ci`; omit its parentheses when there is no scope
 - For breaking changes, put `!` immediately before the colon, for example `feat(api)!: Require authentication`
-- Follow the colon with a space and a concise imperative description (e.g., "Add session-based auth", "Fix null pointer in user lookup")
+- Follow the colon with a space and a concise imperative description that explains why the change matters or the user/operator outcome achieved, rather than low-level symbol or protocol mechanics (prefer `perf(server): Cut websocket frame size by 70%+ with gzipping` over `perf(server): Negotiate permessage-deflate on the websocket`)
 - Max 70 characters total
 - No period at the end
 
@@ -161,7 +189,7 @@ type(scope): description
 
 - `feat: Add session-based authentication`
 - `fix(queue): Resolve race condition in queue worker`
-- `refactor: Simplify middleware chain`
+- `perf(server): Cut websocket frame size by 70%+ with gzipping`
 - `docs(api): Update API reference for v2 endpoints`
 
 ## Output Format
@@ -247,16 +275,16 @@ Use [GitHub admonitions](@/skills/github/gh-create-pr/resources/auto/en-get-star
 ### tldr
 
 - Single sentence, **120 characters max** (hard ceiling)
-- Product-level: what does the user/operator/developer get?
-- No implementation details, no file names
+- Lead with the user, operator, or developer problem solved and the resulting outcome
+- No symbol inventories, deleted helper lists, or file names
 
 ### Summary
 
 - 2-5 bullets, one per meaningful change (not per file)
 - Min (2) and max (5) are hard floors and ceilings per section
-- Bold phrase answers "what does the user/operator get?"
-- Plain language after the dash: one sentence, no jargon
-- No implementation details: reviewers will read the diff for that
+- Bold phrase answers "what problem was solved or what does the user/operator get?"
+- Plain language after the dash: state the problem before the solution in one sentence without jargon
+- Never lead with an implementation inventory (lists of deleted helpers, renamed functions, or touched files belong inside collapsible `<details>` `Technical Details`)
 - No fluff: skip "minor cleanup", "refactor", "update docs" unless they deliver real value
 - **Order by priority/impact, highest first** - the first bullet should be the most important change in the PR
 - Use backticks for code references: file names, paths, commands, config keys, env vars, endpoints, function names
@@ -347,4 +375,6 @@ _tl;dr Users can now log in with email/password and stay authenticated across br
 
 </details>
 ```
+
+> Adapted from [t3dotgg/tstack](https://github.com/t3dotgg/tstack) (MIT).
 

@@ -13,10 +13,12 @@ approvable
 arcsize
 bao
 basenames
+baseRefName
 binstall
 blockquotes
 bluf
 brightgreen
+bugbot
 bunfig
 bunx
 byos
@@ -33,6 +35,8 @@ clinerules
 clippy
 Codeberg
 codegen
+coderabbit
+coderabbitai
 colocate
 colocated
 colour
@@ -45,6 +49,7 @@ crdts
 criticalthink
 crossterm
 cursorrules
+databaseId
 dataclass
 dataclasses
 dedup
@@ -90,11 +95,15 @@ gnused
 gpgsign
 grabbable
 graphviz
+greptile
+gzipping
 hardlink
 hardlinked
 headlessly
-hexdump
+headRefName
+headRefOid
 herdr
+hexdump
 hitl
 husky
 icap
@@ -102,6 +111,7 @@ icat
 imgcat
 IPLD
 iseconds
+isResolved
 jetbrainsmono
 jina
 jujutsu
@@ -118,6 +128,8 @@ lifecycle
 llms
 lockfiles
 logbay
+macroscope
+macroscopeapp
 mahd
 MAHDTech
 makefiles
@@ -125,6 +137,7 @@ mattpocock
 mcafee
 mcpc
 mdns
+mergeStateStatus
 Merkle
 mgmt
 microbenchmark
@@ -136,8 +149,10 @@ mocharc
 mockability
 mtimes
 multiprotocol
+nameWithOwner
 navbars
 ncli
+netlify
 Nextcloud
 nextest
 nixfmt
@@ -146,6 +161,7 @@ nixpkgs
 nonblock
 nonblocking
 noninfringement
+noreply
 npx
 ntnx
 nutanix
@@ -161,6 +177,7 @@ pagefind
 pandoc
 pathlib
 peaceiris
+permessage
 pgrep
 pkgs
 Pocock
@@ -187,8 +204,10 @@ reinstall
 reparented
 reparenting
 reqwest
+resolveReviewThread
 respawn
 retrans
+reviewThreads
 revset
 revsets
 rfds
@@ -209,7 +228,9 @@ secops
 secretspec
 serde
 sess
+Setext
 shortcutting
+shortstat
 sidequery
 Signups
 skimmability
@@ -229,6 +250,7 @@ symlink
 symlinked
 symlinks
 Syncthing
+t3dotgg
 tailwind
 tailwindcss
 tars
@@ -250,8 +272,10 @@ todoread
 todowrite
 toolsdirectory
 toplevel
+tstack
 unitless
 unmirrored
+unreachability
 unrooted
 unslop
 usize

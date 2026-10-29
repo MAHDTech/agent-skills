@@ -5,6 +5,7 @@ These skills exist because other people shared their work and their thinking fir
 ## Projects we adapted or build on
 
 - **[Matt Pocock - `mattpocock/skills`](https://github.com/mattpocock/skills)** - 15 of the skills here (across `engineering/`, `planning/`, `review/`, and `authoring/`) are adapted directly from Matt's collection, used under the MIT License. His category-as-lifecycle layout, prefix-free naming, and model-vs-user invocation split shaped how this whole repo is organized. Full license text lives in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+- **[Theo Browne - `t3dotgg/tstack`](https://github.com/t3dotgg/tstack)** - 3 adapted skills (`gh-pr-comments`, `gh-babysit-pr`, `gh-takeover`) and 4 upgraded workflows (`git-update-branch`, `gh-create-pr`, `gh-resolve-pr-comments`, `gh-submit-review`) under `github/`, used under the MIT License. Full license text lives in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 - **[Olshansk - `Olshansk/agent-skills`](https://github.com/Olshansk/agent-skills)** - early inspiration for structuring a personal, reusable skills collection.
 - **[Anthropic - Agent Skills](https://agentskills.io)** - the open `SKILL.md` standard every skill here speaks, so one skill runs across Claude Code, OpenCode, Goose, and Antigravity.
 - **[Vercel Labs - skills.sh (`vercel-labs/skills`)](https://github.com/vercel-labs/skills)** - the install CLI, discovery convention, badge, and customization that let anyone add these skills with `npx skills add`.

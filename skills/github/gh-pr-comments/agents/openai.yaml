@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub PR Comments"
+  short_description: "Format and scan GitHub PR comments posted for a user"
+  default_prompt: "Use $gh-pr-comments to format and preflight-scan a GitHub comment before posting."
+
+policy:
+  allow_implicit_invocation: true
