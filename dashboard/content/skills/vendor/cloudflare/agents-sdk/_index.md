@@ -208,3 +208,7 @@ Read [client-sdk.md](@/skills/vendor/cloudflare/agents-sdk/references/client-sdk
 - **[references/codemode.md](@/skills/vendor/cloudflare/agents-sdk/references/codemode.md)** — Code Mode for tool orchestration
 - **[references/browse-the-web.md](@/skills/vendor/cloudflare/agents-sdk/references/browse-the-web.md)** — CDP browser tools
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/agents-sdk/references/skill-feedback.md).
+

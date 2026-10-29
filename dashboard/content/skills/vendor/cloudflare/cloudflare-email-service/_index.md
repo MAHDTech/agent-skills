@@ -79,3 +79,7 @@ Read the reference that matches your situation. You don't need all of them.
 - **[references/cli-and-mcp.md](@/skills/vendor/cloudflare/cloudflare-email-service/references/cli-and-mcp.md)** — Domain setup, wrangler commands, MCP tools. For first-time setup.
 - **[references/deliverability.md](@/skills/vendor/cloudflare/cloudflare-email-service/references/deliverability.md)** — SPF/DKIM/DMARC, bounces, suppressions, best practices.
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/cloudflare-email-service/references/skill-feedback.md).
+

@@ -39,3 +39,7 @@ Then read and follow the applicable upstream `SKILL.md` and its relevant referen
 
 If installation is unavailable, read the linked upstream `SKILL.md` and relevant references directly. Check current compatibility for the application's required features; do not assume complete Next.js parity.
 
+## Skill feedback
+
+If the user reports that this skill gave incorrect or outdated guidance, or is missing information, read [references/skill-feedback.md](@/skills/vendor/cloudflare/nextjs-on-cloudflare/references/skill-feedback.md).
+
