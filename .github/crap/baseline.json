@@ -3158,8 +3158,8 @@
       "line": 2242
     },
     {
-      "coverage": 88.57142857142857,
-      "crap": 13.252268221574344,
+      "coverage": 94.28571428571428,
+      "crap": 13.031533527696793,
       "crate": "skills-core",
       "cyclomatic": 13.0,
       "file": "crates/skills-core/src/installer.rs",
@@ -3171,11 +3171,7 @@
           "start": 1010
         },
         {
-          "end": 1030,
-          "start": 1030
-        },
-        {
-          "end": 1042,
+          "end": 1039,
           "start": 1039
         }
       ]
