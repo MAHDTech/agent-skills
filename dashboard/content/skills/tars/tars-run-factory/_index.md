@@ -33,7 +33,7 @@ You start machine runs, read their state, route their directives, and stop the l
   - `--issues N,N`: Run ordered issue list in sequence.
 - Optional flags:
   - `--auto`: Autonomous shift mode (supervisor manages probe, installation binding, and cycles internally until complete or gated).
-  - `--installation-receipt PATH`: Optional path to an installation receipt JSON (otherwise auto-resolved from binary and git).
+  - `--installation-receipt PATH`: Optional path to the installer-published receipt JSON; otherwise use `TARS_INSTALLATION_RECEIPT`, then `~/.gemini/config/tars-installation.receipt.json`.
   - `--merge`: Enable automated landing for approved green PRs (default off; PRs stay open for human review).
   - `--cycles N`: Maximum factory cycles before stopping (default 10).
   - `--runtime-minutes N`: Maximum shift wall time, up to 480 minutes / 8 hours (default 480).
@@ -63,8 +63,14 @@ Execute all checks in order; unresolved failure stops the shift:
 2. Target workspace cleanliness and default branch verification:
    - `git -C <workspace_root> status --porcelain` is empty.
    - `git -C <workspace_root> branch --show-current` matches the remote default branch (`refs/remotes/origin/HEAD`). A dirty tree or non-default branch stops the shift; never attempt to switch or clean branches with git.
-3. Credentials and environment health via `tars-agy doctor <workspace_root>`:
+3. Credentials, installation provenance and environment health via `tars-agy doctor <workspace_root> [--installation-receipt PATH]`:
+   - Pass the same receipt override to doctor and factory; use the same `tars-agy` executable and environment for both.
    - Verify the `github` check reports status `ok`.
+   - Require `factory_installation` status `ok` before starting the supervisor.
+   - A missing check means the executable predates factory readiness diagnostics; stop and report the version mismatch.
+   - A missing, unreadable, malformed or mismatched receipt stops the shift even if the ordinary plugin installation is healthy.
+   - Restore provenance through the supported installer using a clean committed source build or a prebuilt binary and its matching bundle build receipt, or supply an existing valid installed receipt.
+   - The receipt must match both the running executable and the installed plugin assets; binary hashes and customer Git revisions alone cannot establish provenance.
    - The hub persona token `TARS_HUB_TARS_GITHUB_TOKEN` must be present in `~/.config/tars/credentials` (mode `0600`).
    - If `--merge` is specified, verify doctor output confirms `TARS_SPOKE_DOYLE_GITHUB_TOKEN` is present and belongs to a distinct account from the author. If reviewer credentials are unset or identical to the author, automated PR approval remains blocked.
    - Tokens exported directly into the shell environment are ignored by the engine.
@@ -130,20 +136,28 @@ Acknowledge the probe:
 
 Mandatory before executing any workload action (`audit`, `triage`, or `cycle`). Must be sent while `phase` is `"ready"` and `cycles == 0`.
 
-Compute the binary hash: `sha256sum "$(command -v tars-agy)"`.
-Supply the reviewed Git revisions from the operator install receipt:
+Resolve the same installed receipt verified by doctor, using `--installation-receipt`, `TARS_INSTALLATION_RECEIPT`, then `~/.gemini/config/tars-installation.receipt.json`.
+Send the complete receipt unchanged as the value of `installation`, including the bundle provenance fields.
+Keep `integratedRevision` as `null` when integration is unknown.
 
 ```json
 {
   "action": "record-installation",
   "installation": {
     "sourceRevision": "<40-or-64-hex>",
-    "integratedRevision": "<40-or-64-hex>",
+    "integratedRevision": null,
     "installedRevision": "<40-or-64-hex>",
-    "binarySha256": "<sha256>"
+    "binarySha256": "<sha256>",
+    "bundleSha256": "<reviewed-bundle-sha256>",
+    "installedBundle": {
+      "root": "<persistent-installed-plugin-directory>",
+      "sha256": "<localized-installed-bundle-sha256>"
+    }
   }
 }
 ```
+
+Never construct a replacement receipt from the target repository or the currently observed hashes.
 
 ### 3. Shift Start (Optional Stages with `--all`)
 
