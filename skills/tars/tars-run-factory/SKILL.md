@@ -80,7 +80,9 @@ In autonomous mode:
 
 - The supervisor runs the MCP `probe`, verifies required hub tools, and binds the installation receipt automatically.
 - It executes workload cycles sequentially, pacing 10 minutes on `pending_ci` without requiring foreman intervention.
-- It halts and writes `FACTORY_REPORT.md` immediately upon reaching `drained`, any human gate (`approval_needed`, `human_door`, `ruleset_blocked`, `triage`), repeated refusals, or limit exhaustion.
+- It halts and writes `FACTORY_REPORT.md` immediately upon reaching `drained`, any human gate (`approval_needed`, `human_door`, `ruleset_blocked`, `triage`), the first recorded refusal, authentication failure, content filter, or limit exhaustion.
+- It recovers failed turns only when `state.stop` is absent, using fresh stored-state reconciliation within `--recovery-limit`.
+- It never supplies a refusal correction automatically. The corrected retry below requires an interactive foreman while `phase` is `"failed"`.
 - The foreman monitors progress via `tars-agy monitor <workspace_root> <session>` or the ledger, then reads and reports `FACTORY_REPORT.md` when the process exits.
 
 ### Mode B: Interactive Streaming Mode
@@ -181,11 +183,15 @@ Critical rule: Always send `handle` for terminal directives (`drained`, `parked`
 
 ### 5. Failure and Refusal Recovery
 
+This control path is for interactive mode while `phase` is `"failed"`.
+Autonomous mode stops on the first recorded refusal and preserves the terminal report.
+A `"stopped"` shift cannot accept `recover`; preserve its evidence and obtain authorization for a separate bounded shift.
+
 If `phase` is `"failed"`:
 
 1. Reconcile stored state using `tars-agy inspect <workspace_root>`.
 2. Verify the failed host process has exited.
-3. If `state.stop` indicates an incidental tool refusal and retry budget remains (exactly one corrected retry is permitted), send the `recover` control with reconciliation and structured correction:
+3. If `state.stop` is absent, send `recover` with fresh reconciliation; no correction is needed. If `state.stop.kind` is `"refusal"` and an independently permitted alternative exists, the foreman may supply exactly one corrected retry for that tool and target within the remaining recovery budget. Authentication, content-filter and parked stops cannot use this path. Send `recover` with reconciliation and structured correction:
 
    ```json
    {
@@ -205,7 +211,7 @@ If `phase` is `"failed"`:
    }
    ```
 
-4. If the refusal repeats or cannot be corrected within existing policy, stop the shift:
+4. Keep the refused operation and target off limits. Never retry a private path through another tool. If the refusal repeats or cannot be corrected within existing policy, stop the shift:
 
    ```json
    {"action": "stop", "reason": "<concrete blocker description>"}
@@ -221,7 +227,7 @@ The shift terminates immediately upon any of the following:
 - Two consecutive turn transport failures (`failures >= 2`).
 - Three consecutive turns without progress (`no_progress >= 3`).
 - Any 401/403 from GitHub or authentication required from agy.
-- An unrecoverable tool refusal or exhausted refusal retry budget.
+- Any recorded refusal in autonomous mode; an uncorrectable or repeated refusal in interactive mode.
 - A human gate (`approval_needed`, `ruleset_blocked`, `pending_human_merge`, `human_door`, `stalled`).
 
 ## Shift End: The Report
