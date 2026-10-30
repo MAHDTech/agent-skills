@@ -16,6 +16,7 @@ trivy-results.sarif
 node_modules/
 .cache/
 dist/
+target/
 
 # Env & Config
 .env
