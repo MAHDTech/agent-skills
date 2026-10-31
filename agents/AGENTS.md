@@ -111,6 +111,7 @@ description: Single source of truth for agent instructions
 
 ## TARS
 
+- **tars-debug**: Debug and recover the tars-agy Antigravity plugin from outside an active run using tars-agy doctor, inspect, monitor, TARS state logs, and ~/.gemini session transcripts. Use for stuck or failing TARS sessions, hooks, spokes, or factory shifts.
 - **tars-goal**: Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly requests a persistent goal.
 - **tars-run-factory**: Run the TARS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
 

@@ -233,6 +233,7 @@ Environments, CLIs, and agent conventions.
 
 Autonomous software factory and persistent goal workflows.
 
+- **[tars-debug](skills/tars/tars-debug/SKILL.md)** - Debug and recover the tars-agy Antigravity plugin from outside an active run using tars-agy doctor, inspect, monitor, TARS state logs, and ~/.gemini session transcripts. Use for stuck or failing TARS sessions, hooks, spokes, or factory shifts.
 - **[tars-goal](skills/tars/tars-goal/SKILL.md)** - Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly requests a persistent goal.
 - **[tars-run-factory](skills/tars/tars-run-factory/SKILL.md)** - Run the TARS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
 

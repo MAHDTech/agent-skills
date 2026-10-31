@@ -157,6 +157,7 @@ Beyond `/code-review` on the main flow:
 - [/zed](../../tooling/zed/SKILL.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
 - [/oak](../../tooling/oak/SKILL.md) - reach for this when working in an Oak repository (`.oak/`), running `oak` CLI commands, managing change stacks, isolating agents with Oak workspaces, or configuring `.oak/ci/workflows.json`.
 - [/jj](../../tooling/jj/SKILL.md) - reach for this when working in a Jujutsu (`jj`) repository (`.jj/`), running `jj` CLI commands, writing revset or fileset expressions, managing bookmarks, resolving conflicts, or syncing with GitHub.
+- [/tars-debug](../../tars/tars-debug/SKILL.md) - reach for this from outside an active run when debugging a stuck or failing tars-agy session, hook, spoke, or factory shift across TARS state logs and ~/.gemini transcripts.
 - `/tars-run-factory` - reach for this to run the unattended TARS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
