@@ -1,9 +1,36 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.55](https://github.com/MAHDTech/agent-skills/compare/v0.1.54...4c89235bf16cd2fcaf8b1b7cfc49eb5305507bac) (2026-10-28)
+## [v0.1.56](https://github.com/MAHDTech/agent-skills/compare/v0.1.55...2efeebd17b233a66cdcb437743092b9e7831330a) (2026-10-31)
+
+### Features
+
+* **tars:** add tars-debug skill for external tars-agy debugging (#274)
+([ef83d54](https://github.com/MAHDTech/agent-skills/commit/ef83d5451f8ecc06806d1e6fc4bfebd92c47cbde)),
+closes [#274](https://github.com/MAHDTech/agent-skills/issues/274)
+* **installer:** add antigravity-acp skill target (#272)
+([50cf220](https://github.com/MAHDTech/agent-skills/commit/50cf2204c2bc4894829de8ec7e5373f00cb56466)),
+closes [#272](https://github.com/MAHDTech/agent-skills/issues/272)
+* **skills:** adapt tstack PR workflows and upgrade github skills (#263)
+([3d79c3b](https://github.com/MAHDTech/agent-skills/commit/3d79c3b970a371d85b97076bd5367418df680873)),
+closes [#263](https://github.com/MAHDTech/agent-skills/issues/263)
 
 ### Fixes
+
+* tars (#275)
+([0093690](https://github.com/MAHDTech/agent-skills/commit/0093690921003e71e66d8fc3c2980982f3a455e6)),
+closes [#275](https://github.com/MAHDTech/agent-skills/issues/275)
+* ignore Rust target directory in .gitignore (#268)
+([2a1d314](https://github.com/MAHDTech/agent-skills/commit/2a1d3143b2a23c04075ce90fabd7913b6649a314)),
+closes [#268](https://github.com/MAHDTech/agent-skills/issues/268)
+* instructions
+([61fe741](https://github.com/MAHDTech/agent-skills/commit/61fe741a9a355de0fdf91e688484174d8647e176))
+* wording
+([08208b0](https://github.com/MAHDTech/agent-skills/commit/08208b0ff0d3d4707607f1b7bb490e9f1b8439fe))
+
+### [v0.1.55](https://github.com/MAHDTech/agent-skills/compare/v0.1.54...v0.1.55) (2026-10-29)
+
+#### Fixes
 
 * **ci:** build dashboard and stage generated artifacts on vendor refresh
 (#256)
