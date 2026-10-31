@@ -857,6 +857,7 @@ fn test_action_bulk_install_uninstall_isolated() {
     let config = home.join(".config");
     let targets = [
         home.join(".agents/skills"),
+        home.join(".gemini/config/skills"),
         home.join(".cursor/skills"),
         if cfg!(target_os = "macos") {
             home.join("Library/Application Support/Claude/skills")
@@ -902,6 +903,8 @@ fn test_action_bulk_install_uninstall_isolated() {
             assert_eq!(target.join("second/SKILL.md").exists(), installed);
             assert_eq!(target.join("retired").exists(), action != "uninstall");
             if installed {
+                #[cfg(unix)]
+                assert!(target.join("first").is_symlink());
                 assert_eq!(
                     std::fs::read(target.join("first/SKILL.md")).unwrap(),
                     std::fs::read(repo.join("skills/engineering/first/SKILL.md")).unwrap()
@@ -944,6 +947,7 @@ fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
     let task_config = task_home.join(".config");
     let targets = [
         task_home.join(".agents/skills"),
+        task_home.join(".gemini/config/skills"),
         task_home.join(".cursor/skills"),
         if cfg!(target_os = "macos") {
             task_home.join("Library/Application Support/Claude/skills")
@@ -999,7 +1003,7 @@ fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
         .assert()
         .success()
         .stdout(predicate::str::contains(
-            "3 installed, 0 updated, 9 deleted",
+            "4 installed, 0 updated, 12 deleted",
         ));
     for target in &targets {
         assert!(target.join("spacetimedb").symlink_metadata().is_ok());
@@ -1009,7 +1013,7 @@ fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
         .assert()
         .success()
         .stdout(predicate::str::contains(
-            "3 installed, 0 updated, 9 deleted",
+            "4 installed, 0 updated, 12 deleted",
         ));
     for target in &targets {
         for name in ["spacetimedb", "legacy", "retired-link"] {
@@ -1140,4 +1144,40 @@ fn test_bulk_uninstall_matches_repository_names_without_registry() {
     assert!(!target.join("matching").exists());
     assert!(target.join("unrelated").exists());
     assert!(source.join("SKILL.md").exists());
+}
+
+#[test]
+fn test_antigravity_acp_explicit_target() {
+    let temp = tempfile::tempdir().unwrap();
+    let repo = temp.path().join("repo");
+    let source = repo.join("skills/engineering/example");
+    std::fs::create_dir_all(&source).unwrap();
+    std::fs::write(
+        source.join("SKILL.md"),
+        "---\nname: example\ndescription: Test skill\n---\n",
+    )
+    .unwrap();
+    let home = temp.path().join("home");
+    for action_form in [false, true] {
+        for action in ["install", "uninstall"] {
+            let mut args = vec!["skills"];
+            if action_form {
+                args.push("--action");
+            }
+            args.extend([action, "example", "--target", "antigravity-acp"]);
+            Command::cargo_bin("ask")
+                .unwrap()
+                .env("HOME", &home)
+                .env("AGENT_SKILLS_HOME", &repo)
+                .args(args)
+                .assert()
+                .success();
+            assert_eq!(
+                home.join(".gemini/config/skills/example/SKILL.md").exists(),
+                action == "install"
+            );
+            assert!(!home.join(".agents/skills/example").exists());
+            assert!(!home.join("antigravity-acp").exists());
+        }
+    }
 }
