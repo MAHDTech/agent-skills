@@ -39,7 +39,7 @@ If you are working on the skills in this repository, install them from your loca
    cd agent-skills
    ```
 
-2. Install all live skills into ask's three standard targets:
+2. Install all live skills into ask's four standard targets:
 
    ```bash
    ask skills --action install
@@ -61,7 +61,7 @@ The repository is authoritative for matching skill names. Bulk install discovers
 
 Bulk uninstall matches names from both the live and archived catalog. It removes matching directories, symlinks, and registry entries even if an installation was not tracked by ask. It leaves unrelated names, backups, and the source repository untouched. Repeated bulk uninstall is safe when matching installations are already absent. Bulk operations continue processing other skills and return a failure if any operation fails.
 
-The `--action install` and `--action uninstall` forms default to all three standard targets. Use `--target antigravity`, `--target claude`, `--target cursor`, or `--target /path/to/skills` to select one destination. To remove one tracked skill, use `ask skills --action uninstall domain-modeling`.
+The `--action install` and `--action uninstall` forms default to all four standard targets. Use `--target antigravity`, `--target antigravity-acp`, `--target claude`, `--target cursor`, or `--target /path/to/skills` to select one destination. To remove one tracked skill, use `ask skills --action uninstall domain-modeling`.
 
 The existing `ask skills install <source>` and `ask skills uninstall <skill>` subcommands retain their Antigravity-only default. Both accept `--target`.
 
@@ -78,7 +78,7 @@ ask skills --action sync
 ask skills sync --dry-run
 ```
 
-Sync reconciles the live catalog with all three standard targets. It installs missing skills, updates managed installations, and regenerates derived repository files and dashboard content. On Unix, installation uses symlinks; other platforms default to copies. It does not auto-detect installed agent applications.
+Sync reconciles the live catalog with all four standard targets. It installs missing skills, updates managed installations, and regenerates derived repository files and dashboard content. On Unix, installation uses symlinks; other platforms default to copies. It does not auto-detect installed agent applications.
 
 The same command removes obsolete installations sourced from this repository's live or archived catalogs. Renaming `spacetimedb` to `spacetime`, for example, installs the new skill and removes the old installation and registry entry. Cleanup also finds old symlinks that are missing from the registry, including dangling links and relative symlinks. Removed installations are backed up under the target's `.backups/` directory.
 
@@ -86,14 +86,15 @@ Sync preserves untracked directories such as `~/.agents/skills/test1/`, installa
 
 The current target resolver uses these locations:
 
-| Target                  | Directory                                                              |
-| ----------------------- | ---------------------------------------------------------------------- |
-| Antigravity             | `~/.agents/skills/`                                                    |
-| Cursor                  | `~/.cursor/skills/`                                                    |
-| Claude Desktop on Linux | `$XDG_CONFIG_HOME/claude/skills/`, normally `~/.config/claude/skills/` |
-| Claude Desktop on macOS | `~/Library/Application Support/Claude/skills/`                         |
+| Target                    | Directory                                                              |
+| ------------------------- | ---------------------------------------------------------------------- |
+| Antigravity ACP (T3 Code) | `~/.gemini/config/skills/`                                             |
+| Antigravity               | `~/.agents/skills/`                                                    |
+| Cursor                    | `~/.cursor/skills/`                                                    |
+| Claude Desktop on Linux   | `$XDG_CONFIG_HOME/claude/skills/`, normally `~/.config/claude/skills/` |
+| Claude Desktop on macOS   | `~/Library/Application Support/Claude/skills/`                         |
 
-The `claude` option currently selects Claude Desktop, not the `~/.claude/skills/` directory described by older versions of this guide. There is no separate OpenCode or Goose target, and sync does not register skills in Gemini configuration.
+The `claude` option currently selects Claude Desktop, not the `~/.claude/skills/` directory described by older versions of this guide. There is no separate OpenCode or Goose target, and sync does not modify Gemini configuration files.
 
 Sync prints the reason for each planned action. The CLI uses a repository-wins policy: changed copies, redirected or broken links, untracked destinations, and older repository versions are replaced with the repository's version, with backups. Managed links from another checkout are pointed at the current checkout. Repeated sync converges to an up-to-date installation.
 
@@ -102,3 +103,22 @@ Sync also removes names in `skills-archive/` from targets, including untracked c
 Run sync from a persistent checkout. Links installed from a temporary worktree break when that worktree is deleted. A later sync from this checkout repairs them.
 
 `SKILLS_REPO_ONLY=1`, `PRE_COMMIT`, or `CI` skips target synchronization on a normal sync, while dry-run still inspects targets. The standalone sync engine retains its conservative conflict policy by default; repository-wins behavior is selected by the CLI.
+
+### Antigravity ACP in T3 Code
+
+T3 Code's Antigravity provider reads global skills from `~/.gemini/config/skills/`
+and `~/.gemini/antigravity-cli/skills/`. It does not read global `~/.agents/skills/`.
+See the upstream [Antigravity provider documentation](https://github.com/pingdotgg/t3code/blob/main/docs/user/providers-antigravity.md#skills-and-attachments)
+and [skill discovery implementation](https://github.com/pingdotgg/t3code/blob/main/apps/server/src/provider/Drivers/AntigravitySkills.ts).
+
+Install the live catalog into the ACP location:
+
+```bash
+ask skills --action install --target antigravity-acp
+```
+
+For one skill, use `ask skills install domain-modeling --target antigravity-acp`.
+Bulk install and sync also include this target by default. Skills are installed as
+individual links on Unix, with each `SKILL.md` directly inside its skill directory.
+The existing `antigravity` target continues to use `~/.agents/skills/`.
+Run the installation on the environment where T3 Code runs its Antigravity provider.

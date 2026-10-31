@@ -38,6 +38,8 @@ pub enum TargetEnvironment {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         workspace_root: Option<PathBuf>,
     },
+    /// Antigravity ACP global skills, including T3 Code.
+    AntigravityAcp,
     /// Arbitrary user-defined filesystem destination directory.
     Custom(PathBuf),
 }
@@ -50,6 +52,7 @@ impl TargetEnvironment {
             Self::ClaudeDesktop => "claude-desktop",
             Self::Cursor => "cursor",
             Self::Antigravity { .. } => "antigravity",
+            Self::AntigravityAcp => "antigravity-acp",
             Self::Custom(_) => "custom",
         }
     }
@@ -67,6 +70,7 @@ impl TargetEnvironment {
             Self::ClaudeDesktop => "Claude Desktop",
             Self::Cursor => "Cursor",
             Self::Antigravity { .. } => "Antigravity",
+            Self::AntigravityAcp => "Antigravity ACP",
             Self::Custom(_) => "Custom Workspace",
         }
     }
@@ -80,6 +84,7 @@ impl TargetEnvironment {
             Self::Antigravity {
                 workspace_root: None,
             },
+            Self::AntigravityAcp,
         ]
     }
 
@@ -111,6 +116,7 @@ impl TargetEnvironment {
                     home.join(".agents").join("skills")
                 }
             }
+            Self::AntigravityAcp => home.join(".gemini/config/skills"),
             Self::Custom(p) => {
                 if p.is_absolute() {
                     p.clone()
@@ -720,6 +726,7 @@ impl EnvironmentResolver {
                         Ok(root.join(".agents").join("skills"))
                     }
                 }
+                TargetEnvironment::AntigravityAcp => Ok(root.join(".gemini/config/skills")),
                 TargetEnvironment::Custom(p) => {
                     if p.is_absolute() {
                         Ok(p.clone())
@@ -771,6 +778,9 @@ impl EnvironmentResolver {
                     Err(InstallerError::EnvironmentNotResolvable(env.clone()))
                 }
             }
+            TargetEnvironment::AntigravityAcp => dirs::home_dir()
+                .map(|home| home.join(".gemini/config/skills"))
+                .ok_or_else(|| InstallerError::EnvironmentNotResolvable(env.clone())),
             TargetEnvironment::Custom(p) => {
                 if p.is_absolute() {
                     Ok(p.clone())

@@ -297,6 +297,7 @@ fn resolve_target_environment(target: Option<&str>) -> TargetEnvironment {
         },
         Some("claude" | "claude-desktop") => TargetEnvironment::ClaudeDesktop,
         Some("cursor") => TargetEnvironment::Cursor,
+        Some("antigravity-acp") => TargetEnvironment::AntigravityAcp,
         Some(custom) => TargetEnvironment::Custom(PathBuf::from(custom)),
     }
 }
