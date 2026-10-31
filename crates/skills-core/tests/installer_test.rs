@@ -598,7 +598,7 @@ fn test_skill_installer_convenience_wrapper() {
 // -----------------------------------------------------------------------------
 
 #[test]
-#[allow(clippy::similar_names)]
+#[allow(clippy::similar_names, clippy::too_many_lines)]
 fn test_installer_error_into_skill_error_all_variants() {
     use skills_core::error::SkillError;
 
@@ -655,6 +655,15 @@ fn test_installer_error_into_skill_error_all_variants() {
     let fallback_err = InstallerError::EnvironmentNotResolvable(TargetEnvironment::Cursor);
     let skill_err: SkillError = fallback_err.into();
     assert!(matches!(skill_err, SkillError::TargetUnreachable { .. }));
+
+    match SkillError::from(InstallerError::EnvironmentNotResolvable(
+        TargetEnvironment::AntigravityAcp,
+    )) {
+        SkillError::TargetUnreachable { target, .. } => {
+            assert_eq!(target, "AntigravityAcp");
+        }
+        other => panic!("Expected SkillError::TargetUnreachable, got {other:?}"),
+    }
 
     let invalid_source_err = InstallerError::InvalidSourcePath {
         path: PathBuf::from("/missing"),
@@ -766,6 +775,10 @@ fn test_target_environment_default_skills_dir() {
     assert!(default_cursor.ends_with(".cursor/skills"));
 }
 
+// -----------------------------------------------------------------------------
+// 20. Antigravity ACP Target Resolution
+// -----------------------------------------------------------------------------
+
 #[test]
 fn test_antigravity_acp_target_resolution() {
     let home = PathBuf::from("/mock/home");
@@ -787,8 +800,9 @@ fn test_antigravity_acp_target_resolution() {
         target
     );
 }
+
 // -----------------------------------------------------------------------------
-// 20. Uninstall Unrecorded Skill Error
+// 21. Uninstall Unrecorded Skill Error
 // -----------------------------------------------------------------------------
 
 #[test]
@@ -842,7 +856,7 @@ fn test_uninstall_unrecorded_skill_returns_not_found() {
 }
 
 // -----------------------------------------------------------------------------
-// 21. Update Unrecorded Skill Error
+// 22. Update Unrecorded Skill Error
 // -----------------------------------------------------------------------------
 
 #[test]
@@ -879,7 +893,7 @@ fn test_update_unrecorded_skill_returns_not_found() {
 }
 
 // -----------------------------------------------------------------------------
-// 22. Registry Malformed and Corrupted JSON Loading
+// 23. Registry Malformed and Corrupted JSON Loading
 // -----------------------------------------------------------------------------
 
 #[test]
@@ -941,7 +955,7 @@ fn test_registry_load_malformed_and_corrupted_json() {
 }
 
 // -----------------------------------------------------------------------------
-// 23. Registry Unsupported Schema Version
+// 24. Registry Unsupported Schema Version
 // -----------------------------------------------------------------------------
 
 #[test]
@@ -994,7 +1008,7 @@ fn test_registry_load_unsupported_schema_version() {
 }
 
 // -----------------------------------------------------------------------------
-// 24. Install Invalid Source Path Variants
+// 25. Install Invalid Source Path Variants
 // -----------------------------------------------------------------------------
 
 #[test]
