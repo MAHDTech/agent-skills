@@ -28,6 +28,8 @@ You start machine runs, read their state, route their directives, and stop the l
   - `--epic N`: Restrict drain strictly to ratified epic N.
   - `--issue N`: Run single issue N.
   - `--issues N,N`: Run ordered issue list in sequence.
+- For a one-issue diagnostic test, resolve the issue before launch and use `--issue N`.
+  - A cycle limit does not restrict `--all` to one issue.
 - Optional flags:
   - `--auto`: Autonomous shift mode (supervisor manages probe, installation binding, and cycles internally until complete or gated).
   - `--installation-receipt PATH`: Optional path to the installer-published receipt JSON; otherwise use `TARS_INSTALLATION_RECEIPT`, then `~/.gemini/config/tars-installation.receipt.json`.
@@ -253,7 +255,14 @@ Verify its contents, append any necessary human handover context, and present se
 - **Produced**: Verified deliverable inventory (completed issues, PRs opened, PRs reviewed, PRs landed).
 - **Needs Cooper**: Parked items with their exact blockers.
 - **Anomalies**: Recorded failure, refusal, and recovery events.
-- **Handover**: Resumption invocation and durable position.
+- **Timing**: Observed phase, spoke, tool, wait, and recovery intervals with their measurement limits.
+- **Handover**: Outcome-specific next steps and links to durable position and invocation evidence.
+
+The report derives its inventory from the selected shift's recorded evidence, excluding probes and historical deliveries.
+Successful, skipped, neutral, pending, failed, and unknown CI outcomes remain separate.
+Timing diagnostics are collected on every run; inclusive intervals can overlap and must not be added as elapsed wall time.
+Missing or interrupted measurements remain unavailable or incomplete, and a recovered failure remains an anomaly after successful completion.
+A drained selection without blockers requires no human action.
 
 ## Failure Honesty
 
