@@ -655,6 +655,63 @@ fn test_installer_error_into_skill_error_all_variants() {
     let fallback_err = InstallerError::EnvironmentNotResolvable(TargetEnvironment::Cursor);
     let skill_err: SkillError = fallback_err.into();
     assert!(matches!(skill_err, SkillError::TargetUnreachable { .. }));
+
+    let invalid_source_err = InstallerError::InvalidSourcePath {
+        path: PathBuf::from("/missing"),
+        reason: "Source path does not exist".into(),
+    };
+    match SkillError::from(invalid_source_err) {
+        SkillError::Io { path, source } => {
+            assert_eq!(path, Path::new("/missing"));
+            assert_eq!(source.kind(), std::io::ErrorKind::NotFound);
+        }
+        other => panic!("Expected SkillError::Io, got {other:?}"),
+    }
+
+    let schema_err = InstallerError::UnsupportedSchemaVersion {
+        found: 3,
+        supported: 2,
+    };
+    match SkillError::from(schema_err) {
+        SkillError::GeneralIo(err) => {
+            assert_eq!(err.kind(), std::io::ErrorKind::InvalidData);
+        }
+        other => panic!("Expected SkillError::GeneralIo, got {other:?}"),
+    }
+
+    let privilege_err = InstallerError::WindowsSymlinkPrivilegeRequired("denied".into());
+    match SkillError::from(privilege_err) {
+        SkillError::Symlink { message, .. } => {
+            assert!(message.contains("denied"));
+        }
+        other => panic!("Expected SkillError::Symlink, got {other:?}"),
+    }
+
+    let integrity_err = InstallerError::IntegrityMismatch {
+        id: "tampered".into(),
+        expected: "aaa".into(),
+        actual: "bbb".into(),
+    };
+    match SkillError::from(integrity_err) {
+        SkillError::GeneralIo(err) => {
+            assert_eq!(err.kind(), std::io::ErrorKind::InvalidData);
+        }
+        other => panic!("Expected SkillError::GeneralIo, got {other:?}"),
+    }
+
+    let swap_err = InstallerError::AtomicSwapFailed {
+        staging: PathBuf::from("/stage"),
+        target: PathBuf::from("/target"),
+        reason: "rename failed".into(),
+        rollback_status: "restored".into(),
+    };
+    match SkillError::from(swap_err) {
+        SkillError::Io { path, source } => {
+            assert_eq!(path, Path::new("/target"));
+            assert_eq!(source.kind(), std::io::ErrorKind::Other);
+        }
+        other => panic!("Expected SkillError::Io, got {other:?}"),
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -729,4 +786,272 @@ fn test_antigravity_acp_target_resolution() {
         serde_json::from_str::<TargetEnvironment>(&json).unwrap(),
         target
     );
+}
+// -----------------------------------------------------------------------------
+// 20. Uninstall Unrecorded Skill Error
+// -----------------------------------------------------------------------------
+
+#[test]
+fn test_uninstall_unrecorded_skill_returns_not_found() {
+    let temp = TempDir::new().unwrap();
+    let root = temp.path();
+    let installer = Installer::with_root(root);
+    let env = TargetEnvironment::Custom(root.join("installed"));
+
+    let first_err = installer
+        .uninstall("missing-skill", &env, &UninstallOptions::default())
+        .unwrap_err();
+    match first_err {
+        InstallerError::SkillNotFound { id } => {
+            assert_eq!(id, "missing-skill");
+        }
+        other => panic!("Expected SkillNotFound, got {other:?}"),
+    }
+    assert!(!root.join("installed/installed-skills.json").exists());
+
+    let present_source = create_test_skill_fixture(root, "present-skill", "1.0.0", &[]);
+    installer
+        .install(&present_source, &env, &InstallOptions::default())
+        .unwrap();
+
+    let second_err = installer
+        .uninstall("missing-skill", &env, &UninstallOptions::default())
+        .unwrap_err();
+    match second_err {
+        InstallerError::SkillNotFound { id } => {
+            assert_eq!(id, "missing-skill");
+        }
+        other => panic!("Expected SkillNotFound, got {other:?}"),
+    }
+    assert!(root.join("installed/present-skill/SKILL.md").exists());
+    assert!(
+        installer
+            .get_skill("present-skill", &env)
+            .unwrap()
+            .unwrap()
+            .active
+    );
+
+    let skill_installer = SkillInstaller::with_root(env, root);
+    assert!(
+        skill_installer
+            .uninstall_skill("missing-skill", false)
+            .unwrap()
+            .is_none()
+    );
+}
+
+// -----------------------------------------------------------------------------
+// 21. Update Unrecorded Skill Error
+// -----------------------------------------------------------------------------
+
+#[test]
+fn test_update_unrecorded_skill_returns_not_found() {
+    let temp = TempDir::new().unwrap();
+    let root = temp.path();
+    let installer = Installer::with_root(root);
+    let env = TargetEnvironment::Custom(root.join("installed"));
+
+    let source = create_test_skill_fixture(root, "uninstalled-skill", "1.0.0", &[]);
+    let missing_err = installer
+        .update(&source, &env, &InstallOptions::default())
+        .unwrap_err();
+    match missing_err {
+        InstallerError::SkillNotFound { id } => {
+            assert_eq!(id, "uninstalled-skill");
+        }
+        other => panic!("Expected SkillNotFound, got {other:?}"),
+    }
+    assert!(!root.join("installed/uninstalled-skill").exists());
+    assert!(installer.list_skills(&env).unwrap().is_empty());
+
+    let fallback_dir = root.join("fallback-skill");
+    fs::create_dir_all(&fallback_dir).unwrap();
+    let fallback_err = installer
+        .update(&fallback_dir, &env, &InstallOptions::default())
+        .unwrap_err();
+    match fallback_err {
+        InstallerError::SkillNotFound { id } => {
+            assert_eq!(id, "fallback-skill");
+        }
+        other => panic!("Expected SkillNotFound, got {other:?}"),
+    }
+}
+
+// -----------------------------------------------------------------------------
+// 22. Registry Malformed and Corrupted JSON Loading
+// -----------------------------------------------------------------------------
+
+#[test]
+fn test_registry_load_malformed_and_corrupted_json() {
+    let temp = TempDir::new().unwrap();
+    let root = temp.path();
+
+    for (file_name, blank_text) in [("empty.json", ""), ("whitespace.json", "   \n\t  ")] {
+        let blank_path = root.join(file_name);
+        fs::write(&blank_path, blank_text).unwrap();
+        let loaded = InstalledSkillsRegistry::load(&blank_path).unwrap();
+        assert_eq!(loaded.schema_version, 2);
+        assert!(loaded.skills.is_empty());
+    }
+
+    for (file_name, bad_json) in [
+        ("syntax.json", "{ invalid json"),
+        ("truncated.json", "{\"schema_version\": 2,"),
+    ] {
+        let bad_path = root.join(file_name);
+        fs::write(&bad_path, bad_json).unwrap();
+        match InstalledSkillsRegistry::load(&bad_path).unwrap_err() {
+            InstallerError::RegistrySerialization { path, source } => {
+                assert_eq!(path, bad_path);
+                assert!(source.is_syntax() || source.is_eof());
+            }
+            other => panic!("Expected RegistrySerialization, got {other:?}"),
+        }
+    }
+
+    let wrong_shape_path = root.join("wrong-shape.json");
+    fs::write(
+        &wrong_shape_path,
+        r#"{"schema_version": 2, "updated_at": "2026-01-01T00:00:00Z", "skills": "not-a-map"}"#,
+    )
+    .unwrap();
+    match InstalledSkillsRegistry::load(&wrong_shape_path).unwrap_err() {
+        InstallerError::RegistrySerialization { path, source } => {
+            assert_eq!(path, wrong_shape_path);
+            assert!(source.is_data());
+        }
+        other => panic!("Expected RegistrySerialization, got {other:?}"),
+    }
+
+    let installed_dir = root.join("installed");
+    fs::create_dir_all(&installed_dir).unwrap();
+    let env_reg_path = installed_dir.join("installed-skills.json");
+    fs::write(&env_reg_path, "{ invalid json").unwrap();
+
+    let installer = Installer::with_root(root);
+    let env = TargetEnvironment::Custom(installed_dir);
+    match installer.read_registry(&env).unwrap_err() {
+        InstallerError::RegistrySerialization { path, source } => {
+            assert_eq!(path, env_reg_path);
+            assert!(source.is_syntax() || source.is_eof());
+        }
+        other => panic!("Expected RegistrySerialization, got {other:?}"),
+    }
+}
+
+// -----------------------------------------------------------------------------
+// 23. Registry Unsupported Schema Version
+// -----------------------------------------------------------------------------
+
+#[test]
+fn test_registry_load_unsupported_schema_version() {
+    let temp = TempDir::new().unwrap();
+    let root = temp.path();
+
+    let v3_json = r#"{"schema_version": 3, "updated_at": "2026-01-01T00:00:00Z", "skills": {}}"#;
+    let v3_path = root.join("v3-registry.json");
+    fs::write(&v3_path, v3_json).unwrap();
+    match InstalledSkillsRegistry::load(&v3_path).unwrap_err() {
+        InstallerError::UnsupportedSchemaVersion { found, supported } => {
+            assert_eq!(found, 3);
+            assert_eq!(supported, 2);
+        }
+        other => panic!("Expected UnsupportedSchemaVersion, got {other:?}"),
+    }
+
+    let overflow_json = r#"{"schema_version": 18446744073709551615, "updated_at": "2026-01-01T00:00:00Z", "skills": {}}"#;
+    let overflow_path = root.join("overflow-registry.json");
+    fs::write(&overflow_path, overflow_json).unwrap();
+    match InstalledSkillsRegistry::load(&overflow_path).unwrap_err() {
+        InstallerError::UnsupportedSchemaVersion { found, supported } => {
+            assert_eq!(found, u32::MAX);
+            assert_eq!(supported, 2);
+        }
+        other => panic!("Expected UnsupportedSchemaVersion, got {other:?}"),
+    }
+
+    let installed_dir = root.join("installed");
+    fs::create_dir_all(&installed_dir).unwrap();
+    fs::write(installed_dir.join("installed-skills.json"), v3_json).unwrap();
+
+    let installer = Installer::with_root(root);
+    let env = TargetEnvironment::Custom(installed_dir);
+    match installer.read_registry(&env).unwrap_err() {
+        InstallerError::UnsupportedSchemaVersion { found, supported } => {
+            assert_eq!(found, 3);
+            assert_eq!(supported, 2);
+        }
+        other => panic!("Expected UnsupportedSchemaVersion, got {other:?}"),
+    }
+    match installer.list_skills(&env).unwrap_err() {
+        InstallerError::UnsupportedSchemaVersion { found, supported } => {
+            assert_eq!(found, 3);
+            assert_eq!(supported, 2);
+        }
+        other => panic!("Expected UnsupportedSchemaVersion, got {other:?}"),
+    }
+}
+
+// -----------------------------------------------------------------------------
+// 24. Install Invalid Source Path Variants
+// -----------------------------------------------------------------------------
+
+#[test]
+fn test_install_invalid_source_path_variants() {
+    let temp = TempDir::new().unwrap();
+    let root = temp.path();
+    let installer = Installer::with_root(root);
+    let env = TargetEnvironment::Custom(root.join("installed"));
+    let options = InstallOptions::default();
+
+    let missing_source = root.join("missing-source");
+    match installer
+        .install(&missing_source, &env, &options)
+        .unwrap_err()
+    {
+        InstallerError::InvalidSourcePath { path, reason } => {
+            assert_eq!(path, missing_source);
+            assert_eq!(reason, "Source path does not exist");
+        }
+        other => panic!("Expected InvalidSourcePath, got {other:?}"),
+    }
+
+    let file_source = root.join("file-source.txt");
+    fs::write(&file_source, "not a directory\n").unwrap();
+    match installer.install(&file_source, &env, &options).unwrap_err() {
+        InstallerError::InvalidSourcePath { path, reason } => {
+            assert_eq!(path, file_source);
+            assert_eq!(reason, "Source path must be a directory");
+        }
+        other => panic!("Expected InvalidSourcePath, got {other:?}"),
+    }
+
+    let empty_source = root.join("empty-source");
+    fs::create_dir_all(&empty_source).unwrap();
+    match installer
+        .install(&empty_source, &env, &options)
+        .unwrap_err()
+    {
+        InstallerError::InvalidSourcePath { path, reason } => {
+            assert_eq!(path, empty_source);
+            assert_eq!(reason, "Source directory does not contain SKILL.md");
+        }
+        other => panic!("Expected InvalidSourcePath, got {other:?}"),
+    }
+
+    let nested_skill_dir = root.join("nested-skill-dir");
+    fs::create_dir_all(nested_skill_dir.join("SKILL.md")).unwrap();
+    match installer
+        .install(&nested_skill_dir, &env, &options)
+        .unwrap_err()
+    {
+        InstallerError::InvalidSourcePath { path, reason } => {
+            assert_eq!(path, nested_skill_dir);
+            assert_eq!(reason, "Source directory does not contain SKILL.md");
+        }
+        other => panic!("Expected InvalidSourcePath, got {other:?}"),
+    }
+
+    assert!(!root.join("installed").exists());
 }
