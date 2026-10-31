@@ -1,0 +1,7 @@
+interface:
+  display_name: "TARS Debug"
+  short_description: "Debug tars-agy sessions, logs, and Gemini transcripts externally"
+  default_prompt: "Use $tars-debug to diagnose a stuck or failing tars-agy session or factory shift from outside the target workspace."
+
+policy:
+  allow_implicit_invocation: true

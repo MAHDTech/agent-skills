@@ -137,6 +137,7 @@
       "title": "TARS",
       "description": "Autonomous software factory and persistent goal workflows.",
       "skills": [
+        "tars-debug",
         "tars-goal",
         "tars-run-factory"
       ]
