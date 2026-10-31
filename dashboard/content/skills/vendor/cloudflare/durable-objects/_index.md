@@ -41,7 +41,7 @@ Fetch the relevant doc page when implementing features.
 
 - `./references/rules.md` - Core rules, storage, concurrency, RPC, alarms
 - [Testing reference](@/skills/vendor/cloudflare/durable-objects/references/testing.md) - Current Vitest documentation, migration choices, and test selection
-- `./references/workers.md` - Workers handlers, types, wrangler config, observability
+- [Workers reference](@/skills/vendor/cloudflare/durable-objects/references/workers.md) - Workers handlers, types, configuration, tracing, and local debugging
 
 Search: `blockConcurrencyWhile`, `idFromName`, `getByName`, `setAlarm`, `sql.exec`
 
