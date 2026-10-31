@@ -708,3 +708,25 @@ fn test_target_environment_default_skills_dir() {
     let default_cursor = TargetEnvironment::Cursor.default_skills_dir(None);
     assert!(default_cursor.ends_with(".cursor/skills"));
 }
+
+#[test]
+fn test_antigravity_acp_target_resolution() {
+    let home = PathBuf::from("/mock/home");
+    let target = TargetEnvironment::AntigravityAcp;
+    assert_eq!(
+        target.default_skills_dir(Some(&home)),
+        home.join(".gemini/config/skills")
+    );
+    assert_eq!(
+        EnvironmentResolver::resolve_skills_dir_with_root(&target, Some(&home)).unwrap(),
+        home.join(".gemini/config/skills")
+    );
+    assert!(TargetEnvironment::all_standard().contains(&target));
+    assert_eq!(target.identifier(), "antigravity-acp");
+    let json = serde_json::to_string(&target).unwrap();
+    assert_eq!(json, "\"antigravity-acp\"");
+    assert_eq!(
+        serde_json::from_str::<TargetEnvironment>(&json).unwrap(),
+        target
+    );
+}
