@@ -998,6 +998,47 @@ fn test_discovery_index_digest_matches_raw_on_disk_bytes() {
 }
 
 #[test]
+fn test_discovery_index_digest_falls_back_to_raw_when_missing_on_disk() {
+    let harness = ArtifactsTestHarness::new();
+    let raw = "---\nname: in-memory-fallback\ndescription: In-memory fallback test\n---\n# in-memory-fallback\n\nFallback body.\n";
+    let missing_rel = PathBuf::from("skills/engineering/in-memory-fallback/SKILL.md");
+    assert!(!harness.workspace_root.join(&missing_rel).exists());
+
+    let skill = Skill::builder()
+        .path(missing_rel)
+        .dir_name("in-memory-fallback")
+        .category(SkillCategory::Engineering)
+        .promoted(true)
+        .tree(SkillTree::Live)
+        .frontmatter(
+            SkillFrontmatter::builder()
+                .name("in-memory-fallback")
+                .description("In-memory fallback test")
+                .build(),
+        )
+        .content("# in-memory-fallback\n")
+        .raw(raw)
+        .build();
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    assert!(engine.generate_discovery_index(&[skill]).unwrap());
+
+    let v020_path = harness
+        .workspace_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+        .join("index.json");
+    let v020_json: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(v020_path).unwrap()).unwrap();
+
+    let expected_digest = format!("sha256:{}", SkillDownloader::compute_sha256(raw.as_bytes()));
+    assert_eq!(
+        v020_json["skills"][0]["digest"].as_str(),
+        Some(expected_digest.as_str())
+    );
+}
+
+#[test]
 fn test_discovery_index_v010_lists_only_skill_md() {
     let harness = ArtifactsTestHarness::new();
     let skill_dir = harness.create_live_skill(

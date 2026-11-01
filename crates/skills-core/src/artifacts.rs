@@ -11,8 +11,9 @@
 //! Generated-artifact synchronization engine and markdown transformation primitives.
 //!
 //! Synchronizes repository-level manifests (`agents/AGENTS.md`, `README.md`,
-//! `skills.sh.json`) and generates the Zola documentation dashboard content tree
-//! including live categories, sibling reference pages, resources, and archived skills.
+//! `skills.sh.json`), `dashboard/static/.well-known/` discovery manifests, and the Zola
+//! documentation dashboard content tree including live categories, sibling reference
+//! pages, resources, and archived skills.
 
 use std::collections::HashSet;
 use std::fs;
@@ -21,8 +22,8 @@ use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::Serialize;
-use sha2::{Digest, Sha256};
 
+use crate::downloader::SkillDownloader;
 use crate::error::{Result, SkillError};
 use crate::models::{
     SKILLS_DISCOVERY_SCHEMA_V0_2_0, Skill, SkillCategory, SkillGrouping, SkillTree,
@@ -550,18 +551,11 @@ impl ArtifactsEngine {
     }
 
     fn skill_md_sha256(&self, skill: &Skill) -> String {
-        let on_disk_path = if skill.path.is_absolute() {
-            skill.path.clone()
-        } else {
-            self.workspace_root.join(&skill.path)
-        };
-        let mut hasher = Sha256::new();
-        if let Ok(bytes) = fs::read(&on_disk_path) {
-            hasher.update(&bytes);
-        } else {
-            hasher.update(skill.raw.as_bytes());
+        let on_disk_path = self.workspace_root.join(&skill.path);
+        match fs::read(&on_disk_path) {
+            Ok(bytes) => SkillDownloader::compute_sha256(&bytes),
+            Err(_) => SkillDownloader::compute_sha256(skill.raw.as_bytes()),
         }
-        crate::hashing::encode_hex(&hasher.finalize())
     }
 
     /// Generates dashboard content tree under `dashboard/content/skills/`.

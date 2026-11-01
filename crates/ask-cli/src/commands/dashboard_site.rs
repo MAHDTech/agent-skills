@@ -600,41 +600,60 @@ pub(crate) fn collect_snapshot_recursive(
     }
 }
 
-pub(crate) fn rebuild_search_indexes(root: &Path) {
+#[allow(clippy::needless_pass_by_value)]
+fn run_live_reload_step<T, E: std::fmt::Display>(result: Result<T, E>, context: &str) -> bool {
+    match result {
+        Ok(_) => true,
+        Err(err) => {
+            tracing::warn!("Failed to {context} during live reload: {err}");
+            false
+        }
+    }
+}
+
+fn sync_live_reload_inputs(root: &Path) -> bool {
     let options = ArtifactsOptions {
         skip_dashboard: false,
         repo_only: false,
         no_stage: false,
         ..Default::default()
     };
-    if let Err(err) = ArtifactsEngine::with_options(root, options).generate_all() {
-        tracing::warn!("Failed to sync artifacts during live reload: {err}");
+    run_live_reload_step(
+        ArtifactsEngine::with_options(root, options).generate_all(),
+        "sync artifacts",
+    ) && run_live_reload_step(write_skill_dates(root), "write skill dates")
+}
+
+fn prepare_live_reload_site(root: &Path) -> bool {
+    sync_live_reload_inputs(root)
+        && run_live_reload_step(
+            exec_tool(root, "zola", &["--root", "dashboard", "build"], "serve"),
+            "build Zola",
+        )
+}
+
+pub(crate) fn rebuild_search_indexes(root: &Path) {
+    if !prepare_live_reload_site(root) {
         return;
     }
-    if let Err(err) = write_skill_dates(root) {
-        tracing::warn!("Failed to write skill dates during live reload: {err}");
-        return;
-    }
-    if let Err(err) = exec_tool(root, "zola", &["--root", "dashboard", "build"], "serve") {
-        tracing::warn!("Failed to build Zola during live reload: {err}");
-        return;
-    }
-    if let Err(err) = materialize_well_known(root, &root.join("dashboard/public")) {
-        tracing::warn!("Failed to materialize .well-known skills during live reload: {err}");
-    }
-    if let Err(err) = exec_tool(
-        root,
-        "pagefind",
-        &[
-            "--site",
-            "dashboard/public",
-            "--output-path",
-            "dashboard/static/pagefind",
-        ],
-        "serve",
-    ) {
-        tracing::warn!("Failed to index search assets during live reload: {err}");
-    }
+    let _ = run_live_reload_step(
+        materialize_well_known(root, &root.join("dashboard/public")),
+        "materialize .well-known skills",
+    );
+    let _ = run_live_reload_step(
+        exec_tool(
+            root,
+            "pagefind",
+            &[
+                "--site",
+                "dashboard/public",
+                "--output-path",
+                "dashboard/static/pagefind",
+            ],
+            "serve",
+        ),
+        "index search assets",
+    );
 }
 
 #[cfg(test)]
@@ -1084,5 +1103,139 @@ mod tests {
         let mut empty_snapshot = HashMap::new();
         collect_snapshot_recursive(&root.join("nonexistent"), root, &mut empty_snapshot);
         assert!(empty_snapshot.is_empty());
+    }
+
+    #[test]
+    fn test_restore_generated_paths_restores_modified_tracked_well_known() {
+        let temp = tempdir().expect("failed to create temp dir");
+        let root = temp.path();
+
+        let git = |args: &[&str]| {
+            let status = Command::new("git")
+                .args(args)
+                .current_dir(root)
+                .status()
+                .expect("git command failed to spawn");
+            assert!(status.success(), "git {args:?} failed");
+        };
+
+        git(&["init"]);
+        git(&["config", "user.email", "test@example.com"]);
+        git(&["config", "user.name", "Test User"]);
+
+        let well_known_agent = root
+            .join("dashboard/static")
+            .join(WELL_KNOWN_AGENT_SKILLS_DIR);
+        let well_known_skills = root.join("dashboard/static").join(WELL_KNOWN_SKILLS_DIR);
+        std::fs::create_dir_all(root.join("agents")).unwrap();
+        std::fs::create_dir_all(root.join("dashboard/content")).unwrap();
+        std::fs::create_dir_all(&well_known_agent).unwrap();
+        std::fs::create_dir_all(&well_known_skills).unwrap();
+
+        let committed_agent_json = "{\"$schema\":\"v2\",\"skills\":[]}\n";
+        let committed_skills_json = "{\"skills\":[]}\n";
+        std::fs::write(root.join("README.md"), "committed readme\n").unwrap();
+        std::fs::write(root.join("agents/AGENTS.md"), "committed agents\n").unwrap();
+        std::fs::write(root.join("skills.sh.json"), "{}\n").unwrap();
+        std::fs::write(root.join("dashboard/content/_index.md"), "committed page\n").unwrap();
+        std::fs::write(root.join("dashboard/static/CNAME"), "skills.mahdtech.com\n").unwrap();
+        std::fs::write(well_known_agent.join("index.json"), committed_agent_json).unwrap();
+        std::fs::write(well_known_skills.join("index.json"), committed_skills_json).unwrap();
+
+        git(&["add", "."]);
+        git(&["commit", "-m", "chore: initial fixture"]);
+
+        std::fs::write(well_known_agent.join("index.json"), "{\"dirty\":true}\n").unwrap();
+        std::fs::write(well_known_skills.join("index.json"), "{\"dirty\":true}\n").unwrap();
+        let extra_file = root.join(WELL_KNOWN_STATIC_DIR).join("extra.json");
+        std::fs::write(&extra_file, "{}\n").unwrap();
+
+        restore_generated_paths(root);
+
+        assert_eq!(
+            std::fs::read_to_string(well_known_agent.join("index.json")).unwrap(),
+            committed_agent_json
+        );
+        assert_eq!(
+            std::fs::read_to_string(well_known_skills.join("index.json")).unwrap(),
+            committed_skills_json
+        );
+        assert!(!extra_file.exists());
+        assert_eq!(
+            std::fs::read_to_string(root.join("dashboard/static/CNAME")).unwrap(),
+            "skills.mahdtech.com\n"
+        );
+    }
+
+    #[test]
+    fn test_run_live_reload_step_reports_ok_and_err() {
+        assert!(run_live_reload_step::<_, &str>(Ok(1), "sync artifacts"));
+        assert!(!run_live_reload_step::<(), _>(
+            Err("boom"),
+            "sync artifacts"
+        ));
+    }
+
+    #[test]
+    fn test_sync_live_reload_inputs_succeeds_and_fails_hermetically() {
+        let temp = tempdir().expect("failed to create temp dir");
+        let root = temp.path();
+
+        let git = |args: &[&str]| {
+            let status = Command::new("git")
+                .args(args)
+                .current_dir(root)
+                .status()
+                .expect("git command failed to spawn");
+            assert!(status.success(), "git {args:?} failed");
+        };
+
+        git(&["init"]);
+        git(&["config", "user.email", "test@example.com"]);
+        git(&["config", "user.name", "Test User"]);
+
+        let skill_dir = root.join("skills/engineering/demo-skill");
+        std::fs::create_dir_all(&skill_dir).unwrap();
+        std::fs::create_dir_all(root.join("skills-archive")).unwrap();
+        std::fs::create_dir_all(root.join("agents")).unwrap();
+        std::fs::create_dir_all(root.join("docs")).unwrap();
+        std::fs::create_dir_all(root.join("dashboard/content/skills")).unwrap();
+        std::fs::write(
+            skill_dir.join("SKILL.md"),
+            "---\nname: demo-skill\ndescription: Demo skill description\n---\n# demo-skill\n\nBody.\n",
+        )
+        .unwrap();
+
+        assert!(sync_live_reload_inputs(root));
+        let sidecar = root.join("dashboard/skill_dates.toml");
+        assert!(sidecar.is_file());
+        assert!(
+            root.join("dashboard/static")
+                .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+                .join("index.json")
+                .is_file()
+        );
+
+        std::fs::remove_file(&sidecar).unwrap();
+        std::fs::create_dir_all(&sidecar).unwrap();
+        assert!(!sync_live_reload_inputs(root));
+
+        let broken_temp = tempdir().expect("failed to create temp dir");
+        let bad_root = broken_temp.path();
+        std::fs::create_dir_all(bad_root.join("README.md")).unwrap();
+        assert!(!sync_live_reload_inputs(bad_root));
+        assert!(!bad_root.join("dashboard/skill_dates.toml").exists());
+    }
+
+    #[test]
+    fn test_rebuild_search_indexes_short_circuits_on_sync_failure() {
+        let temp = tempdir().expect("failed to create temp dir");
+        let root = temp.path();
+        std::fs::create_dir_all(root.join("README.md")).unwrap();
+
+        rebuild_search_indexes(root);
+
+        assert!(!root.join("dashboard/skill_dates.toml").exists());
+        assert!(!root.join("dashboard/public").exists());
     }
 }
