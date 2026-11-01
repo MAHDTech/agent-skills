@@ -184,6 +184,7 @@ in
           "^README\\.md$"
           "^agents/AGENTS\\.md$"
           "^skills\\.sh\\.json$"
+          "^dashboard/static/\\.well-known/"
           "\\.versionrc$"
         ];
         args = [
@@ -276,6 +277,7 @@ in
           "README\\.md$"
           "^agents/AGENTS\\.md$"
           "^skills\\.sh\\.json$"
+          "^dashboard/static/\\.well-known/"
           "\\.devcontainer\\.json$"
           "\\.devcontainer/devcontainer\\.json$"
         ];
