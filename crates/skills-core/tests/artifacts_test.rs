@@ -4,9 +4,14 @@ use std::fs;
 use std::path::PathBuf;
 use tempfile::TempDir;
 
+use skills_core::artifacts::{
+    WELL_KNOWN_AGENT_SKILLS_DIR, WELL_KNOWN_SKILLS_DIR, WELL_KNOWN_STATIC_DIR,
+    select_discovery_skills,
+};
 use skills_core::{
-    ArtifactsEngine, ArtifactsOptions, SkillParser, escape_zola_shortcodes, rewrite_skill_links,
-    strip_legacy_raw_wrapper, sync_resources,
+    ArtifactsEngine, ArtifactsOptions, SKILLS_DISCOVERY_SCHEMA_V0_2_0, Skill, SkillCategory,
+    SkillDownloader, SkillFrontmatter, SkillParser, SkillTree, escape_zola_shortcodes,
+    rewrite_skill_links, strip_legacy_raw_wrapper, sync_resources,
 };
 
 /// Test harness providing an isolated mock workspace directory structure.
@@ -42,6 +47,21 @@ impl ArtifactsTestHarness {
         fs::create_dir_all(&skill_dir).unwrap();
         let skill_md =
             format!("---\nname: {name}\ndescription: {description}\n---\n# {name}\n\n{content}\n");
+        fs::write(skill_dir.join("SKILL.md"), skill_md).unwrap();
+        skill_dir
+    }
+
+    pub fn create_vendor_skill(&self, vendor: &str, name: &str, description: &str) -> PathBuf {
+        let skill_dir = self
+            .workspace_root
+            .join("skills")
+            .join("vendor")
+            .join(vendor)
+            .join(name);
+        fs::create_dir_all(&skill_dir).unwrap();
+        let skill_md = format!(
+            "---\nname: {name}\ndescription: {description}\n---\n# {name}\n\nVendor body.\n"
+        );
         fs::write(skill_dir.join("SKILL.md"), skill_md).unwrap();
         skill_dir
     }
@@ -855,5 +875,444 @@ fn test_markdown_transformations_archive_link_rewriting() {
     assert_eq!(
         out,
         "[Legacy Tool](@/skills-archive/engineering/legacy-tool/_index.md)"
+    );
+}
+
+#[test]
+fn test_discovery_index_exact_bytes() {
+    let harness = ArtifactsTestHarness::new();
+    let skill_dir = harness.create_live_skill(
+        "engineering",
+        "alpha-tool",
+        "Alpha description.",
+        "Alpha body.",
+    );
+    let raw_bytes = fs::read(skill_dir.join("SKILL.md")).unwrap();
+    let expected_hex = SkillDownloader::compute_sha256(&raw_bytes);
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+
+    assert!(engine.generate_discovery_index(&live).unwrap());
+
+    let v020_path = harness
+        .workspace_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+        .join("index.json");
+    let v010_path = harness
+        .workspace_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_SKILLS_DIR)
+        .join("index.json");
+
+    let v020_content = fs::read_to_string(&v020_path).unwrap();
+    let expected_v020 = format!(
+        "{{\n  \"$schema\": \"{SKILLS_DISCOVERY_SCHEMA_V0_2_0}\",\n  \"skills\": [\n    {{\n      \"name\": \"alpha-tool\",\n      \"type\": \"skill-md\",\n      \"description\": \"Alpha description.\",\n      \"url\": \"/.well-known/agent-skills/alpha-tool/SKILL.md\",\n      \"digest\": \"sha256:{expected_hex}\"\n    }}\n  ]\n}}\n"
+    );
+    assert_eq!(v020_content, expected_v020);
+    assert!(!v020_content.ends_with("\n\n"));
+
+    let v010_content = fs::read_to_string(&v010_path).unwrap();
+    let expected_v010 = "{\n  \"skills\": [\n    {\n      \"name\": \"alpha-tool\",\n      \"description\": \"Alpha description.\",\n      \"files\": [\n        \"SKILL.md\"\n      ]\n    }\n  ]\n}\n";
+    assert_eq!(v010_content, expected_v010);
+    assert!(!v010_content.ends_with("\n\n"));
+}
+
+#[test]
+fn test_discovery_index_sorted_by_name_across_categories() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_live_skill("writing", "zebra-guide", "Zebra desc", "Body");
+    harness.create_live_skill("tooling", "alpha-tool", "Alpha desc", "Body");
+    harness.create_live_skill("engineering", "middle-build", "Middle desc", "Body");
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+
+    assert!(engine.generate_discovery_index(&live).unwrap());
+
+    for rel_dir in [WELL_KNOWN_AGENT_SKILLS_DIR, WELL_KNOWN_SKILLS_DIR] {
+        let index_path = harness
+            .workspace_root
+            .join("dashboard/static")
+            .join(rel_dir)
+            .join("index.json");
+        let parsed: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(index_path).unwrap()).unwrap();
+        let names: Vec<&str> = parsed["skills"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|entry| entry["name"].as_str().unwrap())
+            .collect();
+        assert_eq!(names, vec!["alpha-tool", "middle-build", "zebra-guide"]);
+    }
+}
+
+#[test]
+fn test_discovery_index_digest_matches_raw_on_disk_bytes() {
+    let harness = ArtifactsTestHarness::new();
+    let skill_dir = harness.workspace_root.join("skills/engineering/raw-check");
+    fs::create_dir_all(&skill_dir).unwrap();
+    let skill_md_path = skill_dir.join("SKILL.md");
+
+    let raw_bytes =
+        b"---   \r\nname: raw-check\r\ndescription: Raw bytes test\r\n...\r\n# raw-check\r\n\r\nBody line.\r\n";
+    fs::write(&skill_md_path, raw_bytes).unwrap();
+
+    let raw_str = std::str::from_utf8(raw_bytes).unwrap();
+    let reconstructed_skill = SkillParser::parse_str_with_path(raw_str, &skill_md_path)
+        .unwrap()
+        .into_skill(
+            "skills/engineering/raw-check/SKILL.md",
+            SkillCategory::Engineering,
+        );
+    assert_ne!(
+        reconstructed_skill.raw.as_bytes(),
+        raw_bytes,
+        "ParsedSkill::into_skill reconstruction must differ from raw on-disk bytes for this test"
+    );
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    assert!(
+        engine
+            .generate_discovery_index(&[reconstructed_skill])
+            .unwrap()
+    );
+
+    let v020_path = harness
+        .workspace_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+        .join("index.json");
+    let v020_json: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(v020_path).unwrap()).unwrap();
+
+    let expected_digest = format!("sha256:{}", SkillDownloader::compute_sha256(raw_bytes));
+    assert_eq!(
+        v020_json["skills"][0]["digest"].as_str(),
+        Some(expected_digest.as_str())
+    );
+}
+
+#[test]
+fn test_discovery_index_v010_lists_only_skill_md() {
+    let harness = ArtifactsTestHarness::new();
+    let skill_dir = harness.create_live_skill(
+        "engineering",
+        "resource-rich",
+        "Skill with resources",
+        "Body",
+    );
+    fs::create_dir_all(skill_dir.join("resources/manual")).unwrap();
+    fs::write(skill_dir.join("resources/manual/guide.md"), "# Guide\n").unwrap();
+    fs::create_dir_all(skill_dir.join("agents")).unwrap();
+    fs::write(
+        skill_dir.join("agents/openai.yaml"),
+        "policy:\n  allow_implicit_invocation: true\n",
+    )
+    .unwrap();
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+    assert_eq!(live[0].resources.len(), 1);
+
+    assert!(engine.generate_discovery_index(&live).unwrap());
+
+    let v010_path = harness
+        .workspace_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_SKILLS_DIR)
+        .join("index.json");
+    let v010_json: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(v010_path).unwrap()).unwrap();
+    assert_eq!(
+        v010_json["skills"][0]["files"],
+        serde_json::json!(["SKILL.md"])
+    );
+
+    let v020_path = harness
+        .workspace_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+        .join("index.json");
+    let v020_json: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(v020_path).unwrap()).unwrap();
+    assert!(v020_json["skills"][0].get("files").is_none());
+}
+
+#[test]
+fn test_discovery_index_excludes_vendor_archive_and_in_progress() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_live_skill("engineering", "custom-live", "Custom live skill", "Body");
+    harness.create_vendor_skill("cloudflare", "vendor-skill", "Vendor snapshot");
+    harness.create_archived_skill(
+        "engineering",
+        "retired-skill",
+        "Retired skill",
+        "2025-01-01",
+        None,
+        "Old body",
+    );
+    harness.create_live_skill("in-progress", "draft-work", "Draft skill", "Draft body");
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+
+    assert!(engine.generate_discovery_index(&live).unwrap());
+
+    for rel_dir in [WELL_KNOWN_AGENT_SKILLS_DIR, WELL_KNOWN_SKILLS_DIR] {
+        let index_path = harness
+            .workspace_root
+            .join("dashboard/static")
+            .join(rel_dir)
+            .join("index.json");
+        let parsed: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(index_path).unwrap()).unwrap();
+        let entries = parsed["skills"].as_array().unwrap();
+        assert_eq!(entries.len(), 1);
+        assert_eq!(entries[0]["name"].as_str(), Some("custom-live"));
+    }
+}
+
+#[test]
+fn test_discovery_index_excludes_unsafe_names() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_live_skill("engineering", "safe-name-1", "Safe skill", "Body");
+
+    let mut skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let unsafe_names = [
+        "Upper-Case",
+        "-leading",
+        "trailing-",
+        "double--dash",
+        "../escape",
+        "nested/name",
+        "",
+    ];
+
+    for bad_name in unsafe_names {
+        skills.push(
+            Skill::builder()
+                .path(PathBuf::from("skills/engineering/bad/SKILL.md"))
+                .dir_name("bad")
+                .category(SkillCategory::Engineering)
+                .promoted(true)
+                .tree(SkillTree::Live)
+                .frontmatter(
+                    SkillFrontmatter::builder()
+                        .name(bad_name)
+                        .description("Unsafe name fixture")
+                        .build(),
+                )
+                .content("# Bad\n")
+                .raw("---\n---\n# Bad\n")
+                .build(),
+        );
+    }
+
+    let selected = select_discovery_skills(&skills);
+    assert_eq!(selected.len(), 1);
+    assert_eq!(selected[0].name(), "safe-name-1");
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    assert!(engine.generate_discovery_index(&skills).unwrap());
+
+    for rel_dir in [WELL_KNOWN_AGENT_SKILLS_DIR, WELL_KNOWN_SKILLS_DIR] {
+        let index_path = harness
+            .workspace_root
+            .join("dashboard/static")
+            .join(rel_dir)
+            .join("index.json");
+        let parsed: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(index_path).unwrap()).unwrap();
+        let entries = parsed["skills"].as_array().unwrap();
+        assert_eq!(entries.len(), 1);
+        assert_eq!(entries[0]["name"].as_str(), Some("safe-name-1"));
+    }
+}
+
+#[test]
+fn test_discovery_index_trims_description() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_live_skill(
+        "engineering",
+        "trim-target",
+        "\"  Trimmed summary text.  \\n\"",
+        "Body",
+    );
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+
+    assert!(engine.generate_discovery_index(&live).unwrap());
+
+    for rel_dir in [WELL_KNOWN_AGENT_SKILLS_DIR, WELL_KNOWN_SKILLS_DIR] {
+        let index_path = harness
+            .workspace_root
+            .join("dashboard/static")
+            .join(rel_dir)
+            .join("index.json");
+        let parsed: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(index_path).unwrap()).unwrap();
+        assert_eq!(
+            parsed["skills"][0]["description"].as_str(),
+            Some("Trimmed summary text.")
+        );
+    }
+}
+
+#[test]
+fn test_discovery_index_skipped_with_category_or_skill_filter() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_live_skill("engineering", "eng-one", "Desc", "Body");
+
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+
+    let cat_engine = ArtifactsEngine::with_options(
+        &harness.workspace_root,
+        ArtifactsOptions {
+            category_filter: Some("engineering".to_string()),
+            no_stage: true,
+            ..Default::default()
+        },
+    );
+    assert!(!cat_engine.generate_discovery_index(&live).unwrap());
+    let cat_summary = cat_engine.generate_all().unwrap();
+    assert!(!cat_summary.discovery_index_updated);
+    assert!(!harness.workspace_root.join(WELL_KNOWN_STATIC_DIR).exists());
+
+    let skill_engine = ArtifactsEngine::with_options(
+        &harness.workspace_root,
+        ArtifactsOptions {
+            skill_filter: Some("eng-one".to_string()),
+            no_stage: true,
+            ..Default::default()
+        },
+    );
+    assert!(!skill_engine.generate_discovery_index(&live).unwrap());
+    let skill_summary = skill_engine.generate_all().unwrap();
+    assert!(!skill_summary.discovery_index_updated);
+    assert!(!harness.workspace_root.join(WELL_KNOWN_STATIC_DIR).exists());
+}
+
+#[test]
+fn test_discovery_index_skipped_with_skip_dashboard_or_repo_only() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_live_skill("engineering", "eng-one", "Desc", "Body");
+
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+
+    let skip_engine = ArtifactsEngine::with_options(
+        &harness.workspace_root,
+        ArtifactsOptions {
+            skip_dashboard: true,
+            no_stage: true,
+            ..Default::default()
+        },
+    );
+    assert!(!skip_engine.generate_discovery_index(&live).unwrap());
+    let skip_summary = skip_engine.generate_all().unwrap();
+    assert!(!skip_summary.discovery_index_updated);
+    assert!(!harness.workspace_root.join(WELL_KNOWN_STATIC_DIR).exists());
+
+    let repo_engine = ArtifactsEngine::with_options(
+        &harness.workspace_root,
+        ArtifactsOptions {
+            repo_only: true,
+            no_stage: true,
+            ..Default::default()
+        },
+    );
+    assert!(!repo_engine.generate_discovery_index(&live).unwrap());
+    let repo_summary = repo_engine.generate_all().unwrap();
+    assert!(!repo_summary.discovery_index_updated);
+    assert!(!harness.workspace_root.join(WELL_KNOWN_STATIC_DIR).exists());
+}
+
+#[test]
+fn test_discovery_index_empty_catalog_emits_empty_skills_array() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_vendor_skill("cloudflare", "vendor-only", "Vendor only skill");
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+
+    assert!(engine.generate_discovery_index(&live).unwrap());
+
+    let v020_path = harness
+        .workspace_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+        .join("index.json");
+    let v010_path = harness
+        .workspace_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_SKILLS_DIR)
+        .join("index.json");
+
+    assert_eq!(
+        fs::read_to_string(v020_path).unwrap(),
+        format!("{{\n  \"$schema\": \"{SKILLS_DISCOVERY_SCHEMA_V0_2_0}\",\n  \"skills\": []\n}}\n")
+    );
+    assert_eq!(
+        fs::read_to_string(v010_path).unwrap(),
+        "{\n  \"skills\": []\n}\n"
+    );
+}
+
+#[test]
+fn test_generate_all_writes_discovery_index_and_sets_summary() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_live_skill("engineering", "sync-check", "Sync check desc", "Body");
+
+    let _ = std::process::Command::new("git")
+        .arg("init")
+        .current_dir(&harness.workspace_root)
+        .output();
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    let summary = engine.generate_all().unwrap();
+
+    assert!(summary.discovery_index_updated);
+    let well_known_dir = harness.workspace_root.join(WELL_KNOWN_STATIC_DIR);
+    assert!(summary.staged_files.contains(&well_known_dir));
+    assert!(
+        harness
+            .workspace_root
+            .join("dashboard/static")
+            .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+            .join("index.json")
+            .is_file()
+    );
+    assert!(
+        harness
+            .workspace_root
+            .join("dashboard/static")
+            .join(WELL_KNOWN_SKILLS_DIR)
+            .join("index.json")
+            .is_file()
+    );
+}
+
+#[test]
+fn test_skills_sh_json_empty_catalog_keeps_groupings_key() {
+    let harness = ArtifactsTestHarness::new();
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    assert!(engine.generate_skills_sh_json(&[]).unwrap());
+
+    let manifest_file = harness.workspace_root.join("skills.sh.json");
+    let content = fs::read_to_string(&manifest_file).unwrap();
+    assert_eq!(
+        content,
+        "{\n  \"$schema\": \"https://skills.sh/schemas/skills.sh.schema.json\",\n  \"notGrouped\": \"bottom\",\n  \"groupings\": []\n}\n"
     );
 }

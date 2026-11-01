@@ -436,7 +436,7 @@ pub struct SkillsManifest {
     pub not_grouped: Option<String>,
 
     #[builder(default, setter(into))]
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     pub groupings: Vec<SkillGrouping>,
 }
 
@@ -476,6 +476,13 @@ pub struct SkillsDiscoveryEntry {
     pub files: Vec<String>,
 }
 
+/// JSON schema URI for Agent Skills Discovery RFC v0.2.0 manifests.
+pub const SKILLS_DISCOVERY_SCHEMA_V0_2_0: &str = concat!(
+    "https://",
+    "schemas.agentskills.io",
+    "/discovery/0.2.0/schema.json"
+);
+
 /// Representation of the Agent Skills Discovery manifest (`.well-known/skills/index.json`
 /// or `.well-known/agent-skills/index.json`).
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
@@ -487,7 +494,7 @@ pub struct SkillsDiscoveryIndex {
 
     /// Published skill entries.
     #[builder(default, setter(into))]
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     pub skills: Vec<SkillsDiscoveryEntry>,
 }
 

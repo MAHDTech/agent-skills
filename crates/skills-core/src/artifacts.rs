@@ -20,11 +20,50 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
+use sha2::{Digest, Sha256};
 
 use crate::error::{Result, SkillError};
-use crate::models::{Skill, SkillCategory, SkillTree};
+use crate::models::{
+    SKILLS_DISCOVERY_SCHEMA_V0_2_0, Skill, SkillCategory, SkillGrouping, SkillTree,
+    SkillsDiscoveryEntry, SkillsDiscoveryIndex, SkillsManifest,
+};
 use crate::parser::SkillParser;
+
+/// Repository-relative directory holding tracked `.well-known` discovery manifests.
+pub const WELL_KNOWN_STATIC_DIR: &str = "dashboard/static/.well-known";
+/// Site-relative directory for RFC v0.2.0 discovery manifests and skill files.
+pub const WELL_KNOWN_AGENT_SKILLS_DIR: &str = ".well-known/agent-skills";
+/// Site-relative directory for RFC v0.1.0 compatibility discovery manifests and skill files.
+pub const WELL_KNOWN_SKILLS_DIR: &str = ".well-known/skills";
+/// Canonical skill markdown filename exposed under `.well-known`.
+pub const DISCOVERY_SKILL_FILE: &str = "SKILL.md";
+
+/// Selects custom promoted live skills eligible for public discovery, sorted by skill name.
+#[must_use]
+pub fn select_discovery_skills(skills: &[Skill]) -> Vec<&Skill> {
+    let mut selected: Vec<&Skill> = skills
+        .iter()
+        .filter(|skill| {
+            skill.tree == SkillTree::Live
+                && skill.promoted
+                && skill.vendor_source().is_none()
+                && is_discovery_safe_name(skill.name())
+        })
+        .collect();
+    selected.sort_by(|a, b| a.name().cmp(b.name()).then_with(|| a.path.cmp(&b.path)));
+    selected
+}
+
+fn is_discovery_safe_name(name: &str) -> bool {
+    !name.is_empty()
+        && !name.starts_with('-')
+        && !name.ends_with('-')
+        && !name.contains("--")
+        && name
+            .bytes()
+            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+}
 
 /// Options controlling artifact synchronization behavior.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,27 +105,10 @@ pub struct ArtifactsSummary {
     pub readme_updated: bool,
     pub skills_sh_updated: bool,
     pub dashboard_generated: bool,
+    pub discovery_index_updated: bool,
     pub staged_files: Vec<PathBuf>,
     pub live_skills_count: usize,
     pub archived_skills_count: usize,
-}
-
-/// Schema model for `skills.sh.json` manifest.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SkillsManifest {
-    #[serde(rename = "$schema")]
-    pub schema: String,
-    #[serde(rename = "notGrouped")]
-    pub not_grouped: String,
-    pub groupings: Vec<SkillGrouping>,
-}
-
-/// Category grouping entry within `skills.sh.json`.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SkillGrouping {
-    pub title: String,
-    pub description: String,
-    pub skills: Vec<String>,
 }
 
 /// Orchestrator for repository artifact generation.
@@ -194,6 +216,11 @@ impl ArtifactsEngine {
                 .join("content")
                 .join("skills");
             files_to_stage.push(dashboard_dir);
+        }
+
+        if self.generate_discovery_index(&live_skills)? {
+            summary.discovery_index_updated = true;
+            files_to_stage.push(self.workspace_root.join(WELL_KNOWN_STATIC_DIR));
         }
 
         if !self.options.no_stage {
@@ -455,23 +482,86 @@ impl ArtifactsEngine {
 
         let manifest = SkillsManifest {
             schema: "https://skills.sh/schemas/skills.sh.schema.json".to_string(),
-            not_grouped: "bottom".to_string(),
+            not_grouped: Some("bottom".to_string()),
             groupings,
         };
 
-        let mut buf = Vec::new();
-        let formatter = serde_json::ser::PrettyFormatter::with_indent(b"  ");
-        let mut ser = serde_json::Serializer::with_formatter(&mut buf, formatter);
-        manifest
-            .serialize(&mut ser)
-            .map_err(SkillError::GeneralJson)?;
-
-        let mut json_str = String::from_utf8(buf)
-            .map_err(|e| SkillError::validation(&manifest_file, e.to_string()))?;
-        json_str.push('\n');
-
-        atomic_write(&manifest_file, &json_str)?;
+        write_pretty_json(&manifest_file, &manifest)?;
         Ok(true)
+    }
+
+    /// Generates RFC v0.2.0 and v0.1.0 discovery manifests under `dashboard/static/.well-known/`.
+    pub fn generate_discovery_index(&self, live_skills: &[Skill]) -> Result<bool> {
+        if self.options.category_filter.is_some() || self.options.skill_filter.is_some() {
+            return Ok(false);
+        }
+        if self.options.skip_dashboard || self.options.repo_only {
+            return Ok(false);
+        }
+
+        let selected = select_discovery_skills(live_skills);
+        let mut v020_entries = Vec::with_capacity(selected.len());
+        let mut v010_entries = Vec::with_capacity(selected.len());
+
+        for skill in selected {
+            let name = skill.name().to_string();
+            let description = skill.description().trim().to_string();
+            let digest = format!("sha256:{}", self.skill_md_sha256(skill));
+
+            v020_entries.push(SkillsDiscoveryEntry {
+                name: name.clone(),
+                entry_type: Some("skill-md".to_string()),
+                description: description.clone(),
+                url: Some(format!(
+                    "/{WELL_KNOWN_AGENT_SKILLS_DIR}/{name}/{DISCOVERY_SKILL_FILE}"
+                )),
+                digest: Some(digest),
+                files: Vec::new(),
+            });
+
+            v010_entries.push(SkillsDiscoveryEntry {
+                name,
+                entry_type: None,
+                description,
+                url: None,
+                digest: None,
+                files: vec![DISCOVERY_SKILL_FILE.to_string()],
+            });
+        }
+
+        let v020_index = SkillsDiscoveryIndex {
+            schema: Some(SKILLS_DISCOVERY_SCHEMA_V0_2_0.to_string()),
+            skills: v020_entries,
+        };
+        let v010_index = SkillsDiscoveryIndex {
+            schema: None,
+            skills: v010_entries,
+        };
+
+        let static_dir = self.workspace_root.join("dashboard").join("static");
+        let v020_file = static_dir
+            .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+            .join("index.json");
+        let v010_file = static_dir.join(WELL_KNOWN_SKILLS_DIR).join("index.json");
+
+        write_pretty_json(&v020_file, &v020_index)?;
+        write_pretty_json(&v010_file, &v010_index)?;
+        Ok(true)
+    }
+
+    fn skill_md_sha256(&self, skill: &Skill) -> String {
+        let on_disk_path = if skill.path.is_absolute() {
+            skill.path.clone()
+        } else {
+            self.workspace_root.join(&skill.path)
+        };
+        let mut hasher = Sha256::new();
+        if let Ok(bytes) = fs::read(&on_disk_path) {
+            hasher.update(&bytes);
+        } else {
+            hasher.update(skill.raw.as_bytes());
+        }
+        crate::hashing::encode_hex(&hasher.finalize())
     }
 
     /// Generates dashboard content tree under `dashboard/content/skills/`.
@@ -1539,6 +1629,19 @@ pub fn sync_resources(
     }
 
     Ok(())
+}
+
+fn write_pretty_json<T: Serialize>(path: &Path, value: &T) -> Result<()> {
+    let mut buf = Vec::new();
+    let formatter = serde_json::ser::PrettyFormatter::with_indent(b"  ");
+    let mut ser = serde_json::Serializer::with_formatter(&mut buf, formatter);
+    value.serialize(&mut ser).map_err(SkillError::GeneralJson)?;
+
+    let mut json_str =
+        String::from_utf8(buf).map_err(|e| SkillError::validation(path, e.to_string()))?;
+    json_str.push('\n');
+
+    atomic_write(path, &json_str)
 }
 
 fn atomic_write(path: &Path, content: &str) -> Result<()> {
