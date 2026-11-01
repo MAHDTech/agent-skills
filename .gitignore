@@ -37,14 +37,11 @@ dashboard/static/build/
 dashboard/static/pagefind/
 dashboard/skill_dates.toml
 
-# TARS Cloud allow list
-!.tars/
-!.tars/config.yaml
-
-# TARS Cloud block list
-.tars/scratch/
-.tars/issues/
-.tars/goals/
+# GUARDS
+!/.guards/
+/.guards/*
+!/.guards/config.yaml
+.tars/
 
 # AI Agents
 .agents/teamwork/

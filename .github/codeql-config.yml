@@ -9,7 +9,8 @@ paths-ignore:
   - "**/target/**"
   - ".devenv/**"
   - ".direnv/**"
-  # .tars contains symlinked agent scratch and external worktree state.
+  # .guards and .tars contain symlinked agent scratch and external worktree state.
+  - ".guards/**"
   - ".tars/**"
 
   # --- Frontend build output and dependencies ---

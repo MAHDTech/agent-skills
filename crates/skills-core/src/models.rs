@@ -61,7 +61,7 @@ pub enum SkillCategory {
     Writing,
     Authoring,
     Tooling,
-    Tars,
+    Guards,
     InProgress,
     #[serde(untagged)]
     Custom(String),
@@ -81,7 +81,7 @@ impl SkillCategory {
             Self::Writing => "writing",
             Self::Authoring => "authoring",
             Self::Tooling => "tooling",
-            Self::Tars => "tars",
+            Self::Guards => "guards",
             Self::InProgress => "in-progress",
             Self::Custom(s) => s.as_str(),
         }
@@ -100,7 +100,7 @@ impl SkillCategory {
             Self::Writing => "Writing",
             Self::Authoring => "Authoring",
             Self::Tooling => "Tooling",
-            Self::Tars => "TARS",
+            Self::Guards => "GUARDS",
             Self::InProgress => "In Progress",
             Self::Custom(s) => s.strip_prefix("vendor/").unwrap_or(s.as_str()),
         }
@@ -119,7 +119,9 @@ impl SkillCategory {
             Self::Writing => "Proofreading and documentation polish.",
             Self::Authoring => "Create and maintain the skills themselves.",
             Self::Tooling => "Environments, CLIs, and agent conventions.",
-            Self::Tars => "Autonomous software factory and persistent goal workflows.",
+            Self::Guards => {
+                "Autonomous GUARDS software factory, debugging, and persistent goal workflows."
+            }
             Self::InProgress => "Drafts not yet promoted.",
             Self::Custom(s) if s.starts_with("vendor/") => "Skills maintained by this vendor.",
             Self::Custom(_) => "Custom user-defined category.",
@@ -151,7 +153,7 @@ impl SkillCategory {
             Self::Writing,
             Self::Authoring,
             Self::Tooling,
-            Self::Tars,
+            Self::Guards,
         ]
     }
 
@@ -182,7 +184,7 @@ impl FromStr for SkillCategory {
             "writing" => Self::Writing,
             "authoring" => Self::Authoring,
             "tooling" => Self::Tooling,
-            "tars" => Self::Tars,
+            "guards" => Self::Guards,
             "in-progress" => Self::InProgress,
             other => Self::Custom(other.to_string()),
         })

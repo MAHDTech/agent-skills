@@ -4,7 +4,7 @@ description: Implement pending backlog issues from `.tars/issues/todo/` in paral
 disable-model-invocation: true
 metadata:
   archived: "2026-09-04"
-  replaced-by: "tars-run-factory"
+  replaced-by: "guards-run-factory"
 ---
 
 # Backlog Implement

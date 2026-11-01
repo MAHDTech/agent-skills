@@ -4,7 +4,7 @@ description: Prepare to run the tars-backlog-loop by verifying repository integr
 disable-model-invocation: true
 metadata:
   archived: "2026-09-04"
-  replaced-by: "tars-run-factory"
+  replaced-by: "guards-run-factory"
 ---
 
 # Backlog Prepare

@@ -20,7 +20,7 @@
       "type": "skill-md",
       "description": "Look up Google Antigravity/AGY CLI, IDE, and SDK behavior. Use for its settings, commands, keybindings, agent permissions, hooks, or plugin integration.",
       "url": "/.well-known/agent-skills/antigravity/SKILL.md",
-      "digest": "sha256:db4ac39fff8f7bb8de75944ffcd0edc41b2a6a17697c2b2fa0d720a8142ffcab"
+      "digest": "sha256:383c25412fed412670493ce08f1c3a31e7a3a72e686f2f001a591806287688fb"
     },
     {
       "name": "bevy-development",
@@ -212,6 +212,27 @@
       "digest": "sha256:1a97e8d08f50396ff281c721dac8317da7e0894f95dd2ffc5ae7f18a2627ff25"
     },
     {
+      "name": "guards-debug",
+      "type": "skill-md",
+      "description": "Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts.",
+      "url": "/.well-known/agent-skills/guards-debug/SKILL.md",
+      "digest": "sha256:6614a9a33107d92d30b37fe481381378791843674454226b24f903d65f1a5aca"
+    },
+    {
+      "name": "guards-goal",
+      "type": "skill-md",
+      "description": "Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /guards-goal or explicitly requests a persistent goal.",
+      "url": "/.well-known/agent-skills/guards-goal/SKILL.md",
+      "digest": "sha256:ffb5e5f56639be94c451615b18faf76f5cac9e097b9c8c8585051288cdd17452"
+    },
+    {
+      "name": "guards-run-factory",
+      "type": "skill-md",
+      "description": "Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.",
+      "url": "/.well-known/agent-skills/guards-run-factory/SKILL.md",
+      "digest": "sha256:fcd4d00cb3f05eab3329f20817583f58c011d900c58e8229caf4754304858eed"
+    },
+    {
       "name": "handoff",
       "type": "skill-md",
       "description": "Summarize the current conversation into a temporary handoff for another agent or session. Use when transferring unfinished work; reference durable artifacts, suggest relevant skills, and redact secrets.",
@@ -340,9 +361,9 @@
     {
       "name": "prioritize-backlog",
       "type": "skill-md",
-      "description": "Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use for generic backlog grooming with value-effort, RICE, or WSJF; excludes the automated .tars/issues backlog.",
+      "description": "Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use for generic backlog grooming with value-effort, RICE, or WSJF; excludes the automated .guards/issues backlog.",
       "url": "/.well-known/agent-skills/prioritize-backlog/SKILL.md",
-      "digest": "sha256:b084e5b0ac40ad6cd1efc89d64265f8519910f4684aa134069a253588dfa435c"
+      "digest": "sha256:0a1c3f3ee8fa387547ad0a5ed2481d25ef866fe9b86576ec749761ffd78851fc"
     },
     {
       "name": "productionize-app",
@@ -426,14 +447,14 @@
       "type": "skill-md",
       "description": "Create or update custom agent skills with concise discovery descriptions, matching invocation policies, supporting resources, and catalog checks.",
       "url": "/.well-known/agent-skills/skill-creator/SKILL.md",
-      "digest": "sha256:857a84911267e4f2fad20f845cb595e340644779d625b35dd1351305ebcb6421"
+      "digest": "sha256:494c26cd62184549d30f832b276ffbcaf6d28bbfa58552f7cc146e8a52d6aa0d"
     },
     {
       "name": "skill-router",
       "type": "skill-md",
       "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:e54a29e4c57b9e628104801163eb8d7db1c23ace48f851037473a3c10de35d98"
+      "digest": "sha256:fac4bf48b078ffa2bc46586683435807a9a1a4549f454a9c9dbc8c5ff35c05c6"
     },
     {
       "name": "software-factory",
@@ -464,27 +485,6 @@
       "digest": "sha256:036fb12c00e9bc1b277d5de0fa99efbfa4d3376a42020d24c26d759f7f51b396"
     },
     {
-      "name": "tars-debug",
-      "type": "skill-md",
-      "description": "Debug and recover the tars-agy Antigravity plugin from outside an active run using tars-agy doctor, inspect, monitor, TARS state logs, and ~/.gemini session transcripts. Use for stuck or failing TARS sessions, hooks, spokes, or factory shifts.",
-      "url": "/.well-known/agent-skills/tars-debug/SKILL.md",
-      "digest": "sha256:4c7db9f378973306ab330ac540755ce55932ad916da10132bd308b16a5f43792"
-    },
-    {
-      "name": "tars-goal",
-      "type": "skill-md",
-      "description": "Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly requests a persistent goal.",
-      "url": "/.well-known/agent-skills/tars-goal/SKILL.md",
-      "digest": "sha256:4c3d1898b276d3d6df277d1a7a092c5a593994d016ce6c6350e712a0131a9a17"
-    },
-    {
-      "name": "tars-run-factory",
-      "type": "skill-md",
-      "description": "Run the TARS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.",
-      "url": "/.well-known/agent-skills/tars-run-factory/SKILL.md",
-      "digest": "sha256:65d0748d7f0f8665bbe0ba9469877723378db03e6a21356d1b16483cc9504703"
-    },
-    {
       "name": "tdd",
       "type": "skill-md",
       "description": "Build features or fixes test-first using a red-to-green loop. Use for behavior-focused integration tests, choosing public test seams, and avoiding tests coupled to internals.",
@@ -501,9 +501,9 @@
     {
       "name": "to-tickets",
       "type": "skill-md",
-      "description": "Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .tars/issues automation.",
+      "description": "Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .guards/issues automation.",
       "url": "/.well-known/agent-skills/to-tickets/SKILL.md",
-      "digest": "sha256:78a086b793f129c63f2e5fb0f544191ab34db06a8916394fda64a2822229b5f3"
+      "digest": "sha256:9ca82779eae9e44a133320bbe2891418a74f9f5f966c73d4296ee149868412e2"
     },
     {
       "name": "total-recall",

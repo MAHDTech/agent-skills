@@ -74,7 +74,7 @@ Not new features - working on code that already exists:
 
 ## Crossing sessions
 
-- [/tars-goal](@/skills/tars/tars-goal/_index.md) - reach for this when the user wants to set or resume a persistent goal, pursue its full scope, and verify completion using native goal tools or a repository file fallback.
+- [/guards-goal](@/skills/guards/guards-goal/_index.md) - reach for this when the user wants to set or resume a persistent goal, pursue its full scope, and verify completion using native goal tools or a repository file fallback.
 
 - `/handoff` - reach for this when a thread is full or you need to branch off; it compacts the conversation into a document a fresh session can pick up.
 - `/store-plan` - reach for this when the current plan, decisions, and action items should be saved as a markdown file under `docs/plans/` for later.
@@ -159,8 +159,8 @@ Beyond `/code-review` on the main flow:
 - [/zed](@/skills/tooling/zed/_index.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
 - [/oak](@/skills/tooling/oak/_index.md) - reach for this when working in an Oak repository (`.oak/`), running `oak` CLI commands, managing change stacks, isolating agents with Oak workspaces, or configuring `.oak/ci/workflows.json`.
 - [/jj](@/skills/tooling/jj/_index.md) - reach for this when working in a Jujutsu (`jj`) repository (`.jj/`), running `jj` CLI commands, writing revset or fileset expressions, managing bookmarks, resolving conflicts, or syncing with GitHub.
-- [/tars-debug](@/skills/tars/tars-debug/_index.md) - reach for this from outside an active run when debugging a stuck or failing tars-agy session, hook, spoke, or factory shift across TARS state logs and ~/.gemini transcripts.
-- `/tars-run-factory` - reach for this to run the unattended TARS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
+- [/guards-debug](@/skills/guards/guards-debug/_index.md) - reach for this from outside an active run when debugging a stuck or failing agy-guards session, hook, spoke, or factory shift across GUARDS state logs and ~/.gemini transcripts.
+- [/guards-run-factory](@/skills/guards/guards-run-factory/_index.md) - reach for this to run the unattended GUARDS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
 
