@@ -4,7 +4,7 @@ description: Audit the codebase for bugs, features, security issues, or technica
 disable-model-invocation: true
 metadata:
   archived: "2026-09-04"
-  replaced-by: "tars-run-factory"
+  replaced-by: "guards-run-factory"
 ---
 
 # Backlog Audit

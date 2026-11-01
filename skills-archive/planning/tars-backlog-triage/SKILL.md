@@ -4,7 +4,7 @@ description: Triage pending backlog issues in `.tars/issues/todo/` to verify the
 disable-model-invocation: true
 metadata:
   archived: "2026-09-04"
-  replaced-by: "tars-run-factory"
+  replaced-by: "guards-run-factory"
 ---
 
 # Backlog Triage

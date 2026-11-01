@@ -4,7 +4,7 @@ description: Coordinate the full backlog lifecycle by sequentially executing tar
 disable-model-invocation: true
 metadata:
   archived: "2026-09-04"
-  replaced-by: "tars-run-factory"
+  replaced-by: "guards-run-factory"
 ---
 
 # Backlog Loop

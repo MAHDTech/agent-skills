@@ -1,6 +1,6 @@
 +++
 title = "prioritize-backlog"
-description = "Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use for generic backlog grooming with value-effort, RICE, or WSJF; excludes the automated .tars/issues backlog."
+description = "Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use for generic backlog grooming with value-effort, RICE, or WSJF; excludes the automated .guards/issues backlog."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -14,7 +14,7 @@ mermaid = false
 
 A backlog is a pile until it's groomed. Grooming turns the pile into an ordered queue whose **top is unambiguously the next thing to do** - ordered by **value** against **cost** and **risk**, low-value items cut, and no blocker ever sitting above the work it gates.
 
-This is generic backlog **grooming** - ranking any pile of work (ideas, features, tickets) by value, whatever tracker it lives in. It does **not** touch the `.tars/issues/` backlog that automated factory ticket pipelines operate over; that is a separate ticket pipeline, not the pile you groom here.
+This is generic backlog **grooming** - ranking any pile of work (ideas, features, tickets) by value, whatever tracker it lives in. It does **not** touch the `.guards/issues/` backlog that automated factory ticket pipelines operate over; that is a separate ticket pipeline, not the pile you groom here.
 
 ## Prepare the items
 

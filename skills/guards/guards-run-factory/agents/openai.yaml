@@ -1,0 +1,7 @@
+interface:
+  display_name: "GUARDS Run Factory"
+  short_description: "Run unattended GUARDS software factory over backlogs"
+  default_prompt: "Use $guards-run-factory to orchestrate unattended factory runs."
+
+policy:
+  allow_implicit_invocation: false

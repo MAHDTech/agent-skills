@@ -1,0 +1,7 @@
+interface:
+  display_name: "GUARDS Debug"
+  short_description: "Debug agy-guards sessions, logs, and Gemini transcripts"
+  default_prompt: "Use $guards-debug to diagnose a stuck or failing agy-guards session or factory shift from outside the target workspace."
+
+policy:
+  allow_implicit_invocation: true
