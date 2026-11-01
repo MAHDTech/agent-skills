@@ -2,8 +2,10 @@
 
 use assert_cmd::Command;
 use predicates::prelude::*;
+use skills_core::artifacts::ArtifactsEngine;
 use skills_core::error::SkillError;
-use std::path::PathBuf;
+use skills_core::models::SkillCategory;
+use std::path::{Path, PathBuf};
 
 #[test]
 fn vendor_cli_refreshes_a_local_source_without_fetching_its_documentation() {
@@ -357,62 +359,246 @@ fn test_cli_exit_code_mapping() {
         .code(2);
 }
 
+fn copy_dir_recursive(src: &Path, dst: &Path) {
+    std::fs::create_dir_all(dst).unwrap();
+    for entry in std::fs::read_dir(src).unwrap() {
+        let entry = entry.unwrap();
+        let target = dst.join(entry.file_name());
+        if entry.file_type().unwrap().is_dir() {
+            copy_dir_recursive(&entry.path(), &target);
+        } else {
+            std::fs::copy(entry.path(), target).unwrap();
+        }
+    }
+}
+
+fn seed_promoted_fixture_skills(fixture_root: &Path) {
+    assert!(!SkillCategory::InProgress.description().is_empty());
+    assert!(
+        !SkillCategory::Custom("custom".to_string())
+            .description()
+            .is_empty()
+    );
+
+    for category in SkillCategory::standard_promoted() {
+        if *category == SkillCategory::Tooling {
+            let zola_skill_dir = fixture_root.join("skills/tooling/zola");
+            let zola_agents_dir = zola_skill_dir.join("agents");
+            let zola_manual_dir = zola_skill_dir.join("resources/manual");
+            std::fs::create_dir_all(&zola_agents_dir).unwrap();
+            std::fs::create_dir_all(&zola_manual_dir).unwrap();
+            std::fs::write(
+                zola_skill_dir.join("SKILL.md"),
+                "---\nname: zola\ndescription: Build or serve an existing Zola static site.\n---\n\n# Zola\n\nBuild static documentation sites with Zola.\n\nSee [Guide](./resources/manual/guide.md) and [Data](./resources/manual/data.json).\n",
+            )
+            .unwrap();
+            std::fs::write(
+                zola_agents_dir.join("openai.yaml"),
+                "interface:\n  display_name: \"Zola\"\n  short_description: \"Build or serve Zola static sites\"\n  default_prompt: \"Use $zola to build or serve Zola sites.\"\n\npolicy:\n  allow_implicit_invocation: true\n",
+            )
+            .unwrap();
+            std::fs::write(
+                zola_manual_dir.join("guide.md"),
+                "# Zola Guide\n\nManual resource notes.\n",
+            )
+            .unwrap();
+            std::fs::write(zola_manual_dir.join("data.json"), "{\"ok\":true}\n").unwrap();
+        } else {
+            let slug = category.as_str();
+            let name = format!("{slug}-sample");
+            let skill_dir = fixture_root.join("skills").join(slug).join(&name);
+            let agents_dir = skill_dir.join("agents");
+            std::fs::create_dir_all(&agents_dir).unwrap();
+            std::fs::write(
+                skill_dir.join("SKILL.md"),
+                format!(
+                    "---\nname: {name}\ndescription: Verify sample catalog workflows.\n---\n\n# Sample\n\nVerify sample catalog workflows.\n"
+                ),
+            )
+            .unwrap();
+            std::fs::write(
+                agents_dir.join("openai.yaml"),
+                format!(
+                    "interface:\n  display_name: \"Sample\"\n  short_description: \"Verify sample catalog workflows\"\n  default_prompt: \"Use ${name} to verify sample catalog workflows.\"\n\npolicy:\n  allow_implicit_invocation: true\n"
+                ),
+            )
+            .unwrap();
+        }
+    }
+}
+
+fn seed_vendor_and_archive_fixture_skills(fixture_root: &Path) {
+    let vendor_dir = fixture_root.join("skills/vendor/example/vendor-sample");
+    let vendor_auto_dir = vendor_dir.join("resources/auto");
+    std::fs::create_dir_all(&vendor_auto_dir).unwrap();
+    std::fs::write(
+        vendor_dir.join("SKILL.md"),
+        concat!(
+            "---\n",
+            "name: vendor-sample\n",
+            "description: Exercise vendor catalog and markdown edge cases.\n",
+            "---\n\n",
+            "# Vendor Sample\n\n",
+            "Inline trimmed shortcode: {{- badge(label=\"ok\") -}}\n",
+            "Invalid inline empty ident: {{ (x) }}\n",
+            "Invalid inline digit ident: {{ 1x(a) }}\n",
+            "Body trimmed shortcode: {%- note(kind=\"tip\") -%}body{%- end -%}\n",
+            "Body non-call without paren: {% else %}\n",
+            "Body invalid ident with paren: {% (x) %}\n",
+            "Nested open candidate: {% outer {% inner %}\n",
+            "Unmatched single tick ` on line\n",
+            "Whitespace link target: [Skip](path with space.md)\n",
+            "Unclosed inline open: {{ unclosed inline\n",
+            "Unclosed body open: {% unclosed body\n\n",
+            "```text\n",
+            "unclosed triple fence\n",
+        ),
+    )
+    .unwrap();
+    std::fs::write(
+        vendor_auto_dir.join("unclosed-double.md"),
+        "# Unclosed Double Span\n\nExample ``unclosed double span\n",
+    )
+    .unwrap();
+
+    let archive_dir = fixture_root.join("skills-archive/engineering/archived-sample");
+    let archive_manual_dir = archive_dir.join("resources/manual");
+    std::fs::create_dir_all(&archive_manual_dir).unwrap();
+    std::fs::write(
+        archive_dir.join("SKILL.md"),
+        "---\nname: archived-sample\ndescription: Retire legacy engineering workflow guidance.\nmetadata:\n  archived: \"2025-01-15\"\n---\n\n# Archived Sample\n\nRetired engineering workflow notes.\n",
+    )
+    .unwrap();
+    std::fs::write(
+        archive_manual_dir.join("guide.md"),
+        "# Archived Guide\n\nReference notes for retired workflows.\n",
+    )
+    .unwrap();
+}
+
+fn setup_action_flag_fixture(base: &Path) -> (PathBuf, PathBuf, PathBuf) {
+    let source_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap();
+    let fixture_root = base.join("fixture");
+    let temp_home = base.join("home");
+    let temp_config = temp_home.join(".config");
+    std::fs::create_dir_all(&temp_config).unwrap();
+
+    seed_promoted_fixture_skills(&fixture_root);
+    seed_vendor_and_archive_fixture_skills(&fixture_root);
+
+    for rel in [
+        "dashboard/config.toml",
+        "dashboard/content/_index.md",
+        "dashboard/css/input.css",
+        "dashboard/static/styles/foundation.css",
+        "dashboard/static/styles/themes.css",
+    ] {
+        let dst = fixture_root.join(rel);
+        std::fs::create_dir_all(dst.parent().unwrap()).unwrap();
+        std::fs::copy(source_root.join(rel), dst).unwrap();
+    }
+
+    copy_dir_recursive(
+        &source_root.join("dashboard/themes/tars-dashboards"),
+        &fixture_root.join("dashboard/themes/tars-dashboards"),
+    );
+
+    assert!(
+        std::process::Command::new("git")
+            .arg("init")
+            .current_dir(&fixture_root)
+            .output()
+            .unwrap()
+            .status
+            .success()
+    );
+
+    ArtifactsEngine::new(&fixture_root).generate_all().unwrap();
+
+    for args in [
+        vec!["add", "."],
+        vec![
+            "-c",
+            "user.name=Tests",
+            "-c",
+            "user.email=tests@example.com",
+            "-c",
+            "commit.gpgsign=false",
+            "-c",
+            "core.hooksPath=/dev/null",
+            "commit",
+            "-m",
+            "fixture",
+        ],
+    ] {
+        assert!(
+            std::process::Command::new("git")
+                .args(args)
+                .current_dir(&fixture_root)
+                .output()
+                .unwrap()
+                .status
+                .success()
+        );
+    }
+
+    (fixture_root, temp_home, temp_config)
+}
+
 #[test]
 fn test_cli_action_flag() {
-    let repo_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .to_path_buf();
+    let temp = tempfile::tempdir().unwrap();
+    let (fixture_root, temp_home, temp_config) = setup_action_flag_fixture(temp.path());
+    let output_dir = temp.path().join("dist");
 
-    Command::cargo_bin("ask")
-        .unwrap()
-        .current_dir(&repo_root)
+    let ask_in_fixture = || {
+        let mut command = Command::cargo_bin("ask").unwrap();
+        command
+            .current_dir(&fixture_root)
+            .env("AGENT_SKILLS_HOME", &fixture_root)
+            .env("HOME", &temp_home)
+            .env("XDG_CONFIG_HOME", &temp_config)
+            .env_remove("SKILLS_SKIP_DASHBOARD")
+            .env_remove("SKILLS_NO_STAGE");
+        command
+    };
+
+    ask_in_fixture()
         .args(["skills", "--action", "lint"])
         .assert()
         .success()
         .code(0);
 
-    Command::cargo_bin("ask")
-        .unwrap()
-        .current_dir(&repo_root)
+    ask_in_fixture()
         .args(["skills", "--action", "sync"])
         .env("SKILLS_REPO_ONLY", "1")
         .assert()
         .success()
         .code(0);
 
-    Command::cargo_bin("ask")
-        .unwrap()
-        .current_dir(&repo_root)
+    ask_in_fixture()
         .args(["dashboard", "--action", "summary"])
         .assert()
         .success()
         .code(0);
 
-    Command::cargo_bin("ask")
-        .unwrap()
-        .current_dir(&repo_root)
+    ask_in_fixture()
         .args(["dashboard", "--action", "css"])
         .assert()
         .success()
         .code(0);
 
-    let temp = tempfile::tempdir().unwrap();
-    let output_dir = temp.path().join("dist");
-
-    Command::cargo_bin("ask")
-        .unwrap()
-        .current_dir(&repo_root)
+    ask_in_fixture()
         .args(["dashboard", "--action", "build"])
         .assert()
         .success()
         .code(0);
 
-    Command::cargo_bin("ask")
-        .unwrap()
-        .current_dir(&repo_root)
+    ask_in_fixture()
         .args([
             "dashboard",
             "build",
@@ -429,9 +615,7 @@ fn test_cli_action_flag() {
     let skill = std::fs::read_to_string(output_dir.join("skills/tooling/zola/index.html")).unwrap();
     assert!(skill.contains("id=\"sidebar-active-item\""));
 
-    Command::cargo_bin("ask")
-        .unwrap()
-        .current_dir(&repo_root)
+    ask_in_fixture()
         .args(["dashboard", "--action", "lint"])
         .assert()
         .success()
