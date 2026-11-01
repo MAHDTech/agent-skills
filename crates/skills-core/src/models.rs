@@ -1,5 +1,5 @@
 //! Core domain models and data structures for Agent Skills.
-// cspell:words rposition
+// cspell:words agentskills rposition
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -442,6 +442,54 @@ pub struct SkillsManifest {
 
 /// Alias for `skills.sh.json` manifest.
 pub type SkillsShJson = SkillsManifest;
+
+/// Single skill entry within an Agent Skills Discovery index (`.well-known/skills/index.json`
+/// or `.well-known/agent-skills/index.json`).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
+pub struct SkillsDiscoveryEntry {
+    /// Skill identifier (kebab-case name).
+    #[builder(setter(into))]
+    pub name: String,
+
+    /// Entry artifact type in RFC v0.2.0 (e.g. `"skill-md"` or `"archive"`).
+    #[builder(default, setter(into))]
+    #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
+    pub entry_type: Option<String>,
+
+    /// Short description of the skill and when to invoke it.
+    #[builder(setter(into))]
+    pub description: String,
+
+    /// Direct URL or root-relative path to `SKILL.md` in RFC v0.2.0.
+    #[builder(default, setter(into))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+
+    /// Integrity digest in RFC v0.2.0 (e.g. `"sha256:<hex>"`).
+    #[builder(default, setter(into))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub digest: Option<String>,
+
+    /// Relative file paths inside the skill folder in v0.1.0 (e.g. `["SKILL.md", "references/api.md"]`).
+    #[builder(default, setter(into))]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub files: Vec<String>,
+}
+
+/// Representation of the Agent Skills Discovery manifest (`.well-known/skills/index.json`
+/// or `.well-known/agent-skills/index.json`).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
+pub struct SkillsDiscoveryIndex {
+    /// Optional JSON schema URI for RFC v0.2.0 discovery manifests.
+    #[builder(default, setter(into))]
+    #[serde(default, rename = "$schema", skip_serializing_if = "Option::is_none")]
+    pub schema: Option<String>,
+
+    /// Published skill entries.
+    #[builder(default, setter(into))]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub skills: Vec<SkillsDiscoveryEntry>,
+}
 
 /// Severity level for lint findings.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]

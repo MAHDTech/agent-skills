@@ -1,7 +1,11 @@
 //! Unit and mock integration tests for `skills-core` remote downloader and registry client.
+// cspell:words agentskills dfinity reserialized spacetimedb
 
 use skills_core::downloader::SkillDownloader;
-use skills_core::models::{ResourceKind, Skill, SkillCategory, SkillFrontmatter};
+use skills_core::models::{
+    ResourceKind, Skill, SkillCategory, SkillFrontmatter, SkillsDiscoveryEntry,
+    SkillsDiscoveryIndex,
+};
 use std::fs::{self, File};
 use tempfile::tempdir;
 use wiremock::matchers::{method, path};
@@ -367,4 +371,378 @@ async fn test_download_skill_resources_skips_vendor_skill() {
     let downloader = SkillDownloader::new();
     let files = downloader.download_skill_resources(&skill).await.unwrap();
     assert!(files.is_empty());
+}
+
+#[test]
+fn test_skills_discovery_index_serde_v010_and_v020() {
+    let v010_json = r#"{
+        "skills": [
+            {
+                "name": "icp-cli",
+                "description": "Build and deploy canisters.",
+                "files": ["SKILL.md", "references/config.md"]
+            }
+        ]
+    }"#;
+
+    let parsed_v010: SkillsDiscoveryIndex = serde_json::from_str(v010_json).unwrap();
+    assert_eq!(parsed_v010.schema, None);
+    assert_eq!(parsed_v010.skills.len(), 1);
+    assert_eq!(parsed_v010.skills[0].name, "icp-cli");
+    assert_eq!(parsed_v010.skills[0].entry_type, None);
+    assert_eq!(parsed_v010.skills[0].url, None);
+    assert_eq!(parsed_v010.skills[0].digest, None);
+    assert_eq!(
+        parsed_v010.skills[0].files,
+        vec!["SKILL.md", "references/config.md"]
+    );
+
+    let reserialized_v010 = serde_json::to_value(&parsed_v010).unwrap();
+    assert!(reserialized_v010.get("$schema").is_none());
+    assert!(reserialized_v010["skills"][0].get("type").is_none());
+    assert!(reserialized_v010["skills"][0].get("url").is_none());
+    assert!(reserialized_v010["skills"][0].get("digest").is_none());
+
+    let schema_uri = format!(
+        "https://{}/discovery/0.2.0/schema.json",
+        "schemas.agentskills.io"
+    );
+    let built_v020 = SkillsDiscoveryIndex::builder()
+        .schema(Some(schema_uri.clone()))
+        .skills(vec![
+            SkillsDiscoveryEntry::builder()
+                .name("cli")
+                .entry_type(Some("skill-md".to_string()))
+                .description("SpacetimeDB CLI reference")
+                .url(Some("/.well-known/agent-skills/cli/SKILL.md".to_string()))
+                .digest(Some("sha256:abc123".to_string()))
+                .build(),
+        ])
+        .build();
+
+    let v020_str = serde_json::to_string(&built_v020).unwrap();
+    let round_trip_v020: SkillsDiscoveryIndex = serde_json::from_str(&v020_str).unwrap();
+    assert_eq!(round_trip_v020, built_v020);
+    let v020_val = serde_json::to_value(&round_trip_v020).unwrap();
+    assert_eq!(v020_val["$schema"], schema_uri);
+    assert_eq!(v020_val["skills"][0]["type"], "skill-md");
+    assert!(v020_val["skills"][0].get("files").is_none());
+}
+
+#[test]
+fn test_is_skills_discovery_index_url_and_dotfile_safe_slugs() {
+    let v010_url = format!("https://{}/.well-known/skills/index.json", "dfinity.org");
+    let v020_url = format!(
+        "https://{}/.well-known/agent-skills/index.json?v=2#main",
+        "spacetimedb.com"
+    );
+    let registry_url = format!("https://{}/skills.sh.json", "skills.sh");
+
+    assert!(SkillDownloader::is_skills_discovery_index_url(&v010_url));
+    assert!(SkillDownloader::is_skills_discovery_index_url(&v020_url));
+    assert!(SkillDownloader::is_skills_discovery_index_url(
+        "/.well-known/agent-skills/index.json"
+    ));
+    assert!(!SkillDownloader::is_skills_discovery_index_url(
+        &registry_url
+    ));
+
+    let skill_md_url = format!(
+        "https://{}/.well-known/agent-skills/cli/SKILL.md",
+        "spacetimedb.com"
+    );
+    let slug = SkillDownloader::smart_slugify(&skill_md_url, None);
+    assert!(!slug.starts_with('.'));
+    assert_eq!(slug, "well-known-agent-skills-cli-skill.md");
+
+    let underscore_index = format!("https://{}/_index.md", "example.com");
+    assert_eq!(
+        SkillDownloader::smart_slugify(&underscore_index, None),
+        "overview-index.md"
+    );
+}
+
+#[test]
+fn test_parse_llms_txt_links_multiple_and_bare_urls() {
+    let host = "example.com";
+    let other_host = "other.org";
+    let base_url = format!("https://{host}/docs/llms.txt");
+    let content = format!(
+        "- [First](https://{host}/docs/one.md) and [Second](/docs/two.md)\n\
+         - [Tag] [Third](relative-three.md)\n\
+         Discovery manifest: https://{host}/.well-known/agent-skills/index.json.\n\
+         Also see (https://{host}/docs/bare.md), and ignore https://{other_host}/skip.md\n"
+    );
+
+    let links = SkillDownloader::parse_llms_txt_links(&content, &base_url);
+    assert_eq!(
+        links,
+        vec![
+            format!("https://{host}/docs/one.md"),
+            format!("https://{host}/docs/two.md"),
+            format!("https://{host}/docs/relative-three.md"),
+            format!("https://{host}/.well-known/agent-skills/index.json"),
+            format!("https://{host}/docs/bare.md"),
+        ]
+    );
+}
+
+#[test]
+fn test_verify_sha256_with_prefix() {
+    let payload = b"raw skill markdown with <T> generic";
+    let hex = SkillDownloader::compute_sha256(payload);
+    let prefixed_lower = format!("sha256:{hex}");
+    let prefixed_upper = format!("SHA256:{}", hex.to_ascii_uppercase());
+
+    assert!(SkillDownloader::verify_sha256(payload, &hex));
+    assert!(SkillDownloader::verify_sha256(payload, &prefixed_lower));
+    assert!(SkillDownloader::verify_sha256(payload, &prefixed_upper));
+    assert!(!SkillDownloader::verify_sha256(payload, "sha256:deadbeef"));
+}
+
+#[tokio::test]
+async fn test_download_skill_resources_well_known_v010_and_v020_via_llms_txt() {
+    let mock_server = MockServer::start().await;
+    let base_uri = mock_server.uri();
+
+    let cli_skill_raw = "# CLI Skill\n\nGeneric type Vec<T> outside code fence.\n";
+    let cli_digest = format!(
+        "sha256:{}",
+        SkillDownloader::compute_sha256(cli_skill_raw.as_bytes())
+    );
+
+    let sdk_skill_raw = "# SDK Skill\n\nClient SDK reference.\n";
+    let sdk_digest = format!(
+        "sha256:{}",
+        SkillDownloader::compute_sha256(sdk_skill_raw.as_bytes())
+    );
+
+    let schema_uri = format!(
+        "https://{}/discovery/0.2.0/schema.json",
+        "schemas.agentskills.io"
+    );
+    let v020_index = serde_json::json!({
+        "$schema": schema_uri,
+        "skills": [
+            {
+                "name": "cli",
+                "type": "skill-md",
+                "description": "CLI skill",
+                "url": "/.well-known/agent-skills/cli/SKILL.md",
+                "digest": cli_digest
+            },
+            {
+                "name": "rust-sdk",
+                "type": "skill-md",
+                "description": "Rust SDK skill at shared filename",
+                "url": "/shared/SKILL.md",
+                "digest": sdk_digest
+            },
+            {
+                "name": "bundled-archive",
+                "type": "archive",
+                "description": "Archive entry should be skipped",
+                "url": "/.well-known/agent-skills/bundled-archive/skill.tar.gz"
+            }
+        ]
+    });
+
+    let v010_index = serde_json::json!({
+        "skills": [
+            {
+                "name": "canister-dev",
+                "description": "Canister development skill",
+                "files": ["SKILL.md", "references/guide.md"]
+            }
+        ]
+    });
+
+    let llms_body = format!(
+        "# Documentation Index\n\n\
+         Agent skills discovery: {base_uri}/.well-known/agent-skills/index.json\n"
+    );
+
+    Mock::given(method("GET"))
+        .and(path("/llms.txt"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(llms_body))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/.well-known/agent-skills/index.json"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(v020_index.to_string()))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/.well-known/agent-skills/cli/SKILL.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(cli_skill_raw))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/shared/SKILL.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(sdk_skill_raw))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/.well-known/skills/index.json"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(v010_index.to_string()))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/.well-known/skills/canister-dev/SKILL.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_string("# Canister Dev Skill"))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/.well-known/skills/canister-dev/references/guide.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_string("# Canister Reference Guide"))
+        .mount(&mock_server)
+        .await;
+
+    let dir = tempdir().unwrap();
+    let skill_dir = dir.path().join("skills/engineering/discovery-skill");
+    fs::create_dir_all(&skill_dir).unwrap();
+    let skill_path = skill_dir.join("SKILL.md");
+
+    let fm = SkillFrontmatter::builder()
+        .name("discovery-skill")
+        .description("Test .well-known discovery expansion")
+        .resources(vec![
+            format!("{base_uri}/llms.txt"),
+            format!("{base_uri}/.well-known/skills/index.json"),
+        ])
+        .build();
+
+    let skill = Skill::builder()
+        .path(skill_path)
+        .dir_name("discovery-skill".to_string())
+        .category(SkillCategory::Engineering)
+        .promoted(true)
+        .frontmatter(fm)
+        .content("# Discovery Skill".to_string())
+        .raw("---\nname: discovery-skill\n---".to_string())
+        .resources(Vec::new())
+        .build();
+
+    let downloader = SkillDownloader::builder().max_retries(0).build();
+    let files = downloader.download_skill_resources(&skill).await.unwrap();
+
+    // Expects:
+    // 1. llms.txt
+    // 2. well-known-agent-skills-cli-skill.md (v0.2.0 via llms.txt, raw bytes verified before <T> escaping)
+    // 3. rust-sdk-shared-skill.md (v0.2.0 disambiguated with skill_prefix)
+    // 4. well-known-skills-canister-dev-skill.md (v0.1.0 direct)
+    // 5. well-known-skills-canister-dev-references-guide.md (v0.1.0 direct)
+    assert_eq!(files.len(), 5);
+
+    let filenames: Vec<String> = files
+        .iter()
+        .map(|f| {
+            f.absolute_path
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .to_string()
+        })
+        .collect();
+
+    for name in &filenames {
+        assert!(!name.starts_with('.'), "Unexpected dotfile: {name}");
+        assert!(
+            !name.contains("index.json"),
+            "Raw discovery index.json should not be saved: {name}"
+        );
+    }
+
+    assert!(filenames.contains(&"llms.txt".to_string()));
+    assert!(filenames.contains(&"well-known-agent-skills-cli-skill.md".to_string()));
+    assert!(filenames.contains(&"rust-sdk-shared-skill.md".to_string()));
+    assert!(filenames.contains(&"well-known-skills-canister-dev-skill.md".to_string()));
+    assert!(filenames.contains(&"well-known-skills-canister-dev-references-guide.md".to_string()));
+
+    let cli_file = files
+        .iter()
+        .find(|f| {
+            f.absolute_path
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .as_ref()
+                == "well-known-agent-skills-cli-skill.md"
+        })
+        .unwrap();
+    let saved_cli_content = fs::read_to_string(&cli_file.absolute_path).unwrap();
+    assert!(saved_cli_content.contains(r"Vec\<T\>"));
+}
+
+#[tokio::test]
+async fn test_download_skill_resources_digest_mismatch_returns_error() {
+    let mock_server = MockServer::start().await;
+    let base_uri = mock_server.uri();
+
+    let schema_uri = format!(
+        "https://{}/discovery/0.2.0/schema.json",
+        "schemas.agentskills.io"
+    );
+    let v020_index = serde_json::json!({
+        "$schema": schema_uri,
+        "skills": [
+            {
+                "name": "tampered-skill",
+                "type": "skill-md",
+                "description": "Tampered skill entry",
+                "url": "/.well-known/agent-skills/tampered-skill/SKILL.md",
+                "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+        ]
+    });
+
+    Mock::given(method("GET"))
+        .and(path("/.well-known/agent-skills/index.json"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(v020_index.to_string()))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/.well-known/agent-skills/tampered-skill/SKILL.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_string("# Tampered Content"))
+        .mount(&mock_server)
+        .await;
+
+    let dir = tempdir().unwrap();
+    let skill_dir = dir.path().join("skills/engineering/tampered-test");
+    fs::create_dir_all(&skill_dir).unwrap();
+    let skill_path = skill_dir.join("SKILL.md");
+
+    let fm = SkillFrontmatter::builder()
+        .name("tampered-test")
+        .description("Test digest mismatch failure")
+        .resources(vec![format!(
+            "{base_uri}/.well-known/agent-skills/index.json"
+        )])
+        .build();
+
+    let skill = Skill::builder()
+        .path(skill_path)
+        .dir_name("tampered-test".to_string())
+        .category(SkillCategory::Engineering)
+        .promoted(true)
+        .frontmatter(fm)
+        .content("# Content".to_string())
+        .raw("---\nname: tampered-test\n---".to_string())
+        .resources(Vec::new())
+        .build();
+
+    let downloader = SkillDownloader::builder().max_retries(0).build();
+    let result = downloader.download_skill_resources(&skill).await;
+    assert!(result.is_err());
+
+    let auto_dir = skill_dir.join("resources/auto");
+    let entries: Vec<_> = fs::read_dir(&auto_dir).unwrap().flatten().collect();
+    assert!(entries.is_empty());
 }
