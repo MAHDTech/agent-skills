@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exec cargo nextest run --workspace --all-targets --locked "$@"
+
+if [[ $# -gt 0 ]]; then
+	exec cargo nextest run --workspace --all-targets --locked "$@"
+fi
+
+cargo nextest run --workspace --all-targets --locked
+cargo test --workspace --doc --locked
