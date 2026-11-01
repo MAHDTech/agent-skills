@@ -4,7 +4,7 @@ description: Review the code implementation of a backlog ticket on a subagent br
 disable-model-invocation: true
 metadata:
   archived: "2026-09-04"
-  replaced-by: "tars-run-factory"
+  replaced-by: "guards-run-factory"
 ---
 
 # Backlog Review

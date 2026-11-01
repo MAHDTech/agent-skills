@@ -1,0 +1,564 @@
+{
+  "skills": [
+    {
+      "name": "acp",
+      "description": "Build, integrate, or debug Agent Client Protocol agents and clients with official SDKs. Use for ACP sessions, tool calls, schemas, transports, or protocol migrations.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "agent-guidelines",
+      "description": "Apply coding discipline before and during implementation: state assumptions, keep changes minimal and scoped, and verify behavior against concrete success criteria.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "antigravity",
+      "description": "Look up Google Antigravity/AGY CLI, IDE, and SDK behavior. Use for its settings, commands, keybindings, agent permissions, hooks, or plugin integration.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "bevy-development",
+      "description": "Build or modernize Bevy games and simulations in Rust. Use for ECS design, scheduling, input, assets, messages, performance, or migration between Bevy APIs.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "bevy-egui",
+      "description": "Integrate egui into Bevy with bevy_egui. Use for UI scheduling, HUDs, debug panels, input capture, image textures, multi-window contexts, or rendering UI to game surfaces.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "cargo-crap",
+      "description": "Measure Rust change risk with cargo-crap and coverage data. Use for CRAP scores, cargo-llvm-cov integration, complexity regression gates, CI reports, or badges.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "cargo-doc",
+      "description": "Verify Rust crate APIs with local cargo doc output or docs.rs. Use to inspect exact signatures, methods, traits, and feature-gated items for the project version.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "casita",
+      "description": "Use for Casita CLI or Rust API work: immutable object storage, imports, roots and retention, verified sync, Casitar archives, integrity checks, or garbage collection.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "characterization-tests",
+      "description": "Capture existing behavior of untested or legacy code before a refactor or upgrade. Use for deterministic characterization tests or golden masters, including surprising current behavior.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "code-comments",
+      "description": "Write or review code comments for non-obvious intent, constraints, and invariants. Use to trim redundant or stale comments and audit comment quality in a specified scope or diff.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "code-review",
+      "description": "Review a diff against a fixed commit, branch, tag, or merge-base for repository standards and spec compliance. Use for branch or PR review with two parallel agents, reporting the axes separately.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "codebase-design",
+      "description": "Design or improve module interfaces and test seams. Use when simplifying caller requirements, reducing shallow abstractions, or making modules easier to test and maintain.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "critical-thinking",
+      "description": "Stress-test your immediately preceding response for hidden assumptions, weak evidence, logical gaps, and practical risks. Use to challenge your own advice before the user acts, in the response's language.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "devenv",
+      "description": "Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands. Follow its shell, dependency, SecretSpec, hook, and test-runner conventions.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "diagnosing-bugs",
+      "description": "Diagnose hard bugs, flaky failures, and performance regressions with a reproducible feedback loop. Use to isolate the cause, verify a fix, and add a meaningful regression test.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "domain-modeling",
+      "description": "Clarify domain terms and relationships while designing software. Use to resolve conflicting terminology, stress-test scenarios, update a glossary, or record a consequential ADR.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "egui",
+      "description": "Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "estimate-work",
+      "description": "Estimate a plan or ticket set using relative sizes or time ranges, reference history, named assumptions, and risk. Use when sizing work, forecasting delivery, or deciding whether uncertainty needs a spike.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "gh-babysit-pr",
+      "description": "Monitor an open pull request through CI checks, review bots, and base-branch updates with pr-wait. Use only when the user explicitly asks to watch, monitor, or babysit a PR.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "gh-create-issue",
+      "description": "Create a structured GitHub issue from the current conversation with gh CLI. Use when asked to file an issue that preserves the problem, discussion, constraints, and agreed implementation plan.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "gh-create-pr",
+      "description": "Draft a problem-first Conventional Commit PR title and description with secret scanning and REST fallback. Use when asked to create or update a PR after approval.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "gh-pr-comments",
+      "description": "Format and preflight-scan GitHub comments posted on a user's behalf with account-aware attribution. Use when posting PR comments, inline review notes, or thread replies.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "gh-release-notes",
+      "description": "Curate release notes from commits and merged PRs since the last tag, then create a GitHub release. Use when asked to cut or publish a versioned release, with draft and prerelease options.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "gh-resolve-pr-comments",
+      "description": "Triage and address human and AI bot PR review comments, push back on false positives, and reply before resolving threads. Use when asked to handle PR feedback.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "gh-submit-review",
+      "description": "Publish a GitHub PR review with verdict, inline findings, secret scanning, and human-account attribution. Use when asked to submit a completed PR review.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "gh-takeover",
+      "description": "Adopt and finish an inherited pull request, branch, or agent handoff while preserving contributor credit. Use only when the user explicitly asks to take over existing work.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "gh-triage",
+      "description": "Triage GitHub issues and external PRs: categorize, verify claims, interview as needed, and post agent-ready briefs. Use when asked to change backlog states or run a maintainer triage session.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "git-resolve-conflicts",
+      "description": "Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "git-update-branch",
+      "description": "Assess stale or diverged PRs for conceptual conflicts and update a branch against its base via rebase or merge. Use when asked to modernize or update a branch or PR.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "grilling",
+      "description": "Interview the user one decision at a time before coding. Use when explicitly asked to stress-test a design, or when an explicitly started software-factory or wayfinder workflow requires its planning interview.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "guards-debug",
+      "description": "Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "guards-goal",
+      "description": "Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /guards-goal or explicitly requests a persistent goal.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "guards-run-factory",
+      "description": "Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "handoff",
+      "description": "Summarize the current conversation into a temporary handoff for another agent or session. Use when transferring unfinished work; reference durable artifacts, suggest relevant skills, and redact secrets.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "herdr",
+      "description": "Operate Herdr panes, workspaces, or agent sessions when HERDR_ENV=1. Also use for Herdr setup, configuration, keybindings, and troubleshooting questions.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "install-skills",
+      "description": "Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "jj",
+      "description": "Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "model-context-protocol",
+      "description": "Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "nix-shell",
+      "description": "Run missing ad-hoc CLI utilities in ephemeral nix shell environments when Nix is installed. Use for one-off diagnostics or conversions, keeping project dependencies in its toolchain.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "nutanix-api-v4",
+      "description": "Integrate or debug Nutanix v4 REST APIs and official SDKs. Use for OData queries, namespaces, version compatibility, or migrating legacy Nutanix API integrations.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "nutanix-enterprise-ai",
+      "description": "Configure or troubleshoot Nutanix Enterprise AI (NAI/GPT-in-a-Box). Use for platform deployment, model serving, inference gateways, RBAC, or NAI MCP connectors.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "nutanix-files",
+      "description": "Configure or troubleshoot Nutanix Files servers and SMB/NFS shares. Use for directory integration, Smart Tiering, recovery, analytics, performance, or Files APIs.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "nutanix-kubernetes-platform",
+      "description": "Configure, operate, or troubleshoot Nutanix Kubernetes Platform (NKP), Konvoy, or Kommander. Use for NKP cluster lifecycle, image builds, air-gapped installs, or Insights.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "nutanix-objects",
+      "description": "Configure or troubleshoot Nutanix Objects storage. Use for its S3 APIs, buckets, IAM, WORM policies, replication, cloud tiering, monitoring, or Objects Browser.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "oak",
+      "description": "Use Oak version control in repositories with .oak, or for oak.space tasks. Manage change stacks, conflicts, workspaces, dependency mounts, spaces, and Oak CI.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "optimize-performance",
+      "description": "Improve an existing hot path using benchmarks and profiling. Use for latency, throughput, or memory targets; route newly introduced slowdowns to regression diagnosis.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "pagefind",
+      "description": "Configure, build, or troubleshoot Pagefind search for a static website. Use for indexing options, content exclusions or weighting, generated assets, and client integration.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "pr-build-context",
+      "description": "Prepare a briefing before reviewing a pull request: explain the diff, key files, risks, and questions for the author. Use for PR context, or a whole-repository overview when on its default branch.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "pr-create-test-plan",
+      "description": "Draft TEST_PLAN.md for a branch's real user flows and integration changes using the project's commands. Use when a reviewer needs manual verification steps and a quick smoke test before merging.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "pr-edge-cases",
+      "description": "Probe branch changes, uncommitted work, or specified files for logic errors, missing tests, boundary cases, races, and integration failures. Use to identify what could break before a merge, with file-line findings.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "prek",
+      "description": "Run, configure, or troubleshoot Git pre-commit hooks with prek. Use for hook execution, installation, validation, and cache management; distinguish the hook stage from its CLI.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "prioritize-backlog",
+      "description": "Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use for generic backlog grooming with value-effort, RICE, or WSJF; excludes the automated .guards/issues backlog.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "productionize-app",
+      "description": "Prepare an entire application for production when explicitly requested. Audit and fix configuration, reliability, security, observability, packaging, and deployment readiness.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "proofread",
+      "description": "Proofread a post before publication for spelling, grammar, repetition, links, and weak reasoning. Use for error correction that preserves the author's voice; ask before logic changes or a skimmability pass.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "research",
+      "description": "Research a technical question using primary sources and save cited findings in the repo. Use for documentation, API, specification, or source-code fact gathering.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "rfc-review",
+      "description": "Review an RFC or design document before approval for problem clarity, relevant compliance concerns, security, and performance. Use to return only the three to five most consequential issues with concrete suggestions.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "scope-sweep",
+      "description": "Run a final breadth check after the core work and review to catch missed requirements, incomplete tasks, edge cases, and operational risks. Use before declaring a scope complete, with evidence for remaining gaps.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "scratchpad",
+      "description": "Manage temporary scripts, experiment files, and debugging artifacts during a task. Use one session scratch directory, keep the source tree clean, and remove temporary files afterward.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "sculpt-code",
+      "description": "Refactor a scoped diff or selected files for clearer naming, control flow, structure, and less duplication or dead code. Use for cleanup that preserves behavior.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "self-review",
+      "description": "Review your implementation diff for unfinished work, non-idiomatic code, duplication, and unnecessary complexity. Use after a task to apply focused fixes, with file-and-line evidence for each change.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "simplify-docs",
+      "description": "Simplify a README, setup guide, or technical reference for fast scanning and execution. Use for structural documentation rewrites that lead with the shortest successful path, previewing edits for approval.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "skill-archive",
+      "description": "Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "skill-audit",
+      "description": "Audit the custom skill catalog for invocation policies, descriptions, frontmatter, references, duplicates, and lifecycle drift.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "skill-creator",
+      "description": "Create or update custom agent skills with concise discovery descriptions, matching invocation policies, supporting resources, and catalog checks.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "skill-router",
+      "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "software-factory",
+      "description": "Guide a feature through Product, Architecture, Program Design, and Slice approval gates, then implement verified vertical slices. Use when asked for the full design-to-delivery factory workflow.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "spacetime",
+      "description": "Develop or debug Spacetime/SpacetimeDB modules and real-time clients in Rust, C#, TypeScript, or C++. Use for schemas, backend functions, subscriptions, CLI work, bindings, or migrations.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "store-plan",
+      "description": "Save an agreed conversation plan, decisions, action items, and open questions to a reviewable Markdown file in docs/plans/. Use when a durable repository plan is needed rather than a temporary handoff.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "tailwind",
+      "description": "Style components or build CSS with Tailwind CSS v4. Use for utility classes, CSS-first theme variables, imports, and CLI stylesheet compilation.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "tdd",
+      "description": "Build features or fixes test-first using a red-to-green loop. Use for behavior-focused integration tests, choosing public test seams, and avoiding tests coupled to internals.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "to-spec",
+      "description": "Synthesize the current conversation into a product spec or PRD and publish it to the project's issue tracker. Use when asked to formalize discussed requirements and testing decisions without a new interview.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "to-tickets",
+      "description": "Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .guards/issues automation.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "total-recall",
+      "description": "Maintain an append-only TSV decision trail and audit its evidence against the transcript. Use when explicitly requesting a persistent audit trail for autonomous work, multi-phase migrations, or risky refactors.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "unslop",
+      "description": "Edit writing to remove AI cliches, filler, robotic phrasing, and decorative formatting while preserving meaning and facts. Use when text needs a natural human voice, varied rhythm, and plain language.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "upgrade-dependencies",
+      "description": "Upgrade packages, frameworks, or language/runtime versions using release notes and a green test baseline. Use for version bumps, breaking migrations, and lockfile changes.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "wayfinder",
+      "description": "Chart a large, ambiguous effort as an issue-tracker map of investigation tickets. Use when asked to map unknown decisions or work one frontier ticket per session, rather than slice known implementation work.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "wtf",
+      "description": "Rewrite your own last response more briefly and plainly when the user signals confusion, such as \"huh\" or \"in English\". Use for confusion about your message, not requests to explain an error, output, or regex.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "xai",
+      "description": "Integrate or debug xAI/Grok APIs and SDKs. Use for client configuration, model capabilities, streaming, tool calling, structured output, vision, or search integration.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "zed",
+      "description": "Configure or troubleshoot Zed editor settings, keybindings, and language servers. Use to verify Zed option names and update user or project settings in the correct scope.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "zola",
+      "description": "Build, serve, or customize an existing Zola site. Use for Tera templates, shortcodes, taxonomies, config.toml options, theme changes, or Zola build and link checks.",
+      "files": [
+        "SKILL.md"
+      ]
+    }
+  ]
+}

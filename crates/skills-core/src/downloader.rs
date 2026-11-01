@@ -1,4 +1,5 @@
 //! Remote skill downloader, registry client, resource sanitizer, and directory manager.
+// cspell:words agentskills rsplit
 
 use reqwest::header::{ACCEPT, HeaderMap, HeaderValue, USER_AGENT};
 use reqwest::{Client, StatusCode};
@@ -11,7 +12,17 @@ use std::time::Duration;
 use typed_builder::TypedBuilder;
 
 use crate::error::{Result, SkillError};
-use crate::models::{ResourceFile, ResourceKind, Skill, SkillsManifest};
+use crate::models::{
+    ResourceFile, ResourceKind, Skill, SkillsDiscoveryEntry, SkillsDiscoveryIndex, SkillsManifest,
+};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct ExpandedResourceTarget {
+    url: String,
+    expected_digest: Option<String>,
+    skill_prefix: Option<String>,
+    is_top_level: bool,
+}
 
 /// Default request timeout for downloads in seconds.
 pub const DEFAULT_TIMEOUT_SECS: u64 = 60;
@@ -123,6 +134,13 @@ impl SkillDownloader {
         serde_json::from_str::<SkillsManifest>(&content).map_err(SkillError::GeneralJson)
     }
 
+    /// Fetches and deserializes a remote `.well-known/skills/index.json` or
+    /// `.well-known/agent-skills/index.json` discovery manifest.
+    pub async fn fetch_discovery_index(&self, index_url: &str) -> Result<SkillsDiscoveryIndex> {
+        let content = self.fetch_url(index_url).await?;
+        serde_json::from_str::<SkillsDiscoveryIndex>(&content).map_err(SkillError::GeneralJson)
+    }
+
     /// Downloads and synchronizes all configured `resources` for a single skill.
     ///
     /// Saves downloaded assets exclusively to `<skill_dir>/resources/auto/` and prunes
@@ -146,18 +164,34 @@ impl SkillDownloader {
 
         fs::create_dir_all(&auto_dir).map_err(|e| SkillError::io(&auto_dir, e))?;
 
-        let all_urls_to_fetch = self.expand_resource_urls(resource_urls).await;
+        let all_targets = self.expand_resource_targets(resource_urls).await?;
         let mut downloaded_files: Vec<ResourceFile> = Vec::new();
         let mut saved_filenames: HashSet<String> = HashSet::new();
 
-        for url in &all_urls_to_fetch {
-            let content = match self.fetch_url(url).await {
+        for target in &all_targets {
+            let content = match self.fetch_url(&target.url).await {
                 Ok(c) => c,
-                Err(_) if all_urls_to_fetch.len() > 1 && !resource_urls.contains(url) => continue,
+                Err(_) if all_targets.len() > 1 && !target.is_top_level => continue,
                 Err(err) => return Err(err),
             };
-            let resource_file =
-                Self::save_downloaded_resource(url, &content, &auto_dir, &mut saved_filenames)?;
+            if let Some(ref expected_digest) = target.expected_digest
+                && !Self::verify_sha256(content.as_bytes(), expected_digest)
+            {
+                return Err(SkillError::Network {
+                    url: target.url.clone(),
+                    message: format!(
+                        "SHA-256 digest mismatch for '{}': expected {expected_digest}",
+                        target.url
+                    ),
+                });
+            }
+            let resource_file = Self::save_downloaded_resource(
+                &target.url,
+                &content,
+                &auto_dir,
+                &mut saved_filenames,
+                target.skill_prefix.as_deref(),
+            )?;
             downloaded_files.push(resource_file);
         }
 
@@ -166,28 +200,164 @@ impl SkillDownloader {
         Ok(downloaded_files)
     }
 
-    async fn expand_resource_urls(&self, resource_urls: &[String]) -> Vec<String> {
-        let mut all_urls_to_fetch = Vec::new();
+    async fn expand_resource_targets(
+        &self,
+        resource_urls: &[String],
+    ) -> Result<Vec<ExpandedResourceTarget>> {
+        let mut all_targets: Vec<ExpandedResourceTarget> = Vec::new();
         for url in resource_urls {
             let clean_url = Self::strip_reader_proxy(url);
             if Self::is_non_text_url(clean_url) {
                 continue;
             }
 
-            if Self::is_llms_index_url(clean_url) {
+            if Self::is_skills_discovery_index_url(clean_url) {
+                let index = self.fetch_discovery_index(clean_url).await?;
+                for entry_target in Self::expand_discovery_index_entries(&index, clean_url) {
+                    if !all_targets.iter().any(|t| t.url == entry_target.url) {
+                        all_targets.push(entry_target);
+                    }
+                }
+            } else if Self::is_llms_index_url(clean_url) {
                 if let Ok(index_content) = self.fetch_url(clean_url).await {
-                    all_urls_to_fetch.push(clean_url.to_string());
+                    all_targets.push(ExpandedResourceTarget {
+                        url: clean_url.to_string(),
+                        expected_digest: None,
+                        skill_prefix: None,
+                        is_top_level: true,
+                    });
                     for child in Self::parse_llms_txt_links(&index_content, clean_url) {
-                        if !all_urls_to_fetch.contains(&child) {
-                            all_urls_to_fetch.push(child);
+                        if Self::is_skills_discovery_index_url(&child) {
+                            if let Ok(index) = self.fetch_discovery_index(&child).await {
+                                for entry_target in
+                                    Self::expand_discovery_index_entries(&index, &child)
+                                {
+                                    if !all_targets.iter().any(|t| t.url == entry_target.url) {
+                                        all_targets.push(entry_target);
+                                    }
+                                }
+                            }
+                        } else if !all_targets.iter().any(|t| t.url == child) {
+                            all_targets.push(ExpandedResourceTarget {
+                                url: child,
+                                expected_digest: None,
+                                skill_prefix: None,
+                                is_top_level: false,
+                            });
                         }
                     }
                 }
             } else {
-                all_urls_to_fetch.push(clean_url.to_string());
+                all_targets.push(ExpandedResourceTarget {
+                    url: clean_url.to_string(),
+                    expected_digest: None,
+                    skill_prefix: None,
+                    is_top_level: true,
+                });
             }
         }
-        all_urls_to_fetch
+        Ok(all_targets)
+    }
+
+    fn expand_discovery_index_entries(
+        index: &SkillsDiscoveryIndex,
+        index_url: &str,
+    ) -> Vec<ExpandedResourceTarget> {
+        let no_query = index_url.split('?').next().unwrap_or(index_url);
+        let clean_index = no_query.split('#').next().unwrap_or(no_query);
+        let discovery_root = clean_index
+            .rsplit_once('/')
+            .map_or(clean_index, |(parent, _)| parent);
+
+        let mut targets = Vec::new();
+        for entry in &index.skills {
+            targets.extend(Self::expand_discovery_entry(
+                entry,
+                clean_index,
+                discovery_root,
+            ));
+        }
+        targets
+    }
+
+    fn expand_discovery_entry(
+        entry: &SkillsDiscoveryEntry,
+        clean_index: &str,
+        discovery_root: &str,
+    ) -> Vec<ExpandedResourceTarget> {
+        if let Some(ref entry_type) = entry.entry_type
+            && !entry_type.trim().eq_ignore_ascii_case("skill-md")
+        {
+            return Vec::new();
+        }
+
+        let skill_name = entry.name.trim();
+        if skill_name.is_empty()
+            || skill_name.contains('/')
+            || skill_name.contains('\\')
+            || skill_name.contains("..")
+        {
+            return Vec::new();
+        }
+
+        let mut targets = Vec::new();
+        let mut entry_urls = Vec::new();
+
+        if let Some(ref raw_url) = entry.url {
+            let trimmed_url = raw_url.trim();
+            if !trimmed_url.is_empty() && !has_parent_dir_segment(trimmed_url) {
+                let resolved_url = Self::resolve_relative_url(clean_index, trimmed_url);
+                if !Self::is_non_text_url(&resolved_url) {
+                    entry_urls.push(resolved_url.clone());
+                    targets.push(ExpandedResourceTarget {
+                        url: resolved_url,
+                        expected_digest: entry.digest.clone(),
+                        skill_prefix: Some(skill_name.to_string()),
+                        is_top_level: false,
+                    });
+                }
+            }
+        }
+
+        let entry_base = format!("{discovery_root}/{skill_name}");
+        for file_rel in &entry.files {
+            let clean_rel = file_rel.trim().trim_start_matches('/');
+            if clean_rel.is_empty() || has_parent_dir_segment(clean_rel) {
+                continue;
+            }
+            let file_url = format!("{entry_base}/{clean_rel}");
+            if Self::is_non_text_url(&file_url) || entry_urls.contains(&file_url) {
+                continue;
+            }
+            let expected_digest = if entry.url.is_none()
+                && (entry.files.len() == 1 || clean_rel.eq_ignore_ascii_case("SKILL.md"))
+            {
+                entry.digest.clone()
+            } else {
+                None
+            };
+            entry_urls.push(file_url.clone());
+            targets.push(ExpandedResourceTarget {
+                url: file_url,
+                expected_digest,
+                skill_prefix: Some(skill_name.to_string()),
+                is_top_level: false,
+            });
+        }
+
+        if entry.url.is_none() && entry.files.is_empty() {
+            let fallback_url = format!("{entry_base}/SKILL.md");
+            if !Self::is_non_text_url(&fallback_url) && !entry_urls.contains(&fallback_url) {
+                targets.push(ExpandedResourceTarget {
+                    url: fallback_url,
+                    expected_digest: entry.digest.clone(),
+                    skill_prefix: Some(skill_name.to_string()),
+                    is_top_level: false,
+                });
+            }
+        }
+
+        targets
     }
 
     fn save_downloaded_resource(
@@ -195,11 +365,42 @@ impl SkillDownloader {
         content: &str,
         auto_dir: &Path,
         saved_filenames: &mut HashSet<String>,
+        skill_prefix: Option<&str>,
     ) -> Result<ResourceFile> {
         let sanitized = Self::sanitize_markdown(content);
-        let raw_slug = Self::smart_slugify(url, None);
+        let mut raw_slug = Self::smart_slugify(url, None);
+        if let Some(skill_name) = skill_prefix {
+            let clean_skill: String = skill_name
+                .chars()
+                .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
+                .map(|c| c.to_ascii_lowercase())
+                .collect();
+            let clean_skill = clean_skill.trim_matches(['-', '.']);
+            if !clean_skill.is_empty() && !raw_slug.contains(clean_skill) {
+                raw_slug = format!("{clean_skill}-{raw_slug}");
+            }
+        }
         let final_filename = if saved_filenames.contains(&raw_slug) {
-            format!("{}-{raw_slug}", Self::get_domain_prefix(url))
+            let domain_candidate = format!("{}-{raw_slug}", Self::get_domain_prefix(url));
+            if !saved_filenames.contains(&domain_candidate) {
+                domain_candidate
+            } else {
+                let (stem, ext) = domain_candidate
+                    .rsplit_once('.')
+                    .map_or((domain_candidate.as_str(), ""), |(s, e)| (s, e));
+                let mut counter = 2usize;
+                loop {
+                    let candidate = if ext.is_empty() {
+                        format!("{stem}-{counter}")
+                    } else {
+                        format!("{stem}-{counter}.{ext}")
+                    };
+                    if !saved_filenames.contains(&candidate) {
+                        break candidate;
+                    }
+                    counter += 1;
+                }
+            }
         } else {
             raw_slug
         };
@@ -354,6 +555,20 @@ impl SkillDownloader {
             || (lower.contains("llms") && (lower.ends_with(".txt") || lower.ends_with(".md")))
     }
 
+    /// Checks if a URL targets an Agent Skills Discovery index (`.well-known/skills/index.json`
+    /// or `.well-known/agent-skills/index.json`).
+    #[must_use]
+    #[allow(clippy::case_sensitive_file_extension_comparisons)]
+    pub fn is_skills_discovery_index_url(url_str: &str) -> bool {
+        let no_query = url_str.split('?').next().unwrap_or(url_str);
+        let clean = no_query.split('#').next().unwrap_or(no_query);
+        let lower = clean.to_ascii_lowercase();
+        lower.ends_with("/.well-known/skills/index.json")
+            || lower.ends_with("/.well-known/agent-skills/index.json")
+            || lower == ".well-known/skills/index.json"
+            || lower == ".well-known/agent-skills/index.json"
+    }
+
     /// Extracts a domain brand prefix from a URL.
     #[must_use]
     pub fn get_domain_prefix(url_str: &str) -> String {
@@ -404,7 +619,11 @@ impl SkillDownloader {
         };
 
         let trimmed_path = path_part.trim_matches('/');
-        if trimmed_path.is_empty() || trimmed_path == "index" || trimmed_path == "overview" {
+        if trimmed_path.is_empty()
+            || trimmed_path == "index"
+            || trimmed_path == "_index"
+            || trimmed_path == "overview"
+        {
             return "overview-index.md".to_string();
         }
 
@@ -427,8 +646,8 @@ impl SkillDownloader {
             }
         }
 
-        let final_slug = slug.trim_matches('-');
-        if final_slug.is_empty() || final_slug == "index" {
+        let final_slug = slug.trim_matches(['-', '.']);
+        if final_slug.is_empty() || final_slug == "index" || final_slug == "_index" {
             format!("overview-index{ext}")
         } else {
             format!("{final_slug}{ext}")
@@ -467,71 +686,106 @@ impl SkillDownloader {
         Ok(normalized)
     }
 
-    /// Parses links from an `llms.txt` document.
+    /// Parses links from an `llms.txt` document, extracting both markdown `[text](url)` links
+    /// and bare `http://` / `https://` URLs per line.
     #[must_use]
     pub fn parse_llms_txt_links(content: &str, base_url: &str) -> Vec<String> {
         let mut links = Vec::new();
         let base_domain = Self::get_domain_prefix(base_url);
 
         for line in content.split('\n') {
-            let trimmed = line.trim();
-            if let Some(start_bracket) = trimmed.find('[') {
-                let after = &trimmed[start_bracket + 1..];
-                if let Some(close_bracket) = after.find(']') {
-                    let after_close = &after[close_bracket + 1..];
-                    if after_close.starts_with('(')
-                        && let Some(close_paren) = after_close.find(')')
+            let mut remaining = line.trim();
+            let mut non_markdown_text = String::with_capacity(remaining.len());
+
+            while let Some(start_bracket) = remaining.find('[') {
+                non_markdown_text.push_str(&remaining[..start_bracket]);
+                let after_open = &remaining[start_bracket + 1..];
+                if let Some(close_bracket) = after_open.find(']') {
+                    let after_close = &after_open[close_bracket + 1..];
+                    if let Some(after_paren_open) = after_close.strip_prefix('(')
+                        && let Some(close_paren) = after_paren_open.find(')')
                     {
-                        let raw_link = after_close[1..close_paren].trim();
-                        let clean_link = raw_link
-                            .trim_matches('<')
-                            .trim_matches('>')
-                            .trim_matches('"')
-                            .trim_matches('\'');
-
-                        if !clean_link.is_empty() && !Self::is_non_text_url(clean_link) {
-                            let resolved = if clean_link.starts_with("http://")
-                                || clean_link.starts_with("https://")
-                            {
-                                clean_link.to_string()
-                            } else if clean_link.starts_with('/') {
-                                let origin = base_url
-                                    .split("://")
-                                    .nth(1)
-                                    .unwrap_or(base_url)
-                                    .split('/')
-                                    .next()
-                                    .unwrap_or("");
-                                let scheme = if base_url.starts_with("http://") {
-                                    "http://"
-                                } else {
-                                    "https://"
-                                };
-                                format!("{scheme}{origin}{clean_link}")
-                            } else {
-                                let url_parts = base_url.split('/').collect::<Vec<_>>();
-                                let parent = if url_parts.len() > 1 {
-                                    url_parts[..url_parts.len() - 1].join("/")
-                                } else {
-                                    base_url.to_string()
-                                };
-                                format!("{parent}/{clean_link}")
-                            };
-
-                            let link_domain = Self::get_domain_prefix(&resolved);
-                            if link_domain == base_domain
-                                && resolved != base_url
-                                && !links.contains(&resolved)
-                            {
-                                links.push(resolved);
-                            }
-                        }
+                        let raw_link = after_paren_open[..close_paren].trim();
+                        Self::push_resolved_llms_link(&mut links, raw_link, base_url, &base_domain);
+                        non_markdown_text.push(' ');
+                        remaining = &after_paren_open[close_paren + 1..];
+                        continue;
                     }
+                    non_markdown_text.push(' ');
+                    remaining = after_open;
+                } else {
+                    non_markdown_text.push_str(remaining);
+                    remaining = "";
                 }
+            }
+            non_markdown_text.push_str(remaining);
+
+            for token in non_markdown_text.split_whitespace() {
+                let Some(idx) = token.find("https://").or_else(|| token.find("http://")) else {
+                    continue;
+                };
+                let maybe_url = &token[idx..];
+                let end_idx = maybe_url
+                    .find([')', ']', '>', '"', '\''])
+                    .unwrap_or(maybe_url.len());
+                let candidate = maybe_url[..end_idx].trim_end_matches(['.', ',', ';', ':']);
+                Self::push_resolved_llms_link(&mut links, candidate, base_url, &base_domain);
             }
         }
 
         links
+    }
+
+    fn push_resolved_llms_link(
+        links: &mut Vec<String>,
+        raw_link: &str,
+        base_url: &str,
+        base_domain: &str,
+    ) {
+        let clean_link = raw_link
+            .trim()
+            .trim_matches('<')
+            .trim_matches('>')
+            .trim_matches('"')
+            .trim_matches('\'');
+
+        if clean_link.is_empty() || Self::is_non_text_url(clean_link) {
+            return;
+        }
+
+        let resolved = Self::resolve_relative_url(base_url, clean_link);
+        let link_domain = Self::get_domain_prefix(&resolved);
+        if link_domain == base_domain && resolved != base_url && !links.contains(&resolved) {
+            links.push(resolved);
+        }
+    }
+
+    fn resolve_relative_url(base_url: &str, clean_link: &str) -> String {
+        if clean_link.starts_with("http://") || clean_link.starts_with("https://") {
+            clean_link.to_string()
+        } else if clean_link.starts_with('/') {
+            let origin = base_url
+                .split("://")
+                .nth(1)
+                .unwrap_or(base_url)
+                .split('/')
+                .next()
+                .unwrap_or("");
+            let scheme = if base_url.starts_with("http://") {
+                "http://"
+            } else {
+                "https://"
+            };
+            format!("{scheme}{origin}{clean_link}")
+        } else {
+            let url_parts = base_url.split('/').collect::<Vec<_>>();
+            let parent = if url_parts.len() > 1 {
+                url_parts[..url_parts.len() - 1].join("/")
+            } else {
+                base_url.to_string()
+            };
+            format!("{parent}/{clean_link}")
+        }
     }
 
     /// Strips non-printable control characters and Unicode replacement chars.
@@ -670,12 +924,24 @@ impl SkillDownloader {
         crate::hashing::encode_hex(&hasher.finalize())
     }
 
-    /// Validates SHA-256 digest of input bytes.
+    /// Validates SHA-256 digest of input bytes, accepting bare hex or `sha256:<hex>`.
     #[must_use]
     pub fn verify_sha256(data: &[u8], expected_hex: &str) -> bool {
+        let trimmed = expected_hex.trim();
+        let expected = if trimmed.len() >= 7 && trimmed[..7].eq_ignore_ascii_case("sha256:") {
+            trimmed[7..].trim()
+        } else {
+            trimmed
+        };
         let actual = Self::compute_sha256(data);
-        actual.eq_ignore_ascii_case(expected_hex.trim())
+        actual.eq_ignore_ascii_case(expected)
     }
+}
+
+fn has_parent_dir_segment(raw: &str) -> bool {
+    let no_query = raw.split('?').next().unwrap_or(raw);
+    let path_part = no_query.split('#').next().unwrap_or(no_query);
+    path_part.split(['/', '\\']).any(|seg| seg == "..")
 }
 
 fn is_standard_param_tag(tag: &str) -> bool {

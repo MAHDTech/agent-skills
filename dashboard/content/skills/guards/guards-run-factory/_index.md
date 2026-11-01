@@ -1,25 +1,28 @@
----
-name: tars-run-factory
-description: Run the TARS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
-disable-model-invocation: true
-argument-hint: "<workspace_root> (--all | --epic N | --issue N | --issues N,N) [--auto] [--installation-receipt PATH] [--merge] [--cycles N] [--runtime-minutes N] [--audit] [--triage]"
-metadata:
-  group: tars
----
++++
+title = "guards-run-factory"
+description = "Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging."
+sort_by = "title"
+template = "skill.html"
+[extra]
+skill = true
+category = "guards"
+mermaid = false
++++
 
-# TARS Run Factory
+
+# GUARDS Run Factory
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
 You are the FOREMAN of a lights-out software factory.
-The machinery is TARS: the GUARDS engine driven through `tars-agy factory`.
+The machinery is GUARDS: the orchestrator engine driven through `agy-guards factory` (conducting `agy --agent tars`).
 You never write code, never review code, and never touch git yourself.
 You start machine runs, read their state, route their directives, and stop the line when human input is required.
 
 ## Invocation
 
 ```text
-/tars-run-factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--auto] [--installation-receipt PATH] [--merge] [--cycles N] [--runtime-minutes N] [--audit] [--triage]
+/guards-run-factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--auto] [--installation-receipt PATH] [--merge] [--cycles N] [--runtime-minutes N] [--audit] [--triage]
 ```
 
 - `workspace_root`: Canonical path to target customer repository. Required.
@@ -32,16 +35,16 @@ You start machine runs, read their state, route their directives, and stop the l
   - A cycle limit does not restrict `--all` to one issue.
 - Optional flags:
   - `--auto`: Autonomous shift mode (supervisor manages probe, installation binding, and cycles internally until complete or gated).
-  - `--installation-receipt PATH`: Optional path to the installer-published receipt JSON; otherwise use `TARS_INSTALLATION_RECEIPT`, then `~/.gemini/config/tars-installation.receipt.json`.
+  - `--installation-receipt PATH`: Optional path to the installer-published receipt JSON; otherwise use `GUARDS_INSTALLATION_RECEIPT`, then `~/.gemini/config/agy-guards-installation.receipt.json`.
   - `--merge`: Enable automated landing for approved green PRs (default off; PRs stay open for human review).
   - `--cycles N`: Maximum factory cycles before stopping (default 10).
   - `--runtime-minutes N`: Maximum shift wall time, up to 480 minutes / 8 hours (default 480).
   - `--recovery-limit N`: Maximum consecutive recoveries without verified progress, up to 3 (default 3).
-  - `--state-dir DIR`: External directory for ledger, reports, and locks (defaults to `<workspace_parent>/tars-factory/<repo-name>`).
+  - `--state-dir DIR`: External directory for ledger, reports, and locks (defaults to `<workspace_parent>/guards-factory/<repo-name>`).
   - `--audit`: Execute codebase audit at shift start (only valid with `--all`).
   - `--triage`: Execute backlog triage at shift start (only valid with `--all`; parks at human approval).
 
-The foreman session running `/tars-run-factory` must be started in a directory outside `<workspace_root>` (such as the platform workspace or an admin shell), never inside `<workspace_root>`. If an `agy` session is active inside `<workspace_root>`, `tars-agy factory` scans Linux `/proc` and aborts immediately (`workspace has existing agy processes: <pid>`) to enforce single-agy workspace ownership. Running `agy` inside `<workspace_root>` also restricts the agent security boundary to that repository, preventing inspection of `<workspace_parent>/tars-factory/`.
+The foreman session running `/guards-run-factory` must be started in a directory outside `<workspace_root>` (such as an admin workspace or external shell), never inside `<workspace_root>`. If an `agy` session is active inside `<workspace_root>`, `agy-guards factory` scans Linux `/proc` and aborts immediately (`workspace has existing agy processes: <pid>`) to enforce single-agy workspace ownership. Running `agy` inside `<workspace_root>` also restricts the agent security boundary to that repository, preventing inspection of `<workspace_parent>/guards-factory/`.
 
 ## Hard Rules
 
@@ -52,7 +55,7 @@ The foreman session running `/tars-run-factory` must be started in a directory o
 - Verifiable evidence: The supervisor owns `FACTORY_LEDGER.ndjson`. Never author ledger entries directly; the foreman records state through the `handle` control.
 - Always acknowledge before concluding: Send `handle` for the terminal turn result before stopping. The supervisor writes `FACTORY_REPORT.md` upon handling the terminal directive.
 - Report failures verbatim: Never call a red result green. Never narrow scope silently.
-- Do not restart stalled runs: A stalled issue or tripped circuit breaker parks the shift; `/tars-regress-run` belongs to Cooper.
+- Do not restart stalled runs: A stalled issue or tripped circuit breaker parks the shift; `/guards-regress-run` belongs to Cooper.
 
 ## Pre-Flight Verification
 
@@ -62,16 +65,16 @@ Execute all checks in order; unresolved failure stops the shift:
 2. Target workspace cleanliness and default branch verification:
    - `git -C <workspace_root> status --porcelain` is empty.
    - `git -C <workspace_root> branch --show-current` matches the remote default branch (`refs/remotes/origin/HEAD`). A dirty tree or non-default branch stops the shift; never attempt to switch or clean branches with git.
-3. Credentials, installation provenance and environment health via `tars-agy doctor <workspace_root> [--installation-receipt PATH]`:
-   - Pass the same receipt override to doctor and factory; use the same `tars-agy` executable and environment for both.
+3. Credentials, installation provenance and environment health via `agy-guards doctor <workspace_root> [--installation-receipt PATH]`:
+   - Pass the same receipt override to doctor and factory; use the same `agy-guards` executable and environment for both.
    - Verify the `github` check reports status `ok`.
    - Require `factory_installation` status `ok` before starting the supervisor.
    - A missing check means the executable predates factory readiness diagnostics; stop and report the version mismatch.
    - A missing, unreadable, malformed or mismatched receipt stops the shift even if the ordinary plugin installation is healthy.
    - Restore provenance through the supported installer using a clean committed source build or a prebuilt binary and its matching bundle build receipt, or supply an existing valid installed receipt.
    - The receipt must match both the running executable and the installed plugin assets; binary hashes and customer Git revisions alone cannot establish provenance.
-   - The hub persona token `TARS_HUB_TARS_GITHUB_TOKEN` must be present in `~/.config/tars/credentials` (mode `0600`).
-   - If `--merge` is specified, verify doctor output confirms `TARS_SPOKE_DOYLE_GITHUB_TOKEN` is present and belongs to a distinct account from the author. If reviewer credentials are unset or identical to the author, automated PR approval remains blocked.
+   - The hub persona token `GUARDS_HUB_TARS_GITHUB_TOKEN` must be present in `~/.config/agy-guards/credentials` (mode `0600`).
+   - If `--merge` is specified, verify doctor output confirms `GUARDS_SPOKE_DOYLE_GITHUB_TOKEN` is present and belongs to a distinct account from the author. If reviewer credentials are unset or identical to the author, automated PR approval remains blocked.
    - Tokens exported directly into the shell environment are ignored by the engine.
 
 ## Execution Modes
@@ -81,7 +84,7 @@ Execute all checks in order; unresolved failure stops the shift:
 For one-shot execution environments (Claude Code, OpenAI Codex, Grok-build) and unattended batch runs, pass `--auto`:
 
 ```bash
-tars-agy factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) --auto [--merge] [--cycles N] [--runtime-minutes N] [--installation-receipt PATH]
+agy-guards factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) --auto [--merge] [--cycles N] [--runtime-minutes N] [--installation-receipt PATH]
 ```
 
 In autonomous mode:
@@ -91,17 +94,17 @@ In autonomous mode:
 - It halts and writes `FACTORY_REPORT.md` immediately upon reaching `drained`, any human gate (`approval_needed`, `human_door`, `ruleset_blocked`, `triage`), the first recorded refusal, authentication failure, content filter, or limit exhaustion.
 - It recovers failed turns only when `state.stop` is absent, using fresh stored-state reconciliation within `--recovery-limit`.
 - It never supplies a refusal correction automatically. The corrected retry below requires an interactive foreman while `phase` is `"failed"`.
-- The foreman monitors progress via `tars-agy monitor <workspace_root> <session>` or the ledger, then reads and reports `FACTORY_REPORT.md` when the process exits.
+- The foreman monitors progress via `agy-guards monitor <workspace_root> <session>` or the ledger, then reads and reports `FACTORY_REPORT.md` when the process exits.
 
 ### Mode B: Interactive Streaming Mode
 
 In interactive environments supporting persistent background standard input (such as Antigravity CLI via `run_command` and `manage_task`), launch the supervisor and maintain an open stdin stream:
 
 ```bash
-tars-agy factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--merge] [--cycles N] [--runtime-minutes N] [--state-dir DIR]
+agy-guards factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--merge] [--cycles N] [--runtime-minutes N] [--state-dir DIR]
 ```
 
-Important: Do not pipe single commands with `echo ... | tars-agy factory`. Closing standard input sends EOF, which triggers an immediate supervisor shutdown.
+Important: Do not pipe single commands with `echo ... | agy-guards factory`. Closing standard input sends EOF, which triggers an immediate supervisor shutdown.
 
 Process standard output NDJSON events:
 
@@ -135,7 +138,7 @@ Acknowledge the probe:
 
 Mandatory before executing any workload action (`audit`, `triage`, or `cycle`). Must be sent while `phase` is `"ready"` and `cycles == 0`.
 
-Resolve the same installed receipt verified by doctor, using `--installation-receipt`, `TARS_INSTALLATION_RECEIPT`, then `~/.gemini/config/tars-installation.receipt.json`.
+Resolve the same installed receipt verified by doctor, using `--installation-receipt`, `GUARDS_INSTALLATION_RECEIPT`, then `~/.gemini/config/agy-guards-installation.receipt.json`.
 Send the complete receipt unchanged as the value of `installation`, including the bundle provenance fields.
 Keep `integratedRevision` as `null` when integration is unknown.
 
@@ -205,7 +208,7 @@ A `"stopped"` shift cannot accept `recover`; preserve its evidence and obtain au
 
 If `phase` is `"failed"`:
 
-1. Reconcile stored state using `tars-agy inspect <workspace_root>`.
+1. Reconcile stored state using `agy-guards inspect <workspace_root>`.
 2. Verify the failed host process has exited.
 3. If `state.stop` is absent, send `recover` with fresh reconciliation; no correction is needed. If `state.stop.kind` is `"refusal"` and an independently permitted alternative exists, the foreman may supply exactly one corrected retry for that tool and target within the remaining recovery budget. Authentication, content-filter and parked stops cannot use this path. Send `recover` with reconciliation and structured correction:
 
@@ -269,3 +272,4 @@ A drained selection without blockers requires no human action.
 If the shift ends early, the report states why in the first line.
 If a check was skipped, the report states so.
 A report that hides a red result is worse than a stopped factory.
+

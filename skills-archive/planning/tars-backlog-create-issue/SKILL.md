@@ -4,7 +4,7 @@ description: Use when creating a new backlog issue/ticket in the `.tars/issues/t
 disable-model-invocation: true
 metadata:
   archived: "2026-09-04"
-  replaced-by: "tars-run-factory"
+  replaced-by: "guards-run-factory"
 ---
 
 # Backlog Create Issue

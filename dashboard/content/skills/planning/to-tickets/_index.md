@@ -1,6 +1,6 @@
 +++
 title = "to-tickets"
-description = "Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .tars/issues automation."
+description = "Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .guards/issues automation."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -16,7 +16,7 @@ mermaid = false
 
 Break a plan, spec, or conversation into a set of **tickets** - tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-These are **buildable implementation tickets** - distinct from `/wayfinder`'s investigation tickets (which resolve open _decisions_, not ship features) and from the `.tars/issues/` backlog files that automated factory ticket pipelines generate and consume (a separate ticket-automation pipeline this skill does not write to).
+These are **buildable implementation tickets** - distinct from `/wayfinder`'s investigation tickets (which resolve open _decisions_, not ship features) and from the `.guards/issues/` backlog files that automated factory ticket pipelines generate and consume (a separate ticket-automation pipeline this skill does not write to).
 
 Work from your project's conventions: its issue tracker (GitHub via `gh`, Linear, or local files), triage label vocabulary, domain glossary, and any ADRs in the area you are touching. If those conventions have not been established, ask the user before publishing.
 

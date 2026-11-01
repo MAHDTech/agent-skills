@@ -8,7 +8,7 @@ skill = true
 category = "planning"
 mermaid = false
 archived = "2026-09-04"
-replaced_by = "tars-run-factory"
+replaced_by = "guards-run-factory"
 source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/planning/tars-backlog-triage"
 +++
 

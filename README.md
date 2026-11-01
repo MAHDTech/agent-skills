@@ -148,11 +148,11 @@ Turn ideas into specs, tickets, and multi-session plans.
 - **[estimate-work](skills/planning/estimate-work/SKILL.md)** - Estimate a plan or ticket set using relative sizes or time ranges, reference history, named assumptions, and risk. Use when sizing work, forecasting delivery, or deciding whether uncertainty needs a spike.
 - **[grilling](skills/planning/grilling/SKILL.md)** - Interview the user one decision at a time before coding. Use when explicitly asked to stress-test a design, or when an explicitly started software-factory or wayfinder workflow requires its planning interview.
 - **[handoff](skills/planning/handoff/SKILL.md)** - Summarize the current conversation into a temporary handoff for another agent or session. Use when transferring unfinished work; reference durable artifacts, suggest relevant skills, and redact secrets.
-- **[prioritize-backlog](skills/planning/prioritize-backlog/SKILL.md)** - Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use for generic backlog grooming with value-effort, RICE, or WSJF; excludes the automated .tars/issues backlog.
+- **[prioritize-backlog](skills/planning/prioritize-backlog/SKILL.md)** - Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use for generic backlog grooming with value-effort, RICE, or WSJF; excludes the automated .guards/issues backlog.
 - **[software-factory](skills/planning/software-factory/SKILL.md)** - Guide a feature through Product, Architecture, Program Design, and Slice approval gates, then implement verified vertical slices. Use when asked for the full design-to-delivery factory workflow.
 - **[store-plan](skills/planning/store-plan/SKILL.md)** - Save an agreed conversation plan, decisions, action items, and open questions to a reviewable Markdown file in docs/plans/. Use when a durable repository plan is needed rather than a temporary handoff.
 - **[to-spec](skills/planning/to-spec/SKILL.md)** - Synthesize the current conversation into a product spec or PRD and publish it to the project's issue tracker. Use when asked to formalize discussed requirements and testing decisions without a new interview.
-- **[to-tickets](skills/planning/to-tickets/SKILL.md)** - Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .tars/issues automation.
+- **[to-tickets](skills/planning/to-tickets/SKILL.md)** - Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .guards/issues automation.
 - **[wayfinder](skills/planning/wayfinder/SKILL.md)** - Chart a large, ambiguous effort as an issue-tracker map of investigation tickets. Use when asked to map unknown decisions or work one frontier ticket per session, rather than slice known implementation work.
 
 ### Review
@@ -229,13 +229,13 @@ Environments, CLIs, and agent conventions.
 - **[zed](skills/tooling/zed/SKILL.md)** - Configure or troubleshoot Zed editor settings, keybindings, and language servers. Use to verify Zed option names and update user or project settings in the correct scope.
 - **[zola](skills/tooling/zola/SKILL.md)** - Build, serve, or customize an existing Zola site. Use for Tera templates, shortcodes, taxonomies, config.toml options, theme changes, or Zola build and link checks.
 
-### TARS
+### GUARDS
 
-Autonomous software factory and persistent goal workflows.
+Autonomous GUARDS software factory, debugging, and persistent goal workflows.
 
-- **[tars-debug](skills/tars/tars-debug/SKILL.md)** - Debug and recover the tars-agy Antigravity plugin from outside an active run using tars-agy doctor, inspect, monitor, TARS state logs, and ~/.gemini session transcripts. Use for stuck or failing TARS sessions, hooks, spokes, or factory shifts.
-- **[tars-goal](skills/tars/tars-goal/SKILL.md)** - Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly requests a persistent goal.
-- **[tars-run-factory](skills/tars/tars-run-factory/SKILL.md)** - Run the TARS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
+- **[guards-debug](skills/guards/guards-debug/SKILL.md)** - Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts.
+- **[guards-goal](skills/guards/guards-goal/SKILL.md)** - Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /guards-goal or explicitly requests a persistent goal.
+- **[guards-run-factory](skills/guards/guards-run-factory/SKILL.md)** - Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
 
 ### Vendor Skills
 

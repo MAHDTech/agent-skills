@@ -19,7 +19,7 @@ Local reference documentation for official Google Antigravity developer guides. 
 Use this skill when:
 
 - Researching or verifying Google Antigravity specifications, command-line flags, rules, subagents, permissions, or hooks.
-- Working on `antigravity-plugin-tars` features or configuring workspace settings.
+- Working on `plugin-agy-guards` features or configuring workspace settings.
 
 ## Execution Rules
 
