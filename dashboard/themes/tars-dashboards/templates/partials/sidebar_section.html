@@ -7,38 +7,7 @@
   {% set is_skill = s.extra.skill | default(value=false) %}
 
   {# Check if this section or any descendant is the current page #}
-  {% set_global is_ancestor = false %}
-  {% if s.path == current_path %}
-    {% set_global is_ancestor = true %}
-  {% endif %}
-  {% for p in s.pages %}
-    {% if p.path == current_path %}
-      {% set_global is_ancestor = true %}
-    {% endif %}
-  {% endfor %}
-  {% for subpath in s.subsections %}
-    {% set sub = get_section(path=subpath) %}
-    {% if sub.path == current_path %}
-      {% set_global is_ancestor = true %}
-    {% endif %}
-    {% for p in sub.pages %}
-      {% if p.path == current_path %}
-        {% set_global is_ancestor = true %}
-      {% endif %}
-    {% endfor %}
-    {# Check one more level deep for nested sub-components #}
-    {% for subsubpath in sub.subsections %}
-      {% set subsub = get_section(path=subsubpath) %}
-      {% if subsub.path == current_path %}
-        {% set_global is_ancestor = true %}
-      {% endif %}
-      {% for p in subsub.pages %}
-        {% if p.path == current_path %}
-          {% set_global is_ancestor = true %}
-        {% endif %}
-      {% endfor %}
-    {% endfor %}
-  {% endfor %}
+  {% set is_ancestor = current_path is starting_with(pat=s.path) %}
 
   {% set has_children = (s.pages | length > 0 or s.subsections | length > 0) and not is_skill %}
   {% set is_section_active = s.path == current_path %}
