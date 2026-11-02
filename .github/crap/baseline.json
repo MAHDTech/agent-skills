@@ -477,6 +477,15 @@
       ]
     },
     {
+      "coverage": 100.0,
+      "crap": 1.0,
+      "crate": "ask-cli",
+      "cyclomatic": 1.0,
+      "file": "crates/ask-cli/src/commands/skills.rs",
+      "function": "is_linked_git_worktree",
+      "line": 478
+    },
+    {
       "coverage": 93.33333333333333,
       "crap": 5.208011851851852,
       "crate": "ask-cli",
@@ -552,7 +561,7 @@
       "cyclomatic": 1.6,
       "file": "crates/ask-cli/src/commands/skills.rs",
       "function": "run_clean_resources",
-      "line": 643
+      "line": 648
     },
     {
       "coverage": 100.0,
@@ -561,7 +570,7 @@
       "cyclomatic": 1.8,
       "file": "crates/ask-cli/src/commands/skills.rs",
       "function": "run_download",
-      "line": 560
+      "line": 565
     },
     {
       "coverage": 52.54237288135594,
@@ -570,15 +579,15 @@
       "cyclomatic": 10.2,
       "file": "crates/ask-cli/src/commands/skills.rs",
       "function": "run_download_resources",
-      "line": 575,
+      "line": 580,
       "uncovered": [
         {
-          "end": 596,
-          "start": 593
+          "end": 601,
+          "start": 598
         },
         {
-          "end": 636,
-          "start": 612
+          "end": 641,
+          "start": 617
         }
       ]
     },
@@ -684,21 +693,21 @@
       ]
     },
     {
-      "coverage": 96.07843137254902,
-      "crap": 13.811485175385034,
+      "coverage": 96.15384615384616,
+      "crap": 14.812462448793811,
       "crate": "ask-cli",
-      "cyclomatic": 13.8,
+      "cyclomatic": 14.8,
       "file": "crates/ask-cli/src/commands/skills.rs",
       "function": "run_sync",
-      "line": 479,
+      "line": 483,
       "uncovered": [
         {
-          "end": 484,
-          "start": 484
+          "end": 488,
+          "start": 488
         },
         {
-          "end": 548,
-          "start": 548
+          "end": 553,
+          "start": 553
         }
       ]
     },
@@ -3303,8 +3312,8 @@
       "line": 2252
     },
     {
-      "coverage": 91.42857142857143,
-      "crap": 13.106425655976677,
+      "coverage": 94.28571428571428,
+      "crap": 13.031533527696793,
       "crate": "skills-core",
       "cyclomatic": 13.0,
       "file": "crates/skills-core/src/installer.rs",
@@ -3316,7 +3325,7 @@
           "start": 1020
         },
         {
-          "end": 1052,
+          "end": 1049,
           "start": 1049
         }
       ]
@@ -4422,11 +4431,11 @@
       "cyclomatic": 2.4,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::create_plan",
-      "line": 599,
+      "line": 666,
       "uncovered": [
         {
-          "end": 616,
-          "start": 616
+          "end": 683,
+          "start": 683
         }
       ]
     },
@@ -4437,23 +4446,23 @@
       "cyclomatic": 7.4,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::discover_catalog_skills",
-      "line": 547,
+      "line": 614,
       "uncovered": [
         {
-          "end": 552,
-          "start": 549
+          "end": 619,
+          "start": 616
         },
         {
-          "end": 571,
-          "start": 569
+          "end": 638,
+          "start": 636
         },
         {
-          "end": 582,
-          "start": 578
+          "end": 649,
+          "start": 645
         },
         {
-          "end": 591,
-          "start": 584
+          "end": 658,
+          "start": 651
         }
       ]
     },
@@ -4464,27 +4473,27 @@
       "cyclomatic": 20.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::execute_plan",
-      "line": 946,
+      "line": 1013,
       "uncovered": [
         {
-          "end": 974,
-          "start": 967
+          "end": 1041,
+          "start": 1034
         },
         {
-          "end": 1000,
-          "start": 993
+          "end": 1067,
+          "start": 1060
         },
         {
-          "end": 1028,
-          "start": 1028
+          "end": 1095,
+          "start": 1095
         },
         {
-          "end": 1048,
-          "start": 1041
+          "end": 1115,
+          "start": 1108
         },
         {
-          "end": 1084,
-          "start": 1080
+          "end": 1151,
+          "start": 1147
         }
       ]
     },
@@ -4495,7 +4504,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::new",
-      "line": 468
+      "line": 535
     },
     {
       "coverage": 100.0,
@@ -4504,7 +4513,7 @@
       "cyclomatic": 4.2,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::plan_catalog_skill",
-      "line": 661
+      "line": 728
     },
     {
       "coverage": 98.30508474576271,
@@ -4513,11 +4522,11 @@
       "cyclomatic": 9.2,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::plan_installed_skill",
-      "line": 712,
+      "line": 779,
       "uncovered": [
         {
-          "end": 727,
-          "start": 727
+          "end": 794,
+          "start": 794
         }
       ]
     },
@@ -4528,7 +4537,7 @@
       "cyclomatic": 6.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::plan_registered_orphans",
-      "line": 821
+      "line": 888
     },
     {
       "coverage": 100.0,
@@ -4537,7 +4546,7 @@
       "cyclomatic": 2.6,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::plan_target",
-      "line": 622
+      "line": 689
     },
     {
       "coverage": 92.5,
@@ -4546,11 +4555,11 @@
       "cyclomatic": 5.4,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::plan_unregistered_orphans",
-      "line": 870,
+      "line": 937,
       "uncovered": [
         {
-          "end": 888,
-          "start": 886
+          "end": 955,
+          "start": 953
         }
       ]
     },
@@ -4561,7 +4570,7 @@
       "cyclomatic": 5.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::plan_verified_skill",
-      "line": 777
+      "line": 844
     },
     {
       "coverage": 100.0,
@@ -4570,7 +4579,7 @@
       "cyclomatic": 1.2,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::sync",
-      "line": 1094
+      "line": 1161
     },
     {
       "coverage": 84.61538461538461,
@@ -4579,15 +4588,15 @@
       "cyclomatic": 5.4,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::unregistered_orphan_id",
-      "line": 915,
+      "line": 982,
       "uncovered": [
         {
-          "end": 923,
-          "start": 923
+          "end": 990,
+          "start": 990
         },
         {
-          "end": 935,
-          "start": 933
+          "end": 1002,
+          "start": 1000
         }
       ]
     },
@@ -4598,7 +4607,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::with_conflict_strategy",
-      "line": 498
+      "line": 565
     },
     {
       "coverage": 100.0,
@@ -4607,7 +4616,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::with_dry_run",
-      "line": 519
+      "line": 586
     },
     {
       "coverage": 0.0,
@@ -4616,11 +4625,11 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::with_exclude_patterns",
-      "line": 540,
+      "line": 607,
       "uncovered": [
         {
-          "end": 543,
-          "start": 540
+          "end": 610,
+          "start": 607
         }
       ]
     },
@@ -4631,11 +4640,11 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::with_installer",
-      "line": 526,
+      "line": 593,
       "uncovered": [
         {
-          "end": 529,
-          "start": 526
+          "end": 596,
+          "start": 593
         }
       ]
     },
@@ -4646,7 +4655,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::with_mode",
-      "line": 533
+      "line": 600
     },
     {
       "coverage": 100.0,
@@ -4655,7 +4664,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::with_prune_orphans",
-      "line": 505
+      "line": 572
     },
     {
       "coverage": 100.0,
@@ -4664,7 +4673,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::with_prune_source",
-      "line": 512
+      "line": 579
     },
     {
       "coverage": 100.0,
@@ -4673,7 +4682,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::with_target",
-      "line": 484
+      "line": 551
     },
     {
       "coverage": 100.0,
@@ -4682,7 +4691,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "SkillSyncer::with_targets",
-      "line": 491
+      "line": 558
     },
     {
       "coverage": 0.0,
@@ -4805,6 +4814,25 @@
       ]
     },
     {
+      "coverage": 93.93939393939394,
+      "crap": 11.026936026936028,
+      "crate": "skills-core",
+      "cyclomatic": 11.0,
+      "file": "crates/skills-core/src/sync.rs",
+      "function": "expand_worktree_sources",
+      "line": 448,
+      "uncovered": [
+        {
+          "end": 457,
+          "start": 457
+        },
+        {
+          "end": 460,
+          "start": 460
+        }
+      ]
+    },
+    {
       "coverage": 61.76470588235294,
       "crap": 9.73898330958681,
       "crate": "skills-core",
@@ -4832,17 +4860,41 @@
       ]
     },
     {
-      "coverage": 84.21052631578947,
-      "crap": 7.192885260242018,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "crate": "skills-core",
+      "cyclomatic": 3.0,
+      "file": "crates/skills-core/src/sync.rs",
+      "function": "is_dangling_managed_link",
+      "line": 495
+    },
+    {
+      "coverage": 86.95652173913044,
+      "crap": 7.10873674693844,
       "crate": "skills-core",
       "cyclomatic": 7.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "owns_orphan",
-      "line": 442,
+      "line": 505,
       "uncovered": [
         {
-          "end": 461,
-          "start": 458
+          "end": 528,
+          "start": 525
+        }
+      ]
+    },
+    {
+      "coverage": 84.61538461538461,
+      "crap": 3.6471916249431042,
+      "crate": "skills-core",
+      "cyclomatic": 3.6,
+      "file": "crates/skills-core/src/sync.rs",
+      "function": "resolve_git_common_dir",
+      "line": 434,
+      "uncovered": [
+        {
+          "end": 445,
+          "start": 444
         }
       ]
     },
@@ -4868,7 +4920,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/sync.rs",
       "function": "source_is_owned",
-      "line": 434
+      "line": 487
     },
     {
       "coverage": 95.83333333333334,
