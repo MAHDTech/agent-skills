@@ -1357,3 +1357,149 @@ fn test_skills_sh_json_empty_catalog_keeps_groupings_key() {
         "{\n  \"$schema\": \"https://skills.sh/schemas/skills.sh.schema.json\",\n  \"notGrouped\": \"bottom\",\n  \"groupings\": []\n}\n"
     );
 }
+
+#[test]
+fn test_output_root_stages_artifacts_without_mutating_workspace_root() {
+    let harness = ArtifactsTestHarness::new();
+    fs::remove_dir_all(harness.workspace_root.join("dashboard/content/skills")).unwrap();
+
+    let agents_frontmatter = "---\ncustom_title: Staged Agents\nversion: 2.0.0\n---\n";
+    let sentinel_agents = format!("{agents_frontmatter}# Unstaged local agents edit\n");
+    let sentinel_readme = "Unstaged local README edit\n";
+    let sentinel_skills_sh = "{\"sentinel\":true}\n";
+    let sentinel_dashboard_index = "+++\ntitle = \"Hand Authored Landing\"\n+++\n";
+
+    fs::write(
+        harness.workspace_root.join("agents/AGENTS.md"),
+        &sentinel_agents,
+    )
+    .unwrap();
+    fs::write(harness.workspace_root.join("README.md"), sentinel_readme).unwrap();
+    fs::write(
+        harness.workspace_root.join("skills.sh.json"),
+        sentinel_skills_sh,
+    )
+    .unwrap();
+    fs::write(
+        harness.workspace_root.join("dashboard/content/_index.md"),
+        sentinel_dashboard_index,
+    )
+    .unwrap();
+    harness.create_doc("guide.md", "# Guide\n");
+
+    let live_dir = harness.create_live_skill(
+        "engineering",
+        "alpha-skill",
+        "Alpha skill description",
+        "See [Beta](../beta-skill/SKILL.md) and [Old](../../../skills-archive/planning/old-plan/SKILL.md).",
+    );
+    fs::write(live_dir.join("REFERENCE.md"), "# Reference doc\n").unwrap();
+    fs::create_dir_all(live_dir.join("resources/manual")).unwrap();
+    fs::write(
+        live_dir.join("resources/manual/note.md"),
+        "# Resource note\n",
+    )
+    .unwrap();
+
+    harness.create_live_skill(
+        "engineering",
+        "beta-skill",
+        "Beta skill description",
+        "Beta body.",
+    );
+    harness.create_archived_skill(
+        "planning",
+        "old-plan",
+        "Retired plan skill",
+        "2025-01-01",
+        Some("alpha-skill"),
+        "Archived body.",
+    );
+
+    let staging_temp = TempDir::new().unwrap();
+    let staging_root = staging_temp.path().to_path_buf();
+
+    let engine = ArtifactsEngine::with_options(
+        &harness.workspace_root,
+        ArtifactsOptions {
+            output_root: Some(staging_root.clone()),
+            ..Default::default()
+        },
+    );
+    assert_eq!(engine.output_root(), staging_root.as_path());
+
+    let summary = engine.generate_all().unwrap();
+    assert!(summary.agents_updated);
+    assert!(summary.readme_updated);
+    assert!(summary.skills_sh_updated);
+    assert!(summary.dashboard_generated);
+    assert!(summary.discovery_index_updated);
+    assert!(summary.staged_files.is_empty());
+
+    // Workspace root must remain untouched.
+    assert_eq!(
+        fs::read_to_string(harness.workspace_root.join("agents/AGENTS.md")).unwrap(),
+        sentinel_agents
+    );
+    assert_eq!(
+        fs::read_to_string(harness.workspace_root.join("README.md")).unwrap(),
+        sentinel_readme
+    );
+    assert_eq!(
+        fs::read_to_string(harness.workspace_root.join("skills.sh.json")).unwrap(),
+        sentinel_skills_sh
+    );
+    assert_eq!(
+        fs::read_to_string(harness.workspace_root.join("dashboard/content/_index.md")).unwrap(),
+        sentinel_dashboard_index
+    );
+    assert!(
+        !harness
+            .workspace_root
+            .join("dashboard/content/skills")
+            .exists()
+    );
+    assert!(!harness.workspace_root.join(WELL_KNOWN_STATIC_DIR).exists());
+
+    // Staged output root must contain all generated artifacts resolved from workspace_root.
+    let staged_agents = fs::read_to_string(staging_root.join("agents/AGENTS.md")).unwrap();
+    assert!(staged_agents.starts_with(agents_frontmatter));
+    assert!(staged_agents.contains("- **alpha-skill**: Alpha skill description"));
+
+    let staged_readme = fs::read_to_string(staging_root.join("README.md")).unwrap();
+    assert!(staged_readme.contains("- [guide](docs/guide.md)"));
+    assert!(staged_readme.contains("**[alpha-skill](skills/engineering/alpha-skill/SKILL.md)**"));
+
+    let staged_skills_sh = fs::read_to_string(staging_root.join("skills.sh.json")).unwrap();
+    assert!(staged_skills_sh.contains("\"alpha-skill\""));
+
+    let staged_v020 = staging_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+        .join("index.json");
+    let v020_json: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(staged_v020).unwrap()).unwrap();
+    let expected_sha =
+        SkillDownloader::compute_sha256(&fs::read(live_dir.join("SKILL.md")).unwrap());
+    assert_eq!(
+        v020_json["skills"][0]["digest"].as_str(),
+        Some(format!("sha256:{expected_sha}").as_str())
+    );
+
+    let staged_alpha_index = fs::read_to_string(
+        staging_root.join("dashboard/content/skills/engineering/alpha-skill/_index.md"),
+    )
+    .unwrap();
+    assert!(staged_alpha_index.contains("@/skills/engineering/beta-skill/_index.md"));
+    assert!(staged_alpha_index.contains("@/skills-archive/planning/old-plan/_index.md"));
+    assert!(
+        staging_root
+            .join("dashboard/content/skills/engineering/alpha-skill/REFERENCE.md")
+            .is_file()
+    );
+    assert!(
+        staging_root
+            .join("dashboard/content/skills/engineering/alpha-skill/resources/manual/note.md")
+            .is_file()
+    );
+}

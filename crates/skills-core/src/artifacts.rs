@@ -83,6 +83,8 @@ pub struct ArtifactsOptions {
     pub github_source: String,
     /// Git default branch for web links (default: "main").
     pub git_branch: String,
+    /// Optional staging output root directory (defaults to `workspace_root` when `None`).
+    pub output_root: Option<PathBuf>,
 }
 
 impl Default for ArtifactsOptions {
@@ -95,6 +97,7 @@ impl Default for ArtifactsOptions {
             skill_filter: None,
             github_source: "MAHDTech/agent-skills".to_string(),
             git_branch: "main".to_string(),
+            output_root: None,
         }
     }
 }
@@ -169,6 +172,15 @@ impl ArtifactsEngine {
         &self.workspace_root
     }
 
+    /// Returns a reference to the target output root path (defaults to `workspace_root`).
+    #[must_use]
+    pub fn output_root(&self) -> &Path {
+        self.options
+            .output_root
+            .as_deref()
+            .unwrap_or(&self.workspace_root)
+    }
+
     /// Runs all artifact generation tasks and git staging.
     pub fn generate_all(&self) -> Result<ArtifactsSummary> {
         let all_skills = SkillParser::discover_skills(&self.workspace_root)?;
@@ -189,21 +201,22 @@ impl ArtifactsEngine {
             ..Default::default()
         };
 
+        let output_root = self.output_root();
         let mut files_to_stage = Vec::new();
 
         if self.generate_agents_md(&live_skills)? {
             summary.agents_updated = true;
-            files_to_stage.push(self.workspace_root.join("agents").join("AGENTS.md"));
+            files_to_stage.push(output_root.join("agents").join("AGENTS.md"));
         }
 
         if self.generate_readme(&live_skills)? {
             summary.readme_updated = true;
-            files_to_stage.push(self.workspace_root.join("README.md"));
+            files_to_stage.push(output_root.join("README.md"));
         }
 
         if self.generate_skills_sh_json(&live_skills)? {
             summary.skills_sh_updated = true;
-            files_to_stage.push(self.workspace_root.join("skills.sh.json"));
+            files_to_stage.push(output_root.join("skills.sh.json"));
         }
 
         if !self.options.skip_dashboard
@@ -211,20 +224,16 @@ impl ArtifactsEngine {
             && self.generate_dashboard_content(&live_skills, &archived_skills)?
         {
             summary.dashboard_generated = true;
-            let dashboard_dir = self
-                .workspace_root
-                .join("dashboard")
-                .join("content")
-                .join("skills");
+            let dashboard_dir = output_root.join("dashboard").join("content").join("skills");
             files_to_stage.push(dashboard_dir);
         }
 
         if self.generate_discovery_index(&live_skills)? {
             summary.discovery_index_updated = true;
-            files_to_stage.push(self.workspace_root.join(WELL_KNOWN_STATIC_DIR));
+            files_to_stage.push(output_root.join(WELL_KNOWN_STATIC_DIR));
         }
 
-        if !self.options.no_stage {
+        if !self.options.no_stage && self.options.output_root.is_none() {
             summary.staged_files = self.stage_files(&files_to_stage)?;
         }
 
@@ -237,10 +246,11 @@ impl ArtifactsEngine {
             return Ok(false);
         }
 
-        let agents_file = self.workspace_root.join("agents").join("AGENTS.md");
-        let frontmatter = if agents_file.is_file() {
-            let existing =
-                fs::read_to_string(&agents_file).map_err(|e| SkillError::io(&agents_file, e))?;
+        let source_agents_file = self.workspace_root.join("agents").join("AGENTS.md");
+        let out_agents_file = self.output_root().join("agents").join("AGENTS.md");
+        let frontmatter = if source_agents_file.is_file() {
+            let existing = fs::read_to_string(&source_agents_file)
+                .map_err(|e| SkillError::io(&source_agents_file, e))?;
             let normalized = normalize_crlf(&existing);
             extract_yaml_frontmatter(&normalized)
                 .unwrap_or("")
@@ -280,7 +290,7 @@ impl ArtifactsEngine {
         }
 
         let full_content = format!("{frontmatter}{body}");
-        atomic_write(&agents_file, &full_content)?;
+        atomic_write(&out_agents_file, &full_content)?;
         Ok(true)
     }
 
@@ -290,7 +300,7 @@ impl ArtifactsEngine {
             return Ok(false);
         }
 
-        let readme_file = self.workspace_root.join("README.md");
+        let readme_file = self.output_root().join("README.md");
         let docs_dir = self.workspace_root.join("docs");
 
         let mut docs_list = Vec::new();
@@ -454,7 +464,7 @@ impl ArtifactsEngine {
             return Ok(false);
         }
 
-        let manifest_file = self.workspace_root.join("skills.sh.json");
+        let manifest_file = self.output_root().join("skills.sh.json");
         let mut groupings = Vec::new();
 
         for category in &catalog_categories(live_skills) {
@@ -539,7 +549,7 @@ impl ArtifactsEngine {
             skills: v010_entries,
         };
 
-        let static_dir = self.workspace_root.join("dashboard").join("static");
+        let static_dir = self.output_root().join("dashboard").join("static");
         let v020_file = static_dir
             .join(WELL_KNOWN_AGENT_SKILLS_DIR)
             .join("index.json");
@@ -569,7 +579,7 @@ impl ArtifactsEngine {
         }
 
         let dashboard_content_dir = self
-            .workspace_root
+            .output_root()
             .join("dashboard")
             .join("content")
             .join("skills");
