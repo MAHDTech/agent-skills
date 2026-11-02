@@ -475,6 +475,10 @@ async fn run_lint(path: Option<&Path>, fix: bool, format: OutputFormat) -> Resul
     Ok(())
 }
 
+fn is_linked_git_worktree(root: &Path) -> bool {
+    root.join(".git").is_file()
+}
+
 #[allow(clippy::unused_async)]
 async fn run_sync(dry_run: bool) -> Result<(), CliError> {
     let root = resolve_root()?;
@@ -486,7 +490,8 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
     let repo_only = !dry_run
         && (std::env::var("SKILLS_REPO_ONLY").is_ok()
             || std::env::var("PRE_COMMIT").is_ok()
-            || std::env::var("CI").is_ok());
+            || std::env::var("CI").is_ok()
+            || is_linked_git_worktree(&root));
 
     if repo_only {
         println!("Repository-only sync active: skipping machine target synchronization.");

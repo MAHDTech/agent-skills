@@ -1,3 +1,4 @@
+// cspell:words gitdir
 //! End-to-end integration tests for the `ask` CLI binary.
 
 use assert_cmd::Command;
@@ -1136,6 +1137,18 @@ fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
         .success()
         .stdout(predicate::str::contains(
             "0 installed, 0 updated, 0 deleted",
+        ));
+
+    std::fs::write(
+        repo.join(".git"),
+        "gitdir: /tmp/example/.git/worktrees/wt\n",
+    )
+    .unwrap();
+    run_sync(&["skills", "sync"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "Repository-only sync active: skipping machine target synchronization.",
         ));
 }
 

@@ -4,7 +4,7 @@
 //! and multiple target agent execution environments (Claude Desktop, Cursor, Antigravity, Custom).
 //! Supports side-effect-free drift planning, SemVer-aware upgrade/conflict detection,
 //! orphan pruning, atomic rollouts with automated backups, and dry-run guarantees.
-// cspell:words Syncer syncer
+// cspell:words Syncer syncer commondir gitdir
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -431,12 +431,75 @@ fn resolve_source_path(source: &Path) -> Option<PathBuf> {
     None
 }
 
+fn resolve_git_common_dir(worktree_root: &Path) -> Option<PathBuf> {
+    let dot_git = worktree_root.join(".git");
+    if dot_git.is_dir() {
+        return Some(dot_git);
+    }
+    let gitdir_line = fs::read_to_string(&dot_git).ok()?;
+    let gitdir_raw = gitdir_line.trim().strip_prefix("gitdir:")?.trim();
+    let gitdir = worktree_root.join(gitdir_raw);
+    if let Ok(commondir) = fs::read_to_string(gitdir.join("commondir")) {
+        return Some(normalize_path(&gitdir.join(commondir.trim())));
+    }
+    gitdir.parent()?.parent().map(Path::to_path_buf)
+}
+
+fn expand_worktree_sources(source: &Path) -> Vec<PathBuf> {
+    let mut sources: Vec<PathBuf> = resolve_source_path(source).into_iter().collect();
+    let Some(worktree_root) = source
+        .ancestors()
+        .find(|ancestor| ancestor.join(".git").symlink_metadata().is_ok())
+    else {
+        return sources;
+    };
+    let Ok(rel_source) = source.strip_prefix(worktree_root) else {
+        return sources;
+    };
+    let Some(common_dir) = resolve_git_common_dir(worktree_root) else {
+        return sources;
+    };
+    if let Some(main_root) = common_dir.parent()
+        && common_dir.file_name().is_some_and(|name| name == ".git")
+        && let Some(resolved) = resolve_source_path(&main_root.join(rel_source))
+        && !sources.contains(&resolved)
+    {
+        sources.push(resolved);
+    }
+    if let Ok(entries) = fs::read_dir(common_dir.join("worktrees")) {
+        for entry in entries.flatten() {
+            let entry_path = entry.path();
+            if let Ok(gitdir) = fs::read_to_string(entry_path.join("gitdir"))
+                && let Some(linked_root) = entry_path
+                    .join(gitdir.trim())
+                    .parent()
+                    .map(Path::to_path_buf)
+                && let Some(resolved) = resolve_source_path(&linked_root.join(rel_source))
+                && !sources.contains(&resolved)
+            {
+                sources.push(resolved);
+            }
+        }
+    }
+    sources
+}
+
 fn source_is_owned(source: &Path, owned_sources: &[PathBuf]) -> bool {
     resolve_source_path(source).is_some_and(|resolved| {
         owned_sources
             .iter()
             .any(|catalog| resolved != *catalog && resolved.starts_with(catalog))
     })
+}
+
+fn is_dangling_managed_link(
+    target: &Path,
+    resolved_link: &Path,
+    installed: &InstalledSkill,
+) -> bool {
+    installed.mode == InstallMode::Symlink
+        && !target.exists()
+        && normalize_path(resolved_link) == normalize_path(&installed.source_path)
 }
 
 fn owns_orphan(
@@ -447,9 +510,13 @@ fn owns_orphan(
 ) -> bool {
     let target = skills_dir.join(skill_id);
     match target.symlink_metadata() {
-        Ok(metadata) if metadata.is_symlink() => fs::read_link(target)
+        Ok(metadata) if metadata.is_symlink() => fs::read_link(&target)
             .ok()
-            .is_some_and(|source| source_is_owned(&skills_dir.join(source), owned_sources)),
+            .map(|source| skills_dir.join(source))
+            .is_some_and(|source| {
+                source_is_owned(&source, owned_sources)
+                    || is_dangling_managed_link(&target, &source, installed)
+            }),
         Ok(metadata) => {
             metadata.is_dir()
                 && installed.mode == InstallMode::Copy
@@ -600,7 +667,7 @@ impl SkillSyncer {
         let catalog_skills = self.discover_catalog_skills()?;
         let owned_sources: Vec<PathBuf> = std::iter::once(&self.catalog_dir)
             .chain(&self.prune_sources)
-            .filter_map(|source| resolve_source_path(source))
+            .flat_map(|source| expand_worktree_sources(source))
             .collect();
         let mut sorted_catalog_skills: Vec<(&String, &PathBuf)> = catalog_skills.iter().collect();
         sorted_catalog_skills.sort_by_key(|(id, _)| *id);

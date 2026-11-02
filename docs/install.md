@@ -102,7 +102,7 @@ Sync also removes names in `skills-archive/` from targets, including untracked c
 
 Run sync from a persistent checkout. Links installed from a temporary worktree break when that worktree is deleted. A later sync from this checkout repairs them.
 
-`SKILLS_REPO_ONLY=1`, `PRE_COMMIT`, or `CI` skips target synchronization on a normal sync, while dry-run still inspects targets. The standalone sync engine retains its conservative conflict policy by default; repository-wins behavior is selected by the CLI.
+`SKILLS_REPO_ONLY=1`, `PRE_COMMIT`, `CI`, or running inside a linked Git worktree skips target synchronization on a normal sync, while dry-run still inspects targets. The standalone sync engine retains its conservative conflict policy by default; repository-wins behavior is selected by the CLI.
 
 ### Antigravity ACP in T3 Code
 

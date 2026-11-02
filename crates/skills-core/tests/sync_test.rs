@@ -1,4 +1,4 @@
-// cspell:words Syncer syncer
+// cspell:words Syncer syncer commondir gitdir
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -690,6 +690,89 @@ fn test_sync_repairs_managed_link_after_worktree_removed() {
         source.canonicalize().unwrap()
     );
     assert!(syncer.create_plan().unwrap().is_noop());
+}
+
+#[test]
+#[cfg(unix)]
+fn test_sync_prunes_renamed_skill_from_linked_or_deleted_worktree() {
+    let h = TestHarness::new();
+    let repo_root = h.temp.path().join("repo");
+    let main_catalog = repo_root.join("skills");
+    let worktree_root = h.temp.path().join("worktree-a");
+    let worktree_catalog = worktree_root.join("skills");
+    let deleted_worktree_catalog = h.temp.path().join("worktree-deleted/skills");
+    fs::create_dir_all(repo_root.join(".git/worktrees/wt-a")).unwrap();
+    fs::write(
+        repo_root.join(".git/worktrees/wt-a/gitdir"),
+        format!("{}\n", worktree_root.join(".git").display()),
+    )
+    .unwrap();
+    fs::write(repo_root.join(".git/worktrees/wt-a/commondir"), "../..\n").unwrap();
+    fs::create_dir_all(&worktree_root).unwrap();
+    fs::write(
+        worktree_root.join(".git"),
+        format!(
+            "gitdir: {}\n",
+            repo_root.join(".git/worktrees/wt-a").display()
+        ),
+    )
+    .unwrap();
+
+    let wt_old = create_mock_skill(&worktree_catalog, "tars-debug", "1.0.0", "Old WT skill");
+    let deleted_old = create_mock_skill(
+        &deleted_worktree_catalog,
+        "tars-deleted",
+        "1.0.0",
+        "Deleted WT skill",
+    );
+    let current = create_mock_skill(&main_catalog, "guards-debug", "1.0.0", "Renamed skill");
+
+    let installer = Installer::new();
+    installer
+        .install(&wt_old, &h.target, &InstallOptions::default())
+        .unwrap();
+    installer
+        .install(&deleted_old, &h.target, &InstallOptions::default())
+        .unwrap();
+    std::os::unix::fs::symlink(
+        worktree_catalog.join("tars-unregistered"),
+        h.agent_dir.join("tars-unregistered"),
+    )
+    .unwrap();
+    fs::remove_dir_all(h.temp.path().join("worktree-deleted")).unwrap();
+
+    let syncer = SkillSyncer::new(&main_catalog)
+        .with_target(h.target.clone())
+        .with_prune_orphans(true);
+    let summary = syncer.sync().unwrap();
+    assert_eq!(summary.installed, 1);
+    assert_eq!(summary.deleted, 3);
+    for removed in ["tars-debug", "tars-deleted", "tars-unregistered"] {
+        assert!(h.agent_dir.join(removed).symlink_metadata().is_err());
+    }
+    assert_eq!(
+        h.agent_dir.join("guards-debug").canonicalize().unwrap(),
+        current.canonicalize().unwrap()
+    );
+
+    // Also verify common_dir discovery when syncing from a linked worktree root
+    let main_obsolete = create_mock_skill(&main_catalog, "main-obsolete", "1.0.0", "Main obsolete");
+    installer
+        .install(&main_obsolete, &h.target, &InstallOptions::default())
+        .unwrap();
+    fs::remove_dir_all(&wt_old).unwrap();
+    create_mock_skill(&worktree_catalog, "guards-debug", "1.0.0", "Renamed skill");
+    let wt_syncer = SkillSyncer::new(&worktree_catalog)
+        .with_target(h.target.clone())
+        .with_prune_orphans(true);
+    let wt_summary = wt_syncer.sync().unwrap();
+    assert_eq!(wt_summary.deleted, 1);
+    assert!(
+        h.agent_dir
+            .join("main-obsolete")
+            .symlink_metadata()
+            .is_err()
+    );
 }
 
 #[test]
