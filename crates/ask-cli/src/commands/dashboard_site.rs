@@ -1,10 +1,11 @@
 //! Native command implementations for static dashboard generation and lifecycle operations.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
-use std::time::{Duration, SystemTime};
+use std::process::Command;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use skills_core::artifacts::{
     ArtifactsEngine, ArtifactsOptions, DISCOVERY_SKILL_FILE, WELL_KNOWN_AGENT_SKILLS_DIR,
@@ -344,49 +345,113 @@ pub(crate) fn porcelain_drift(status: &str) -> Vec<&str> {
         .collect()
 }
 
-/// Restores generated manifests and cleans untracked dashboard artifacts after `run_lint`.
-pub(crate) fn restore_generated_paths(root: &Path) {
-    let _ = Command::new("git")
-        .args([
-            "checkout",
-            "--",
-            "README.md",
-            "agents/AGENTS.md",
-            "skills.sh.json",
-            "dashboard/content",
-        ])
-        .current_dir(root)
-        .status();
-    let _ = Command::new("git")
-        .args(["clean", "-fdq", "dashboard/content"])
-        .current_dir(root)
-        .status();
-    let _ = Command::new("git")
-        .args(["checkout", "--", WELL_KNOWN_STATIC_DIR])
-        .stderr(Stdio::null())
-        .current_dir(root)
-        .status();
-    let _ = Command::new("git")
-        .args(["clean", "-fdq", WELL_KNOWN_STATIC_DIR])
-        .current_dir(root)
-        .status();
+static STAGING_COUNTER: AtomicUsize = AtomicUsize::new(0);
+
+/// Scoped temporary directory used for non-destructive artifact staging during lint.
+struct StagingDir {
+    path: PathBuf,
 }
 
-/// Verifies committed documentation content matches freshly generated output without drift.
-#[allow(clippy::unused_async)]
-pub(crate) async fn run_lint() -> Result<(), CliError> {
-    let root = resolve_root()?;
+impl StagingDir {
+    fn new(prefix: &str) -> Result<Self, CliError> {
+        let pid = std::process::id();
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map_or(0, |d| d.as_nanos());
+        let seq = STAGING_COUNTER.fetch_add(1, Ordering::Relaxed);
+        let path = std::env::temp_dir().join(format!("{prefix}-{pid}-{nanos}-{seq}"));
+        std::fs::create_dir_all(&path).map_err(|err| SkillError::io(&path, err))?;
+        Ok(Self { path })
+    }
+
+    fn path(&self) -> &Path {
+        &self.path
+    }
+}
+
+impl Drop for StagingDir {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.path);
+    }
+}
+
+/// Recursively collects regular file paths under `dir`, formatted as POSIX paths relative to `base`.
+fn collect_relative_files(
+    base: &Path,
+    dir: &Path,
+    out: &mut BTreeSet<String>,
+) -> Result<(), CliError> {
+    if !dir.is_dir() {
+        return Ok(());
+    }
+    let entries = std::fs::read_dir(dir).map_err(|err| SkillError::io(dir, err))?;
+    for entry in entries {
+        let entry = entry.map_err(|err| SkillError::io(dir, err))?;
+        let path = entry.path();
+        if path.is_dir() {
+            collect_relative_files(base, &path, out)?;
+        } else if path.is_file()
+            && let Ok(rel) = path.strip_prefix(base)
+        {
+            out.insert(rel.to_string_lossy().replace('\\', "/"));
+        }
+    }
+    Ok(())
+}
+
+/// Compares generated dashboard trees between `staged_root` and `workspace_root` without modifying `workspace_root`.
+pub(crate) fn compare_generated_trees(
+    staged_root: &Path,
+    workspace_root: &Path,
+) -> Result<Vec<String>, CliError> {
+    let mut drifted = Vec::new();
+    for rel_tree in ["dashboard/content/skills", WELL_KNOWN_STATIC_DIR] {
+        let mut rel_files = BTreeSet::new();
+        collect_relative_files(staged_root, &staged_root.join(rel_tree), &mut rel_files)?;
+        collect_relative_files(
+            workspace_root,
+            &workspace_root.join(rel_tree),
+            &mut rel_files,
+        )?;
+
+        for rel_path in rel_files {
+            let staged_file = staged_root.join(&rel_path);
+            let workspace_file = workspace_root.join(&rel_path);
+            if !workspace_file.is_file() {
+                drifted.push(format!(" D {rel_path}"));
+            } else if !staged_file.is_file() {
+                drifted.push(format!("?? {rel_path}"));
+            } else {
+                let staged_bytes =
+                    std::fs::read(&staged_file).map_err(|err| SkillError::io(&staged_file, err))?;
+                let workspace_bytes = std::fs::read(&workspace_file)
+                    .map_err(|err| SkillError::io(&workspace_file, err))?;
+                if staged_bytes != workspace_bytes {
+                    drifted.push(format!(" M {rel_path}"));
+                }
+            }
+        }
+    }
+    Ok(drifted)
+}
+
+/// Verifies committed documentation content at `root` matches freshly staged output without mutating `root`.
+pub(crate) fn check_lint_at(root: &Path) -> Result<(), CliError> {
+    let staging = StagingDir::new("ask-dashboard-lint")?;
 
     let options = ArtifactsOptions {
         skip_dashboard: false,
         repo_only: false,
         no_stage: true,
+        output_root: Some(staging.path().to_path_buf()),
         ..Default::default()
     };
-    ArtifactsEngine::with_options(&root, options).generate_all()?;
+    ArtifactsEngine::with_options(root, options).generate_all()?;
+
+    let mut drifted = compare_generated_trees(staging.path(), root)?;
 
     let status = exec_tool_capture(
-        &root,
+        root,
         "git",
         &[
             "status",
@@ -398,8 +463,15 @@ pub(crate) async fn run_lint() -> Result<(), CliError> {
         "lint",
     )?;
 
-    let drifted = porcelain_drift(&status);
-    restore_generated_paths(&root);
+    for line in porcelain_drift(&status) {
+        let rel_path = line.get(3..).unwrap_or(line).trim();
+        let already_recorded = drifted
+            .iter()
+            .any(|entry| entry.get(3..).unwrap_or(entry).trim() == rel_path);
+        if !already_recorded {
+            drifted.push(line.to_string());
+        }
+    }
 
     if !drifted.is_empty() {
         eprintln!(
@@ -414,6 +486,13 @@ pub(crate) async fn run_lint() -> Result<(), CliError> {
 
     println!("Done! Dashboard content is committed and up to date.");
     Ok(())
+}
+
+/// Verifies committed documentation content matches freshly generated output without drift.
+#[allow(clippy::unused_async)]
+pub(crate) async fn run_lint() -> Result<(), CliError> {
+    let root = resolve_root()?;
+    check_lint_at(&root)
 }
 
 /// Spawns the Tailwind CSS watcher subprocess.
@@ -970,7 +1049,7 @@ mod tests {
     }
 
     #[test]
-    fn test_restore_generated_paths_survives_untracked_well_known() {
+    fn test_check_lint_at_preserves_unstaged_edits_and_untracked_files() {
         let temp = tempdir().expect("failed to create temp dir");
         let root = temp.path();
 
@@ -987,36 +1066,89 @@ mod tests {
         git(&["config", "user.email", "test@example.com"]);
         git(&["config", "user.name", "Test User"]);
 
+        let skill_dir = root.join("skills/engineering/demo-skill");
+        std::fs::create_dir_all(&skill_dir).unwrap();
+        std::fs::write(
+            skill_dir.join("SKILL.md"),
+            "---\nname: demo-skill\ndescription: Demo skill\n---\n# demo-skill\n\nBody.\n",
+        )
+        .unwrap();
         std::fs::create_dir_all(root.join("agents")).unwrap();
         std::fs::create_dir_all(root.join("dashboard/content")).unwrap();
         std::fs::create_dir_all(root.join("dashboard/static")).unwrap();
-
-        std::fs::write(root.join("README.md"), "committed readme\n").unwrap();
-        std::fs::write(root.join("agents/AGENTS.md"), "committed agents\n").unwrap();
-        std::fs::write(root.join("skills.sh.json"), "{}\n").unwrap();
         std::fs::write(root.join("dashboard/content/_index.md"), "committed page\n").unwrap();
         std::fs::write(root.join("dashboard/static/CNAME"), "skills.mahdtech.com\n").unwrap();
+
+        ArtifactsEngine::with_options(
+            root,
+            ArtifactsOptions {
+                no_stage: true,
+                ..Default::default()
+            },
+        )
+        .generate_all()
+        .unwrap();
 
         git(&["add", "."]);
         git(&["commit", "-m", "chore: initial fixture"]);
 
-        std::fs::write(root.join("README.md"), "dirty readme\n").unwrap();
-        let well_known_agent = root
-            .join("dashboard/static")
-            .join(WELL_KNOWN_AGENT_SKILLS_DIR);
-        let well_known_skills = root.join("dashboard/static").join(WELL_KNOWN_SKILLS_DIR);
-        std::fs::create_dir_all(&well_known_agent).unwrap();
-        std::fs::create_dir_all(&well_known_skills).unwrap();
-        std::fs::write(well_known_agent.join("index.json"), "{}\n").unwrap();
-        std::fs::write(well_known_skills.join("index.json"), "{}\n").unwrap();
+        // Clean committed state passes lint.
+        check_lint_at(root).expect("clean committed state should pass lint");
 
-        restore_generated_paths(root);
+        // Unstaged edits to non-dashboard files must be ignored by dashboard lint and preserved.
+        std::fs::write(root.join("README.md"), "dirty readme\n").unwrap();
+        std::fs::write(root.join("agents/AGENTS.md"), "dirty agents\n").unwrap();
+        std::fs::write(root.join("skills.sh.json"), "{\"dirty\":true}\n").unwrap();
+
+        check_lint_at(root).expect("dirty repo manifests should not fail dashboard lint");
+        assert_eq!(
+            std::fs::read_to_string(root.join("README.md")).unwrap(),
+            "dirty readme\n"
+        );
+        assert_eq!(
+            std::fs::read_to_string(root.join("agents/AGENTS.md")).unwrap(),
+            "dirty agents\n"
+        );
+        assert_eq!(
+            std::fs::read_to_string(root.join("skills.sh.json")).unwrap(),
+            "{\"dirty\":true}\n"
+        );
+
+        // Unstaged edit to dashboard/content/_index.md and untracked files under dashboard/content
+        // and dashboard/static/.well-known must fail lint WITHOUT reverting or deleting them.
+        std::fs::write(root.join("dashboard/content/_index.md"), "dirty landing\n").unwrap();
+        let untracked_content = root.join("dashboard/content/untracked-draft.md");
+        std::fs::write(&untracked_content, "draft content\n").unwrap();
+        let untracked_well_known = root.join(WELL_KNOWN_STATIC_DIR).join("extra.json");
+        std::fs::write(&untracked_well_known, "{\"extra\":true}\n").unwrap();
+
+        let err = check_lint_at(root).expect_err("dirty dashboard files should fail lint");
+        assert!(matches!(err, CliError::Subprocess { code: Some(1), .. }));
 
         assert_eq!(
             std::fs::read_to_string(root.join("README.md")).unwrap(),
-            "committed readme\n"
+            "dirty readme\n"
         );
-        assert!(!root.join(WELL_KNOWN_STATIC_DIR).exists());
+        assert_eq!(
+            std::fs::read_to_string(root.join("agents/AGENTS.md")).unwrap(),
+            "dirty agents\n"
+        );
+        assert_eq!(
+            std::fs::read_to_string(root.join("skills.sh.json")).unwrap(),
+            "{\"dirty\":true}\n"
+        );
+        assert_eq!(
+            std::fs::read_to_string(root.join("dashboard/content/_index.md")).unwrap(),
+            "dirty landing\n"
+        );
+        assert_eq!(
+            std::fs::read_to_string(&untracked_content).unwrap(),
+            "draft content\n"
+        );
+        assert_eq!(
+            std::fs::read_to_string(&untracked_well_known).unwrap(),
+            "{\"extra\":true}\n"
+        );
         assert_eq!(
             std::fs::read_to_string(root.join("dashboard/static/CNAME")).unwrap(),
             "skills.mahdtech.com\n"
@@ -1106,7 +1238,7 @@ mod tests {
     }
 
     #[test]
-    fn test_restore_generated_paths_restores_modified_tracked_well_known() {
+    fn test_check_lint_at_detects_content_and_well_known_drift_without_mutating_workspace() {
         let temp = tempdir().expect("failed to create temp dir");
         let root = temp.path();
 
@@ -1123,47 +1255,100 @@ mod tests {
         git(&["config", "user.email", "test@example.com"]);
         git(&["config", "user.name", "Test User"]);
 
-        let well_known_agent = root
-            .join("dashboard/static")
-            .join(WELL_KNOWN_AGENT_SKILLS_DIR);
-        let well_known_skills = root.join("dashboard/static").join(WELL_KNOWN_SKILLS_DIR);
+        let skill_dir = root.join("skills/engineering/demo-skill");
+        std::fs::create_dir_all(&skill_dir).unwrap();
+        std::fs::write(
+            skill_dir.join("SKILL.md"),
+            "---\nname: demo-skill\ndescription: Initial description\n---\n# demo-skill\n\nInitial body.\n",
+        )
+        .unwrap();
         std::fs::create_dir_all(root.join("agents")).unwrap();
         std::fs::create_dir_all(root.join("dashboard/content")).unwrap();
-        std::fs::create_dir_all(&well_known_agent).unwrap();
-        std::fs::create_dir_all(&well_known_skills).unwrap();
-
-        let committed_agent_json = "{\"$schema\":\"v2\",\"skills\":[]}\n";
-        let committed_skills_json = "{\"skills\":[]}\n";
-        std::fs::write(root.join("README.md"), "committed readme\n").unwrap();
-        std::fs::write(root.join("agents/AGENTS.md"), "committed agents\n").unwrap();
-        std::fs::write(root.join("skills.sh.json"), "{}\n").unwrap();
         std::fs::write(root.join("dashboard/content/_index.md"), "committed page\n").unwrap();
-        std::fs::write(root.join("dashboard/static/CNAME"), "skills.mahdtech.com\n").unwrap();
-        std::fs::write(well_known_agent.join("index.json"), committed_agent_json).unwrap();
-        std::fs::write(well_known_skills.join("index.json"), committed_skills_json).unwrap();
+
+        ArtifactsEngine::with_options(
+            root,
+            ArtifactsOptions {
+                no_stage: true,
+                ..Default::default()
+            },
+        )
+        .generate_all()
+        .unwrap();
 
         git(&["add", "."]);
         git(&["commit", "-m", "chore: initial fixture"]);
 
-        std::fs::write(well_known_agent.join("index.json"), "{\"dirty\":true}\n").unwrap();
-        std::fs::write(well_known_skills.join("index.json"), "{\"dirty\":true}\n").unwrap();
-        let extra_file = root.join(WELL_KNOWN_STATIC_DIR).join("extra.json");
-        std::fs::write(&extra_file, "{}\n").unwrap();
+        let generated_skill_page =
+            root.join("dashboard/content/skills/engineering/demo-skill/_index.md");
+        let original_skill_page = std::fs::read_to_string(&generated_skill_page).unwrap();
 
-        restore_generated_paths(root);
+        // Modify source skill without regenerating dashboard artifacts.
+        std::fs::write(
+            skill_dir.join("SKILL.md"),
+            "---\nname: demo-skill\ndescription: Updated description\n---\n# demo-skill\n\nUpdated body.\n",
+        )
+        .unwrap();
 
+        let err = check_lint_at(root).expect_err("stale dashboard artifacts should fail lint");
+        assert!(matches!(err, CliError::Subprocess { code: Some(1), .. }));
+
+        // Workspace dashboard files must remain untouched by check_lint_at.
         assert_eq!(
-            std::fs::read_to_string(well_known_agent.join("index.json")).unwrap(),
-            committed_agent_json
+            std::fs::read_to_string(&generated_skill_page).unwrap(),
+            original_skill_page
         );
+    }
+
+    #[test]
+    fn test_compare_generated_trees_reports_missing_extra_and_modified_files() {
+        let staged_temp = tempdir().expect("failed to create staged temp dir");
+        let workspace_temp = tempdir().expect("failed to create workspace temp dir");
+        let staged = staged_temp.path();
+        let workspace = workspace_temp.path();
+
+        let staged_skill_dir = staged.join("dashboard/content/skills/engineering/alpha");
+        let ws_skill_dir = workspace.join("dashboard/content/skills/engineering/alpha");
+        std::fs::create_dir_all(&staged_skill_dir).unwrap();
+        std::fs::create_dir_all(&ws_skill_dir).unwrap();
+
+        // Missing in workspace (" D ")
+        std::fs::write(staged_skill_dir.join("missing.md"), "staged only\n").unwrap();
+
+        // Extra in workspace ("?? ")
+        std::fs::write(ws_skill_dir.join("extra.md"), "workspace only\n").unwrap();
+
+        // Modified between staged and workspace (" M ")
+        std::fs::write(staged_skill_dir.join("_index.md"), "fresh content\n").unwrap();
+        std::fs::write(ws_skill_dir.join("_index.md"), "stale content\n").unwrap();
+
+        // Matching file (not reported)
+        let staged_wk = staged
+            .join("dashboard/static")
+            .join(WELL_KNOWN_AGENT_SKILLS_DIR);
+        let ws_wk = workspace
+            .join("dashboard/static")
+            .join(WELL_KNOWN_AGENT_SKILLS_DIR);
+        std::fs::create_dir_all(&staged_wk).unwrap();
+        std::fs::create_dir_all(&ws_wk).unwrap();
+        std::fs::write(staged_wk.join("index.json"), "{}\n").unwrap();
+        std::fs::write(ws_wk.join("index.json"), "{}\n").unwrap();
+
+        // Hand-authored dashboard/content/_index.md outside skills/ is ignored by compare_generated_trees.
+        std::fs::write(
+            workspace.join("dashboard/content/_index.md"),
+            "hand authored\n",
+        )
+        .unwrap();
+
+        let drifted = compare_generated_trees(staged, workspace).unwrap();
         assert_eq!(
-            std::fs::read_to_string(well_known_skills.join("index.json")).unwrap(),
-            committed_skills_json
-        );
-        assert!(!extra_file.exists());
-        assert_eq!(
-            std::fs::read_to_string(root.join("dashboard/static/CNAME")).unwrap(),
-            "skills.mahdtech.com\n"
+            drifted,
+            vec![
+                " M dashboard/content/skills/engineering/alpha/_index.md".to_string(),
+                "?? dashboard/content/skills/engineering/alpha/extra.md".to_string(),
+                " D dashboard/content/skills/engineering/alpha/missing.md".to_string(),
+            ]
         );
     }
 
