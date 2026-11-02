@@ -4,6 +4,12 @@
 <div class="flex gap-8">
   <article class="prose max-w-none flex-1 min-w-0" data-pagefind-body>
 
+    {# Archive banner #}
+    {% if page.extra.archived %}
+      <div class="p-4 mb-6 rounded-md text-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-muted)">
+        Archived on {{ page.extra.archived }}.{% if page.extra.replaced_by %} Replaced by {{ page.extra.replaced_by }}.{% endif %} Not installed by <code>npx skills add MAHDTech/agent-skills</code>; source: <a href="{{ page.extra.source_url }}" target="_blank" rel="noopener noreferrer">{{ page.extra.source_url }}</a>.
+      </div>
+    {% endif %}
 
     {# Metadata bar #}
     <div class="flex flex-wrap gap-4 text-sm !mt-1" style="color: var(--color-muted)">
