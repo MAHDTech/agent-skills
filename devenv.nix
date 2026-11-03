@@ -197,6 +197,8 @@ in
         enable = true;
         name = "Dashboard Lint";
         entry = "cargo run -p ask-cli -- dashboard lint";
+        files = "^(skills(-archive)?/.*\\.md$|dashboard/(content|themes|css)/|dashboard/config\\.toml$)";
+        excludes = [ ];
         always_run = true;
         pass_filenames = false;
         require_serial = true;

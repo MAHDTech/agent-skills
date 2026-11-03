@@ -29,6 +29,20 @@ fn vendor_cli_refreshes_a_local_source_without_fetching_its_documentation() {
         ),
     )
     .unwrap();
+    let source_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap();
+    for rel in ["dashboard/config.toml", "dashboard/content/_index.md"] {
+        let dst = catalog.join(rel);
+        std::fs::create_dir_all(dst.parent().unwrap()).unwrap();
+        std::fs::copy(source_root.join(rel), dst).unwrap();
+    }
+    copy_dir_recursive(
+        &source_root.join("dashboard/themes/tars-dashboards"),
+        &catalog.join("dashboard/themes/tars-dashboards"),
+    );
     for dir in [&upstream, &catalog] {
         for args in [
             vec!["init"],

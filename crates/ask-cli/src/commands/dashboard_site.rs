@@ -435,6 +435,16 @@ pub(crate) fn compare_generated_trees(
     Ok(drifted)
 }
 
+/// Validates Zola configuration, Tera templates, and internal links without fetching external URLs.
+pub(crate) fn check_zola_site(root: &Path) -> Result<(), CliError> {
+    exec_tool(
+        root,
+        "zola",
+        &["--root", "dashboard", "check", "--skip-external-links"],
+        "lint",
+    )
+}
+
 /// Verifies committed documentation content at `root` matches freshly staged output without mutating `root`.
 pub(crate) fn check_lint_at(root: &Path) -> Result<(), CliError> {
     let staging = StagingDir::new("ask-dashboard-lint")?;
@@ -484,15 +494,17 @@ pub(crate) fn check_lint_at(root: &Path) -> Result<(), CliError> {
         });
     }
 
-    println!("Done! Dashboard content is committed and up to date.");
     Ok(())
 }
 
-/// Verifies committed documentation content matches freshly generated output without drift.
+/// Verifies committed documentation content matches freshly generated output without drift and passes Zola validation.
 #[allow(clippy::unused_async)]
 pub(crate) async fn run_lint() -> Result<(), CliError> {
     let root = resolve_root()?;
-    check_lint_at(&root)
+    check_lint_at(&root)?;
+    check_zola_site(&root)?;
+    println!("Done! Dashboard content is committed and up to date.");
+    Ok(())
 }
 
 /// Spawns the Tailwind CSS watcher subprocess.
@@ -1422,5 +1434,60 @@ mod tests {
 
         assert!(!root.join("dashboard/skill_dates.toml").exists());
         assert!(!root.join("dashboard/public").exists());
+    }
+
+    #[test]
+    fn test_check_zola_site_succeeds_on_valid_fixture() {
+        let temp = tempdir().expect("failed to create temp dir");
+        let root = temp.path();
+        let dashboard = root.join("dashboard");
+        std::fs::create_dir_all(dashboard.join("content")).unwrap();
+        std::fs::create_dir_all(dashboard.join("templates")).unwrap();
+        std::fs::write(
+            dashboard.join("config.toml"),
+            "base_url = \"https://example.com\"\ncompile_sass = false\nbuild_search_index = false\n",
+        )
+        .unwrap();
+        std::fs::write(
+            dashboard.join("content/_index.md"),
+            "+++\ntitle = \"Home\"\n+++\n# Home\n",
+        )
+        .unwrap();
+        std::fs::write(
+            dashboard.join("templates/index.html"),
+            "<!doctype html><html><body>{{ section.title }}</body></html>\n",
+        )
+        .unwrap();
+
+        assert!(check_zola_site(root).is_ok());
+    }
+
+    #[test]
+    fn test_check_zola_site_fails_on_broken_template_or_config() {
+        let temp = tempdir().expect("failed to create temp dir");
+        let root = temp.path();
+        let dashboard = root.join("dashboard");
+        std::fs::create_dir_all(dashboard.join("content")).unwrap();
+        std::fs::create_dir_all(dashboard.join("templates")).unwrap();
+        std::fs::write(
+            dashboard.join("config.toml"),
+            "base_url = \"https://example.com\"\ncompile_sass = false\nbuild_search_index = false\n",
+        )
+        .unwrap();
+        std::fs::write(
+            dashboard.join("content/_index.md"),
+            "+++\ntitle = \"Home\"\n+++\n# Home\n",
+        )
+        .unwrap();
+        std::fs::write(
+            dashboard.join("templates/index.html"),
+            "<!doctype html><html><body>{{ unclosed</body></html>\n",
+        )
+        .unwrap();
+
+        assert!(matches!(
+            check_zola_site(root),
+            Err(CliError::Subprocess { .. })
+        ));
     }
 }
