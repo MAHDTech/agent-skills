@@ -37,6 +37,53 @@ impl OutputFormat {
     }
 }
 
+/// Installation strategy for `ask skills sync`.
+#[derive(ValueEnum, Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub enum SyncInstallMode {
+    /// Automatically attempts symlink mode and falls back to copy mode if unsupported.
+    #[default]
+    #[value(
+        name = "auto",
+        help = "Automatically prefer symlinks with copy fallback"
+    )]
+    Auto,
+
+    /// Creates filesystem symbolic links pointing to the catalog skill directory.
+    #[value(name = "symlink", help = "Install skills as symbolic links")]
+    Symlink,
+
+    /// Recursively copies skill files into the target environment directory.
+    #[value(name = "copy", help = "Copy skill files into the target directory")]
+    Copy,
+}
+
+/// Conflict resolution policy for `ask skills sync`.
+#[derive(ValueEnum, Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub enum SyncConflictStrategy {
+    /// Local catalog state overwrites conflicting target state with backup creation.
+    #[default]
+    #[value(
+        name = "local-wins",
+        help = "Overwrite conflicting target skills with local catalog versions"
+    )]
+    LocalWins,
+
+    /// Target state is preserved and conflicting local catalog changes are skipped.
+    #[value(
+        name = "remote-wins",
+        help = "Preserve existing conflicting skills in the target environment"
+    )]
+    RemoteWins,
+
+    /// Aborts on unresolved conflicts in headless or non-interactive execution.
+    #[value(
+        name = "prompt-user",
+        alias = "prompt",
+        help = "Abort on conflict unless resolved interactively"
+    )]
+    PromptUser,
+}
+
 /// Unified command-line interface for the Agent Skills ecosystem.
 #[derive(Parser, Debug, Clone)]
 #[command(
@@ -120,7 +167,7 @@ pub struct SkillsArgs {
     #[arg(value_name = "SOURCE", requires = "action")]
     pub source: Option<String>,
 
-    /// Target for install/uninstall actions; defaults to all standard targets.
+    /// Target for install/uninstall/sync actions; defaults to all standard targets.
     #[arg(short, long, requires = "action")]
     pub target: Option<String>,
 
@@ -202,6 +249,50 @@ pub enum SkillsCommands {
     /// Install current skills and remove obsolete catalog-owned installations.
     #[command(about = "Install current skills and remove obsolete catalog-owned installations")]
     Sync {
+        /// Target execution environment; defaults to all standard targets.
+        #[arg(
+            short,
+            long,
+            help = "Target execution environment; defaults to all standard targets"
+        )]
+        target: Option<String>,
+
+        /// Installation mode for synchronized skills.
+        #[arg(
+            long,
+            value_enum,
+            default_value_t = SyncInstallMode::Auto,
+            help = "Installation mode for synchronized skills"
+        )]
+        mode: SyncInstallMode,
+
+        /// Conflict resolution strategy when target skills diverge.
+        #[arg(
+            long,
+            value_enum,
+            default_value_t = SyncConflictStrategy::LocalWins,
+            help = "Conflict resolution strategy when target skills diverge"
+        )]
+        strategy: SyncConflictStrategy,
+
+        /// Remove obsolete catalog-owned skill installations from target environments.
+        #[arg(
+            long,
+            default_value_t = true,
+            num_args = 0..=1,
+            default_missing_value = "true",
+            action = clap::ArgAction::Set,
+            help = "Remove obsolete catalog-owned skill installations from target environments"
+        )]
+        prune_orphans: bool,
+
+        /// Skip machine target synchronization and only update repository artifacts.
+        #[arg(
+            long,
+            help = "Skip machine target synchronization and only update repository artifacts"
+        )]
+        repo_only: bool,
+
         /// Simulate synchronization actions without writing changes to disk.
         #[arg(
             long,
@@ -304,4 +395,118 @@ pub struct TuiArgs {
         help = "Initial active view tab (explorer, inspector, linter, runner)"
     )]
     pub start_view: Option<String>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn parse_sync_command(args: &[&str]) -> SkillsCommands {
+        let cli = Cli::try_parse_from(args).expect("CLI arguments should parse");
+        match cli.command {
+            Some(Commands::Skills(skills_args)) => {
+                skills_args.command.expect("Skills subcommand should exist")
+            }
+            other => panic!("Expected Skills command, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_skills_sync_defaults() {
+        let cmd = parse_sync_command(&["ask", "skills", "sync"]);
+        assert_eq!(
+            cmd,
+            SkillsCommands::Sync {
+                target: None,
+                mode: SyncInstallMode::Auto,
+                strategy: SyncConflictStrategy::LocalWins,
+                prune_orphans: true,
+                repo_only: false,
+                dry_run: false,
+            }
+        );
+    }
+
+    #[test]
+    fn test_skills_sync_custom_flags() {
+        let cmd = parse_sync_command(&[
+            "ask",
+            "skills",
+            "sync",
+            "--target",
+            "cursor",
+            "--mode",
+            "copy",
+            "--strategy",
+            "remote-wins",
+            "--prune-orphans=false",
+            "--repo-only",
+            "--dry-run",
+        ]);
+        assert_eq!(
+            cmd,
+            SkillsCommands::Sync {
+                target: Some("cursor".to_string()),
+                mode: SyncInstallMode::Copy,
+                strategy: SyncConflictStrategy::RemoteWins,
+                prune_orphans: false,
+                repo_only: true,
+                dry_run: true,
+            }
+        );
+    }
+
+    #[test]
+    fn test_skills_sync_prune_orphans_variations() {
+        let bare = parse_sync_command(&["ask", "skills", "sync", "--prune-orphans"]);
+        assert_eq!(
+            bare,
+            SkillsCommands::Sync {
+                target: None,
+                mode: SyncInstallMode::Auto,
+                strategy: SyncConflictStrategy::LocalWins,
+                prune_orphans: true,
+                repo_only: false,
+                dry_run: false,
+            }
+        );
+
+        let explicit_true = parse_sync_command(&["ask", "skills", "sync", "--prune-orphans=true"]);
+        assert_eq!(
+            explicit_true,
+            SkillsCommands::Sync {
+                target: None,
+                mode: SyncInstallMode::Auto,
+                strategy: SyncConflictStrategy::LocalWins,
+                prune_orphans: true,
+                repo_only: false,
+                dry_run: false,
+            }
+        );
+
+        let space_false_and_alias = parse_sync_command(&[
+            "ask",
+            "skills",
+            "sync",
+            "-t",
+            "claude",
+            "--mode",
+            "symlink",
+            "--strategy",
+            "prompt",
+            "--prune-orphans",
+            "false",
+        ]);
+        assert_eq!(
+            space_false_and_alias,
+            SkillsCommands::Sync {
+                target: Some("claude".to_string()),
+                mode: SyncInstallMode::Symlink,
+                strategy: SyncConflictStrategy::PromptUser,
+                prune_orphans: false,
+                repo_only: false,
+                dry_run: false,
+            }
+        );
+    }
 }
