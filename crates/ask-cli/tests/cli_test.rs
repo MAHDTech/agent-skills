@@ -794,6 +794,29 @@ fn test_dashboard_summary_json() {
 }
 
 #[test]
+fn test_dashboard_summary_plain() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["dashboard", "summary", "--format", "plain"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("Total Skills: "))
+        .stdout(predicate::str::contains("Active Skills: "))
+        .stdout(predicate::str::contains("Overall Health Score: "))
+        .stdout(predicate::str::contains("Clean Skills: "))
+        .stdout(predicate::str::contains("Static Analysis Errors: "))
+        .stdout(predicate::str::contains("Static Analysis Warnings: "))
+        .stdout(predicate::str::contains("Engineering\t"))
+        .stdout(predicate::str::contains("Antigravity\t"))
+        .stdout(predicate::str::contains("Catalog Overview Metric").not())
+        .stdout(predicate::str::contains("Diagnostic Quality Metric").not())
+        .stdout(predicate::str::contains("╭").not())
+        .stdout(predicate::str::contains("│").not())
+        .stdout(predicate::str::contains("╰").not());
+}
+
+#[test]
 fn test_tui_help_flags() {
     Command::cargo_bin("ask")
         .unwrap()
