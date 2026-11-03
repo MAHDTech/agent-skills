@@ -51,6 +51,20 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 CODEQL_LOCK_DIR="${HOME}/.codeql"
 CODEQL_LOCK_FILE="${CODEQL_LOCK_DIR}/codeql.lock"
+CODEQL_LOCK_ACQUIRED=false
+
+# Release lock on exit, Ctrl-C, HUP, or failure - clear identity if held and close fd.
+release_lock() {
+	local sig="${1:-EXIT}"
+	trap - EXIT INT TERM HUP
+	if [[ ${CODEQL_LOCK_ACQUIRED:-false} == "true" ]]; then
+		truncate -s 0 "${CODEQL_LOCK_FILE}" 2>/dev/null || true
+	fi
+	exec 9>&- 2>/dev/null || true
+	if [[ ${sig} != "EXIT" ]]; then
+		kill -s "${sig}" $$
+	fi
+}
 
 acquire_lock() {
 	mkdir -p "${CODEQL_LOCK_DIR}"
@@ -61,7 +75,12 @@ acquire_lock() {
 
 	# Open with >> (append) so the current holder's identity is not truncated
 	# before we've had a chance to read it. flock works on any open mode.
+	CODEQL_LOCK_ACQUIRED=false
 	exec 9>>"${CODEQL_LOCK_FILE}"
+	trap 'release_lock EXIT' EXIT
+	trap 'release_lock INT' INT
+	trap 'release_lock TERM' TERM
+	trap 'release_lock HUP' HUP
 
 	if ! flock --nonblock 9 2>/dev/null; then
 		local holder
@@ -73,32 +92,22 @@ acquire_lock() {
 			sleep ${poll}
 			waited=$((waited + poll))
 			if [[ ${waited} -ge ${timeout} ]]; then
-				log_error "Timed out waiting ${timeout}s for CodeQL lock."
-				log_error "If no other scan is running, remove manually: ${CODEQL_LOCK_FILE}"
-				exec 9>&-
+				local current_holder
+				current_holder=$(cat "${CODEQL_LOCK_FILE}" 2>/dev/null || true)
+				[[ -z ${current_holder} ]] && current_holder="${holder}"
+				log_error "Timed out waiting ${timeout}s for CodeQL lock (held by: ${current_holder})."
+				log_error "Inspect whether the recorded PID is still running (e.g., ps -p <pid>) before retrying; do not delete ${CODEQL_LOCK_FILE}."
 				exit 1
 			fi
 			log_info "Still waiting... (${waited}s elapsed)"
 		done
 	fi
 
+	CODEQL_LOCK_ACQUIRED=true
+
 	# Truncate then write our identity so the file stays a single clean line.
 	truncate -s 0 "${CODEQL_LOCK_FILE}"
 	echo "pid=$$, repo=${PROJECT_ROOT}, started=$(date -Iseconds)" >&9
-
-	# Release lock on exit, Ctrl-C, or failure - clear identity and close fd.
-	release_lock() {
-		local sig="${1:-EXIT}"
-		trap - EXIT INT TERM
-		truncate -s 0 "${CODEQL_LOCK_FILE}" 2>/dev/null || true
-		exec 9>&- 2>/dev/null || true
-		if [[ ${sig} != "EXIT" ]]; then
-			kill -s "${sig}" $$
-		fi
-	}
-	trap 'release_lock EXIT' EXIT
-	trap 'release_lock INT' INT
-	trap 'release_lock TERM' TERM
 
 	log_info "Lock acquired (${CODEQL_LOCK_FILE})"
 }
