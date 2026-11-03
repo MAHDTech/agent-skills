@@ -37,14 +37,14 @@ jobs:
 
       - id: upload_pages_artifact
         name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: ./dashboard/public
           include-hidden-files: true
 
       - id: deploy_to_gh_pages
         name: Deploy to GH Pages
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
       - id: report_status
         name: Report Deployment Status
