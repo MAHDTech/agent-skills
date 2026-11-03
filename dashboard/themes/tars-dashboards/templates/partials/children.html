@@ -15,7 +15,7 @@
         <li>
           <a href="{{ subsection.permalink }}">{{ subsection.title }}</a>
           {% if subsection.description %}
-            <span style="color: var(--color-muted)"> — {{ subsection.description }}</span>
+            <span style="color: var(--color-muted)"> - {{ subsection.description }}</span>
           {% endif %}
         </li>
       {% endfor %}
@@ -32,7 +32,7 @@
             <span style="color: var(--color-muted)" class="text-sm ml-2">{{ page.date | date(format="%Y-%m-%d") }}</span>
           {% endif %}
           {% if page.description %}
-            <span style="color: var(--color-muted)"> — {{ page.description }}</span>
+            <span style="color: var(--color-muted)"> - {{ page.description }}</span>
           {% endif %}
         </li>
       {% endfor %}
