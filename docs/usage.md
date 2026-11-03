@@ -35,3 +35,14 @@ The `sync` action regenerates `README.md`, `agents/AGENTS.md`, the dashboard con
 ## Development
 
 Use `devenv --no-tui shell` to enter the development environment with all required tools (Rust, Zola, Tailwind CSS, Pagefind, and the rest) on your PATH.
+
+## Architecture Decision Records
+
+Architectural decisions for the repository tooling, catalog rules, and dashboard pipeline are recorded in `docs/adr/`:
+
+- [ADR 0001: Rewrite Developer and Dashboard Tooling in Rust](./adr/0001-rust-tooling-migration.md) - Migrates internal developer tooling from Bun and TypeScript to a unified Rust Cargo workspace while keeping downstream consumer installation decoupled.
+- [ADR 0002: Unified CLI Architecture and Ratatui TUI](./adr/0002-unified-cli-and-tui.md) - Consolidates skill and dashboard operations into the single `ask` binary with Clap subcommands and an interactive Ratatui terminal UI.
+- [ADR 0003: Managed Vendor Snapshots in the Shared Catalog](./adr/0003-managed-vendor-snapshots.md) - Commits declarative upstream vendor skill snapshots under `skills/vendor/<vendor>/<skill>/` from `vendor-skills.yaml` with per-source staging and collision checks.
+- [ADR 0004: Skills Archive Layout and Cohesive Group Cross-Reference Policy](./adr/0004-skills-archive-and-group-policy.md) - Moves retired skills to `skills-archive/<category>/<name>/` so installers skip them while preserving category history, and enforces `metadata.group` cross-reference rules across live skills.
+- [ADR 0005: Deterministic Generated Artifact Synchronization Engine](./adr/0005-generated-artifact-sync-engine.md) - Centralizes generation of `README.md`, `agents/AGENTS.md`, `skills.sh.json`, `dashboard/content/skills/`, and `.well-known` discovery manifests in `ArtifactsEngine`, separate from local host symlink installation.
+- [ADR 0006: Static Dashboard Site Pipeline with Tailwind CSS, Zola, and Pagefind](./adr/0006-static-dashboard-site-pipeline.md) - Splits `ask dashboard` into fast in-memory catalog telemetry and the static-site build, serve, CSS, and staging lint pipeline.
