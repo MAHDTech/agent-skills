@@ -16,5 +16,4 @@ skills-core = { workspace = true }
 ratatui = { workspace = true }
 crossterm = { workspace = true }
 tokio = { workspace = true }
-color-eyre = { workspace = true }
 futures = { workspace = true }
