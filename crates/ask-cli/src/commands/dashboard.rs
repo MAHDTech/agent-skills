@@ -3,12 +3,14 @@
 #[path = "dashboard_site.rs"]
 mod dashboard_site;
 
+use std::fmt::Write as _;
+
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, Table};
 
 use crate::cli::{DashboardArgs, DashboardCommands, OutputFormat};
 use crate::commands::{CliError, resolve_root};
-use skills_core::dashboard::DashboardEngine;
+use skills_core::dashboard::{DashboardEngine, DashboardSummary};
 use skills_core::error::SkillError;
 
 /// Dispatches dashboard telemetry and static documentation operations.
@@ -62,6 +64,8 @@ async fn run_summary(format: OutputFormat) -> Result<(), CliError> {
     } else if format == OutputFormat::Yaml {
         let yaml = serde_yaml::to_string(&summary).map_err(|e| SkillError::yaml(&root, e))?;
         println!("{yaml}");
+    } else if format == OutputFormat::Plain {
+        print!("{}", format_summary_plain(&summary));
     } else {
         // Table 1: Catalog Overview
         let mut overview_table = Table::new();
@@ -196,4 +200,71 @@ async fn run_summary(format: OutputFormat) -> Result<(), CliError> {
     }
 
     Ok(())
+}
+
+fn format_summary_plain(summary: &DashboardSummary) -> String {
+    let mut out = String::new();
+
+    let _ = writeln!(out, "Total Skills: {}", summary.total_skills);
+    let _ = writeln!(out, "Active Skills: {}", summary.active_skills);
+    let _ = writeln!(out, "Inactive Skills: {}", summary.inactive_skills);
+    let _ = writeln!(out, "Promoted Skills: {}", summary.promoted_skills);
+    let _ = writeln!(out, "Lifecycle Skills: {}", summary.lifecycle_skills);
+    let _ = writeln!(out, "User Invoked Skills: {}", summary.user_invoked_skills);
+    let _ = writeln!(
+        out,
+        "Model Invoked Skills: {}",
+        summary.model_invoked_skills
+    );
+    let _ = writeln!(out, "Forked Skills: {}", summary.forked_skills);
+    let _ = writeln!(out, "Total Tokens: {}", summary.total_tokens);
+    let _ = writeln!(out, "Average Prompt Tokens: {}", summary.avg_prompt_tokens);
+    let _ = writeln!(out, "Min Prompt Tokens: {}", summary.min_prompt_tokens);
+    let _ = writeln!(out, "Max Prompt Tokens: {}", summary.max_prompt_tokens);
+
+    out.push('\n');
+    let _ = writeln!(out, "Overall Health Score: {:.1}%", summary.health.score);
+    let _ = writeln!(
+        out,
+        "Clean Skills: {} ({:.1}%)",
+        summary.health.clean_skills, summary.health.clean_percentage
+    );
+    let _ = writeln!(
+        out,
+        "Static Analysis Errors: {}",
+        summary.health.total_errors
+    );
+    let _ = writeln!(
+        out,
+        "Static Analysis Warnings: {}",
+        summary.health.total_warnings
+    );
+
+    out.push('\n');
+    for cat in &summary.categories {
+        let _ = writeln!(
+            out,
+            "{}\t{}\t{:.1}%\t{}\t{}\t{}",
+            cat.category.title(),
+            cat.count,
+            cat.percentage,
+            cat.total_tokens,
+            cat.promoted_count,
+            cat.lifecycle_count
+        );
+    }
+
+    out.push('\n');
+    for target in &summary.targets {
+        let _ = writeln!(
+            out,
+            "{}\t{}\t{}\t{:.1}%",
+            target.environment.display_name(),
+            target.installed_count,
+            target.active_count,
+            target.percentage
+        );
+    }
+
+    out
 }
