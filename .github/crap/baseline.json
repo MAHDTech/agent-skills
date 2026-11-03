@@ -64,27 +64,78 @@
       ]
     },
     {
+      "coverage": 100.0,
+      "crap": 1.0,
+      "crate": "ask-cli",
+      "cyclomatic": 1.0,
+      "file": "crates/ask-cli/src/commands/dashboard_site.rs",
+      "function": "StagingDir::drop",
+      "line": 373
+    },
+    {
+      "coverage": 100.0,
+      "crap": 1.2,
+      "crate": "ask-cli",
+      "cyclomatic": 1.2,
+      "file": "crates/ask-cli/src/commands/dashboard_site.rs",
+      "function": "StagingDir::new",
+      "line": 356
+    },
+    {
+      "coverage": 100.0,
+      "crap": 1.0,
+      "crate": "ask-cli",
+      "cyclomatic": 1.0,
+      "file": "crates/ask-cli/src/commands/dashboard_site.rs",
+      "function": "StagingDir::path",
+      "line": 367
+    },
+    {
       "coverage": 76.36363636363637,
       "crap": 4.655650909090909,
       "crate": "ask-cli",
       "cyclomatic": 4.4,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "build_site",
-      "line": 241,
+      "line": 242,
       "uncovered": [
         {
-          "end": 264,
-          "start": 264
+          "end": 265,
+          "start": 265
         },
         {
-          "end": 293,
-          "start": 283
+          "end": 294,
+          "start": 284
         },
         {
-          "end": 300,
-          "start": 300
+          "end": 301,
+          "start": 301
         }
       ]
+    },
+    {
+      "coverage": 97.5609756097561,
+      "crap": 4.800334295787931,
+      "crate": "ask-cli",
+      "cyclomatic": 4.8,
+      "file": "crates/ask-cli/src/commands/dashboard_site.rs",
+      "function": "check_lint_at",
+      "line": 449,
+      "uncovered": [
+        {
+          "end": 474,
+          "start": 474
+        }
+      ]
+    },
+    {
+      "coverage": 100.0,
+      "crap": 1.0,
+      "crate": "ask-cli",
+      "cyclomatic": 1.0,
+      "file": "crates/ask-cli/src/commands/dashboard_site.rs",
+      "function": "check_zola_site",
+      "line": 439
     },
     {
       "coverage": 63.63636363636363,
@@ -93,15 +144,30 @@
       "cyclomatic": 8.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "clean_output_dir",
-      "line": 207,
+      "line": 208,
       "uncovered": [
         {
-          "end": 212,
-          "start": 212
+          "end": 213,
+          "start": 213
         },
         {
-          "end": 235,
-          "start": 225
+          "end": 236,
+          "start": 226
+        }
+      ]
+    },
+    {
+      "coverage": 95.23809523809523,
+      "crap": 6.604703595724003,
+      "crate": "ask-cli",
+      "cyclomatic": 6.6,
+      "file": "crates/ask-cli/src/commands/dashboard_site.rs",
+      "function": "collect_relative_files",
+      "line": 379,
+      "uncovered": [
+        {
+          "end": 385,
+          "start": 385
         }
       ]
     },
@@ -112,7 +178,22 @@
       "cyclomatic": 6.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "collect_snapshot_recursive",
-      "line": 576
+      "line": 667
+    },
+    {
+      "coverage": 96.66666666666667,
+      "crap": 6.801712592592592,
+      "crate": "ask-cli",
+      "cyclomatic": 6.8,
+      "file": "crates/ask-cli/src/commands/dashboard_site.rs",
+      "function": "compare_generated_trees",
+      "line": 403,
+      "uncovered": [
+        {
+          "end": 415,
+          "start": 415
+        }
+      ]
     },
     {
       "coverage": 95.23809523809523,
@@ -121,11 +202,11 @@
       "cyclomatic": 5.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "exec_tool",
-      "line": 27,
+      "line": 28,
       "uncovered": [
         {
-          "end": 51,
-          "start": 51
+          "end": 52,
+          "start": 52
         }
       ]
     },
@@ -136,15 +217,15 @@
       "cyclomatic": 5.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "exec_tool_capture",
-      "line": 56,
+      "line": 57,
       "uncovered": [
         {
-          "end": 73,
-          "start": 70
+          "end": 74,
+          "start": 71
         },
         {
-          "end": 80,
-          "start": 80
+          "end": 81,
+          "start": 81
         }
       ]
     },
@@ -155,7 +236,7 @@
       "cyclomatic": 1.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "format_tool_not_found_error",
-      "line": 20
+      "line": 21
     },
     {
       "coverage": 91.66666666666666,
@@ -164,11 +245,11 @@
       "cyclomatic": 6.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "is_ignored_snapshot_entry",
-      "line": 560,
+      "line": 651,
       "uncovered": [
         {
-          "end": 571,
-          "start": 571
+          "end": 662,
+          "start": 662
         }
       ]
     },
@@ -179,11 +260,11 @@
       "cyclomatic": 4.6,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "materialize_well_known",
-      "line": 184,
+      "line": 185,
       "uncovered": [
         {
-          "end": 191,
-          "start": 191
+          "end": 192,
+          "start": 192
         }
       ]
     },
@@ -194,7 +275,7 @@
       "cyclomatic": 1.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "porcelain_drift",
-      "line": 338
+      "line": 339
     },
     {
       "coverage": 50.0,
@@ -203,11 +284,11 @@
       "cyclomatic": 2.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "prepare_live_reload_site",
-      "line": 627,
+      "line": 718,
       "uncovered": [
         {
-          "end": 631,
-          "start": 629
+          "end": 722,
+          "start": 720
         }
       ]
     },
@@ -218,11 +299,11 @@
       "cyclomatic": 2.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "rebuild_search_indexes",
-      "line": 635,
+      "line": 726,
       "uncovered": [
         {
-          "end": 656,
-          "start": 638
+          "end": 747,
+          "start": 729
         }
       ]
     },
@@ -233,16 +314,7 @@
       "cyclomatic": 4.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "resolve_output_dir",
-      "line": 175
-    },
-    {
-      "coverage": 100.0,
-      "crap": 1.0,
-      "crate": "ask-cli",
-      "cyclomatic": 1.0,
-      "file": "crates/ask-cli/src/commands/dashboard_site.rs",
-      "function": "restore_generated_paths",
-      "line": 348
+      "line": 176
     },
     {
       "coverage": 100.0,
@@ -251,7 +323,7 @@
       "cyclomatic": 1.4,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "run_build",
-      "line": 308
+      "line": 309
     },
     {
       "coverage": 93.75,
@@ -260,32 +332,22 @@
       "cyclomatic": 1.4,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "run_css",
-      "line": 320,
+      "line": 321,
       "uncovered": [
         {
-          "end": 332,
-          "start": 332
+          "end": 333,
+          "start": 333
         }
       ]
     },
     {
-      "coverage": 79.41176470588235,
-      "crap": 2.658993486668024,
+      "coverage": 100.0,
+      "crap": 1.6,
       "crate": "ask-cli",
-      "cyclomatic": 2.6,
+      "cyclomatic": 1.6,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "run_lint",
-      "line": 377,
-      "uncovered": [
-        {
-          "end": 399,
-          "start": 399
-        },
-        {
-          "end": 412,
-          "start": 405
-        }
-      ]
+      "line": 502
     },
     {
       "coverage": 100.0,
@@ -294,7 +356,7 @@
       "cyclomatic": 3.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "run_live_reload_step",
-      "line": 604
+      "line": 695
     },
     {
       "coverage": 0.0,
@@ -303,11 +365,11 @@
       "cyclomatic": 3.6,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "run_serve",
-      "line": 456,
+      "line": 547,
       "uncovered": [
         {
-          "end": 472,
-          "start": 456
+          "end": 563,
+          "start": 547
         }
       ]
     },
@@ -318,11 +380,11 @@
       "cyclomatic": 2.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "serve_event_loop",
-      "line": 491,
+      "line": 582,
       "uncovered": [
         {
-          "end": 539,
-          "start": 491
+          "end": 630,
+          "start": 582
         }
       ]
     },
@@ -333,11 +395,11 @@
       "cyclomatic": 3.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "snapshot_watch_dirs",
-      "line": 541,
+      "line": 632,
       "uncovered": [
         {
-          "end": 557,
-          "start": 541
+          "end": 648,
+          "start": 632
         }
       ]
     },
@@ -348,11 +410,11 @@
       "cyclomatic": 1.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "spawn_tailwind",
-      "line": 420,
+      "line": 511,
       "uncovered": [
         {
-          "end": 438,
-          "start": 420
+          "end": 529,
+          "start": 511
         }
       ]
     },
@@ -363,11 +425,11 @@
       "cyclomatic": 1.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "spawn_zola",
-      "line": 441,
+      "line": 532,
       "uncovered": [
         {
-          "end": 453,
-          "start": 441
+          "end": 544,
+          "start": 532
         }
       ]
     },
@@ -378,7 +440,7 @@
       "cyclomatic": 2.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "sync_live_reload_inputs",
-      "line": 614
+      "line": 705
     },
     {
       "coverage": 0.0,
@@ -387,11 +449,11 @@
       "cyclomatic": 3.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "wait_for_terminate",
-      "line": 475,
+      "line": 566,
       "uncovered": [
         {
-          "end": 484,
-          "start": 475
+          "end": 575,
+          "start": 566
         }
       ]
     },
@@ -402,7 +464,7 @@
       "cyclomatic": 1.0,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "wait_for_terminate",
-      "line": 487
+      "line": 578
     },
     {
       "coverage": 91.93548387096774,
@@ -411,27 +473,27 @@
       "cyclomatic": 15.2,
       "file": "crates/ask-cli/src/commands/dashboard_site.rs",
       "function": "write_skill_dates",
-      "line": 85,
+      "line": 86,
       "uncovered": [
         {
-          "end": 97,
-          "start": 97
+          "end": 98,
+          "start": 98
         },
         {
-          "end": 103,
-          "start": 103
+          "end": 104,
+          "start": 104
         },
         {
-          "end": 106,
-          "start": 106
+          "end": 107,
+          "start": 107
         },
         {
-          "end": 110,
-          "start": 110
+          "end": 111,
+          "start": 111
         },
         {
-          "end": 119,
-          "start": 119
+          "end": 120,
+          "start": 120
         }
       ]
     },
@@ -855,7 +917,7 @@
       "cyclomatic": 6.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::from_env",
-      "line": 143
+      "line": 146
     },
     {
       "coverage": 100.0,
@@ -864,16 +926,16 @@
       "cyclomatic": 9.4,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::generate_agents_md",
-      "line": 235
+      "line": 244
     },
     {
       "coverage": 100.0,
-      "crap": 12.4,
+      "crap": 13.4,
       "crate": "skills-core",
-      "cyclomatic": 12.4,
+      "cyclomatic": 13.4,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::generate_all",
-      "line": 173
+      "line": 185
     },
     {
       "coverage": 89.28571428571429,
@@ -882,35 +944,35 @@
       "cyclomatic": 17.6,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::generate_archive_section",
-      "line": 755,
+      "line": 765,
       "uncovered": [
         {
-          "end": 802,
-          "start": 801
+          "end": 812,
+          "start": 811
         },
         {
-          "end": 814,
-          "start": 814
+          "end": 824,
+          "start": 824
         },
         {
-          "end": 835,
-          "start": 832
+          "end": 845,
+          "start": 842
         },
         {
-          "end": 856,
-          "start": 852
+          "end": 866,
+          "start": 862
         },
         {
-          "end": 887,
-          "start": 887
+          "end": 897,
+          "start": 897
         },
         {
-          "end": 941,
-          "start": 941
+          "end": 951,
+          "start": 951
         },
         {
-          "end": 943,
-          "start": 943
+          "end": 953,
+          "start": 953
         }
       ]
     },
@@ -921,15 +983,15 @@
       "cyclomatic": 4.6,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::generate_dashboard_content",
-      "line": 562,
+      "line": 572,
       "uncovered": [
         {
-          "end": 594,
-          "start": 594
+          "end": 604,
+          "start": 604
         },
         {
-          "end": 605,
-          "start": 605
+          "end": 615,
+          "start": 615
         }
       ]
     },
@@ -940,7 +1002,7 @@
       "cyclomatic": 6.4,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::generate_discovery_index",
-      "line": 495
+      "line": 505
     },
     {
       "coverage": 92.92035398230088,
@@ -949,27 +1011,27 @@
       "cyclomatic": 14.4,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::generate_live_categories",
-      "line": 611,
+      "line": 621,
       "uncovered": [
         {
-          "end": 633,
-          "start": 633
+          "end": 643,
+          "start": 643
         },
         {
-          "end": 669,
-          "start": 666
+          "end": 679,
+          "start": 676
         },
         {
-          "end": 728,
-          "start": 728
+          "end": 738,
+          "start": 738
         },
         {
-          "end": 746,
-          "start": 746
+          "end": 756,
+          "start": 756
         },
         {
-          "end": 748,
-          "start": 748
+          "end": 758,
+          "start": 758
         }
       ]
     },
@@ -980,7 +1042,7 @@
       "cyclomatic": 14.2,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::generate_readme",
-      "line": 288
+      "line": 298
     },
     {
       "coverage": 100.0,
@@ -989,7 +1051,7 @@
       "cyclomatic": 6.2,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::generate_skills_sh_json",
-      "line": 452
+      "line": 462
     },
     {
       "coverage": 100.0,
@@ -998,7 +1060,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::new",
-      "line": 128
+      "line": 131
     },
     {
       "coverage": 100.0,
@@ -1007,7 +1069,16 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::options",
-      "line": 162
+      "line": 165
+    },
+    {
+      "coverage": 100.0,
+      "crap": 1.0,
+      "crate": "skills-core",
+      "cyclomatic": 1.0,
+      "file": "crates/skills-core/src/artifacts.rs",
+      "function": "ArtifactsEngine::output_root",
+      "line": 177
     },
     {
       "coverage": 100.0,
@@ -1016,7 +1087,7 @@
       "cyclomatic": 3.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::skill_md_sha256",
-      "line": 553
+      "line": 563
     },
     {
       "coverage": 100.0,
@@ -1025,7 +1096,7 @@
       "cyclomatic": 5.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::stage_files",
-      "line": 950
+      "line": 960
     },
     {
       "coverage": 100.0,
@@ -1034,7 +1105,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::with_options",
-      "line": 134
+      "line": 137
     },
     {
       "coverage": 0.0,
@@ -1043,11 +1114,11 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsEngine::workspace_root",
-      "line": 168,
+      "line": 171,
       "uncovered": [
         {
-          "end": 170,
-          "start": 168
+          "end": 173,
+          "start": 171
         }
       ]
     },
@@ -1058,7 +1129,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "ArtifactsOptions::default",
-      "line": 89
+      "line": 91
     },
     {
       "coverage": 94.11764705882352,
@@ -1067,11 +1138,11 @@
       "cyclomatic": 3.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "atomic_write",
-      "line": 1641,
+      "line": 1651,
       "uncovered": [
         {
-          "end": 1644,
-          "start": 1644
+          "end": 1654,
+          "start": 1654
         }
       ]
     },
@@ -1082,7 +1153,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "catalog_categories",
-      "line": 1860
+      "line": 1870
     },
     {
       "coverage": 100.0,
@@ -1091,7 +1162,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "contains_mermaid",
-      "line": 1686
+      "line": 1696
     },
     {
       "coverage": 100.0,
@@ -1100,7 +1171,7 @@
       "cyclomatic": 24.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "escape_zola_shortcodes",
-      "line": 1100
+      "line": 1110
     },
     {
       "coverage": 90.0,
@@ -1109,11 +1180,11 @@
       "cyclomatic": 3.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "extract_yaml_frontmatter",
-      "line": 1673,
+      "line": 1683,
       "uncovered": [
         {
-          "end": 1682,
-          "start": 1682
+          "end": 1692,
+          "start": 1692
         }
       ]
     },
@@ -1124,7 +1195,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "generate_nonce",
-      "line": 1662
+      "line": 1672
     },
     {
       "coverage": 100.0,
@@ -1133,7 +1204,7 @@
       "cyclomatic": 6.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "infer_roots_from_src",
-      "line": 1452
+      "line": 1462
     },
     {
       "coverage": 100.0,
@@ -1142,7 +1213,7 @@
       "cyclomatic": 4.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "is_body_open_shortcode",
-      "line": 1255
+      "line": 1265
     },
     {
       "coverage": 100.0,
@@ -1160,7 +1231,7 @@
       "cyclomatic": 4.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "is_inline_shortcode_call",
-      "line": 1244
+      "line": 1254
     },
     {
       "coverage": 100.0,
@@ -1169,7 +1240,7 @@
       "cyclomatic": 4.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "is_valid_shortcode_ident",
-      "line": 1266
+      "line": 1276
     },
     {
       "coverage": 80.0,
@@ -1178,11 +1249,11 @@
       "cyclomatic": 5.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "matches_skill_filter",
-      "line": 1690,
+      "line": 1700,
       "uncovered": [
         {
-          "end": 1692,
-          "start": 1692
+          "end": 1702,
+          "start": 1702
         }
       ]
     },
@@ -1193,7 +1264,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "normalize_crlf",
-      "line": 1669
+      "line": 1679
     },
     {
       "coverage": 88.23529411764706,
@@ -1202,11 +1273,11 @@
       "cyclomatic": 7.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "posix_normalize",
-      "line": 1723,
+      "line": 1733,
       "uncovered": [
         {
-          "end": 1734,
-          "start": 1733
+          "end": 1744,
+          "start": 1743
         }
       ]
     },
@@ -1217,15 +1288,15 @@
       "cyclomatic": 4.8,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "prepare_dashboard_dir",
-      "line": 977,
+      "line": 987,
       "uncovered": [
         {
-          "end": 986,
-          "start": 986
+          "end": 996,
+          "start": 996
         },
         {
-          "end": 998,
-          "start": 998
+          "end": 1008,
+          "start": 1008
         }
       ]
     },
@@ -1236,11 +1307,11 @@
       "cyclomatic": 8.2,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "resolve_resource_file_type",
-      "line": 1475,
+      "line": 1485,
       "uncovered": [
         {
-          "end": 1501,
-          "start": 1490
+          "end": 1511,
+          "start": 1500
         }
       ]
     },
@@ -1251,15 +1322,15 @@
       "cyclomatic": 7.4,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "rewrite_single_link_target",
-      "line": 1278,
+      "line": 1288,
       "uncovered": [
         {
-          "end": 1310,
-          "start": 1310
+          "end": 1320,
+          "start": 1320
         },
         {
-          "end": 1318,
-          "start": 1318
+          "end": 1328,
+          "start": 1328
         }
       ]
     },
@@ -1270,7 +1341,7 @@
       "cyclomatic": 18.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "rewrite_skill_links",
-      "line": 1329
+      "line": 1339
     },
     {
       "coverage": 100.0,
@@ -1288,7 +1359,7 @@
       "cyclomatic": 7.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "should_include_skill",
-      "line": 1698
+      "line": 1708
     },
     {
       "coverage": 78.94736842105263,
@@ -1297,23 +1368,23 @@
       "cyclomatic": 10.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "strip_legacy_raw_wrapper",
-      "line": 1069,
+      "line": 1079,
       "uncovered": [
         {
-          "end": 1075,
-          "start": 1075
+          "end": 1085,
+          "start": 1085
         },
         {
-          "end": 1083,
-          "start": 1083
+          "end": 1093,
+          "start": 1093
         },
         {
-          "end": 1087,
-          "start": 1087
+          "end": 1097,
+          "start": 1097
         },
         {
-          "end": 1090,
-          "start": 1090
+          "end": 1100,
+          "start": 1100
         }
       ]
     },
@@ -1324,27 +1395,27 @@
       "cyclomatic": 12.6,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "sync_resources",
-      "line": 1515,
+      "line": 1525,
       "uncovered": [
         {
-          "end": 1525,
-          "start": 1525
+          "end": 1535,
+          "start": 1535
         },
         {
-          "end": 1539,
-          "start": 1539
+          "end": 1549,
+          "start": 1549
         },
         {
-          "end": 1559,
-          "start": 1559
+          "end": 1569,
+          "start": 1569
         },
         {
-          "end": 1589,
-          "start": 1589
+          "end": 1599,
+          "start": 1599
         },
         {
-          "end": 1622,
-          "start": 1622
+          "end": 1632,
+          "start": 1632
         }
       ]
     },
@@ -1355,7 +1426,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "to_posix_path",
-      "line": 1719
+      "line": 1729
     },
     {
       "coverage": 100.0,
@@ -1364,7 +1435,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "to_toml_string",
-      "line": 1742
+      "line": 1752
     },
     {
       "coverage": 100.0,
@@ -1373,7 +1444,7 @@
       "cyclomatic": 1.4,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "write_pretty_json",
-      "line": 1628
+      "line": 1638
     },
     {
       "coverage": 95.34883720930233,
@@ -1382,15 +1453,15 @@
       "cyclomatic": 9.4,
       "file": "crates/skills-core/src/artifacts.rs",
       "function": "write_sibling_docs",
-      "line": 1013,
+      "line": 1023,
       "uncovered": [
         {
-          "end": 1019,
-          "start": 1019
+          "end": 1029,
+          "start": 1029
         },
         {
-          "end": 1033,
-          "start": 1033
+          "end": 1043,
+          "start": 1043
         }
       ]
     },
@@ -3312,8 +3383,8 @@
       "line": 2252
     },
     {
-      "coverage": 88.57142857142857,
-      "crap": 13.252268221574344,
+      "coverage": 91.42857142857143,
+      "crap": 13.106425655976677,
       "crate": "skills-core",
       "cyclomatic": 13.0,
       "file": "crates/skills-core/src/installer.rs",
@@ -3323,10 +3394,6 @@
         {
           "end": 1020,
           "start": 1020
-        },
-        {
-          "end": 1040,
-          "start": 1040
         },
         {
           "end": 1052,
