@@ -14,7 +14,7 @@ use skills_core::downloader::SkillDownloader;
 use skills_core::error::SkillError;
 use skills_core::installer::{InstallOptions, Installer, TargetEnvironment, UninstallOptions};
 use skills_core::lint::SkillLinter;
-use skills_core::models::LintSeverity;
+use skills_core::models::{LintIssue, LintSeverity};
 use skills_core::parser::SkillParser;
 use skills_core::sync::{ConflictStrategy, SkillSyncer, SyncActionKind};
 
@@ -385,6 +385,14 @@ fn collect_markdown_files(path: &Path, files: &mut Vec<PathBuf>) {
     }
 }
 
+fn should_print_fix_banner(files_modified: usize, format: OutputFormat) -> bool {
+    files_modified > 0 && !matches!(format, OutputFormat::Json | OutputFormat::Yaml)
+}
+
+fn serialize_lint_issues_yaml(root: &Path, issues: &[LintIssue]) -> Result<String, SkillError> {
+    serde_yaml::to_string(issues).map_err(|e| SkillError::yaml(root, e))
+}
+
 #[allow(clippy::unused_async)]
 async fn run_lint(path: Option<&Path>, fix: bool, format: OutputFormat) -> Result<(), CliError> {
     let root = resolve_root()?;
@@ -423,7 +431,7 @@ async fn run_lint(path: Option<&Path>, fix: bool, format: OutputFormat) -> Resul
             }
         }
 
-        if files_modified > 0 && format != OutputFormat::Json {
+        if should_print_fix_banner(files_modified, format) {
             println!("Fixed {total_fixes} issue(s) across {files_modified} file(s).");
         }
     }
@@ -441,6 +449,9 @@ async fn run_lint(path: Option<&Path>, fix: bool, format: OutputFormat) -> Resul
             source: e,
         })?;
         println!("{json}");
+    } else if format == OutputFormat::Yaml {
+        let yaml = serialize_lint_issues_yaml(&root, &report.issues)?;
+        println!("{yaml}");
     } else {
         for issue in &report.issues {
             let tag = match issue.severity {
@@ -651,4 +662,104 @@ async fn run_clean_resources() -> Result<(), CliError> {
     let count = SkillDownloader::new().clean_all_resources(&skills)?;
     println!("Cleaned auto resources across {count} skill directories.");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_serialize_lint_issues_yaml_empty() {
+        let yaml = serialize_lint_issues_yaml(Path::new("."), &[]).unwrap();
+        let parsed: Vec<LintIssue> = serde_yaml::from_str(&yaml).unwrap();
+        assert!(parsed.is_empty());
+        assert_eq!(yaml.trim(), "[]");
+    }
+
+    #[test]
+    fn test_serialize_lint_issues_yaml_round_trip() {
+        let issues = vec![
+            LintIssue::builder()
+                .file("skills/tooling/demo/SKILL.md")
+                .line(Some(4))
+                .column(Some(12))
+                .rule("no-em-dashes")
+                .message("Contains prohibited punctuation.")
+                .severity(LintSeverity::Error)
+                .build(),
+            LintIssue::builder()
+                .file("skills/custom/demo/SKILL.md")
+                .rule("valid-category")
+                .message("Unrecognized or custom skill category 'custom'")
+                .severity(LintSeverity::Warning)
+                .build(),
+        ];
+
+        let yaml = serialize_lint_issues_yaml(Path::new("."), &issues).unwrap();
+        let round_trip: Vec<LintIssue> = serde_yaml::from_str(&yaml).unwrap();
+        assert_eq!(round_trip, issues);
+    }
+
+    #[test]
+    fn test_should_print_fix_banner_excludes_json_and_yaml() {
+        assert!(!should_print_fix_banner(0, OutputFormat::Plain));
+        assert!(!should_print_fix_banner(0, OutputFormat::Table));
+        assert!(!should_print_fix_banner(0, OutputFormat::Json));
+        assert!(!should_print_fix_banner(0, OutputFormat::Yaml));
+
+        assert!(should_print_fix_banner(2, OutputFormat::Plain));
+        assert!(should_print_fix_banner(2, OutputFormat::Table));
+        assert!(!should_print_fix_banner(2, OutputFormat::Json));
+        assert!(!should_print_fix_banner(2, OutputFormat::Yaml));
+    }
+
+    #[tokio::test]
+    async fn test_run_lint_yaml_format_and_fix() {
+        let temp = tempdir().unwrap();
+
+        let valid_dir = temp.path().join("skills/in-progress/valid-skill");
+        std::fs::create_dir_all(&valid_dir).unwrap();
+        let valid_file = valid_dir.join("SKILL.md");
+        std::fs::write(
+            &valid_file,
+            "---\nname: valid-skill\ndescription: A valid skill description\n---\n# Valid Skill\n",
+        )
+        .unwrap();
+
+        run_lint(Some(&valid_file), false, OutputFormat::Yaml)
+            .await
+            .unwrap();
+
+        let invalid_dir = temp.path().join("skills/in-progress/invalid-skill");
+        std::fs::create_dir_all(&invalid_dir).unwrap();
+        let invalid_file = invalid_dir.join("SKILL.md");
+        std::fs::write(
+            &invalid_file,
+            "---\ndescription: Missing name field\n---\n# Invalid Skill\n",
+        )
+        .unwrap();
+
+        let err = run_lint(Some(&invalid_file), false, OutputFormat::Yaml)
+            .await
+            .unwrap_err();
+        assert!(matches!(err, CliError::Skill(SkillError::Lint { .. })));
+
+        let fixable_dir = temp.path().join("skills/in-progress/fixable-skill");
+        std::fs::create_dir_all(&fixable_dir).unwrap();
+        let fixable_file = fixable_dir.join("SKILL.md");
+        std::fs::write(
+            &fixable_file,
+            "---\nname: fixable-skill\ndescription: A valid skill description\n---\n# Content \u{2014} with em dash\n",
+        )
+        .unwrap();
+
+        run_lint(Some(&fixable_file), true, OutputFormat::Yaml)
+            .await
+            .unwrap();
+
+        let sanitized = std::fs::read_to_string(&fixable_file).unwrap();
+        assert!(!sanitized.contains('\u{2014}'));
+        assert!(sanitized.contains("# Content - with em dash"));
+    }
 }
