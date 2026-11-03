@@ -21,7 +21,7 @@ use skills_core::models::{LintIssue, Skill};
 use skills_core::parser::{SkillParser, TemplatePlaceholder};
 
 /// Configures stdout in raw alternate screen mode with mouse tracking and panic protection.
-pub fn init_terminal() -> color_eyre::Result<Terminal<CrosstermBackend<Stdout>>> {
+pub fn init_terminal() -> std::io::Result<Terminal<CrosstermBackend<Stdout>>> {
     enable_raw_mode()?;
     let mut guard = TerminalGuard::new();
     let mut stdout_handle = stdout();
@@ -35,7 +35,7 @@ pub fn init_terminal() -> color_eyre::Result<Terminal<CrosstermBackend<Stdout>>>
 }
 
 /// Restores the terminal to canonical line-buffered state and re-enables cursor display.
-pub fn restore_terminal() -> color_eyre::Result<()> {
+pub fn restore_terminal() -> std::io::Result<()> {
     let mut stdout_handle = stdout();
     execute!(
         stdout_handle,
@@ -860,7 +860,7 @@ impl App {
     }
 
     /// Encodes rendered prompt text to base64 and emits an OSC 52 clipboard escape sequence to stdout.
-    pub fn export_runner_prompt_clipboard(&mut self) -> color_eyre::Result<()> {
+    pub fn export_runner_prompt_clipboard(&mut self) -> std::io::Result<()> {
         let prompt = self.render_runner_prompt();
         let b64 = base64_encode(prompt.as_bytes());
         let osc52 = format!("\x1b]52;c;{b64}\x07");
@@ -872,10 +872,7 @@ impl App {
     }
 
     /// Writes the rendered prompt text to a file on disk.
-    pub fn export_runner_prompt_file(
-        &mut self,
-        dest: Option<&Path>,
-    ) -> color_eyre::Result<PathBuf> {
+    pub fn export_runner_prompt_file(&mut self, dest: Option<&Path>) -> std::io::Result<PathBuf> {
         let dest_path = if let Some(p) = dest {
             p.to_path_buf()
         } else if let Some(skill) = self.selected_skill() {
