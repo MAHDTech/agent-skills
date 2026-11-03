@@ -39,13 +39,11 @@ pub async fn run(args: TuiArgs) -> Result<(), CliError> {
     }
 
     let tick_rate = Duration::from_millis(args.tick_rate.unwrap_or(250));
-    let mut terminal =
-        init_terminal().map_err(|e| SkillError::GeneralIo(std::io::Error::other(e.to_string())))?;
+    let mut terminal = init_terminal().map_err(SkillError::GeneralIo)?;
     let mut events = EventHandler::new(tick_rate);
 
     let loop_result = run_event_loop(&mut terminal, &mut app, &mut events).await;
-    let restore_result =
-        restore_terminal().map_err(|e| SkillError::GeneralIo(std::io::Error::other(e.to_string())));
+    let restore_result = restore_terminal().map_err(SkillError::GeneralIo);
 
     loop_result.and(restore_result)?;
     Ok(())
@@ -59,7 +57,7 @@ async fn run_event_loop(
     while app.is_running() {
         terminal
             .draw(|frame| draw(frame, app))
-            .map_err(|e| SkillError::GeneralIo(std::io::Error::other(e.to_string())))?;
+            .map_err(SkillError::GeneralIo)?;
 
         let event = events.next().await.map_err(|e| {
             SkillError::GeneralIo(std::io::Error::new(
