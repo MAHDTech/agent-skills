@@ -461,7 +461,7 @@
       "type": "skill-md",
       "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:fac4bf48b078ffa2bc46586683435807a9a1a4549f454a9c9dbc8c5ff35c05c6"
+      "digest": "sha256:916dd2a522a59c6147035390a8cc1cfc8a22e6f594f16fe4d33b288a2e61eaa7"
     },
     {
       "name": "software-factory",
