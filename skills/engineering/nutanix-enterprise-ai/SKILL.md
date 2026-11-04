@@ -75,6 +75,7 @@ Route inference traffic between on-prem models and cloud APIs:
 
 - **Local Endpoints**: Route between multiple local deployments for load balancing and high availability.
 - **Third-Party Providers**: Aggregate AWS Bedrock, Azure OpenAI, Google Gemini, Anthropic, or OpenAI behind a unified gateway endpoint with rate limits and unified API keys.
+- **AgentRouter Gateway**: NAI's Agent Gateway and unified routing layer are powered by AgentRouter; see [agent-router](../agent-router/SKILL.md) (`/agent-router`) for AgentRouter gateway configuration, unified LLM routing, and MCP or A2A server routing.
 
 ### 4. Model Context Protocol (MCP) Integration
 

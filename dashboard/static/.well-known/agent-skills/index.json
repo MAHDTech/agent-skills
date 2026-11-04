@@ -16,6 +16,13 @@
       "digest": "sha256:6983dae74cc723e47d397a635ff15655daa5ca11493d89f6ce1d038a525269ad"
     },
     {
+      "name": "agent-router",
+      "type": "skill-md",
+      "description": "Configure, route, or troubleshoot AgentRouter AI gateways, unified LLM endpoints, and MCP or A2A servers, including the gateway powering Nutanix Enterprise AI (NAI).",
+      "url": "/.well-known/agent-skills/agent-router/SKILL.md",
+      "digest": "sha256:b7bf9c3f78de4259f65aa49b7800cea3e809df762e7542cf096567fea07f0958"
+    },
+    {
       "name": "antigravity",
       "type": "skill-md",
       "description": "Look up Google Antigravity/AGY CLI, IDE, and SDK behavior. Use for its settings, commands, keybindings, agent permissions, hooks, or plugin integration.",
@@ -247,6 +254,13 @@
       "digest": "sha256:320b66245c61d80aa1b4309b01bc650fd12119552532969267b4d69c6d5bd781"
     },
     {
+      "name": "icp",
+      "type": "skill-md",
+      "description": "Build, secure, test, and deploy Internet Computer (ICP) canisters and full-stack dapps in Motoko, Rust, and TypeScript. Use for canister architecture, stable memory, ICRC and chain-key tokens (ckBTC, ckETH, ckSOL), Internet Identity, vetKeys, HTTPS outcalls, or icp CLI workflows.",
+      "url": "/.well-known/agent-skills/icp/SKILL.md",
+      "digest": "sha256:113dfc524ebe7ad376cb46d5bf0648fab2f8f5f75272a24ad5d8d1c838dea581"
+    },
+    {
       "name": "install-skills",
       "type": "skill-md",
       "description": "Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.",
@@ -286,7 +300,7 @@
       "type": "skill-md",
       "description": "Configure or troubleshoot Nutanix Enterprise AI (NAI/GPT-in-a-Box). Use for platform deployment, model serving, inference gateways, RBAC, or NAI MCP connectors.",
       "url": "/.well-known/agent-skills/nutanix-enterprise-ai/SKILL.md",
-      "digest": "sha256:5bb279f437bf3c7355ef8e2a94950abdc58dab2c6384ab8575af1d64e01736c1"
+      "digest": "sha256:4e4bedc10cc19dc3b956680975dae2da57dcada3abf3ec6ecded68246d5205a2"
     },
     {
       "name": "nutanix-files",
@@ -454,7 +468,7 @@
       "type": "skill-md",
       "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:fac4bf48b078ffa2bc46586683435807a9a1a4549f454a9c9dbc8c5ff35c05c6"
+      "digest": "sha256:ab003d4b61a3abbe0f41b5ede56b2a4ee5d0b8fa90da13ed23c8e1a847c76abc"
     },
     {
       "name": "software-factory",

@@ -7,16 +7,61 @@ use colored::Colorize;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, Table};
 
-use crate::cli::{OutputFormat, SkillsArgs, SkillsCommands};
+use crate::cli::{OutputFormat, SkillsArgs, SkillsCommands, SyncConflictStrategy, SyncInstallMode};
 use crate::commands::{CliError, resolve_root};
 use skills_core::artifacts::{ArtifactsEngine, ArtifactsOptions};
 use skills_core::downloader::SkillDownloader;
 use skills_core::error::SkillError;
-use skills_core::installer::{InstallOptions, Installer, TargetEnvironment, UninstallOptions};
+use skills_core::installer::{
+    InstallMode, InstallOptions, Installer, TargetEnvironment, UninstallOptions,
+};
 use skills_core::lint::SkillLinter;
-use skills_core::models::LintSeverity;
+use skills_core::models::{LintIssue, LintSeverity};
 use skills_core::parser::SkillParser;
 use skills_core::sync::{ConflictStrategy, SkillSyncer, SyncActionKind};
+
+impl From<SyncInstallMode> for InstallMode {
+    fn from(mode: SyncInstallMode) -> Self {
+        match mode {
+            SyncInstallMode::Auto => Self::Auto,
+            SyncInstallMode::Symlink => Self::Symlink,
+            SyncInstallMode::Copy => Self::Copy,
+        }
+    }
+}
+
+impl From<SyncConflictStrategy> for ConflictStrategy {
+    fn from(strategy: SyncConflictStrategy) -> Self {
+        match strategy {
+            SyncConflictStrategy::LocalWins => Self::LocalWins,
+            SyncConflictStrategy::RemoteWins => Self::RemoteWins,
+            SyncConflictStrategy::PromptUser => Self::PromptUser,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct SyncCommandOptions<'a> {
+    target: Option<&'a str>,
+    mode: SyncInstallMode,
+    strategy: SyncConflictStrategy,
+    prune_orphans: bool,
+    repo_only: bool,
+    dry_run: bool,
+}
+
+impl Default for SyncCommandOptions<'_> {
+    fn default() -> Self {
+        Self {
+            target: None,
+            mode: SyncInstallMode::Auto,
+            strategy: SyncConflictStrategy::LocalWins,
+            prune_orphans: true,
+            repo_only: false,
+            dry_run: false,
+        }
+    }
+}
 
 /// Dispatches catalog operations to skills-core domain engines.
 pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError> {
@@ -43,7 +88,24 @@ pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError>
                 run_uninstall(skill, target.as_deref()).await
             }
             SkillsCommands::Lint { path, fix } => run_lint(path.as_deref(), *fix, format).await,
-            SkillsCommands::Sync { dry_run } => run_sync(*dry_run).await,
+            SkillsCommands::Sync {
+                target,
+                mode,
+                strategy,
+                prune_orphans,
+                repo_only,
+                dry_run,
+            } => {
+                run_sync(SyncCommandOptions {
+                    target: target.as_deref(),
+                    mode: *mode,
+                    strategy: *strategy,
+                    prune_orphans: *prune_orphans,
+                    repo_only: *repo_only,
+                    dry_run: *dry_run,
+                })
+                .await
+            }
             SkillsCommands::Download { url } => run_download(url).await,
             SkillsCommands::DownloadResources {
                 force,
@@ -60,13 +122,13 @@ pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError>
 }
 
 async fn run_action(action: &str, args: &SkillsArgs, format: OutputFormat) -> Result<(), CliError> {
-    if (args.source.is_some() || args.target.is_some())
-        && !matches!(action, "install" | "uninstall")
+    if args.source.is_some() && !matches!(action, "install" | "uninstall")
+        || args.target.is_some() && !matches!(action, "install" | "uninstall" | "sync")
         || args.dry_run && action != "sync"
     {
         return Err(CliError::Io(std::io::Error::new(
             std::io::ErrorKind::InvalidInput,
-            "SOURCE and --target require install/uninstall; --dry-run requires sync",
+            "SOURCE requires install/uninstall; --target requires install/uninstall/sync; --dry-run requires sync",
         )));
     }
     match action {
@@ -77,7 +139,14 @@ async fn run_action(action: &str, args: &SkillsArgs, format: OutputFormat) -> Re
         ))),
         "install" | "uninstall" => run_bulk_action(action, args).await,
         "lint" => run_lint(None, false, format).await,
-        "sync" => run_sync(args.dry_run).await,
+        "sync" => {
+            run_sync(SyncCommandOptions {
+                target: args.target.as_deref(),
+                dry_run: args.dry_run,
+                ..SyncCommandOptions::default()
+            })
+            .await
+        }
         "download-resources" => run_download_resources(false, false, None, format).await,
         "clean-resources" => run_clean_resources().await,
         other => Err(CliError::Io(std::io::Error::new(
@@ -385,6 +454,14 @@ fn collect_markdown_files(path: &Path, files: &mut Vec<PathBuf>) {
     }
 }
 
+fn should_print_fix_banner(files_modified: usize, format: OutputFormat) -> bool {
+    files_modified > 0 && !matches!(format, OutputFormat::Json | OutputFormat::Yaml)
+}
+
+fn serialize_lint_issues_yaml(root: &Path, issues: &[LintIssue]) -> Result<String, SkillError> {
+    serde_yaml::to_string(issues).map_err(|e| SkillError::yaml(root, e))
+}
+
 #[allow(clippy::unused_async)]
 async fn run_lint(path: Option<&Path>, fix: bool, format: OutputFormat) -> Result<(), CliError> {
     let root = resolve_root()?;
@@ -423,7 +500,7 @@ async fn run_lint(path: Option<&Path>, fix: bool, format: OutputFormat) -> Resul
             }
         }
 
-        if files_modified > 0 && format != OutputFormat::Json {
+        if should_print_fix_banner(files_modified, format) {
             println!("Fixed {total_fixes} issue(s) across {files_modified} file(s).");
         }
     }
@@ -441,6 +518,9 @@ async fn run_lint(path: Option<&Path>, fix: bool, format: OutputFormat) -> Resul
             source: e,
         })?;
         println!("{json}");
+    } else if format == OutputFormat::Yaml {
+        let yaml = serialize_lint_issues_yaml(&root, &report.issues)?;
+        println!("{yaml}");
     } else {
         for issue in &report.issues {
             let tag = match issue.severity {
@@ -479,29 +559,49 @@ fn is_linked_git_worktree(root: &Path) -> bool {
     root.join(".git").is_file()
 }
 
+fn resolve_sync_targets(target: Option<&str>) -> Vec<TargetEnvironment> {
+    target.map_or_else(TargetEnvironment::all_standard, |t| {
+        vec![resolve_target_environment(Some(t))]
+    })
+}
+
+fn should_sync_repo_only(dry_run: bool, repo_only_flag: bool, root: &Path) -> bool {
+    !dry_run
+        && (repo_only_flag
+            || std::env::var("SKILLS_REPO_ONLY").is_ok()
+            || std::env::var("PRE_COMMIT").is_ok()
+            || std::env::var("CI").is_ok()
+            || is_linked_git_worktree(root))
+}
+
+fn build_skill_syncer(
+    root: &Path,
+    catalog_dir: PathBuf,
+    options: SyncCommandOptions<'_>,
+) -> SkillSyncer {
+    SkillSyncer::new(catalog_dir)
+        .with_targets(resolve_sync_targets(options.target))
+        .with_mode(options.mode.into())
+        .with_conflict_strategy(options.strategy.into())
+        .with_prune_orphans(options.prune_orphans)
+        .with_prune_source(root.join("skills-archive"))
+        .with_dry_run(options.dry_run)
+}
+
 #[allow(clippy::unused_async)]
-async fn run_sync(dry_run: bool) -> Result<(), CliError> {
+async fn run_sync(options: SyncCommandOptions<'_>) -> Result<(), CliError> {
     let root = resolve_root()?;
     let catalog_dir = if root.join("skills").is_dir() {
         root.join("skills")
     } else {
         root.clone()
     };
-    let repo_only = !dry_run
-        && (std::env::var("SKILLS_REPO_ONLY").is_ok()
-            || std::env::var("PRE_COMMIT").is_ok()
-            || std::env::var("CI").is_ok()
-            || is_linked_git_worktree(&root));
+    let repo_only = should_sync_repo_only(options.dry_run, options.repo_only, &root);
 
     if repo_only {
         println!("Repository-only sync active: skipping machine target synchronization.");
     } else {
-        let syncer = SkillSyncer::new(catalog_dir)
-            .with_targets(TargetEnvironment::all_standard())
-            .with_conflict_strategy(ConflictStrategy::LocalWins)
-            .with_prune_orphans(true)
-            .with_prune_source(root.join("skills-archive"))
-            .with_dry_run(dry_run);
+        let syncer = build_skill_syncer(&root, catalog_dir, options);
 
         let plan = syncer.create_plan().map_err(SkillError::from)?;
 
@@ -532,7 +632,7 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
         );
     }
 
-    let artifacts = if dry_run {
+    let artifacts = if options.dry_run {
         None
     } else {
         Some(ArtifactsEngine::from_env(&root).generate_all()?)
@@ -651,4 +751,206 @@ async fn run_clean_resources() -> Result<(), CliError> {
     let count = SkillDownloader::new().clean_all_resources(&skills)?;
     println!("Cleaned auto resources across {count} skill directories.");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_serialize_lint_issues_yaml_empty() {
+        let yaml = serialize_lint_issues_yaml(Path::new("."), &[]).unwrap();
+        let parsed: Vec<LintIssue> = serde_yaml::from_str(&yaml).unwrap();
+        assert!(parsed.is_empty());
+        assert_eq!(yaml.trim(), "[]");
+    }
+
+    #[test]
+    fn test_serialize_lint_issues_yaml_round_trip() {
+        let issues = vec![
+            LintIssue::builder()
+                .file("skills/tooling/demo/SKILL.md")
+                .line(Some(4))
+                .column(Some(12))
+                .rule("no-em-dashes")
+                .message("Contains prohibited punctuation.")
+                .severity(LintSeverity::Error)
+                .build(),
+            LintIssue::builder()
+                .file("skills/custom/demo/SKILL.md")
+                .rule("valid-category")
+                .message("Unrecognized or custom skill category 'custom'")
+                .severity(LintSeverity::Warning)
+                .build(),
+        ];
+
+        let yaml = serialize_lint_issues_yaml(Path::new("."), &issues).unwrap();
+        let round_trip: Vec<LintIssue> = serde_yaml::from_str(&yaml).unwrap();
+        assert_eq!(round_trip, issues);
+    }
+
+    #[test]
+    fn test_should_print_fix_banner_excludes_json_and_yaml() {
+        assert!(!should_print_fix_banner(0, OutputFormat::Plain));
+        assert!(!should_print_fix_banner(0, OutputFormat::Table));
+        assert!(!should_print_fix_banner(0, OutputFormat::Json));
+        assert!(!should_print_fix_banner(0, OutputFormat::Yaml));
+
+        assert!(should_print_fix_banner(2, OutputFormat::Plain));
+        assert!(should_print_fix_banner(2, OutputFormat::Table));
+        assert!(!should_print_fix_banner(2, OutputFormat::Json));
+        assert!(!should_print_fix_banner(2, OutputFormat::Yaml));
+    }
+
+    #[test]
+    fn test_sync_enum_conversions() {
+        assert_eq!(InstallMode::from(SyncInstallMode::Auto), InstallMode::Auto);
+        assert_eq!(
+            InstallMode::from(SyncInstallMode::Symlink),
+            InstallMode::Symlink
+        );
+        assert_eq!(InstallMode::from(SyncInstallMode::Copy), InstallMode::Copy);
+
+        assert_eq!(
+            ConflictStrategy::from(SyncConflictStrategy::LocalWins),
+            ConflictStrategy::LocalWins
+        );
+        assert_eq!(
+            ConflictStrategy::from(SyncConflictStrategy::RemoteWins),
+            ConflictStrategy::RemoteWins
+        );
+        assert_eq!(
+            ConflictStrategy::from(SyncConflictStrategy::PromptUser),
+            ConflictStrategy::PromptUser
+        );
+    }
+
+    #[test]
+    fn test_resolve_sync_targets_default_and_single() {
+        assert_eq!(
+            resolve_sync_targets(None),
+            TargetEnvironment::all_standard()
+        );
+        assert_eq!(
+            resolve_sync_targets(Some("cursor")),
+            vec![TargetEnvironment::Cursor]
+        );
+    }
+
+    #[test]
+    fn test_build_skill_syncer_applies_options() {
+        let root = Path::new("/tmp/repo-root");
+        let catalog_dir = root.join("skills");
+        let options = SyncCommandOptions {
+            target: Some("claude"),
+            mode: SyncInstallMode::Copy,
+            strategy: SyncConflictStrategy::RemoteWins,
+            prune_orphans: false,
+            repo_only: false,
+            dry_run: true,
+        };
+
+        let syncer = build_skill_syncer(root, catalog_dir.clone(), options);
+        assert_eq!(syncer.catalog_dir, catalog_dir);
+        assert_eq!(syncer.targets, vec![TargetEnvironment::ClaudeDesktop]);
+        assert_eq!(syncer.mode, InstallMode::Copy);
+        assert_eq!(syncer.conflict_strategy, ConflictStrategy::RemoteWins);
+        assert!(!syncer.prune_orphans);
+        assert_eq!(syncer.prune_sources, vec![root.join("skills-archive")]);
+        assert!(syncer.dry_run);
+    }
+
+    #[test]
+    fn test_should_sync_repo_only_respects_flag_and_dry_run() {
+        let temp = tempdir().unwrap();
+        assert!(should_sync_repo_only(false, true, temp.path()));
+        assert!(!should_sync_repo_only(true, true, temp.path()));
+    }
+
+    #[tokio::test]
+    async fn test_run_action_rejects_invalid_target_and_source_combinations() {
+        let list_with_target = SkillsArgs {
+            action: Some("list".to_string()),
+            source: None,
+            target: Some("cursor".to_string()),
+            dry_run: false,
+            command: None,
+        };
+        let err = run_action("list", &list_with_target, OutputFormat::Plain)
+            .await
+            .unwrap_err();
+        match err {
+            CliError::Io(io_err) => {
+                assert_eq!(io_err.kind(), std::io::ErrorKind::InvalidInput);
+            }
+            other => panic!("Expected InvalidInput Io error, got {other:?}"),
+        }
+
+        let sync_with_source = SkillsArgs {
+            action: Some("sync".to_string()),
+            source: Some("some-skill".to_string()),
+            target: None,
+            dry_run: false,
+            command: None,
+        };
+        let err = run_action("sync", &sync_with_source, OutputFormat::Plain)
+            .await
+            .unwrap_err();
+        match err {
+            CliError::Io(io_err) => {
+                assert_eq!(io_err.kind(), std::io::ErrorKind::InvalidInput);
+            }
+            other => panic!("Expected InvalidInput Io error, got {other:?}"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_run_lint_yaml_format_and_fix() {
+        let temp = tempdir().unwrap();
+
+        let valid_dir = temp.path().join("skills/in-progress/valid-skill");
+        std::fs::create_dir_all(&valid_dir).unwrap();
+        let valid_file = valid_dir.join("SKILL.md");
+        std::fs::write(
+            &valid_file,
+            "---\nname: valid-skill\ndescription: A valid skill description\n---\n# Valid Skill\n",
+        )
+        .unwrap();
+
+        run_lint(Some(&valid_file), false, OutputFormat::Yaml)
+            .await
+            .unwrap();
+
+        let invalid_dir = temp.path().join("skills/in-progress/invalid-skill");
+        std::fs::create_dir_all(&invalid_dir).unwrap();
+        let invalid_file = invalid_dir.join("SKILL.md");
+        std::fs::write(
+            &invalid_file,
+            "---\ndescription: Missing name field\n---\n# Invalid Skill\n",
+        )
+        .unwrap();
+
+        let err = run_lint(Some(&invalid_file), false, OutputFormat::Yaml)
+            .await
+            .unwrap_err();
+        assert!(matches!(err, CliError::Skill(SkillError::Lint { .. })));
+
+        let fixable_dir = temp.path().join("skills/in-progress/fixable-skill");
+        std::fs::create_dir_all(&fixable_dir).unwrap();
+        let fixable_file = fixable_dir.join("SKILL.md");
+        std::fs::write(
+            &fixable_file,
+            "---\nname: fixable-skill\ndescription: A valid skill description\n---\n# Content \u{2014} with em dash\n",
+        )
+        .unwrap();
+
+        run_lint(Some(&fixable_file), true, OutputFormat::Yaml)
+            .await
+            .unwrap();
+
+        let sanitized = std::fs::read_to_string(&fixable_file).unwrap();
+        assert!(!sanitized.contains('\u{2014}'));
+        assert!(sanitized.contains("# Content - with em dash"));
+    }
 }

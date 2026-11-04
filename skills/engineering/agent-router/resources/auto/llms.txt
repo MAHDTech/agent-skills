@@ -1,0 +1,99 @@
+# Agent Router (formerly Envoy AI Gateway)
+
+> The open source AI gateway and MCP gateway built on Envoy and Envoy Gateway. An Agentic AI Foundation project. Agent Router controls; Envoy carries.
+
+Agent Router gives application teams one OpenAI-compatible API for every model and MCP tool, and platform teams one place to enforce credentials, routing, quotas, failover and usage attribution. Repository: https://github.com/theagentrouter/agent-router · License: Apache-2.0
+
+## Home
+
+- [Home](https://theagentrouter.ai/docs/): Welcome to the Agent Router documentation!
+
+## Getting Started
+
+- [Getting Started](https://theagentrouter.ai/docs/getting-started/): Agent Router runs two ways.
+- [Prerequisites](https://theagentrouter.ai/docs/getting-started/prerequisites): Before you begin using Agent Router, you'll need to ensure you have the following prerequisites in place.
+- [Installation](https://theagentrouter.ai/docs/getting-started/installation): This guide will walk you through installing Agent Router and its required components.
+- [Basic Usage](https://theagentrouter.ai/docs/getting-started/basic-usage): This guide will help you set up a basic AI Gateway configuration and make your first request.
+- [Connect Providers](https://theagentrouter.ai/docs/getting-started/connect-providers/): After setting up the basic AI Gateway with the mock backend, you can configure it to work with real AI model providers.
+- [Connect OpenAI](https://theagentrouter.ai/docs/getting-started/connect-providers/openai): This guide will help you configure Agent Router to work with OpenAI's models.
+- [Connect AWS Bedrock](https://theagentrouter.ai/docs/getting-started/connect-providers/aws-bedrock): This guide will help you configure Agent Router to work with AWS Bedrock's foundation models, including Llama, Anthropic Claude, and other models available on AWS Bedrock.
+- [Connect Azure OpenAI](https://theagentrouter.ai/docs/getting-started/connect-providers/azure-openai): This guide will help you configure Agent Router to work with Azure OpenAI's foundation models.
+- [Connect GCP VertexAI](https://theagentrouter.ai/docs/getting-started/connect-providers/gcp-vertexai): This guide will help you configure Agent Router to work with GCP VertexAI's Gemini and Anthropic models.
+- [Connect Tetrate Agent Router Service (TARS)](https://theagentrouter.ai/docs/getting-started/connect-providers/tars): This guide will help you configure Agent Router to work with Tetrate Agent Router Service (TARS)'s models.
+- [Connect Anthropic](https://theagentrouter.ai/docs/getting-started/connect-providers/anthropic): This guide will help you configure Agent Router to work with Anthropic's models.
+- [Connect Bitdeer AI](https://theagentrouter.ai/docs/getting-started/connect-providers/bitdeer): This guide will help you configure Agent Router to work with Bitdeer AI's serverless models through its OpenAI-compatible API.
+
+## Agent Router CLI
+
+- [Agent Router CLI](https://theagentrouter.ai/docs/cli/): The Agent Router CLI, aigw, is a command-line interface that provides a set of useful tools for using the gateway.
+- [Installation](https://theagentrouter.ai/docs/cli/aigwinstall): Each release includes the binaries for the aigw CLI build for different platforms.
+- [aigw run](https://theagentrouter.ai/docs/cli/aigwrun): This command runs the Agent Router locally as a standalone proxy with a given configuration file without any dependencies such as docker or Kubernetes.
+
+## Concepts
+
+- [Concepts](https://theagentrouter.ai/docs/concepts/): Welcome to the Concepts section of Agent Router documentation.
+- [Architecture](https://theagentrouter.ai/docs/concepts/architecture/): This section provides a detailed look at the architectural components of Agent Router.
+- [System Architecture Overview](https://theagentrouter.ai/docs/concepts/architecture/system-architecture): Agent Router follows a modern cloud-native architecture pattern with distinct control and data planes.
+- [Control Plane Explained](https://theagentrouter.ai/docs/concepts/architecture/control-plane): The control plane is responsible for configuring and managing the system.
+- [Data Plane and Traffic Flow](https://theagentrouter.ai/docs/concepts/architecture/data-plane): The data plane handles the actual request traffic, with the External Processor (ExtProc) playing a central role in managing AI-specific processing.
+- [Resources](https://theagentrouter.ai/docs/concepts/resources): The Agent Router uses several custom resources to manage AI traffic.
+
+## Capabilities
+
+- [Capabilities](https://theagentrouter.ai/docs/capabilities/): Welcome to the Agent Router capabilities documentation!
+- [Gateway Configuration](https://theagentrouter.ai/docs/capabilities/gateway-config): The GatewayConfig CRD provides gateway-scoped configuration for the AI Gateway external processor container.
+- [Scaling the AI Gateway Controller](https://theagentrouter.ai/docs/capabilities/scaling): The AI Gateway controller has two independent components with different scaling characteristics.
+- [Model Context Protocol (MCP) Gateway](https://theagentrouter.ai/docs/capabilities/mcp/): Agent Router provides first-class support for Model Context Protocol (MCP), enabling AI agents to securely connect to external tools and data sources.
+- [Agent2Agent (A2A) Traffic](https://theagentrouter.ai/docs/capabilities/a2a/): Following this page, an A2A agent behind the gateway gets.
+- [Inference Optimization](https://theagentrouter.ai/docs/capabilities/inference/): Agent Router offers smart ways to improve the speed and reliability of your AI/LLM tasks.
+- [InferencePool Support](https://theagentrouter.ai/docs/capabilities/inference/inferencepool-support): InferencePool is a powerful feature that enables intelligent routing and load balancing for AI inference workloads.
+- [HTTPRoute + InferencePool Guide](https://theagentrouter.ai/docs/capabilities/inference/httproute-inferencepool): This guide shows how to use InferencePool with the standard Gateway API HTTPRoute for intelligent inference routing.
+- [AIGatewayRoute + InferencePool Guide](https://theagentrouter.ai/docs/capabilities/inference/aigatewayroute-inferencepool): This guide demonstrates how to use InferencePool with AIGatewayRoute for advanced AI-specific inference routing.
+- [LLM Provider Integrations](https://theagentrouter.ai/docs/capabilities/llm-integrations/): Agent Router provides integration to multiple LLM Providers.
+- [Prompt Caching](https://theagentrouter.ai/docs/capabilities/llm-integrations/prompt-caching): Agent Router provides provider-agnostic prompt caching through a unified cache_control API.
+- [Supported AI Providers](https://theagentrouter.ai/docs/capabilities/llm-integrations/supported-providers): Since the Agent Router is designed to provide a Unified API for routing and managing LLM/AI traffic, it supports various AI providers out of the box.
+- [Supported API Endpoints](https://theagentrouter.ai/docs/capabilities/llm-integrations/supported-endpoints): The Agent Router provides OpenAI-compatible API endpoints as well as the Anthropic-compatible API for routing and managing LLM/AI traffic.
+- [Connecting to AI Providers](https://theagentrouter.ai/docs/capabilities/llm-integrations/connect-providers): Agent Router provides a unified interface for connecting to multiple AI providers through a standardized configuration approach.
+- [Extension Fields](https://theagentrouter.ai/docs/capabilities/llm-integrations/vendor-specific-fields): The AI Gateway supports extension fields that allow you to specify unified or backend-specific parameters directly as inline fields in your OpenAI-compatible requests.
+- [Observability](https://theagentrouter.ai/docs/capabilities/observability/): Agent Router extends the capabilities of Envoy Gateway, and as you run Envoy Gateway you have access to the foundational observability in the Envoy Gateway system.
+- [AI/LLM Metrics](https://theagentrouter.ai/docs/capabilities/observability/metrics): When using the Agent Router, it will collect AI specific metrics and expose them to Prometheus for monitoring by default.
+- [GenAI Distributed Tracing](https://theagentrouter.ai/docs/capabilities/observability/tracing): Agent Router's router joins and records distributed traces when supplied with an OpenTelemetry collector endpoint.
+- [Access Logs With AI/LLM/MCP Metadata](https://theagentrouter.ai/docs/capabilities/observability/accesslogs): It is possible to configure Envoy Access Logs to include metadata generated by the AI Gateway such as the selected model and token consumption.
+- [Security](https://theagentrouter.ai/docs/capabilities/security/): As Agent Router is built on Envoy Gateway, you can leverage the Envoy Gateway Security Policy by attaching them to the Gateway and/or generated HTTPRoutes.
+- [Upstream Authentication](https://theagentrouter.ai/docs/capabilities/security/upstream-auth): Upstream Authentication secures the connectivity between the Gateway and the LLM Providers.
+- [Traffic Handling](https://theagentrouter.ai/docs/capabilities/traffic/): This section provides information about traffic routing related capabilities in Agent Router, including Quota Policy for controlling total token consumption budgets across time windows.
+- [Usage-based Rate Limiting](https://theagentrouter.ai/docs/capabilities/traffic/usage-based-ratelimiting): This guide focuses on AI Gateway's specific capabilities for token-based rate limiting in LLM requests.
+- [Provider Fallback](https://theagentrouter.ai/docs/capabilities/traffic/provider-fallback): Agent Router supports provider fallback to ensure high availability and reliability for AI/LLM workloads.
+- [Quota Policy](https://theagentrouter.ai/docs/capabilities/traffic/quota-policy): QuotaPolicy enables token-based quota management for AI inference services in Agent Router.
+- [Header and Body Mutations](https://theagentrouter.ai/docs/capabilities/traffic/header-body-mutations): Agent Router allows you to mutate HTTP headers and JSON request body fields before requests are sent to backends.
+- [Model Name Virtualization](https://theagentrouter.ai/docs/capabilities/traffic/model-name-virtualization): Agent Router provides an advanced model name virtualization capability that allows you to manage and route requests to different AI models seamlessly.
+
+## Compatibility Matrix
+
+- [Compatibility Matrix](https://theagentrouter.ai/docs/compatibility): This document provides compatibility information for Agent Router releases with their dependencies.
+
+## Terminology
+
+- [Terminology](https://theagentrouter.ai/docs/terminology): This glossary provides definitions for key terms and concepts used in AI Gateway and GenAI traffic handling.
+
+## API Reference
+
+- [API Reference](https://theagentrouter.ai/docs/api/): Package v1alpha1 contains API schema definitions for the aigateway.envoyproxy.io API group.
+
+## Blog
+
+- [Agent Router 1.2: safe to share across users and teams](https://theagentrouter.ai/blog/v1.2-release-announcement): Agent Router 1.2 is the first release under the new name. It hardens the MCP gateway for real users, isolates credentials between teams that share a gateway, and fixes the bugs that bite in production. Here is what that means for you, what to check before you upgrade, and how to get involved.
+- [Envoy AI Gateway is becoming Agent Router, an Agentic AI Foundation project](https://theagentrouter.ai/blog/envoy-ai-gateway-is-now-agent-router): On 10 September, Envoy AI Gateway officially joins the Agentic AI Foundation as Agent Router. Same code, same maintainers, same APIs. Here is what changes, what does not, and where to find us.
+- [Multi-User MCP in Production: Per-User Identity at the Gateway Layer](https://theagentrouter.ai/blog/multi-user-mcp-header-forwarding): How Envoy AI Gateway's header forwarding gives MCP tool calls per-user identity without OAuth infrastructure — and when you need OAuth instead.
+- [Announcing Envoy AI Gateway 1.0 — A Stable, Production-Ready AI Gateway](https://theagentrouter.ai/blog/v1.0-release-announcement): Envoy AI Gateway 1.0 is here — the first stable release of the open source AI gateway built on CNCF Envoy Gateway. A committed-stable control-plane API, 16 AI providers, an MCP gateway, multimodal support, and enterprise observability, all backed by a growing community.
+- [Benchmarking Envoy AI Gateway Control Plane Scaling](https://theagentrouter.ai/blog/benchmarking-control-plane-scaling): How many AIGatewayRoute resources can Envoy AI Gateway handle? We benchmarked the control plane scaling to 2,000 routes and measured latency, CPU, and memory usage.
+- [The Reality and Performance of MCP Traffic Routing with Envoy AI Gateway](https://theagentrouter.ai/blog/mcp-in-envoy-ai-gateway): In this article explore how Envoy AI Gateway handles stateful MCP sessions, keeps performance competitive, and stays aligned with the broader Envoy ecosystem.
+- [Announcing Model Context Protocol Support in Envoy AI Gateway](https://theagentrouter.ai/blog/mcp-implementation): Envoy AI Gateway now supports Model Context Protocol (MCP), bringing enterprise-grade security, routing, and observability to AI agent tool integrations with full spec compliance, OAuth authentication, and zero-friction deployment.
+- [Enhancing AI Gateway Observability - OpenTelemetry Tracing Arrives in Envoy AI Gateway](https://theagentrouter.ai/blog/openinference-for-ai-observability): Envoy AI Gateway v0.3 introduces OpenTelemetry tracing with OpenInference conventions, providing complete visibility into LLM application behavior beyond metrics.Understand not just what happened, but why.
+- [Announcing the Envoy AI Gateway v0.3 Release](https://theagentrouter.ai/blog/v0.3-release-announcement): Envoy AI Gateway v0.3 brings intelligent inference routing with Endpoint Picker, production-ready Google Vertex AI support, and enterprise observability with OpenInference tracing—transforming AI infrastructure from static to intelligent.
+- [Envoy AI Gateway Introduces Endpoint Picker Support](https://theagentrouter.ai/blog/endpoint-picker-for-inference-routing): Envoy AI Gateway introduces Endpoint Picker Provider support for intelligent inference routing based on real-time AI metrics like KV-cache usage and queue depth—moving beyond traditional load balancing to optimize AI workload performance.
+- [A Reference Architecture for Adopters of Envoy AI Gateway](https://theagentrouter.ai/blog/envoy-ai-gateway-reference-architecture): Explore how to build a scalable GenAI platform using a two-tier architecture with Envoy AI Gateway. Centralize access to external and self-hosted LLMs through a unified API while managing credentials, costs, and governance.
+- [Announcing the first Envoy AI Gateway Release – A Community Milestone!](https://theagentrouter.ai/blog/01-release-announcement): On February 25, 2025 Envoy AI Gateway v0.1 was Released. The first AI gateway built on CNCF Envoy Gateway, delivering unified LLM API access, upstream authorization, and token-based rate limiting to simplify enterprise AI adoption.
+- [End User Keynote at KubeCon 2024](https://theagentrouter.ai/blog/kubecon-end-user-keynote-2024): Watch the KubeCon 2024 End User Keynote featuring Envoy AI Gateway—learn how Bloomberg and Tetrate are centralizing enterprise AI workflows with unified model access, usage limiting, and upstream authorization at scale.
+- [Introducing Envoy AI Gateway](https://theagentrouter.ai/blog/introducing-envoy-ai-gateway): Open collaboration to bring AI Gateway features to the Envoy community
+

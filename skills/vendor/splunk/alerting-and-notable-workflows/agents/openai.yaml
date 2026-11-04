@@ -1,0 +1,4 @@
+interface:
+  display_name: "Alerting and Notable Workflows"
+  short_description: "Assess Splunk alert, notable, and risk workflows safely"
+  default_prompt: "Use $alerting-and-notable-workflows to assess alert, scheduled-report action, finding/notable, or risk workflow readiness from supplied evidence without changing the deployment."

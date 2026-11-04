@@ -1,0 +1,4 @@
+interface:
+  display_name: "Splunk License and Capacity Planning Advisor"
+  short_description: "Separate entitlement lifecycle from evidence-based capacity planning."
+  default_prompt: "Use $license-and-capacity-planning-advisor to classify a Splunk Enterprise license request as entitlement lifecycle, capacity demand, both, or unknown; gather only the minimum non-sensitive evidence; ground product claims in current official Splunk documentation; and return an assumption-bounded advisory plan without inventing quantities or making commercial decisions."

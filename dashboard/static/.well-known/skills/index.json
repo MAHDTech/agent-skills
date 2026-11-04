@@ -15,6 +15,13 @@
       ]
     },
     {
+      "name": "agent-router",
+      "description": "Configure, route, or troubleshoot AgentRouter AI gateways, unified LLM endpoints, and MCP or A2A servers, including the gateway powering Nutanix Enterprise AI (NAI).",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "name": "antigravity",
       "description": "Look up Google Antigravity/AGY CLI, IDE, and SDK behavior. Use for its settings, commands, keybindings, agent permissions, hooks, or plugin integration.",
       "files": [
@@ -241,6 +248,13 @@
     {
       "name": "herdr",
       "description": "Operate Herdr panes, workspaces, or agent sessions when HERDR_ENV=1. Also use for Herdr setup, configuration, keybindings, and troubleshooting questions.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "icp",
+      "description": "Build, secure, test, and deploy Internet Computer (ICP) canisters and full-stack dapps in Motoko, Rust, and TypeScript. Use for canister architecture, stable memory, ICRC and chain-key tokens (ckBTC, ckETH, ckSOL), Internet Identity, vetKeys, HTTPS outcalls, or icp CLI workflows.",
       "files": [
         "SKILL.md"
       ]

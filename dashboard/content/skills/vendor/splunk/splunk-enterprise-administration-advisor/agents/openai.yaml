@@ -1,0 +1,4 @@
+interface:
+  display_name: "Splunk Enterprise Administration Advisor"
+  short_description: "Advise on Splunk Enterprise users, roles, precedence, ownership, and validation read-only."
+  default_prompt: "Use $splunk-enterprise-administration-advisor to provide cited, read-only Splunk Enterprise administration guidance for local users, roles, capabilities, configuration precedence, service ownership, maintenance readiness, and safe non-mutating validation. Preserve supplied facts and unknowns, separate source files from btool effective state and runtime state, request only the smallest sanitized decision-changing evidence, and route out-of-scope SAML/LDAP/SSO, knowledge-object, index/storage, app lifecycle, cluster, upgrade/security, health/diag, platform failure, license/capacity, deployment-server, or forwarder-fleet work to the owning skill."

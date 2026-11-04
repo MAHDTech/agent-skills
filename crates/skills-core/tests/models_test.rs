@@ -1,4 +1,5 @@
 //! Comprehensive unit and integration tests for `skills-core` domain models and error types.
+// cspell:words subsearch tstats
 
 use skills_core::error::SkillError;
 use skills_core::models::{
@@ -57,6 +58,45 @@ metadata:
         Some("mattpocock/skills")
     );
     assert_eq!(meta.get("license").map(String::as_str), Some("MIT"));
+}
+
+#[test]
+fn test_skill_frontmatter_deserialization_nested_metadata() {
+    let yaml_doc = r#"
+name: splunk-search-optimization
+description: Optimize Splunk SPL searches.
+metadata:
+  author: Splunk Inc.
+  version: "1.0.0"
+  count: 42
+  enabled: true
+  empty_val: ~
+  splunk:
+    category: search
+    SPL_version: "9.2"
+    sub_skills:
+      - tstats-acceleration
+      - subsearch-alternatives
+    related_skills:
+      - splunk-spl-fundamentals
+"#;
+
+    let fm: SkillFrontmatter = serde_yaml::from_str(yaml_doc).unwrap();
+    assert_eq!(fm.name, "splunk-search-optimization");
+    assert_eq!(fm.metadata_str("author"), Some("Splunk Inc."));
+    assert_eq!(fm.metadata_str("version"), Some("1.0.0"));
+    assert_eq!(fm.metadata_str("count"), Some("42"));
+    assert_eq!(fm.metadata_str("enabled"), Some("true"));
+    assert_eq!(fm.metadata_str("empty_val"), Some(""));
+    assert_eq!(fm.metadata_str("missing"), None);
+
+    let splunk_meta = fm
+        .metadata_str("splunk")
+        .expect("nested splunk metadata should be present");
+    assert!(splunk_meta.contains("category: search"));
+    assert!(splunk_meta.contains("SPL_version:"));
+    assert!(splunk_meta.contains("tstats-acceleration"));
+    assert!(splunk_meta.contains("splunk-spl-fundamentals"));
 }
 
 #[test]

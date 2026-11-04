@@ -30,7 +30,7 @@ bunx skills update
 
 ## For developers
 
-If you are working on the skills in this repository, install them from your local working tree so you can iterate live.
+If you are working on the skills in this repository, install them from your local working tree so you can iterate live. The `ask` CLI is provided by the `devenv` shell environment, so prefix commands with `devenv --no-tui shell -- <command>` or run them after entering `devenv --no-tui shell`.
 
 1. Clone the repository:
 
@@ -42,40 +42,40 @@ If you are working on the skills in this repository, install them from your loca
 2. Install all live skills into ask's four standard targets:
 
    ```bash
-   ask skills --action install
+   devenv --no-tui shell -- ask skills --action install
    ```
 
 3. Install one directory containing a `SKILL.md` file:
 
    ```bash
-   ask skills --action install skills/engineering/domain-modeling
+   devenv --no-tui shell -- ask skills --action install skills/engineering/domain-modeling
    ```
 
 4. Uninstall all matching repository skills in those targets:
 
    ```bash
-   ask skills --action uninstall
+   devenv --no-tui shell -- ask skills --action uninstall
    ```
 
 The repository is authoritative for matching skill names. Bulk install discovers the live `skills/` tree, including draft skills in `in-progress/`, and excludes `skills-archive/`. Install replaces matching destinations, including untracked copies and broken links, and creates backups under the target's `.backups/` directory.
 
 Bulk uninstall matches names from both the live and archived catalog. It removes matching directories, symlinks, and registry entries even if an installation was not tracked by ask. It leaves unrelated names, backups, and the source repository untouched. Repeated bulk uninstall is safe when matching installations are already absent. Bulk operations continue processing other skills and return a failure if any operation fails.
 
-The `--action install` and `--action uninstall` forms default to all four standard targets. Use `--target antigravity`, `--target antigravity-acp`, `--target claude`, `--target cursor`, or `--target /path/to/skills` to select one destination. To remove one tracked skill, use `ask skills --action uninstall domain-modeling`.
+The `--action install` and `--action uninstall` forms default to all four standard targets. Use `--target antigravity`, `--target antigravity-acp`, `--target claude`, `--target cursor`, or `--target /path/to/skills` to select one destination. To remove one tracked skill, use `devenv --no-tui shell -- ask skills --action uninstall domain-modeling`.
 
-The existing `ask skills install <source>` and `ask skills uninstall <skill>` subcommands retain their Antigravity-only default. Both accept `--target`.
+The existing `devenv --no-tui shell -- ask skills install <source>` and `devenv --no-tui shell -- ask skills uninstall <skill>` subcommands retain their Antigravity-only default. Both accept `--target`.
 
 ### Synchronization
 
 ```bash
 # Inspect the plan without modifying repository files or installed skills
-ask skills --action sync --dry-run
+devenv --no-tui shell -- ask skills --action sync --dry-run
 
 # Update installations and regenerate repository artifacts
-ask skills --action sync
+devenv --no-tui shell -- ask skills --action sync
 
 # Equivalent subcommand form
-ask skills sync --dry-run
+devenv --no-tui shell -- ask skills sync --dry-run
 ```
 
 Sync reconciles the live catalog with all four standard targets. It installs missing skills, updates managed installations, and regenerates derived repository files and dashboard content. On Unix, installation uses symlinks; other platforms default to copies. It does not auto-detect installed agent applications.
@@ -114,10 +114,10 @@ and [skill discovery implementation](https://github.com/pingdotgg/t3code/blob/ma
 Install the live catalog into the ACP location:
 
 ```bash
-ask skills --action install --target antigravity-acp
+devenv --no-tui shell -- ask skills --action install --target antigravity-acp
 ```
 
-For one skill, use `ask skills install domain-modeling --target antigravity-acp`.
+For one skill, use `devenv --no-tui shell -- ask skills install domain-modeling --target antigravity-acp`.
 Bulk install and sync also include this target by default. Skills are installed as
 individual links on Unix, with each `SKILL.md` directly inside its skill directory.
 The existing `antigravity` target continues to use `~/.agents/skills/`.

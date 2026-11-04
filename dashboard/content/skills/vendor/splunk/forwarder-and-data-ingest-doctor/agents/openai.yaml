@@ -1,0 +1,4 @@
+interface:
+  display_name: "Forwarder and Data Ingest Doctor"
+  short_description: "Diagnose forwarder and ingest paths safely."
+  default_prompt: "Use $forwarder-and-data-ingest-doctor to diagnose this Splunk ingest path from sanitized, read-only evidence."

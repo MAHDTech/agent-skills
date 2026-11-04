@@ -1,0 +1,4 @@
+interface:
+  display_name: "Data Model and Search Acceleration"
+  short_description: "Assess Splunk acceleration readiness and summary health safely"
+  default_prompt: "Use $data-model-and-search-acceleration to assess data-model or report-acceleration readiness, summary coverage, and validation evidence without changing the deployment."
