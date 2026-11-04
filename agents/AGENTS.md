@@ -15,6 +15,7 @@ description: Single source of truth for agent instructions
 - **diagnosing-bugs**: Diagnose hard bugs, flaky failures, and performance regressions with a reproducible feedback loop. Use to isolate the cause, verify a fix, and add a meaningful regression test.
 - **domain-modeling**: Clarify domain terms and relationships while designing software. Use to resolve conflicting terminology, stress-test scenarios, update a glossary, or record a consequential ADR.
 - **egui**: Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures.
+- **icp**: Build, secure, test, and deploy Internet Computer (ICP) canisters and full-stack dapps in Motoko, Rust, and TypeScript. Use for canister architecture, stable memory, ICRC and chain-key tokens (ckBTC, ckETH, ckSOL), Internet Identity, vetKeys, HTTPS outcalls, or icp CLI workflows.
 - **model-context-protocol**: Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing.
 - **nutanix-api-v4**: Integrate or debug Nutanix v4 REST APIs and official SDKs. Use for OData queries, namespaces, version compatibility, or migrating legacy Nutanix API integrations.
 - **nutanix-enterprise-ai**: Configure or troubleshoot Nutanix Enterprise AI (NAI/GPT-in-a-Box). Use for platform deployment, model serving, inference gateways, RBAC, or NAI MCP connectors.
