@@ -13,3 +13,8 @@ sources:
     excludes: []
     license-files:
       - codex-plugin/plugins/spacetimedb/LICENSE
+  - id: splunk
+    repository: https://github.com/splunk/splunk-agent-skills.git
+    ref: main
+    path: skills
+    excludes: []

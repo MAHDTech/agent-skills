@@ -1,0 +1,4 @@
+interface:
+  display_name: "Splunk Search"
+  short_description: "Run bounded read-only Splunk searches through splunkctl."
+  default_prompt: "Use $splunk-search to run a bounded read-only Splunk search through splunkctl and return compact evidence without flooding context."

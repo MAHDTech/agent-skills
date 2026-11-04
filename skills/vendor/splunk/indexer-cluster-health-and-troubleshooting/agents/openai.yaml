@@ -1,0 +1,4 @@
+interface:
+  display_name: "Indexer Cluster Health and Troubleshooting"
+  short_description: "Assess indexer-cluster health and readiness without changes"
+  default_prompt: "Use $indexer-cluster-health-and-troubleshooting to assess indexer-cluster membership, factors, bucket health, bundle state, or rolling readiness from read-only evidence without changing the deployment."

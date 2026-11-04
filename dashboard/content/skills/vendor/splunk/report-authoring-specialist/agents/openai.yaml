@@ -1,0 +1,4 @@
+interface:
+  display_name: "Report Authoring Specialist"
+  short_description: "Define report contracts and readiness without changes"
+  default_prompt: "Use $report-authoring-specialist to define or assess a scheduled or ad hoc Splunk report from supplied requirements and read-only evidence without writing SPL, changing the report, scheduling it, or sending output."

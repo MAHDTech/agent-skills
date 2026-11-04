@@ -178,21 +178,16 @@ impl ParsedSkill {
             category.is_promoted()
         };
 
-        let group = self
-            .frontmatter
-            .metadata
-            .as_ref()
-            .and_then(|m| m.get("group").cloned());
+        let group = self.frontmatter.metadata_str("group").map(str::to_string);
         let archived = self
             .frontmatter
-            .metadata
-            .as_ref()
-            .and_then(|m| m.get("archived").cloned());
-        let replaced_by = self.frontmatter.metadata.as_ref().and_then(|m| {
-            m.get("replaced-by")
-                .or_else(|| m.get("replaced_by"))
-                .cloned()
-        });
+            .metadata_str("archived")
+            .map(str::to_string);
+        let replaced_by = self
+            .frontmatter
+            .metadata_str("replaced-by")
+            .or_else(|| self.frontmatter.metadata_str("replaced_by"))
+            .map(str::to_string);
 
         let raw = format!(
             "---\n{}---\n{}",
@@ -217,7 +212,7 @@ impl ParsedSkill {
     }
 }
 
-/// Tracks CommonMark fenced code block state across sequential markdown lines.
+/// Tracks `CommonMark` fenced code block state across sequential markdown lines.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct CodeFenceTracker {
     active_fence: Option<(char, usize)>,
@@ -230,7 +225,7 @@ pub enum FenceTransition<'a> {
     Outside,
     /// Line opens a new fenced code block.
     Opened {
-        /// Fence delimiter character (`'`'` or `'~'`).
+        /// Fence delimiter character (backtick or `'~'`).
         fence_char: char,
         /// Number of consecutive opening delimiter characters (`>= 3`).
         fence_len: usize,
@@ -243,7 +238,7 @@ pub enum FenceTransition<'a> {
     Inside,
     /// Line closes the active fenced code block.
     Closed {
-        /// Fence delimiter character (`'`'` or `'~'`).
+        /// Fence delimiter character (backtick or `'~'`).
         fence_char: char,
         /// Number of consecutive closing delimiter characters (`>= open_len`).
         fence_len: usize,
@@ -803,21 +798,16 @@ impl SkillParser {
             category.is_promoted()
         };
 
-        let group = parsed
-            .frontmatter
-            .metadata
-            .as_ref()
-            .and_then(|m| m.get("group").cloned());
+        let group = parsed.frontmatter.metadata_str("group").map(str::to_string);
         let archived = parsed
             .frontmatter
-            .metadata
-            .as_ref()
-            .and_then(|m| m.get("archived").cloned());
-        let replaced_by = parsed.frontmatter.metadata.as_ref().and_then(|m| {
-            m.get("replaced-by")
-                .or_else(|| m.get("replaced_by"))
-                .cloned()
-        });
+            .metadata_str("archived")
+            .map(str::to_string);
+        let replaced_by = parsed
+            .frontmatter
+            .metadata_str("replaced-by")
+            .or_else(|| parsed.frontmatter.metadata_str("replaced_by"))
+            .map(str::to_string);
 
         let resources = self.discover_resources_internal(parent)?;
 

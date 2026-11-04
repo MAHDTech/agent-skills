@@ -1,0 +1,4 @@
+interface:
+  display_name: "Search Head Cluster Health and Troubleshooting"
+  short_description: "Assess SHC health and rolling readiness without changes"
+  default_prompt: "Use $search-head-cluster-health-and-troubleshooting to assess captaincy, member health, replication, KV Store, deployer state, search availability, or rolling readiness from read-only evidence without changing the deployment."

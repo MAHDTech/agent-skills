@@ -659,6 +659,7 @@ impl ArtifactsEngine {
             let cat_dir = dashboard_content_dir.join(category.as_str());
             fs::create_dir_all(&cat_dir).map_err(|e| SkillError::io(&cat_dir, e))?;
 
+            let is_vendor_category = category.as_str().starts_with("vendor/");
             let cat_index = cat_dir.join("_index.md");
             let cat_meta = format!(
                 "+++\ntitle = {}\ndescription = {}\nsort_by = \"title\"\ntemplate = \"section.html\"\nweight = {}\n+++\n",
@@ -667,7 +668,9 @@ impl ArtifactsEngine {
                 *weight
             );
             atomic_write(&cat_index, &cat_meta)?;
-            *weight += 1;
+            if !is_vendor_category || *weight < 13 {
+                *weight += 1;
+            }
 
             matching.sort_by(|a, b| a.dir_name.cmp(&b.dir_name));
 
@@ -858,19 +861,13 @@ impl ArtifactsEngine {
                 let archived_date = s
                     .archived
                     .as_deref()
-                    .or_else(|| {
-                        s.frontmatter
-                            .metadata
-                            .as_ref()
-                            .and_then(|m| m.get("archived").map(std::string::String::as_str))
-                    })
+                    .or_else(|| s.frontmatter.metadata_str("archived"))
                     .unwrap_or("");
 
                 let replaced_by = s.replaced_by.as_deref().or_else(|| {
                     s.frontmatter
-                        .metadata
-                        .as_ref()
-                        .and_then(|m| m.get("replaced-by").map(std::string::String::as_str))
+                        .metadata_str("replaced-by")
+                        .or_else(|| s.frontmatter.metadata_str("replaced_by"))
                 });
 
                 let prefix = concat!("https://", "github.com");
@@ -1753,6 +1750,17 @@ fn to_toml_string(value: &str) -> String {
     serde_json::to_string(value).unwrap_or_else(|_| format!("\"{value}\""))
 }
 
+fn catalog_categories(skills: &[Skill]) -> Vec<SkillCategory> {
+    let mut categories = SkillCategory::standard_promoted().to_vec();
+    let vendors: std::collections::BTreeSet<_> = skills
+        .iter()
+        .filter(|skill| skill.vendor_source().is_some())
+        .map(|skill| skill.category.as_str().to_string())
+        .collect();
+    categories.extend(vendors.into_iter().map(SkillCategory::Custom));
+    categories
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1865,15 +1873,4 @@ mod tests {
             "Expected staged normal file in git status, got: {status_str}"
         );
     }
-}
-
-fn catalog_categories(skills: &[Skill]) -> Vec<SkillCategory> {
-    let mut categories = SkillCategory::standard_promoted().to_vec();
-    let vendors: std::collections::BTreeSet<_> = skills
-        .iter()
-        .filter(|skill| skill.vendor_source().is_some())
-        .map(|skill| skill.category.as_str().to_string())
-        .collect();
-    categories.extend(vendors.into_iter().map(SkillCategory::Custom));
-    categories
 }

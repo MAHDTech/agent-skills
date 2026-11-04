@@ -1,0 +1,4 @@
+interface:
+  display_name: "Splunk Setup Page Builder"
+  short_description: "Build a certification-compliant first-run setup page for a Splunk app or add-on, using the configurations REST endpoint and storage/passwords instead of the deprecated setup.xml mechanism."
+  default_prompt: "Use $splunk-setup-page-builder to add a first-run setup page to this Splunk app or add-on that collects the required settings and secrets, wires app.conf and default.meta correctly, and passes splunk-appinspect in both test and precert mode."

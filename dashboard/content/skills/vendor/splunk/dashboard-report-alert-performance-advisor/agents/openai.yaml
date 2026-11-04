@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dashboard, Report, and Alert Performance Advisor"
+  short_description: "Assess object latency and scheduling without changes"
+  default_prompt: "Use $dashboard-report-alert-performance-advisor to assess dashboard, report, or alert latency, scheduling, timeout, concurrency, or fan-out evidence and return a non-mutating finding, validation plan, and owner routes."

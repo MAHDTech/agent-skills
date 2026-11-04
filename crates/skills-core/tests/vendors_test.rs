@@ -105,6 +105,71 @@ fn vendor_refresh_preserves_support_files_and_mirrors_changes() {
 }
 
 #[test]
+fn vendor_refresh_imports_skills_with_nested_metadata() {
+    use skills_core::parser::SkillParser;
+
+    let temp = tempdir().unwrap();
+    let upstream = temp.path().join("upstream");
+    let root = temp.path().join("catalog");
+    repository(&upstream);
+    fs::create_dir_all(&root).unwrap();
+
+    let skill_dir = upstream.join("skills/splunk-nested-skill");
+    fs::create_dir_all(&skill_dir).unwrap();
+    fs::write(
+        skill_dir.join("SKILL.md"),
+        r#"---
+name: splunk-nested-skill
+description: Vendor skill with nested metadata structures.
+metadata:
+  author: Splunk Inc.
+  version: "1.0.0"
+  splunk:
+    category: administration
+    SPL_version: "9.2"
+    sub_skills:
+      - index-management
+    related_skills:
+      - splunk-search-optimization
+---
+
+# Splunk Nested Skill
+
+Skill body content.
+"#,
+    )
+    .unwrap();
+    fs::write(upstream.join("LICENSE"), "Apache-2.0").unwrap();
+    commit(&upstream);
+    manifest(&root, &[("splunk", &upstream)]);
+
+    let report = update_vendors(&root, None).unwrap();
+    assert!(report.fetched.contains_key("splunk"));
+
+    let imported = root.join("skills/vendor/splunk/splunk-nested-skill/SKILL.md");
+    assert!(imported.is_file());
+
+    let parsed = SkillParser::parse_file(&imported).unwrap();
+    assert_eq!(parsed.name(), "splunk-nested-skill");
+    assert_eq!(parsed.vendor_source(), Some("splunk"));
+    assert_eq!(
+        parsed.frontmatter.metadata_str("author"),
+        Some("Splunk Inc.")
+    );
+    assert!(
+        parsed
+            .frontmatter
+            .metadata_str("splunk")
+            .unwrap()
+            .contains("index-management")
+    );
+
+    let discovered = SkillParser::discover_skills(&root).unwrap();
+    assert_eq!(discovered.len(), 1);
+    assert_eq!(discovered[0].name(), "splunk-nested-skill");
+}
+
+#[test]
 fn vendor_exclusions_resolve_collisions_and_can_be_cleared() {
     let temp = tempdir().unwrap();
     let upstream = temp.path().join("upstream");

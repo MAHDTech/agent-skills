@@ -1,0 +1,4 @@
+interface:
+  display_name: "Search and Dashboard Troubleshooter"
+  short_description: "Diagnose broken Splunk searches and saved objects from evidence."
+  default_prompt: "Use $search-and-dashboard-troubleshooter to bind the supplied product, exact deployment/version, object, functional stages, ownership, permissions, time, and dependencies without weakening known context; request only one privacy-safe discriminator; name only evidenced accountable roles; define objective aligned read-only validation and closure; and route only evidence-backed adjacent work by exact catalog display name without exposing private endpoints, certificate identity, raw SPL/config/events/topology, credentials, or provider internals and without writing SPL, changing objects, optimizing, mutating, or remediating anything."

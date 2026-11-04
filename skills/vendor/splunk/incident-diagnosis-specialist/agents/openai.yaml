@@ -1,0 +1,4 @@
+interface:
+  display_name: "Incident Diagnosis Specialist"
+  short_description: "Diagnose post-triage multi-component Splunk incidents safely."
+  default_prompt: "Use $incident-diagnosis-specialist to consume only the supplied privacy-reviewed diagnostic packet, lead with established impact, preserve product/deployment/provider context and unknowns, align evidence clocks, map components and dependencies, rank competing testable hypotheses, request the smallest safe read-only discriminator, confirm causes only for evidenced bounded scope, and hand confirmed component failures to exact specialists while retaining incident-wide state. Do not collect raw diagnostics, troubleshoot or remediate components, configure, restart, mutate, stress test, or claim unverified root cause, recovery, stability, closure, or handoff completion."

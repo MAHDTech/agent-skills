@@ -1,0 +1,4 @@
+interface:
+  display_name: "Data Source Onboarding Advisor"
+  short_description: "Plan evidence-bound Splunk source onboarding and acceptance."
+  default_prompt: "Use $data-source-onboarding-advisor to preserve supplied new-source facts and unknowns; bind product, deployment, provider, export, owners, authority, metadata, timestamp, event boundaries, and acceptance; compare only currently documented applicable methods; return ready, not_ready, or decision_blocked with the smallest next questions and exact handoffs; and do not set up endpoints, troubleshoot ingest, plan fleet rollout, design architecture, implement fields or CIM, configure, deploy, mutate, remediate, or claim acceptance."
