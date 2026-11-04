@@ -118,6 +118,7 @@ Beyond `/code-review` on the main flow:
 
 ## Cloud, infrastructure, and AI models
 
+- [/agent-router](@/skills/engineering/agent-router/_index.md) - reach for this when configuring or troubleshooting AgentRouter AI gateways, unified LLM endpoints, or MCP and A2A routing (including the gateway inside Nutanix Enterprise AI).
 - [/icp](@/skills/engineering/icp/_index.md) - reach for this when building, securing, testing, or deploying Internet Computer (ICP) canisters and dapps in Motoko, Rust, or TypeScript (stable memory, ICRC/chain-key tokens, Internet Identity, vetKeys, HTTPS outcalls, or icp CLI).
 - `/nutanix-api-v4` - reach for this when developing, integrating, or troubleshooting with Nutanix v4 REST APIs or SDKs.
 - `/nutanix-enterprise-ai` - reach for this when deploying, configuring, serving, or troubleshooting LLMs and MCP servers with Nutanix Enterprise AI (NAI v2.8).

@@ -112,6 +112,7 @@ devenv --no-tui test
 The core build, debug, and delivery loop.
 
 - **[acp](skills/engineering/acp/SKILL.md)** - Build, integrate, or debug Agent Client Protocol agents and clients with official SDKs. Use for ACP sessions, tool calls, schemas, transports, or protocol migrations.
+- **[agent-router](skills/engineering/agent-router/SKILL.md)** - Configure, route, or troubleshoot AgentRouter AI gateways, unified LLM endpoints, and MCP or A2A servers, including the gateway powering Nutanix Enterprise AI (NAI).
 - **[casita](skills/engineering/casita/SKILL.md)** - Use for Casita CLI or Rust API work: immutable object storage, imports, roots and retention, verified sync, Casitar archives, integrity checks, or garbage collection.
 - **[characterization-tests](skills/engineering/characterization-tests/SKILL.md)** - Capture existing behavior of untested or legacy code before a refactor or upgrade. Use for deterministic characterization tests or golden masters, including surprising current behavior.
 - **[code-comments](skills/engineering/code-comments/SKILL.md)** - Write or review code comments for non-obvious intent, constraints, and invariants. Use to trim redundant or stale comments and audit comment quality in a specified scope or diff.
