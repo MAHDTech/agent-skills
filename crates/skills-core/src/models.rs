@@ -242,13 +242,55 @@ pub struct SkillFrontmatter {
 
     /// Provenance metadata key-value map (e.g. source, license).
     #[builder(default, setter(into))]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        deserialize_with = "deserialize_metadata",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub metadata: Option<HashMap<String, String>>,
 
     /// Arbitrary additional frontmatter fields preserved across round-trips.
     #[builder(default, setter(into))]
     #[serde(flatten, default, skip_serializing_if = "HashMap::is_empty")]
     pub extra: HashMap<String, serde_yaml::Value>,
+}
+
+impl SkillFrontmatter {
+    /// Returns the string value associated with `key` in `metadata`, if present.
+    #[must_use]
+    pub fn metadata_str(&self, key: &str) -> Option<&str> {
+        self.metadata
+            .as_ref()
+            .and_then(|m| m.get(key).map(String::as_str))
+    }
+}
+
+fn deserialize_metadata<'de, D>(
+    deserializer: D,
+) -> std::result::Result<Option<HashMap<String, String>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let raw: Option<HashMap<String, serde_yaml::Value>> = Option::deserialize(deserializer)?;
+    Ok(raw.map(|map| {
+        map.into_iter()
+            .map(|(k, v)| (k, yaml_value_to_metadata_string(v)))
+            .collect()
+    }))
+}
+
+fn yaml_value_to_metadata_string(value: serde_yaml::Value) -> String {
+    match value {
+        serde_yaml::Value::String(s) => s,
+        serde_yaml::Value::Bool(b) => b.to_string(),
+        serde_yaml::Value::Number(n) => n.to_string(),
+        serde_yaml::Value::Null => String::new(),
+        serde_yaml::Value::Sequence(_)
+        | serde_yaml::Value::Mapping(_)
+        | serde_yaml::Value::Tagged(_) => serde_yaml::to_string(&value)
+            .map(|s| s.trim().to_string())
+            .unwrap_or_default(),
+    }
 }
 
 /// Alias for backwards compatibility with legacy TypeScript typing.

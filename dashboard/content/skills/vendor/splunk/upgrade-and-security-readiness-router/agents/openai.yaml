@@ -1,0 +1,4 @@
+interface:
+  display_name: "Upgrade and Security Readiness Router"
+  short_description: "Route Splunk upgrade and security readiness requests"
+  default_prompt: "Use $upgrade-and-security-readiness-router to classify each Splunk version-change, advisory, vulnerability, compliance, or post-change incident decision; bind documentation-dependent routes to exact current public authority; preserve supplied facts and separate customer, decision, sibling, and provider ownership; ask one smallest route-changing question only when needed; and end with complete exact route payloads plus objective reassessment and closure without doing or claiming downstream work."

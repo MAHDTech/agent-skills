@@ -1,0 +1,4 @@
+interface:
+  display_name: "Index and Storage Management Advisor"
+  short_description: "Design Splunk indexes, retention, storage, and SmartStore safely"
+  default_prompt: "Use $index-and-storage-management-advisor to produce an evidence-labeled index, retention, capacity, or storage decision without changing the deployment."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ingestion Pipeline Design"
+  short_description: "Design evidence-bound Splunk ingestion pipelines"
+  default_prompt: "Use $ingestion-pipeline-design to turn the known source requirements into a non-mutating, implementation-ready Splunk ingestion architecture with applicability, ownership, validation, and explicit sibling handoffs."
