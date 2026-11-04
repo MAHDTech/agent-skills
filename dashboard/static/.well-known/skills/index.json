@@ -15,6 +15,13 @@
       ]
     },
     {
+      "name": "agent-router",
+      "description": "Configure, route, or troubleshoot AgentRouter AI gateways, unified LLM endpoints, and MCP or A2A servers, including the gateway powering Nutanix Enterprise AI (NAI).",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "name": "antigravity",
       "description": "Look up Google Antigravity/AGY CLI, IDE, and SDK behavior. Use for its settings, commands, keybindings, agent permissions, hooks, or plugin integration.",
       "files": [

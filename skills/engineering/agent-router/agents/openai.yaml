@@ -1,0 +1,7 @@
+interface:
+  display_name: "AgentRouter"
+  short_description: "Configure AgentRouter LLM, MCP, and A2A AI gateways"
+  default_prompt: "Use $agent-router to configure or troubleshoot an AgentRouter or NAI gateway."
+
+policy:
+  allow_implicit_invocation: true
