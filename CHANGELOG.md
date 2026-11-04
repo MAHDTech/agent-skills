@@ -1,9 +1,72 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.56](https://github.com/MAHDTech/agent-skills/compare/v0.1.55...8f79b1aac07be73fd64cf73489dca4be296e2d2f) (2026-11-02)
+## [v0.1.57](https://github.com/MAHDTech/agent-skills/compare/v0.1.56...f66c34c4f24658978122217ca823d3cb447e152a) (2026-11-05)
 
 ### Features
+
+* **skills:** add agent-router skill with automated resource downloads (#311)
+([6cad376](https://github.com/MAHDTech/agent-skills/commit/6cad376733450d7bbbbc47c18202187e0b85367d)),
+closes [#311](https://github.com/MAHDTech/agent-skills/issues/311)
+* **skills:** add Splunk vendor skills from splunk/splunk-agent-skills (#310)
+([95c38b9](https://github.com/MAHDTech/agent-skills/commit/95c38b93a5d5ae865873c6560698295c3006bc27)),
+closes [#310](https://github.com/MAHDTech/agent-skills/issues/310)
+* **skills:** add lightweight ICP meta-skill for Internet Computer development
+(#309)
+([2eda407](https://github.com/MAHDTech/agent-skills/commit/2eda407f90be8d4aed6cce6d24f2566dc839eb18)),
+closes [#309](https://github.com/MAHDTech/agent-skills/issues/309)
+* **cli:** expose sync flags in ask skills sync (#297)
+([ad9ecba](https://github.com/MAHDTech/agent-skills/commit/ad9ecba9a8e36ef03e3f09773f43626857f6a061)),
+closes [#297](https://github.com/MAHDTech/agent-skills/issues/297)
+* **dashboard:** add responsive mobile navigation drawer (#292)
+([70e8e42](https://github.com/MAHDTech/agent-skills/commit/70e8e42fdef6475bb326ab1c7ef1bd64262b266f)),
+closes [#292](https://github.com/MAHDTech/agent-skills/issues/292)
+
+### Fixes
+
+* **dashboard:** improve muted text contrast across tars themes (#307)
+([5aedd89](https://github.com/MAHDTech/agent-skills/commit/5aedd898acf4f5f97da904a71181dc45b507349c)),
+closes [#307](https://github.com/MAHDTech/agent-skills/issues/307)
+* **codeql:** register lock traps early and replace unsafe timeout advice
+(#299)
+([bd3b1dc](https://github.com/MAHDTech/agent-skills/commit/bd3b1dc1dbc88c8f45830fa389162384d7318938)),
+closes [#299](https://github.com/MAHDTech/agent-skills/issues/299)
+* **cli:** support --format yaml in ask skills lint (#296)
+([f1602df](https://github.com/MAHDTech/agent-skills/commit/f1602df424857f47eab81d804e374ad2904085e1)),
+closes [#296](https://github.com/MAHDTech/agent-skills/issues/296)
+* **cli:** support plain text output in ask dashboard summary (#295)
+([c0f132f](https://github.com/MAHDTech/agent-skills/commit/c0f132fdd5c1cfd4873ecefba88a71b525251a84)),
+closes [#295](https://github.com/MAHDTech/agent-skills/issues/295)
+* **dashboard:** replace Unicode em-dashes in Tera HTML templates (#293)
+([39f6e34](https://github.com/MAHDTech/agent-skills/commit/39f6e34d16c1b88ff1aee4f1e4aa2598916aeb23)),
+closes [#293](https://github.com/MAHDTech/agent-skills/issues/293)
+* **dashboard:** remove unused Station tailwind.css from static assets (#291)
+([a798de2](https://github.com/MAHDTech/agent-skills/commit/a798de20b01104e4e1a0e21fd7e72bd85bbd5b4d)),
+closes [#291](https://github.com/MAHDTech/agent-skills/issues/291)
+* **dashboard:** validate Zola templates and config in dashboard lint (#287)
+([76cbfad](https://github.com/MAHDTech/agent-skills/commit/76cbfada928cdcea1d307d1d9217b2587a6f8508)),
+closes [#287](https://github.com/MAHDTech/agent-skills/issues/287)
+* **dashboard:** verify lint artifact parity without git checkout or clean
+(#289)
+([7526cd5](https://github.com/MAHDTech/agent-skills/commit/7526cd5086bf825a03f25b312fbfe4191fedbef3)),
+closes [#289](https://github.com/MAHDTech/agent-skills/issues/289)
+* **dashboard:** use root-relative font-face paths in foundation.css (#288)
+([d834e4a](https://github.com/MAHDTech/agent-skills/commit/d834e4aa431e730cd21f9bd0c9eef88e5bc9952a)),
+closes [#288](https://github.com/MAHDTech/agent-skills/issues/288)
+* **dashboard:** expand sidebar accordion for nested archive skills (#286)
+([d62c09b](https://github.com/MAHDTech/agent-skills/commit/d62c09b17b66f9797ecf8ab124fb09b18601087a)),
+closes [#286](https://github.com/MAHDTech/agent-skills/issues/286)
+* **sync:** prune worktree orphans and skip target sync in linked worktrees
+(#283)
+([d636527](https://github.com/MAHDTech/agent-skills/commit/d636527dcf59f4cd2769876fb8d808869370379c)),
+closes [#283](https://github.com/MAHDTech/agent-skills/issues/283)
+* add archive warning banner to page.html (#282)
+([7e4a050](https://github.com/MAHDTech/agent-skills/commit/7e4a05035d242384386a7dd6f276bf0b5d8d7511)),
+closes [#282](https://github.com/MAHDTech/agent-skills/issues/282)
+
+### [v0.1.56](https://github.com/MAHDTech/agent-skills/compare/v0.1.55...v0.1.56) (2026-11-02)
+
+#### Features
 
 * **artifacts:** generate .well-known agent-skills discovery index for
 dashboard (#278)
@@ -23,7 +86,7 @@ closes [#272](https://github.com/MAHDTech/agent-skills/issues/272)
 ([3d79c3b](https://github.com/MAHDTech/agent-skills/commit/3d79c3b970a371d85b97076bd5367418df680873)),
 closes [#263](https://github.com/MAHDTech/agent-skills/issues/263)
 
-### Fixes
+#### Fixes
 
 * **test:** run workspace documentation tests in run-tests.sh (#276)
 ([51bf521](https://github.com/MAHDTech/agent-skills/commit/51bf5218fee8827f45ceb7b206fc127b0ae86337)),
