@@ -247,6 +247,13 @@
       "digest": "sha256:320b66245c61d80aa1b4309b01bc650fd12119552532969267b4d69c6d5bd781"
     },
     {
+      "name": "icp",
+      "type": "skill-md",
+      "description": "Build, secure, test, and deploy Internet Computer (ICP) canisters and full-stack dapps in Motoko, Rust, and TypeScript. Use for canister architecture, stable memory, ICRC and chain-key tokens (ckBTC, ckETH, ckSOL), Internet Identity, vetKeys, HTTPS outcalls, or icp CLI workflows.",
+      "url": "/.well-known/agent-skills/icp/SKILL.md",
+      "digest": "sha256:113dfc524ebe7ad376cb46d5bf0648fab2f8f5f75272a24ad5d8d1c838dea581"
+    },
+    {
       "name": "install-skills",
       "type": "skill-md",
       "description": "Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.",

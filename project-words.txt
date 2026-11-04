@@ -25,6 +25,8 @@ bunx
 bwrap
 byos
 cachix
+canister
+canisters
 casita
 casitar
 cfasync
@@ -32,6 +34,9 @@ cheatsheet
 checkboxed
 checkpointing
 chrono
+ckbtc
+cketh
+cksol
 cksum
 clinerules
 clippy
@@ -52,6 +57,8 @@ crdts
 criticalthink
 crossterm
 cursorrules
+dapp
+dapps
 databaseId
 dataclass
 dataclasses
@@ -62,6 +69,7 @@ demoable
 despawn
 despawns
 devenv
+dfinity
 direnv
 dnsutils
 dockerfiles
@@ -111,7 +119,10 @@ hitl
 husky
 icap
 icat
+icrc
+icskills
 imgcat
+internetcomputer
 IPLD
 iseconds
 isResolved
@@ -152,6 +163,8 @@ mktemp
 mmdc
 mocharc
 mockability
+mops
+motoko
 mtimes
 multiprotocol
 nameWithOwner
@@ -178,6 +191,8 @@ Ondrej's
 oneline
 opencode
 ousterhout
+outcall
+outcalls
 pagefind
 pandoc
 pathlib
@@ -247,6 +262,8 @@ sqfs
 stfolder
 stignore
 strokecolor
+subaccount
+subaccounts
 sublicense
 subsubpath
 subthread
@@ -289,6 +306,9 @@ velero
 venv
 vercel
 verdana
+vetkd
+vetkey
+vetkeys
 walkdir
 wayfinder
 wayfinding

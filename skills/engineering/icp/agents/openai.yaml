@@ -1,0 +1,7 @@
+interface:
+  display_name: "Internet Computer (ICP)"
+  short_description: "Build, secure, and deploy Internet Computer canisters"
+  default_prompt: "Use $icp to build, secure, or deploy an Internet Computer canister."
+
+policy:
+  allow_implicit_invocation: true
