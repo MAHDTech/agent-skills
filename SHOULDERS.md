@@ -4,6 +4,7 @@ These skills exist because other people shared their work and their thinking fir
 
 ## Projects we adapted or build on
 
+- **[Impeccable - `pbakaus/impeccable`](https://github.com/pbakaus/impeccable)** - selected design workflow and craft guidance adapted into `interface-design`, with additional desktop, terminal, and game UI coverage. Used under Apache-2.0; attribution and the bundled license are recorded in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 - **[Matt Pocock - `mattpocock/skills`](https://github.com/mattpocock/skills)** - 15 of the skills here (across `engineering/`, `planning/`, `review/`, and `authoring/`) are adapted directly from Matt's collection, used under the MIT License. His category-as-lifecycle layout, prefix-free naming, and model-vs-user invocation split shaped how this whole repo is organized. Full license text lives in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 - **[Theo Browne - `t3dotgg/tstack`](https://github.com/t3dotgg/tstack)** - 3 adapted skills (`gh-pr-comments`, `gh-babysit-pr`, `gh-takeover`) and 4 upgraded workflows (`git-update-branch`, `gh-create-pr`, `gh-resolve-pr-comments`, `gh-submit-review`) under `github/`, used under the MIT License. Full license text lives in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 - **[Olshansk - `Olshansk/agent-skills`](https://github.com/Olshansk/agent-skills)** - early inspiration for structuring a personal, reusable skills collection.
