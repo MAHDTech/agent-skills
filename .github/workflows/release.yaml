@@ -86,7 +86,7 @@ jobs:
       contents: write
       pull-requests: read
       actions: read
-    uses: tars-cloud/actions/.github/workflows/consumer-rust-release-publish.yaml@26ffb67cc8d374672f646d6dd8829befa844b0e9 # v3.12.0
+    uses: tars-cloud/actions/.github/workflows/consumer-rust-release-publish.yaml@66eaed79bdbbb12ecbc98d3a50b6ab58b289b19b # v3.13.2
     with:
       commit-sha: ${{ needs.candidate.outputs.commit-sha }}
       artifact-run-id: ${{ github.run_id }}
