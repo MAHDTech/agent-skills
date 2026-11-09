@@ -268,6 +268,13 @@
       "digest": "sha256:be3dbf85a7ed023eda2b3e421424d505eb265e46502f9d7f9b17420fe8c34164"
     },
     {
+      "name": "interface-design",
+      "type": "skill-md",
+      "description": "Design, build, refine, or critique user interfaces across web, desktop, mobile, terminals, and games. Use for UI/UX decisions, visual systems, interaction flows, and rendered design reviews.",
+      "url": "/.well-known/agent-skills/interface-design/SKILL.md",
+      "digest": "sha256:66ed4a1fa3116343dddc4e219dcde06da7946d6249f38aba964b676e7a4f0239"
+    },
+    {
       "name": "jj",
       "type": "skill-md",
       "description": "Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.",
@@ -468,7 +475,7 @@
       "type": "skill-md",
       "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:ab003d4b61a3abbe0f41b5ede56b2a4ee5d0b8fa90da13ed23c8e1a847c76abc"
+      "digest": "sha256:a0e07c114baa57c3c8ef02047c25d025681fc6ca848077e1b6cf059cd89718dc"
     },
     {
       "name": "software-factory",
