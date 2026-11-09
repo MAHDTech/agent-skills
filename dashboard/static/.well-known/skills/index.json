@@ -267,6 +267,13 @@
       ]
     },
     {
+      "name": "interface-design",
+      "description": "Design, build, refine, or critique user interfaces across web, desktop, mobile, terminals, and games. Use for UI/UX decisions, visual systems, interaction flows, and rendered design reviews.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "name": "jj",
       "description": "Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.",
       "files": [

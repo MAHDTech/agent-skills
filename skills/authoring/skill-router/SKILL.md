@@ -107,6 +107,10 @@ Beyond `/code-review` on the main flow:
 - `/git-update-branch` - reach for this when a branch or stale PR has diverged from its base and needs conceptual-conflict checks before a deliberate rebase or merge.
 - `/gh-release-notes` - reach for this when you want release notes or a changelog for a version and to cut a GitHub release.
 
+## Interface design
+
+- [/interface-design](../../engineering/interface-design/SKILL.md) - reach for this when planning, building, refining, or critiquing UI/UX across web, desktop, mobile, terminal interfaces, and games. Covers visual vocabulary, interaction, accessibility, and rendered verification; retain framework specialists for API and integration details.
+
 ## Game and database development
 
 - `/bevy-development` - reach for this when working in the Bevy game engine (Rust ECS, systems, assets, states, scheduling).
