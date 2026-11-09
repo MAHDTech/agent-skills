@@ -11,6 +11,7 @@ antipatterns
 apos
 approvable
 arcsize
+Bakaus
 bao
 basenames
 baseRefName
@@ -199,6 +200,7 @@ pathlib
 peaceiris
 permessage
 pgrep
+pbakaus
 pkgs
 Pocock
 prefactoring

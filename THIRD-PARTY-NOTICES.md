@@ -2,6 +2,10 @@
 
 This project includes work adapted from other open-source projects. Their licenses and notices are reproduced below.
 
+## pbakaus/impeccable
+
+The `interface-design` skill adapts selected guidance from [Impeccable](https://github.com/pbakaus/impeccable), copyright 2025 Paul Bakaus, under the Apache License, Version 2.0. The modified workflow and references broaden its scope across interface platforms and remove upstream runtime dependencies. The full [upstream license](skills/engineering/interface-design/resources/manual/LICENSE.impeccable) ships with the skill; [sources and maintenance](skills/engineering/interface-design/resources/manual/sources.md) records the reviewed revision and adaptations.
+
 ## mattpocock/skills
 
 A number of the skills in this repository - across the `engineering/`, `planning/`, `review/`, and `authoring/` categories - are adapted from Matt Pocock's skills collection at <https://github.com/mattpocock/skills>, used under the MIT License.

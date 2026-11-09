@@ -1,0 +1,7 @@
+interface:
+  display_name: "Interface Design"
+  short_description: "Design and review interfaces across platforms"
+  default_prompt: "Use $interface-design to design or improve this interface."
+
+policy:
+  allow_implicit_invocation: true
