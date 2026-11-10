@@ -1,9 +1,17 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.57](https://github.com/MAHDTech/agent-skills/compare/v0.1.56...f66c34c4f24658978122217ca823d3cb447e152a) (2026-11-05)
+## [v0.1.58](https://github.com/MAHDTech/agent-skills/compare/v0.1.57...7f4282fa5c69f305fd690dbeeda4bc3821f09e85) (2026-11-09)
 
 ### Features
+
+* **skills:** add cross-platform interface design guidance (#318)
+([1d2b8a4](https://github.com/MAHDTech/agent-skills/commit/1d2b8a4cec38e1f485231a7d57b2b01cd5a1974b)),
+closes [#318](https://github.com/MAHDTech/agent-skills/issues/318)
+
+### [v0.1.57](https://github.com/MAHDTech/agent-skills/compare/v0.1.56...v0.1.57) (2026-11-05)
+
+#### Features
 
 * **skills:** add agent-router skill with automated resource downloads (#311)
 ([6cad376](https://github.com/MAHDTech/agent-skills/commit/6cad376733450d7bbbbc47c18202187e0b85367d)),
@@ -22,7 +30,7 @@ closes [#297](https://github.com/MAHDTech/agent-skills/issues/297)
 ([70e8e42](https://github.com/MAHDTech/agent-skills/commit/70e8e42fdef6475bb326ab1c7ef1bd64262b266f)),
 closes [#292](https://github.com/MAHDTech/agent-skills/issues/292)
 
-### Fixes
+#### Fixes
 
 * **dashboard:** improve muted text contrast across tars themes (#307)
 ([5aedd89](https://github.com/MAHDTech/agent-skills/commit/5aedd898acf4f5f97da904a71181dc45b507349c)),
