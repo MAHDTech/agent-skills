@@ -6,6 +6,11 @@ sources:
     ref: main
     path: skills
     excludes: []
+  - id: dbos
+    repository: https://github.com/dbos-inc/agent-skills.git
+    ref: main
+    path: skills
+    excludes: []
   - id: spacetimedb
     repository: https://github.com/clockworklabs/SpacetimeDB.git
     ref: master

@@ -488,3 +488,70 @@ fn vendor_layout_changes_do_not_silently_drop_nested_skills() {
             .contains("Previous version")
     );
 }
+
+#[cfg(unix)]
+#[test]
+fn vendor_refresh_materializes_contained_file_symlinks() {
+    use std::os::unix::fs::symlink;
+
+    let temp = tempdir().unwrap();
+    let upstream = temp.path().join("upstream");
+    let root = temp.path().join("catalog");
+    repository(&upstream);
+    fs::create_dir_all(&root).unwrap();
+    skill(&upstream, "alpha", "# Alpha skill");
+    let skill_dir = upstream.join("skills/alpha");
+    fs::write(skill_dir.join("AGENTS.md"), "# Agent navigation guide\n").unwrap();
+    symlink("AGENTS.md", skill_dir.join("CLAUDE.md")).unwrap();
+    commit(&upstream);
+    manifest(&root, &[("example", &upstream)]);
+
+    let report = update_vendors(&root, None).unwrap();
+    assert!(report.fetched.contains_key("example"), "{report:?}");
+
+    let materialized = root.join("skills/vendor/example/alpha/CLAUDE.md");
+    let meta = fs::symlink_metadata(&materialized).unwrap();
+    assert!(meta.file_type().is_file());
+    assert!(!meta.file_type().is_symlink());
+    assert_eq!(
+        fs::read_to_string(&materialized).unwrap(),
+        "# Agent navigation guide\n"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn vendor_refresh_rejects_escaping_broken_and_directory_symlinks() {
+    use std::os::unix::fs::symlink;
+
+    let temp = tempdir().unwrap();
+
+    for kind in ["broken", "escaping", "directory"] {
+        let upstream = temp.path().join(format!("upstream-{kind}"));
+        let root = temp.path().join(format!("catalog-{kind}"));
+        repository(&upstream);
+        fs::create_dir_all(&root).unwrap();
+        fs::write(upstream.join("OUTSIDE.md"), "outside").unwrap();
+        skill(&upstream, "alpha", "# Alpha skill");
+        let skill_dir = upstream.join("skills/alpha");
+        fs::create_dir_all(skill_dir.join("references")).unwrap();
+        fs::write(skill_dir.join("references/guide.md"), "guide").unwrap();
+
+        match kind {
+            "broken" => symlink("missing.md", skill_dir.join("CLAUDE.md")).unwrap(),
+            "escaping" => symlink("../../OUTSIDE.md", skill_dir.join("CLAUDE.md")).unwrap(),
+            "directory" => symlink("references", skill_dir.join("linked-refs")).unwrap(),
+            _ => unreachable!(),
+        }
+
+        commit(&upstream);
+        manifest(&root, &[("example", &upstream)]);
+
+        let report = update_vendors(&root, None).unwrap();
+        assert!(
+            report.skipped.contains_key("example"),
+            "expected {kind} symlink to be rejected, got {report:?}"
+        );
+        assert!(!root.join("skills/vendor/example/alpha").exists());
+    }
+}
