@@ -16,7 +16,7 @@ mermaid = false
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Consult the [gh pr manual](@/skills/github/gh-resolve-pr-comments/resources/auto/manual-gh_pr.md) for more details.
+Consult the `gh pr` manual in `resources/auto/manual-gh_pr.md` for more details.
 
 Pull human and AI review-bot comments from the current branch's PR, verify every claim against source, align on a triage plan with the developer, apply minimal fixes or evidence-backed pushback, and reply before resolving threads.
 

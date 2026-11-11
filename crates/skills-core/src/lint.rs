@@ -339,7 +339,7 @@ impl SkillLinter {
                     parent.to_path_buf()
                 };
 
-                Self::scan_relative_links(line, line_num, &skill.path, &base_dir, report);
+                Self::scan_relative_links(line, line_num, skill, &base_dir, report);
             }
         }
     }
@@ -347,7 +347,7 @@ impl SkillLinter {
     fn scan_relative_links(
         line: &str,
         line_num: usize,
-        skill_file: &Path,
+        skill: &Skill,
         base_dir: &Path,
         report: &mut LintReport,
     ) {
@@ -375,16 +375,23 @@ impl SkillLinter {
                             let target_path = base_dir.join(clean_target);
                             if !target_path.exists() {
                                 report.add(
-                                        LintIssue::builder()
-                                            .file(skill_file.to_path_buf())
-                                            .line(Some(line_num))
-                                            .rule("broken-relative-links")
-                                            .message(format!(
-                                                "Broken relative link: referenced file '{clean_target}' does not exist on disk"
-                                            ))
-                                            .severity(LintSeverity::Error)
-                                            .build(),
-                                    );
+                                    LintIssue::builder()
+                                        .file(skill.path.clone())
+                                        .line(Some(line_num))
+                                        .rule("broken-relative-links")
+                                        .message(format!(
+                                            "Broken relative link: referenced file '{clean_target}' does not exist on disk"
+                                        ))
+                                        .severity(LintSeverity::Error)
+                                        .build(),
+                                );
+                            } else {
+                                Self::check_auto_resource_link(
+                                    clean_target,
+                                    line_num,
+                                    skill,
+                                    report,
+                                );
                             }
                         }
                     }
@@ -394,6 +401,31 @@ impl SkillLinter {
                 }
             }
             remaining = after_bracket;
+        }
+    }
+
+    fn check_auto_resource_link(
+        clean_target: &str,
+        line_num: usize,
+        skill: &Skill,
+        report: &mut LintReport,
+    ) {
+        if skill.tree != SkillTree::Live {
+            return;
+        }
+        let normalized = clean_target.strip_prefix("./").unwrap_or(clean_target);
+        if normalized == "resources/auto" || normalized.starts_with("resources/auto/") {
+            report.add(
+                LintIssue::builder()
+                    .file(skill.path.clone())
+                    .line(Some(line_num))
+                    .rule("fragile-auto-resource-link")
+                    .message(format!(
+                        "Fragile relative link to auto-downloaded resource '{clean_target}': reference 'resources/auto/' via inline code or directory search instead of Markdown links"
+                    ))
+                    .severity(LintSeverity::Warning)
+                    .build(),
+            );
         }
     }
 

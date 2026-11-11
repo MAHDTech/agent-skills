@@ -282,13 +282,13 @@ Casita uses explicit, typed error categories and deterministic integrity checks:
 
 ## 9. Further Reference and Detailed Guides
 
-The following in-depth guides are vendored under `resources/auto/`:
+Consult `resources/auto/llms.txt` or `resources/auto/llms-full.txt`, and inspect topic guides under `resources/auto/`:
 
-- **CLI and Commands**: [CLI Reference](resources/auto/reference-cli-index.md) and [Quick Start](resources/auto/getting-started-index.md)
-- **Rust APIs**: [Rust API Reference](resources/auto/reference-rust-api-index.md) and [Experimental Rust API](resources/auto/reference-experimental-rust-api-index.md)
-- **Concepts and Architecture**: [Concepts Overview](resources/auto/concepts-index.md), [Blob Storage](resources/auto/concepts-blob-storage-index.md), [Directory Storage](resources/auto/concepts-directory-storage-index.md), and [Division of Responsibilities](resources/auto/concepts-responsibilities-index.md)
-- **Lifecycle and Maintenance**: [Roots and Retention](resources/auto/concepts-roots-and-retention-index.md), [Garbage Collection](resources/auto/concepts-garbage-collection-index.md), and [Shared Payload Services](resources/auto/concepts-shared-payload-services-index.md)
-- **Synchronization and Transport**: [Sync Guide](resources/auto/guides-sync-index.md) and [Casitar Archives](resources/auto/guides-casitar-index.md)
-- **Integrations and Operations**: [Operations Guide](resources/auto/guides-operations-index.md), [Cargo Integration](resources/auto/integrations-cargo-index.md), and [Local IPC](resources/auto/integrations-ipc-index.md)
-- **Integrity and Errors**: [Errors and Integrity](resources/auto/reference-errors-index.md) and [Object Formats](resources/auto/reference-object-formats-index.md)
-- **Complete Docs**: [Full Documentation](resources/auto/llms-full.txt)
+- **CLI and Commands**: `resources/auto/reference-cli-index.md` and `resources/auto/getting-started-index.md`
+- **Rust APIs**: `resources/auto/reference-rust-api-index.md` and `resources/auto/reference-experimental-rust-api-index.md`
+- **Concepts and Architecture**: `resources/auto/concepts-index.md`, `resources/auto/concepts-blob-storage-index.md`, `resources/auto/concepts-directory-storage-index.md`, and `resources/auto/concepts-responsibilities-index.md`
+- **Lifecycle and Maintenance**: `resources/auto/concepts-roots-and-retention-index.md`, `resources/auto/concepts-garbage-collection-index.md`, and `resources/auto/concepts-shared-payload-services-index.md`
+- **Synchronization and Transport**: `resources/auto/guides-sync-index.md` and `resources/auto/guides-casitar-index.md`
+- **Integrations and Operations**: `resources/auto/guides-operations-index.md`, `resources/auto/integrations-cargo-index.md`, and `resources/auto/integrations-ipc-index.md`
+- **Integrity and Errors**: `resources/auto/reference-errors-index.md` and `resources/auto/reference-object-formats-index.md`
+- **Complete Docs**: `resources/auto/llms.txt` and `resources/auto/llms-full.txt`

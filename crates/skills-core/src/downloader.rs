@@ -13,7 +13,8 @@ use typed_builder::TypedBuilder;
 
 use crate::error::{Result, SkillError};
 use crate::models::{
-    ResourceFile, ResourceKind, Skill, SkillsDiscoveryEntry, SkillsDiscoveryIndex, SkillsManifest,
+    ResourceFile, ResourceKind, Skill, SkillTree, SkillsDiscoveryEntry, SkillsDiscoveryIndex,
+    SkillsManifest,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -147,7 +148,7 @@ impl SkillDownloader {
     /// any unreferenced orphaned files in `resources/auto/`.
     /// Never modifies or deletes any files in `resources/manual/`.
     pub async fn download_skill_resources(&self, skill: &Skill) -> Result<Vec<ResourceFile>> {
-        if skill.vendor_source().is_some() {
+        if !Self::is_managed_resource_skill(skill) {
             return Ok(Vec::new());
         }
         let skill_dir = skill.path.parent().unwrap_or_else(|| Path::new("."));
@@ -220,12 +221,7 @@ impl SkillDownloader {
                 }
             } else if Self::is_llms_index_url(clean_url) {
                 if let Ok(index_content) = self.fetch_url(clean_url).await {
-                    all_targets.push(ExpandedResourceTarget {
-                        url: clean_url.to_string(),
-                        expected_digest: None,
-                        skill_prefix: None,
-                        is_top_level: true,
-                    });
+                    Self::upsert_top_level_target(&mut all_targets, clean_url);
                     for child in Self::parse_llms_txt_links(&index_content, clean_url) {
                         if Self::is_skills_discovery_index_url(&child) {
                             if let Ok(index) = self.fetch_discovery_index(&child).await {
@@ -248,15 +244,27 @@ impl SkillDownloader {
                     }
                 }
             } else {
-                all_targets.push(ExpandedResourceTarget {
-                    url: clean_url.to_string(),
-                    expected_digest: None,
-                    skill_prefix: None,
-                    is_top_level: true,
-                });
+                Self::upsert_top_level_target(&mut all_targets, clean_url);
             }
         }
         Ok(all_targets)
+    }
+
+    fn is_managed_resource_skill(skill: &Skill) -> bool {
+        skill.tree == SkillTree::Live && skill.vendor_source().is_none()
+    }
+
+    fn upsert_top_level_target(targets: &mut Vec<ExpandedResourceTarget>, url: &str) {
+        if let Some(existing) = targets.iter_mut().find(|t| t.url == url) {
+            existing.is_top_level = true;
+        } else {
+            targets.push(ExpandedResourceTarget {
+                url: url.to_string(),
+                expected_digest: None,
+                skill_prefix: None,
+                is_top_level: true,
+            });
+        }
     }
 
     fn expand_discovery_index_entries(
@@ -447,7 +455,7 @@ impl SkillDownloader {
     ) -> Result<HashMap<String, Vec<ResourceFile>>> {
         let mut results = HashMap::new();
         for skill in skills {
-            if skill.vendor_source().is_some() {
+            if !Self::is_managed_resource_skill(skill) {
                 continue;
             }
             let files = self.download_skill_resources(skill).await?;
@@ -474,7 +482,7 @@ impl SkillDownloader {
     pub fn clean_all_resources(&self, skills: &[Skill]) -> Result<usize> {
         let mut count = 0;
         for skill in skills {
-            if skill.vendor_source().is_some() {
+            if !Self::is_managed_resource_skill(skill) {
                 continue;
             }
             if let Some(parent) = skill.path.parent() {
@@ -543,15 +551,18 @@ impl SkillDownloader {
         PREFIXES.iter().any(|p| lower.starts_with(p)) || CONTAINS.iter().any(|c| lower.contains(c))
     }
 
-    /// Checks if a URL targets an `llms.txt` or `llms-full.txt` index file.
+    /// Checks if a URL targets an `llms.txt` link-index file (excluding consolidated `llms-full` bundles).
     #[must_use]
     #[allow(clippy::case_sensitive_file_extension_comparisons)]
     pub fn is_llms_index_url(url_str: &str) -> bool {
-        let clean = url_str.split('?').next().unwrap_or(url_str);
+        let no_query = url_str.split('?').next().unwrap_or(url_str);
+        let clean = no_query.split('#').next().unwrap_or(no_query);
         let lower = clean.to_ascii_lowercase();
+        if lower.contains("llms-full") || lower.contains("llms_full") {
+            return false;
+        }
         lower.ends_with("/llms.txt")
             || lower.ends_with("/_llms.txt")
-            || lower.ends_with("/llms-full.txt")
             || (lower.contains("llms") && (lower.ends_with(".txt") || lower.ends_with(".md")))
     }
 
@@ -749,13 +760,24 @@ impl SkillDownloader {
             .trim_matches('"')
             .trim_matches('\'');
 
-        if clean_link.is_empty() || Self::is_non_text_url(clean_link) {
+        if clean_link.is_empty() || clean_link.starts_with('#') || Self::is_non_text_url(clean_link)
+        {
             return;
         }
 
-        let resolved = Self::resolve_relative_url(base_url, clean_link);
+        let resolved_raw = Self::resolve_relative_url(base_url, clean_link);
+        let resolved = resolved_raw
+            .split('#')
+            .next()
+            .unwrap_or(&resolved_raw)
+            .to_string();
+        let clean_base = base_url.split('#').next().unwrap_or(base_url);
         let link_domain = Self::get_domain_prefix(&resolved);
-        if link_domain == base_domain && resolved != base_url && !links.contains(&resolved) {
+        if !resolved.is_empty()
+            && link_domain == base_domain
+            && resolved != clean_base
+            && !links.contains(&resolved)
+        {
             links.push(resolved);
         }
     }

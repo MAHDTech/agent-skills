@@ -21,15 +21,15 @@ AgentRouter also powers the underlying Agent Gateway and unified endpoint router
 
 Before authoring gateway configurations, routing policies, MCP server definitions, or client integrations, inspect the downloaded upstream documentation in `resources/auto/`:
 
-1. Read [`resources/auto/llms.txt`](resources/auto/llms.txt) first to locate the relevant getting-started, concept, capability, CLI, or API reference guide.
+1. Read `resources/auto/llms.txt` first to locate the relevant getting-started, concept, capability, CLI, or API reference guide.
 2. Open the matching reference files in `resources/auto/` to verify exact CRD group versions, field names, CLI flags, and security policies:
-   - Core CRDs and architecture: [`resources/auto/docs-concepts-resources.md`](resources/auto/docs-concepts-resources.md), [`resources/auto/docs-concepts-architecture-system-architecture.md`](resources/auto/docs-concepts-architecture-system-architecture.md), and [`resources/auto/docs-api.md`](resources/auto/docs-api.md)
-   - Provider connections and LLM routing: [`resources/auto/docs-capabilities-llm-integrations-connect-providers.md`](resources/auto/docs-capabilities-llm-integrations-connect-providers.md), [`resources/auto/docs-capabilities-llm-integrations-supported-providers.md`](resources/auto/docs-capabilities-llm-integrations-supported-providers.md), and [`resources/auto/docs-capabilities-inference-inferencepool-support.md`](resources/auto/docs-capabilities-inference-inferencepool-support.md)
-   - MCP gateway routing: [`resources/auto/docs-capabilities-mcp.md`](resources/auto/docs-capabilities-mcp.md)
-   - A2A agent traffic: [`resources/auto/docs-capabilities-a2a.md`](resources/auto/docs-capabilities-a2a.md)
-   - Traffic policies, fallback, and token rate limiting: [`resources/auto/docs-capabilities-traffic-provider-fallback.md`](resources/auto/docs-capabilities-traffic-provider-fallback.md), [`resources/auto/docs-capabilities-traffic-usage-based-ratelimiting.md`](resources/auto/docs-capabilities-traffic-usage-based-ratelimiting.md), and [`resources/auto/docs-capabilities-traffic-quota-policy.md`](resources/auto/docs-capabilities-traffic-quota-policy.md)
-   - Security and observability: [`resources/auto/docs-capabilities-security-upstream-auth.md`](resources/auto/docs-capabilities-security-upstream-auth.md), [`resources/auto/docs-capabilities-observability-metrics.md`](resources/auto/docs-capabilities-observability-metrics.md), and [`resources/auto/docs-capabilities-observability-tracing.md`](resources/auto/docs-capabilities-observability-tracing.md)
-   - Standalone CLI (`aigw`): [`resources/auto/docs-cli.md`](resources/auto/docs-cli.md) and [`resources/auto/docs-cli-aigwrun.md`](resources/auto/docs-cli-aigwrun.md)
+   - Core CRDs and architecture: `resources/auto/docs-concepts-resources.md`, `resources/auto/docs-concepts-architecture-system-architecture.md`, and `resources/auto/docs-api.md`
+   - Provider connections and LLM routing: `resources/auto/docs-capabilities-llm-integrations-connect-providers.md`, `resources/auto/docs-capabilities-llm-integrations-supported-providers.md`, and `resources/auto/docs-capabilities-inference-inferencepool-support.md`
+   - MCP gateway routing: `resources/auto/docs-capabilities-mcp.md`
+   - A2A agent traffic: `resources/auto/docs-capabilities-a2a.md`
+   - Traffic policies, fallback, and token rate limiting: `resources/auto/docs-capabilities-traffic-provider-fallback.md`, `resources/auto/docs-capabilities-traffic-usage-based-ratelimiting.md`, and `resources/auto/docs-capabilities-traffic-quota-policy.md`
+   - Security and observability: `resources/auto/docs-capabilities-security-upstream-auth.md`, `resources/auto/docs-capabilities-observability-metrics.md`, and `resources/auto/docs-capabilities-observability-tracing.md`
+   - Standalone CLI (`aigw`): `resources/auto/docs-cli.md` and `resources/auto/docs-cli-aigwrun.md`
 
 ---
 
@@ -92,7 +92,7 @@ spec:
 
 - Use `toolSelector` in `MCPRoute` backend references to filter exposed tools by exact name or regular expression.
 - Upstream tool names are prefixed with the backend name (for example, `github__issue_read`) so tool invocations route deterministically across multiplexed MCP backends.
-- Consult [`resources/auto/docs-capabilities-mcp.md`](resources/auto/docs-capabilities-mcp.md) for OAuth authorization, JWT scope enforcement, and per-user header forwarding.
+- Consult `resources/auto/docs-capabilities-mcp.md` (via `resources/auto/llms.txt`) for OAuth authorization, JWT scope enforcement, and per-user header forwarding.
 
 ### 3. Agent-to-Agent (A2A) Routing and Guardrails
 
@@ -101,7 +101,7 @@ AgentRouter routes Agent2Agent (A2A) traffic using Envoy Gateway `HTTPRoute` res
 - Expose public agent discovery on `GET /.well-known/agent-card.json` and JSON-RPC task execution on `POST /a2a` with extended streaming timeouts (for example, `30m` for Server-Sent Events).
 - Isolate A2A listeners onto a dedicated `Gateway` resource or per-route filter scope so JSON-RPC envelope validation does not buffer unrelated LLM routes.
 - Attach `SecurityPolicy`, token rate limits (`BackendTrafficPolicy`), and `QuotaPolicy` rules to enforce authentication and usage budgets across agent calls.
-- Consult [`resources/auto/docs-capabilities-a2a.md`](resources/auto/docs-capabilities-a2a.md) for complete listener and route manifests.
+- Consult `resources/auto/docs-capabilities-a2a.md` (via `resources/auto/llms.txt`) for complete listener and route manifests.
 
 ### 4. Nutanix Enterprise AI (NAI) Gateway Integration
 
@@ -114,6 +114,6 @@ When working in a Nutanix Enterprise AI environment, choose the skill that match
 
 ## Completion Criteria
 
-- Gateway routes, provider credentials, and MCP/A2A schemas are verified against [`resources/auto/llms.txt`](resources/auto/llms.txt) and the corresponding `resources/auto/*.md` reference guides.
+- Gateway routes, provider credentials, and MCP/A2A schemas are verified against `resources/auto/llms.txt` and the corresponding `resources/auto/*.md` reference guides.
 - Kubernetes manifests (`AIGatewayRoute`, `AIServiceBackend`, `BackendSecurityPolicy`, `MCPRoute`, `HTTPRoute`) and client requests specify explicit API versions, authentication headers, timeouts, and model or tool selectors.
 - All configuration changes and documentation updates pass repository skill and catalog validation (`ask skills lint`).

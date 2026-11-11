@@ -3,7 +3,7 @@
 
 use skills_core::downloader::SkillDownloader;
 use skills_core::models::{
-    ResourceKind, Skill, SkillCategory, SkillFrontmatter, SkillsDiscoveryEntry,
+    ResourceKind, Skill, SkillCategory, SkillFrontmatter, SkillTree, SkillsDiscoveryEntry,
     SkillsDiscoveryIndex,
 };
 use std::fs::{self, File};
@@ -745,4 +745,131 @@ async fn test_download_skill_resources_digest_mismatch_returns_error() {
     let auto_dir = skill_dir.join("resources/auto");
     let entries: Vec<_> = fs::read_dir(&auto_dir).unwrap().flatten().collect();
     assert!(entries.is_empty());
+}
+
+#[tokio::test]
+async fn test_download_and_clean_skip_archived_skills() {
+    let dir = tempdir().unwrap();
+    let archive_skill_dir = dir.path().join("skills-archive/engineering/retired-skill");
+    let auto_dir = archive_skill_dir.join("resources/auto");
+    fs::create_dir_all(&auto_dir).unwrap();
+    let preserved_file = auto_dir.join("legacy-doc.md");
+    fs::write(&preserved_file, "# Legacy Doc").unwrap();
+
+    let fm = SkillFrontmatter::builder()
+        .name("retired-skill")
+        .description("Archived skill should not be fetched or cleaned")
+        .resources(vec!["http://127.0.0.1:9/should-not-fetch.md".to_string()])
+        .build();
+
+    let archived_skill = Skill::builder()
+        .path(archive_skill_dir.join("SKILL.md"))
+        .dir_name("retired-skill".to_string())
+        .category(SkillCategory::Engineering)
+        .promoted(false)
+        .tree(SkillTree::Archive)
+        .archived(Some("2026-01-01".to_string()))
+        .frontmatter(fm)
+        .content("# Retired".to_string())
+        .raw("---\nname: retired-skill\n---".to_string())
+        .resources(Vec::new())
+        .build();
+
+    let downloader = SkillDownloader::builder().max_retries(0).build();
+    let single = downloader
+        .download_skill_resources(&archived_skill)
+        .await
+        .unwrap();
+    assert!(single.is_empty());
+
+    let batch = downloader
+        .download_all_resources(std::slice::from_ref(&archived_skill))
+        .await
+        .unwrap();
+    assert!(batch.is_empty());
+
+    let cleaned = downloader
+        .clean_all_resources(std::slice::from_ref(&archived_skill))
+        .unwrap();
+    assert_eq!(cleaned, 0);
+    assert!(preserved_file.exists());
+}
+
+#[tokio::test]
+async fn test_llms_full_not_crawled_and_fragment_links_deduplicated() {
+    assert!(SkillDownloader::is_llms_index_url(
+        "https://example.com/llms.txt"
+    ));
+    assert!(SkillDownloader::is_llms_index_url(
+        "https://example.com/docs/devenv-llms.txt"
+    ));
+    assert!(!SkillDownloader::is_llms_index_url(
+        "https://example.com/llms-full.txt"
+    ));
+    assert!(!SkillDownloader::is_llms_index_url(
+        "https://example.com/docs/llms-full.txt?raw=1"
+    ));
+
+    let mock_server = MockServer::start().await;
+    let base_uri = mock_server.uri();
+
+    let llms_index = format!(
+        "# Index\n\
+         - [Overview](#overview)\n\
+         - [Features Intro]({base_uri}/docs/features.md#intro)\n\
+         - [Features Git]({base_uri}/docs/features.md#git)\n\
+         - [Full Bundle]({base_uri}/docs/llms-full.txt)\n"
+    );
+    let llms_full = format!(
+        "# Consolidated Bundle\n\
+         Should not crawl [Unreachable]({base_uri}/docs/never-crawl.md)\n"
+    );
+
+    Mock::given(method("GET"))
+        .and(path("/llms.txt"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(llms_index))
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/docs/features.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_string("# Features"))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/docs/llms-full.txt"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(llms_full))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    let dir = tempdir().unwrap();
+    let skill_dir = dir.path().join("skills/tooling/dedup-skill");
+    fs::create_dir_all(&skill_dir).unwrap();
+
+    let fm = SkillFrontmatter::builder()
+        .name("dedup-skill")
+        .description("Verify llms-full and fragment deduplication")
+        .resources(vec![
+            format!("{base_uri}/llms.txt"),
+            format!("{base_uri}/docs/llms-full.txt"),
+        ])
+        .build();
+
+    let skill = Skill::builder()
+        .path(skill_dir.join("SKILL.md"))
+        .dir_name("dedup-skill".to_string())
+        .category(SkillCategory::Tooling)
+        .promoted(true)
+        .frontmatter(fm)
+        .content("# Dedup Skill".to_string())
+        .raw("---\nname: dedup-skill\n---".to_string())
+        .resources(Vec::new())
+        .build();
+
+    let downloader = SkillDownloader::builder().max_retries(0).build();
+    let files = downloader.download_skill_resources(&skill).await.unwrap();
+    assert_eq!(files.len(), 3);
 }

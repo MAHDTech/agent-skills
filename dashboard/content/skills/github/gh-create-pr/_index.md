@@ -16,7 +16,7 @@ mermaid = false
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Consult the [gh pr manual](@/skills/github/gh-create-pr/resources/auto/manual-gh_pr.md) for more details.
+Consult the `gh pr` manual in `resources/auto/manual-gh_pr.md` for more details.
 
 Generate a concise PR description by analyzing the diff against a base branch.
 
@@ -232,7 +232,7 @@ _tl;dr Single sentence, 120 characters max, summarizing the most important outco
 
 ## GitHub Admonitions
 
-Use [GitHub admonitions](@/skills/github/gh-create-pr/resources/auto/en-get-started-writing-on-github-getting-started-with-writing-and-formatting-on-github-basic-writing-and-formatting-syntax.md#alerts) at the **very top** of the description (before the tl;dr) when the PR has important context that reviewers need upfront. Do NOT use admonitions by default - only when one of the situations below applies.
+Use GitHub admonitions (see `resources/auto/en-get-started-writing-on-github-getting-started-with-writing-and-formatting-on-github-basic-writing-and-formatting-syntax.md`) at the **very top** of the description (before the tl;dr) when the PR has important context that reviewers need upfront. Do NOT use admonitions by default - only when one of the situations below applies.
 
 **Syntax:**
 

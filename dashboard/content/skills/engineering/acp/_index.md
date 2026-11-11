@@ -187,5 +187,5 @@ ACP v2 introduces several protocol refinements:
 
 Detailed specifications and RFD documents are downloaded into `resources/auto/` for deep reference:
 
-- [LLMs Index](resources/auto/llms.txt) - Master listing of all ACP specs, announcements, and RFDs.
+- `resources/auto/llms.txt` - Master listing of all ACP specs, announcements, and RFDs.
 

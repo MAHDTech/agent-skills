@@ -109,6 +109,6 @@ Devenv integrates with SecretSpec, a tool that manages secret resolution and aud
 
 ## References
 
-- [Devenv Documentation](@/skills/tooling/devenv/resources/auto/getting-started-index.md)
+- Local reference docs in `resources/auto/` (`resources/auto/devenv-llms.txt`, `resources/auto/devenv-llms-full.txt`, and `resources/auto/llms.txt`)
 - [Devenv MCP Server](https://mcp.devenv.sh) (Online-Only)
 

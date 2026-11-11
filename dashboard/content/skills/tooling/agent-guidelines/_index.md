@@ -12,7 +12,7 @@ mermaid = false
 
 # Guidelines
 
-Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](@/skills/tooling/agent-guidelines/resources/auto/karpathy-status-2015883857489522876.md) on LLM coding pitfalls.
+Behavioral guidelines to reduce common LLM coding mistakes, derived from Andrej Karpathy's observations on LLM coding pitfalls (cached in `resources/auto/karpathy-status-2015883857489522876.md`).
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 

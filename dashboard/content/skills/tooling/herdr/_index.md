@@ -25,9 +25,9 @@ This skill serves two distinct roles:
 
 ## Progressive Disclosure & Reference Resources
 
-- **Full Documentation Index (CLI, Config, Integrations, Socket API):** See [resources/auto/llms-full.txt](resources/auto/llms-full.txt) for the complete consolidated reference covering CLI commands, `config.toml` keybindings, agent lifecycle integrations, and socket protocol commands.
-- **Human Setup & Troubleshooting Guide:** See [resources/auto/agent-guide.md](@/skills/tooling/herdr/resources/auto/agent-guide.md) for human onboarding, concept models, and diagnostic recipes.
-- **Upstream Agent Control Skill:** See [resources/auto/herdrdev-herdr-master-skills-herdr-skill.md](@/skills/tooling/herdr/resources/auto/herdrdev-herdr-master-skills-herdr-skill.md) for the upstream agent skill file.
+- **Full Documentation Index (CLI, Config, Integrations, Socket API):** See `resources/auto/llms.txt` and `resources/auto/llms-full.txt` for the consolidated reference covering CLI commands, `config.toml` keybindings, agent lifecycle integrations, and socket protocol commands.
+- **Human Setup & Troubleshooting Guide:** Search `resources/auto/` (such as `resources/auto/agent-guide.md`) via `resources/auto/llms.txt` for human onboarding, concept models, and diagnostic recipes.
+- **Upstream Agent Control Skill:** See `resources/auto/herdrdev-herdr-master-skills-herdr-skill.md` for the upstream agent skill file.
 - **Alacritty macOS Keybindings Guide:** See [resources/manual/herdr-alacritty.md](@/skills/tooling/herdr/resources/manual/herdr-alacritty.md) for binding macOS Command (Cmd/Super) keys to Herdr actions via Kitty CSI-u escape sequences in Alacritty.
 
 ---

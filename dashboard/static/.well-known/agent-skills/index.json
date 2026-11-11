@@ -6,28 +6,28 @@
       "type": "skill-md",
       "description": "Build, integrate, or debug Agent Client Protocol agents and clients with official SDKs. Use for ACP sessions, tool calls, schemas, transports, or protocol migrations.",
       "url": "/.well-known/agent-skills/acp/SKILL.md",
-      "digest": "sha256:1962df3948c888b107d6298897a1b1c69919bfdeafa03500f2253e375958cda0"
+      "digest": "sha256:d669d807183e74861343062373bf516773dc4f25ce17e05500fc4c1cad47f962"
     },
     {
       "name": "agent-guidelines",
       "type": "skill-md",
       "description": "Apply coding discipline before and during implementation: state assumptions, keep changes minimal and scoped, and verify behavior against concrete success criteria.",
       "url": "/.well-known/agent-skills/agent-guidelines/SKILL.md",
-      "digest": "sha256:6983dae74cc723e47d397a635ff15655daa5ca11493d89f6ce1d038a525269ad"
+      "digest": "sha256:9d6312e0b89e23b4682d99d28f6e636b4199f12031751ac47bfcf27d23876680"
     },
     {
       "name": "agent-router",
       "type": "skill-md",
       "description": "Configure, route, or troubleshoot AgentRouter AI gateways, unified LLM endpoints, and MCP or A2A servers, including the gateway powering Nutanix Enterprise AI (NAI).",
       "url": "/.well-known/agent-skills/agent-router/SKILL.md",
-      "digest": "sha256:b7bf9c3f78de4259f65aa49b7800cea3e809df762e7542cf096567fea07f0958"
+      "digest": "sha256:2f9a58bd1c64ef01f1f5860d8a1fc2babcabd99913ee220b61fc3fdda1fea99b"
     },
     {
       "name": "antigravity",
       "type": "skill-md",
       "description": "Look up Google Antigravity/AGY CLI, IDE, and SDK behavior. Use for its settings, commands, keybindings, agent permissions, hooks, or plugin integration.",
       "url": "/.well-known/agent-skills/antigravity/SKILL.md",
-      "digest": "sha256:383c25412fed412670493ce08f1c3a31e7a3a72e686f2f001a591806287688fb"
+      "digest": "sha256:7cd4f491313844f2a6dd3338e7985dd31570ec94b4d264be29b89b35ab4910a2"
     },
     {
       "name": "bevy-development",
@@ -62,7 +62,7 @@
       "type": "skill-md",
       "description": "Use for Casita CLI or Rust API work: immutable object storage, imports, roots and retention, verified sync, Casitar archives, integrity checks, or garbage collection.",
       "url": "/.well-known/agent-skills/casita/SKILL.md",
-      "digest": "sha256:c55d30181f3c26680dedc818c11a5eb9dd3e4696113e5fcc0b1a5fec9e6b23ac"
+      "digest": "sha256:7710e0978eb1633bc2f7c065d525bc6afc97a14dc46288251f96b7a6deb24ae0"
     },
     {
       "name": "characterization-tests",
@@ -104,7 +104,7 @@
       "type": "skill-md",
       "description": "Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands. Follow its shell, dependency, SecretSpec, hook, and test-runner conventions.",
       "url": "/.well-known/agent-skills/devenv/SKILL.md",
-      "digest": "sha256:3056dc80930aaf2c040ce64e39244517d8b51220fd9d5b518df57e95ae9a8125"
+      "digest": "sha256:e9e8dd0e9739418c48b0241fbd0cc386861b84bdda627a2fd246bb520bf676f1"
     },
     {
       "name": "diagnosing-bugs",
@@ -146,14 +146,14 @@
       "type": "skill-md",
       "description": "Create a structured GitHub issue from the current conversation with gh CLI. Use when asked to file an issue that preserves the problem, discussion, constraints, and agreed implementation plan.",
       "url": "/.well-known/agent-skills/gh-create-issue/SKILL.md",
-      "digest": "sha256:097d92bba016f739aa5b2d9a2176707e15151d595533ca64f785acf3f7f2aeb1"
+      "digest": "sha256:a3e0c1ec0d350a80dd937119e07f9d632ef67eece518793a0b3071528cdc8f1c"
     },
     {
       "name": "gh-create-pr",
       "type": "skill-md",
       "description": "Draft a problem-first Conventional Commit PR title and description with secret scanning and REST fallback. Use when asked to create or update a PR after approval.",
       "url": "/.well-known/agent-skills/gh-create-pr/SKILL.md",
-      "digest": "sha256:2e592d2e38531f05b0bea0477c4da29a880a5c683b3a58392c60b69568af2eaf"
+      "digest": "sha256:e1c30bfca72dd688930beed409125573b51bce7e729333d10424cdba56f152e5"
     },
     {
       "name": "gh-pr-comments",
@@ -174,14 +174,14 @@
       "type": "skill-md",
       "description": "Triage and address human and AI bot PR review comments, push back on false positives, and reply before resolving threads. Use when asked to handle PR feedback.",
       "url": "/.well-known/agent-skills/gh-resolve-pr-comments/SKILL.md",
-      "digest": "sha256:3c84e87c41f252230e69452f1bbe1d66037a341d370e9ea5395a81dec10219fc"
+      "digest": "sha256:e5e65e3d6ba420ce9e5aebe94b270020b8fd4dfc9ffdff51f544446bf28cc351"
     },
     {
       "name": "gh-submit-review",
       "type": "skill-md",
       "description": "Publish a GitHub PR review with verdict, inline findings, secret scanning, and human-account attribution. Use when asked to submit a completed PR review.",
       "url": "/.well-known/agent-skills/gh-submit-review/SKILL.md",
-      "digest": "sha256:c816aadb41864c0d5e365c057d60aaa7e19cfc2f303e001373d8124ba7dade7b"
+      "digest": "sha256:8d0c370f8d634f0bc044f34c569700b3b94f91f72b57b14e50276ce831a0267c"
     },
     {
       "name": "gh-takeover",
@@ -195,7 +195,7 @@
       "type": "skill-md",
       "description": "Triage GitHub issues and external PRs: categorize, verify claims, interview as needed, and post agent-ready briefs. Use when asked to change backlog states or run a maintainer triage session.",
       "url": "/.well-known/agent-skills/gh-triage/SKILL.md",
-      "digest": "sha256:0ce4f76966ae563c38a1a69aeaa88e2fe87be58e7647d9ac1ab5488920e2ad09"
+      "digest": "sha256:8e3fddc7dc4969f09454102a3c492619e7266eeff2bb8c90cc2ccaf8fe1172a9"
     },
     {
       "name": "git-resolve-conflicts",
@@ -251,14 +251,14 @@
       "type": "skill-md",
       "description": "Operate Herdr panes, workspaces, or agent sessions when HERDR_ENV=1. Also use for Herdr setup, configuration, keybindings, and troubleshooting questions.",
       "url": "/.well-known/agent-skills/herdr/SKILL.md",
-      "digest": "sha256:320b66245c61d80aa1b4309b01bc650fd12119552532969267b4d69c6d5bd781"
+      "digest": "sha256:2791d5ecbaa9475bbe06121daf2915861747c631bbbe564668fc27be56ac3d44"
     },
     {
       "name": "icp",
       "type": "skill-md",
       "description": "Build, secure, test, and deploy Internet Computer (ICP) canisters and full-stack dapps in Motoko, Rust, and TypeScript. Use for canister architecture, stable memory, ICRC and chain-key tokens (ckBTC, ckETH, ckSOL), Internet Identity, vetKeys, HTTPS outcalls, or icp CLI workflows.",
       "url": "/.well-known/agent-skills/icp/SKILL.md",
-      "digest": "sha256:113dfc524ebe7ad376cb46d5bf0648fab2f8f5f75272a24ad5d8d1c838dea581"
+      "digest": "sha256:42cf6a0069dd0677a9e0185e7337998237299551620e350291d9b6d748b88f1d"
     },
     {
       "name": "install-skills",
@@ -279,14 +279,14 @@
       "type": "skill-md",
       "description": "Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.",
       "url": "/.well-known/agent-skills/jj/SKILL.md",
-      "digest": "sha256:e83bbf38de831f975e2d13995561e28e6caa39af2778821b8ee980acc1192b2b"
+      "digest": "sha256:f7d17fbf316e5c1df52c5c2d3d13f5569ab8bd7df5bf516aa89199b5d055bc58"
     },
     {
       "name": "model-context-protocol",
       "type": "skill-md",
       "description": "Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing.",
       "url": "/.well-known/agent-skills/model-context-protocol/SKILL.md",
-      "digest": "sha256:e4e5f59448ed149930b5d6bad7ca3ee5f4c0cb85461fc89e33951fb44b9d2b10"
+      "digest": "sha256:107c8c5aa2ec7f1850fe3c1360cfeb9113b251d2fa43d2477064d76e2140e49a"
     },
     {
       "name": "nix-shell",
@@ -335,7 +335,7 @@
       "type": "skill-md",
       "description": "Use Oak version control in repositories with .oak, or for oak.space tasks. Manage change stacks, conflicts, workspaces, dependency mounts, spaces, and Oak CI.",
       "url": "/.well-known/agent-skills/oak/SKILL.md",
-      "digest": "sha256:cd91ab9a8296994491827cc6d5b492775a0697894702a52bbcca2c9240b9bd73"
+      "digest": "sha256:3351de2a0d47e42fa1dbb82d3d04cfab6055408c1ea1672cedff3510864a19bc"
     },
     {
       "name": "optimize-performance",
@@ -349,7 +349,7 @@
       "type": "skill-md",
       "description": "Configure, build, or troubleshoot Pagefind search for a static website. Use for indexing options, content exclusions or weighting, generated assets, and client integration.",
       "url": "/.well-known/agent-skills/pagefind/SKILL.md",
-      "digest": "sha256:1abc8e22b4db5fe7a5fbe741ec59906efa6dcd9389c7cf611d2a8911f40798b5"
+      "digest": "sha256:35bb5352159fc616fc9ee57979853baaa9c2b58b14650a1e1f534e6abc4d40f3"
     },
     {
       "name": "pr-build-context",
@@ -468,7 +468,7 @@
       "type": "skill-md",
       "description": "Create or update custom agent skills with concise discovery descriptions, matching invocation policies, supporting resources, and catalog checks.",
       "url": "/.well-known/agent-skills/skill-creator/SKILL.md",
-      "digest": "sha256:494c26cd62184549d30f832b276ffbcaf6d28bbfa58552f7cc146e8a52d6aa0d"
+      "digest": "sha256:abddd11fae51339af895e5060cc138f7c276acf6c2e60aac5afc3bcda3867734"
     },
     {
       "name": "skill-router",
@@ -489,7 +489,7 @@
       "type": "skill-md",
       "description": "Develop or debug Spacetime/SpacetimeDB modules and real-time clients in Rust, C#, TypeScript, or C++. Use for schemas, backend functions, subscriptions, CLI work, bindings, or migrations.",
       "url": "/.well-known/agent-skills/spacetime/SKILL.md",
-      "digest": "sha256:1f8b9a8568941628cc149de718c1eeca848568415f7a7f04a60b0a6436e66757"
+      "digest": "sha256:d10f3a467e58df818b7ef419c0dd52b34beb1033359b9b8a8c5a6693bf3075da"
     },
     {
       "name": "store-plan",
@@ -503,7 +503,7 @@
       "type": "skill-md",
       "description": "Style components or build CSS with Tailwind CSS v4. Use for utility classes, CSS-first theme variables, imports, and CLI stylesheet compilation.",
       "url": "/.well-known/agent-skills/tailwind/SKILL.md",
-      "digest": "sha256:036fb12c00e9bc1b277d5de0fa99efbfa4d3376a42020d24c26d759f7f51b396"
+      "digest": "sha256:f3744ce22082808e77acccbeea5a14dee7e41ba3a8dd06355f2c9c3ef98769cf"
     },
     {
       "name": "tdd",
@@ -580,7 +580,7 @@
       "type": "skill-md",
       "description": "Build, serve, or customize an existing Zola site. Use for Tera templates, shortcodes, taxonomies, config.toml options, theme changes, or Zola build and link checks.",
       "url": "/.well-known/agent-skills/zola/SKILL.md",
-      "digest": "sha256:c65aec99ebbc2d2aa79e6eaba635eb33d972aff43340f39d5f4e79e09bb75498"
+      "digest": "sha256:939d0e14951ef0144afa2ec3c3424566556b93b8d2b9abac6b220df0b4b8e320"
     }
   ]
 }
