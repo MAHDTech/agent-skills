@@ -1,0 +1,84 @@
++++
+title = "queue-management"
+[extra]
+skill = false
+category = "vendor/dbos"
+mermaid = false
+skill_name = "dbos-java"
++++
+
+---
+title: Reconfigure Queues at Runtime
+impact: MEDIUM
+impactDescription: Adjusts flow control without redeploying or restarting workers
+tags: queue, management, updateQueue, conflict-resolution, operations
+---
+
+## Reconfigure Queues at Runtime
+
+Queue configuration lives in the system database, so limits can be changed while the application runs. Use
+`updateQueue` to modify only the fields you pass; absent fields keep their current values. A queue registered with the
+deprecated `partitionQueue` flag has its limits frozen ([queue-partitioning.md](@/skills/vendor/dbos/dbos-java/references/queue-partitioning.md)).
+
+**Incorrect (redeploying to change a limit):**
+
+```java
+// Changing the registerQueue call and restarting every worker is
+// unnecessary — and this call would only take effect on the next deploy
+dbos.registerQueue("email-queue", new QueueOptions().withConcurrency(20));
+```
+
+**Correct (update the live configuration):**
+
+```java
+// Change only the concurrency; the rate limit and other fields are untouched
+dbos.updateQueue("email-queue", new QueueOptions().withConcurrency(20));
+
+// Change the rate limit
+dbos.updateQueue("email-queue", new QueueOptions().withRateLimit(25, 30, TimeUnit.SECONDS));
+
+// Inspect what is registered
+Optional<Queue> queue = dbos.findQueue("email-queue");
+List<Queue> queues = dbos.listQueues();
+
+// Remove a queue (drain or cancel its workflows first)
+boolean deleted = dbos.deleteQueue("email-queue");
+```
+
+Workers pick up new configuration on their next polling iteration.
+
+Startup conflicts: if your application calls `registerQueue` on every start, the next process to boot can overwrite
+runtime changes. Control this with `QueueConflictResolution`:
+
+- `UPDATE_IF_LATEST_VERSION` (default for `dbos.registerQueue`) — overwrite only if this executor runs the latest
+  registered application version
+- `NEVER_UPDATE` — leave existing configuration alone, preserving runtime changes
+- `ALWAYS_UPDATE` (default for `DBOSClient.registerQueue`) — always overwrite
+
+```java
+dbos.registerQueue("email-queue",
+    new QueueOptions().withConcurrency(10),
+    QueueConflictResolution.NEVER_UPDATE);
+```
+
+Field semantics: each `QueueOptions` field is tri-state. Absent (never set on `new QueueOptions()`) means "leave
+unchanged", a value sets it, and `null` clears it. While the deprecated `Field` overloads still exist, a bare `null`
+is ambiguous and does not compile, so clear with a cast: `new QueueOptions().withConcurrency((Integer) null)` removes
+the concurrency limit. To change one half of a stored rate limit and keep the other, use `withRateLimitMax(Integer)`
+or `withRateLimitPeriod(Duration)` (and `withPartitionRateLimitMax` / `withPartitionRateLimitPeriod`)
+([queue-rate-limiting.md](@/skills/vendor/dbos/dbos-java/references/queue-rate-limiting.md)). Do not build `Field` values or use the deprecated `set*`/`and*`
+helpers.
+
+Deleting a queue leaves its enqueued workflows unrunnable — they resume only if a queue with the same name is
+registered later, which is rarely intended. Cancel or drain pending workflows before deleting. To rescue workflows
+already stuck on a deleted queue, move them to a registered queue with `dbos.resumeWorkflow(workflowId, queueName)`.
+
+The same management methods are available on `DBOSClient` for admin tooling that runs outside the application.
+
+On a shared system database, a queue is owned and polled by the application that registered it, `listQueues()`
+lists this application's queues (plus unclaimed ones; `listQueues(List<String>)` names others), and registering a
+name another application owns throws `DBOSApplicationNameConflictException`
+([advanced-shared-database.md](@/skills/vendor/dbos/dbos-java/references/advanced-shared-database.md)).
+
+Reference: [Reconfiguring Queues at Runtime](https://docs.dbos.dev/java/tutorials/queue-tutorial#reconfiguring-queues-at-runtime)
+

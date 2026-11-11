@@ -145,6 +145,14 @@ description: Single source of truth for agent instructions
 - **workers-profiling**: Profile or debug CPU usage and memory allocation in deployed Cloudflare Workers and Durable Objects. Then use this information to optimize your code.
 - **wrangler**: Run or troubleshoot Wrangler CLI commands in projects that have a wrangler.jsonc, wrangler.json, or wrangler.toml file, including local development, Previews, deployment, and resource management. For new projects and projects without a Wrangler configuration file, use the cf CLI instead.
 
+### dbos
+
+- **dbos-golang**: DBOS Go SDK for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Go code with DBOS, creating workflows and steps, using queues, using the DBOS Client from external applications, or building Go applications that need to be resilient to failures.
+- **dbos-java**: DBOS Java SDK for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Java or Kotlin code with DBOS, creating workflows and steps, using queues, integrating DBOS with Spring Boot, using DBOSClient from external applications, or building JVM applications that need to be resilient to failures.
+- **dbos-python**: DBOS Python SDK (3.x) for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Python code with DBOS, creating workflows and steps, using queues, datasource transactions, or schedules, using DBOSClient from external applications, upgrading DBOS Python 2.x code to 3.x, or building applications that need to be resilient to failures.
+- **dbos-rust**: DBOS Rust SDK (the dbos crate) for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Rust code with DBOS, creating workflows and steps, using queues, using the DBOS Client from external applications, or building Rust applications that need to be resilient to failures.
+- **dbos-typescript**: DBOS TypeScript SDK for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing TypeScript code with DBOS, creating workflows and steps, using queues, using DBOSClient from external applications, or building applications that need to be resilient to failures.
+
 ### spacetimedb
 
 - **cli**: SpacetimeDB CLI reference for initializing projects, building modules, publishing databases, querying data, and managing servers

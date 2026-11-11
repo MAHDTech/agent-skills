@@ -1,0 +1,83 @@
++++
+title = "workflow-control"
+[extra]
+skill = false
+category = "vendor/dbos"
+mermaid = false
+skill_name = "dbos-java"
++++
+
+---
+title: Cancel, Resume, Fork, and Delete Workflows
+impact: MEDIUM
+impactDescription: Recovers stuck or failed workflows without losing completed work
+tags: workflow, cancel, resume, fork, management, recovery
+---
+
+## Cancel, Resume, Fork, and Delete Workflows
+
+DBOS manages workflow execution through the system database, so a workflow can be cancelled, resumed from its last
+completed step, or forked into a new execution starting at a chosen step. Use these instead of ad-hoc retry loops
+that re-run already-completed work.
+
+**Incorrect (re-running the whole workflow after a failure):**
+
+```java
+// Restarts from scratch: every completed step runs again, duplicating side effects
+try {
+  proxy.processOrder(orderId);
+} catch (Exception e) {
+  proxy.processOrder(orderId);
+}
+```
+
+**Correct (resume or fork the existing execution):**
+
+```java
+// Resume a cancelled or stuck workflow from its last completed step. It is re-enqueued
+// on the DBOS internal queue (no flow control), so it starts as soon as it is dequeued
+WorkflowHandle<String, Exception> handle = dbos.resumeWorkflow(workflowId);
+
+// Resume onto a specific queue instead
+dbos.resumeWorkflow(workflowId, "recovery-queue");
+
+// Fork: create a NEW workflow that replays checkpoints before startStep,
+// then re-executes from startStep onward with fixed code
+import dev.dbos.transact.workflow.ForkOptions;
+
+var forked = dbos.forkWorkflow(workflowId, 2,
+    new ForkOptions()
+        .withApplicationVersion("2.0.0")   // run on the new code version
+        .withForkedWorkflowId("retry-123"));
+
+// Cancel: sets status to CANCELLED and preempts at the next step boundary
+dbos.cancelWorkflow(workflowId);
+dbos.cancelWorkflow(workflowId, true);       // also cancel descendants
+dbos.cancelWorkflows(List.of("wf-1", "wf-2"));
+
+// Delete permanently (workflow and its recorded steps)
+dbos.deleteWorkflow(workflowId, true);       // also delete children
+```
+
+Other control operations:
+
+- `dbos.resumeWorkflows(List<String>)` / `dbos.resumeWorkflows(List<String>, String queueName)` — bulk resume
+- Resume works on an `ENQUEUED` workflow too, which moves a workflow stranded on a deleted or newly partitioned
+  queue; a resumed workflow keeps its application version. Workflows that ended `SUCCESS` or `ERROR` are not resumed
+- `dbos.setWorkflowDelay(workflowId, Duration)` or `setWorkflowDelay(workflowId, Instant)` — hold an enqueued or
+  pending workflow in `DELAYED` state until the time passes
+- `dbos.updateWorkflowAttributes(workflowId, Map<String, Object>)` — replace searchable metadata; safe to call from
+  inside a workflow (recorded as a step)
+
+Notes:
+
+- `startStep` for `forkWorkflow` is the `functionId` reported by `dbos.listWorkflowSteps(workflowId)`
+- Forking creates a new workflow ID; the original is left untouched and its status reports `wasForkedFrom`, while
+  the fork's `forkedFrom` names the original. List either side with `ListWorkflowsInput.withWasForkedFrom(true)` or
+  `withIsFork(true)` ([workflow-introspection.md](@/skills/vendor/dbos/dbos-java/references/workflow-introspection.md))
+- Resuming a workflow whose code changed incompatibly will fail — fork onto a new application version instead
+- The same operations are available from outside the application through `DBOSClient`
+  ([client-setup.md](@/skills/vendor/dbos/dbos-java/references/client-setup.md))
+
+Reference: [Workflow Management](https://docs.dbos.dev/java/tutorials/workflow-management)
+

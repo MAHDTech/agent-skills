@@ -63,6 +63,7 @@ dapps
 databaseId
 dataclass
 dataclasses
+dbos
 dedup
 deepenable
 deltadb

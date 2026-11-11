@@ -464,6 +464,7 @@ fn prepare_source(source: &Source, staging: &Path) -> Result<(PathBuf, String)> 
 }
 
 fn copy_tree(source: &Path, target: &Path) -> Result<()> {
+    let canonical_source = source.canonicalize()?;
     for entry in WalkDir::new(source).follow_links(false) {
         let entry = entry.map_err(|e| SkillError::validation(source, e.to_string()))?;
         let relative = entry
@@ -472,18 +473,28 @@ fn copy_tree(source: &Path, target: &Path) -> Result<()> {
             .map_err(|e| SkillError::validation(source, e.to_string()))?;
         let destination = target.join(relative);
         if entry.file_type().is_symlink() {
-            return Err(SkillError::validation(
-                entry.path(),
-                "Vendor symlinks are unsupported",
-            ));
-        }
-        if entry.file_type().is_dir() {
+            let resolved = resolve_contained_file_symlink(entry.path(), &canonical_source)?;
+            fs::copy(resolved, destination)?;
+        } else if entry.file_type().is_dir() {
             fs::create_dir_all(&destination)?;
         } else if entry.file_type().is_file() {
             fs::copy(entry.path(), destination)?;
         }
     }
     Ok(())
+}
+
+fn resolve_contained_file_symlink(path: &Path, canonical_source: &Path) -> Result<PathBuf> {
+    let resolved = path
+        .canonicalize()
+        .map_err(|_| SkillError::validation(path, "Vendor symlinks are unsupported"))?;
+    if !resolved.starts_with(canonical_source) || !resolved.is_file() {
+        return Err(SkillError::validation(
+            path,
+            "Vendor symlinks are unsupported",
+        ));
+    }
+    Ok(resolved)
 }
 
 fn copy_licenses(source: &Source, checkout: &Path, target: &Path) -> Result<()> {
