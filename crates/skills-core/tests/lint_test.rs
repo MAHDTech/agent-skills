@@ -1,7 +1,7 @@
 //! Integration and unit tests for `skills-core` static analysis and linting engine.
 
 use skills_core::lint::SkillLinter;
-use skills_core::models::{LintSeverity, Skill, SkillCategory, SkillFrontmatter};
+use skills_core::models::{LintSeverity, Skill, SkillCategory, SkillFrontmatter, SkillTree};
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::PathBuf;
@@ -421,4 +421,91 @@ fn test_lint_anti_slop_content() {
     );
     let rep = linter.lint_skill(&unslop_skill);
     assert!(!rep.issues.iter().any(|i| i.rule == "no-slop-content"));
+}
+
+#[test]
+fn test_lint_fragile_auto_resource_links() {
+    let dir = tempdir().unwrap();
+    let rel_skill_dir = "skills/tooling/auto-links";
+    let skill_dir = dir.path().join(rel_skill_dir);
+    let auto_dir = skill_dir.join("resources/auto");
+    let manual_dir = skill_dir.join("resources/manual");
+    fs::create_dir_all(&auto_dir).unwrap();
+    fs::create_dir_all(&manual_dir).unwrap();
+
+    File::create(auto_dir.join("llms.txt")).unwrap();
+    File::create(auto_dir.join("crawled-child.md")).unwrap();
+    File::create(manual_dir.join("handwritten.md")).unwrap();
+
+    let body = "\
+# Auto Links
+
+- Manual doc: [Manual](resources/manual/handwritten.md)
+- Inline code index: `resources/auto/llms.txt`
+- Inline code child: `resources/auto/crawled-child.md`
+- Fragile index link: [LLMs Index](./resources/auto/llms.txt)
+- Fragile child link: [Child](resources/auto/crawled-child.md)
+";
+
+    let fm = SkillFrontmatter::builder()
+        .name("auto-links")
+        .description("Validate auto resource link warning.")
+        .resources(vec!["https://example.com/llms.txt".to_string()])
+        .build();
+
+    let raw = format!(
+        "---\nname: auto-links\ndescription: Validate auto resource link warning.\n---\n{body}"
+    );
+
+    let live_skill = Skill::builder()
+        .path(PathBuf::from(format!("{rel_skill_dir}/SKILL.md")))
+        .dir_name("auto-links".to_string())
+        .category(SkillCategory::Tooling)
+        .promoted(true)
+        .tree(SkillTree::Live)
+        .frontmatter(fm.clone())
+        .content(body.to_string())
+        .raw(raw.clone())
+        .resources(Vec::new())
+        .build();
+
+    let linter = SkillLinter::with_base_path(dir.path());
+    let report = linter.lint_skill(&live_skill);
+    assert!(
+        !report.has_errors(),
+        "Unexpected errors: {:?}",
+        report.issues
+    );
+
+    let fragile_warnings: Vec<_> = report
+        .issues
+        .iter()
+        .filter(|i| i.rule == "fragile-auto-resource-link")
+        .collect();
+    assert_eq!(fragile_warnings.len(), 2);
+    assert_eq!(fragile_warnings[0].severity, LintSeverity::Warning);
+    assert!(fragile_warnings[0].message.contains("llms.txt"));
+    assert!(fragile_warnings[1].message.contains("crawled-child.md"));
+
+    // Archived skills are exempt from fragile-auto-resource-link warnings
+    let archived_skill = Skill::builder()
+        .path(PathBuf::from(format!("{rel_skill_dir}/SKILL.md")))
+        .dir_name("auto-links".to_string())
+        .category(SkillCategory::Tooling)
+        .promoted(false)
+        .tree(SkillTree::Archive)
+        .archived(Some("2026-01-01".to_string()))
+        .frontmatter(fm)
+        .content(body.to_string())
+        .raw(raw)
+        .resources(Vec::new())
+        .build();
+
+    let archived_report = linter.lint_skill(&archived_skill);
+    assert!(
+        !archived_report
+            .issues
+            .iter()
+            .any(|i| i.rule == "fragile-auto-resource-link")
+    );
 }

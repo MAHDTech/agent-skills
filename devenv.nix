@@ -36,6 +36,46 @@ let
     trivy
     zola
   ];
+
+  hookBinPath = lib.makeBinPath (
+    [
+      config.languages.rust.toolchainPackage
+      pkgs.clang
+      pkgs.stdenv.cc
+      pkgs.pkg-config
+      pkgs.cmake
+      pkgs.git
+      pkgs.zola
+      pkgs.tailwindcss_4
+      pkgs.pagefind
+      pkgs.coreutils
+    ]
+    ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.mold ]
+  );
+
+  rustHookEnv = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList (name: value: ''export ${name}="''${${name}:-${toString value}}"'') (
+      lib.filterAttrs (
+        name: value:
+        value != null
+        && (
+          builtins.elem name [
+            "CC"
+            "CXX"
+            "CC_FOR_BUILD"
+            "CXX_FOR_BUILD"
+          ]
+          || lib.hasPrefix "CARGO_TARGET_" name
+        )
+      ) config.env
+    )
+  );
+
+  cargoHook = pkgs.writeShellScript "cargo-git-hook" ''
+    export PATH="${hookBinPath}:''${PATH:-}"
+    ${rustHookEnv}
+    exec cargo "$@"
+  '';
 in
 {
   name = "agent-skills";
@@ -137,6 +177,7 @@ in
       };
       cargo-check = {
         enable = true;
+        entry = lib.mkForce "${cargoHook} check";
         files = rustInputs;
         args = [
           "--workspace"
@@ -166,8 +207,8 @@ in
       };
       clippy = {
         enable = true;
+        entry = lib.mkForce "${cargoHook} clippy --workspace --all-targets --locked";
         files = rustInputs;
-        settings.extraArgs = "--workspace --all-targets --locked";
       };
       commitizen.enable = true;
       convco = {
@@ -196,7 +237,7 @@ in
       dashboard-lint = {
         enable = true;
         name = "Dashboard Lint";
-        entry = "cargo run -p ask-cli -- dashboard lint";
+        entry = "${cargoHook} run -p ask-cli -- dashboard lint";
         files = "^(skills(-archive)?/.*\\.md$|dashboard/(content|themes|css)/|dashboard/config\\.toml$)";
         excludes = [ ];
         always_run = true;
@@ -300,14 +341,14 @@ in
       skills-test = {
         enable = true;
         name = "Skills Lint";
-        entry = "cargo run -p ask-cli -- skills lint";
+        entry = "${cargoHook} run -p ask-cli -- skills lint";
         files = "^skills/.*\\.md$";
         pass_filenames = false;
       };
       skills-sync = {
         enable = true;
         name = "Skills Sync";
-        entry = "env SKILLS_REPO_ONLY=1 SKILLS_SKIP_DASHBOARD=1 cargo run -p ask-cli -- skills sync";
+        entry = "env SKILLS_REPO_ONLY=1 SKILLS_SKIP_DASHBOARD=1 ${cargoHook} run -p ask-cli -- skills sync";
         files = "SKILL\\.md$";
         pass_filenames = false;
         require_serial = true;

@@ -14,7 +14,7 @@ resources:
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Consult the [gh issue manual](resources/auto/manual-gh_issue.md) for more details.
+Consult the `gh issue` manual in `resources/auto/manual-gh_issue.md` for more details.
 
 Move the issues on a GitHub repository through a small state machine of triage roles, using the `gh` CLI and the repo's GitHub labels.
 

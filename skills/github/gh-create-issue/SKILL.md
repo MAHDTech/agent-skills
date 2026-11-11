@@ -12,7 +12,7 @@ metadata:
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Consult the [gh issue manual](resources/auto/manual-gh_issue.md) for more details.
+Consult the `gh issue` manual in `resources/auto/manual-gh_issue.md` for more details.
 
 Create a well-structured GitHub issue using `gh` CLI, populated with context from the current conversation.
 

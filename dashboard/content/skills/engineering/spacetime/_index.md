@@ -19,7 +19,7 @@ The platform is now called Spacetime. Technical identifiers still include `space
 ## Start with the installed version
 
 1. Inspect the module's dependency versions, client SDK versions, generated bindings, and `spacetime.json`. Run `spacetime version` and check command flags with `spacetime help <command>`.
-2. Find the relevant page in the [downloaded documentation index](resources/auto/docs-llms.txt). Search the [full documentation](resources/auto/docs-llms-full.txt) by page heading or source URL for readable examples; individual downloaded pages can contain HTML.
+2. Find the relevant page in the downloaded documentation index (`resources/auto/docs-llms.txt`). Search the full documentation (`resources/auto/docs-llms-full.txt`) by page heading or source URL for readable examples; individual downloaded pages can contain HTML.
 3. Match examples to the project's language and version. The current documentation targets 2.x; read its upgrade notes before changing a 1.x project. Check the [upstream index](https://spacetimedb.com/docs/llms.txt) when local resources lack an API or appear stale.
 
 Use these documentation sections for the task at hand:

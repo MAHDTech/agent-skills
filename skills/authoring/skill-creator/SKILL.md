@@ -119,6 +119,7 @@ Never place a file directly in `resources/`: every resource lives under `auto/` 
 - **Code fence language tags (MD040)**: Never use bare triple backticks. Always declare a language tag (` ```bash `, ` ```json `, ` ```text `, ` ```rust `).
 - **Blank lines around fences (MD031)**: Every code block must be preceded and followed by a blank line, including when nested inside lists.
 - **No absolute file links**: Never use `file:///` URLs referencing local paths. Always use relative repository paths (e.g. `../../review/code-review/SKILL.md`).
+- **No Markdown links to auto-downloaded resources**: Never create Markdown links targeting `resources/auto/` files; reference `resources/auto/` paths via inline code spans (`` `resources/auto/...` ``) or directory search so `ask skills clean-resources` and upstream URL changes never break links (`fragile-auto-resource-link`).
 - **Heading formatting**: Headings must use plain text sentence case without bold markup (e.g. `### 1. Audit environment`, never `### 1. **Phase 1: Initial Assessment**`). Bold markup inside headings is prohibited and flagged by `ask skills lint`.
 - **No tautological list items**: Never use bold list lead-ins that merely repeat the item name (e.g. `- **Performance:** Optimize performance...`). State concrete details or use direct prose.
 

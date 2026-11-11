@@ -580,5 +580,5 @@ npx @modelcontextprotocol/inspector python server.py
 
 Official Model Context Protocol specifications and documentation are vendored in `resources/auto/` for deep lookup:
 
-- [LLMs Index](resources/auto/llms.txt) - Master listing of all MCP specifications, developer guides, extensions, and SEPs.
+- `resources/auto/llms.txt` - Master listing of all MCP specifications, developer guides, extensions, and SEPs.
 
