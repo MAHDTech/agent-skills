@@ -153,10 +153,12 @@
         "basin",
         "cf-cli",
         "cloudflare",
+        "cloudflare-app-bootstrap",
         "cloudflare-email-service",
         "cloudflare-one",
         "cloudflare-one-migrations",
         "durable-objects",
+        "frameworks-on-cloudflare",
         "gateway-workers",
         "k2",
         "nextjs-on-cloudflare",
@@ -166,6 +168,7 @@
         "turnstile-spin",
         "web-perf",
         "workers-best-practices",
+        "workers-development",
         "workers-profiling",
         "wrangler"
       ]
