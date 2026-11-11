@@ -3466,8 +3466,8 @@
       "line": 2252
     },
     {
-      "coverage": 94.28571428571428,
-      "crap": 13.031533527696793,
+      "coverage": 88.57142857142857,
+      "crap": 13.252268221574344,
       "crate": "skills-core",
       "cyclomatic": 13.0,
       "file": "crates/skills-core/src/installer.rs",
@@ -3479,7 +3479,11 @@
           "start": 1020
         },
         {
-          "end": 1049,
+          "end": 1040,
+          "start": 1040
+        },
+        {
+          "end": 1052,
           "start": 1049
         }
       ]
@@ -5109,30 +5113,26 @@
       "cyclomatic": 4.8,
       "file": "crates/skills-core/src/vendors.rs",
       "function": "copy_licenses",
-      "line": 489,
+      "line": 500,
       "uncovered": [
         {
-          "end": 512,
-          "start": 512
+          "end": 523,
+          "start": 523
         }
       ]
     },
     {
-      "coverage": 76.19047619047619,
-      "crap": 6.254054637728107,
+      "coverage": 94.73684210526315,
+      "crap": 6.405971715993585,
       "crate": "skills-core",
-      "cyclomatic": 5.8,
+      "cyclomatic": 6.4,
       "file": "crates/skills-core/src/vendors.rs",
       "function": "copy_tree",
       "line": 466,
       "uncovered": [
         {
-          "end": 478,
-          "start": 475
-        },
-        {
-          "end": 484,
-          "start": 484
+          "end": 482,
+          "start": 482
         }
       ]
     },
@@ -5258,17 +5258,26 @@
       "cyclomatic": 6.6,
       "file": "crates/skills-core/src/vendors.rs",
       "function": "replace_directory",
-      "line": 517,
+      "line": 528,
       "uncovered": [
-        {
-          "end": 525,
-          "start": 522
-        },
         {
           "end": 536,
           "start": 533
+        },
+        {
+          "end": 547,
+          "start": 544
         }
       ]
+    },
+    {
+      "coverage": 100.0,
+      "crap": 3.2,
+      "crate": "skills-core",
+      "cyclomatic": 3.2,
+      "file": "crates/skills-core/src/vendors.rs",
+      "function": "resolve_contained_file_symlink",
+      "line": 487
     },
     {
       "coverage": 77.14285714285715,
