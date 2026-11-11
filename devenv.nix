@@ -255,7 +255,11 @@ in
       lychee = {
         enable = true;
         excludes = [
+          "\\.lock$"
+          "^\\.out-of-scope/"
+          "^dashboard/"
           "^skills/vendor/"
+          "^skills(-archive)?/tooling/opencode-acp/"
         ];
       };
       markdownlint = {

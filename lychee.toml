@@ -3,19 +3,28 @@
 # Accept status codes from hosts that block/deny automated checkers.
 accept = ["200..=299", "403", "406", "429"]
 
+# Retry transient network/server errors before marking a link broken.
+max_retries = 2
+retry_wait_time = 2
+
 # Skip loopback/link-local/private IPs (localhost example URLs in templates).
 exclude_loopback = true
 
-# Paths lychee should not check at all:
-#   - opencode-acp/**      : vendored third-party docs (agentclientprotocol.com)
-#   - dashboard/**         : Zola site; links resolve at build time, not as local files
-#   - .out-of-scope/**     : example/placeholder content
-#   - skills/**/resources/auto : vendored downloaded 3rd party documentation
+# Paths lychee should not check at all (anchored regexes; mirrored in devenv.nix
+# git-hooks.hooks.lychee.excludes so prek does not pass excluded files as CLI inputs):
+#   - skills/vendor/**                          : managed upstream vendor snapshots
+#   - skills(-archive)?/tooling/opencode-acp/** : vendored third-party docs (agentclientprotocol.com)
+#   - skills(-archive)?/**/resources/auto/**    : downloaded third-party documentation
+#   - dashboard/**                              : Zola site; links resolve at build time
+#   - .out-of-scope/**                          : example/placeholder content
+#   - *.lock                                    : package and environment lockfiles
 exclude_path = [
-  "skills/tooling/opencode-acp",
-  "skills/.*/resources/auto",
-  "dashboard",
-  ".out-of-scope",
+  '^(\./)?skills/vendor/',
+  '^(\./)?skills(-archive)?/tooling/opencode-acp/',
+  '^(\./)?skills(-archive)?/.*/resources/auto/',
+  '^(\./)?dashboard/',
+  '^(\./)?\.out-of-scope/',
+  '\.lock$',
 ]
 
 # URL patterns to ignore (regex):
