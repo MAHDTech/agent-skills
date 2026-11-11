@@ -1766,15 +1766,15 @@
       "cyclomatic": 9.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::check_path_traversal",
-      "line": 658,
+      "line": 669,
       "uncovered": [
         {
-          "end": 667,
-          "start": 666
+          "end": 678,
+          "start": 677
         },
         {
-          "end": 673,
-          "start": 670
+          "end": 684,
+          "start": 681
         }
       ]
     },
@@ -1785,11 +1785,11 @@
       "cyclomatic": 4.2,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::clean_all_resources",
-      "line": 474,
+      "line": 482,
       "uncovered": [
         {
-          "end": 482,
-          "start": 479
+          "end": 490,
+          "start": 487
         }
       ]
     },
@@ -1800,7 +1800,7 @@
       "cyclomatic": 2.2,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::clean_auto_resources",
-      "line": 463
+      "line": 471
     },
     {
       "coverage": 100.0,
@@ -1809,7 +1809,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::compute_sha256",
-      "line": 921
+      "line": 943
     },
     {
       "coverage": 100.0,
@@ -1818,7 +1818,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::decode_html_entities",
-      "line": 809
+      "line": 831
     },
     {
       "coverage": 100.0,
@@ -1827,20 +1827,20 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::default",
-      "line": 72
+      "line": 73
     },
     {
-      "coverage": 0.0,
-      "crap": 13.440000000000001,
+      "coverage": 76.92307692307693,
+      "crap": 3.325844333181611,
       "crate": "skills-core",
       "cyclomatic": 3.2,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::download_all_resources",
-      "line": 444,
+      "line": 452,
       "uncovered": [
         {
-          "end": 457,
-          "start": 444
+          "end": 462,
+          "start": 460
         }
       ]
     },
@@ -1851,15 +1851,15 @@
       "cyclomatic": 11.6,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::download_skill_resources",
-      "line": 149,
+      "line": 150,
       "uncovered": [
         {
-          "end": 175,
-          "start": 175
+          "end": 176,
+          "start": 176
         },
         {
-          "end": 194,
-          "start": 194
+          "end": 195,
+          "start": 195
         }
       ]
     },
@@ -1870,19 +1870,19 @@
       "cyclomatic": 26.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::escape_orphan_type_brackets",
-      "line": 822,
+      "line": 844,
       "uncovered": [
         {
-          "end": 871,
-          "start": 869
+          "end": 893,
+          "start": 891
         },
         {
-          "end": 882,
-          "start": 879
+          "end": 904,
+          "start": 901
         },
         {
-          "end": 887,
-          "start": 884
+          "end": 909,
+          "start": 906
         }
       ]
     },
@@ -1893,27 +1893,27 @@
       "cyclomatic": 23.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::expand_discovery_entry",
-      "line": 283,
+      "line": 291,
       "uncovered": [
         {
-          "end": 300,
-          "start": 300
+          "end": 308,
+          "start": 308
         },
         {
-          "end": 319,
-          "start": 319
+          "end": 327,
+          "start": 327
         },
         {
-          "end": 326,
-          "start": 326
+          "end": 334,
+          "start": 334
         },
         {
-          "end": 330,
-          "start": 330
+          "end": 338,
+          "start": 338
         },
         {
-          "end": 357,
-          "start": 349
+          "end": 365,
+          "start": 357
         }
       ]
     },
@@ -1924,24 +1924,24 @@
       "cyclomatic": 2.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::expand_discovery_index_entries",
-      "line": 262
+      "line": 270
     },
     {
-      "coverage": 96.15384615384616,
-      "crap": 14.211472462448793,
+      "coverage": 95.23809523809523,
+      "crap": 14.221773026670986,
       "crate": "skills-core",
       "cyclomatic": 14.2,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::expand_resource_targets",
-      "line": 203,
+      "line": 204,
       "uncovered": [
         {
-          "end": 239,
-          "start": 239
+          "end": 235,
+          "start": 235
         },
         {
-          "end": 249,
-          "start": 249
+          "end": 245,
+          "start": 245
         }
       ]
     },
@@ -1952,7 +1952,7 @@
       "cyclomatic": 1.2,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::fetch_discovery_index",
-      "line": 139
+      "line": 140
     },
     {
       "coverage": 100.0,
@@ -1961,7 +1961,7 @@
       "cyclomatic": 1.2,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::fetch_registry",
-      "line": 132
+      "line": 133
     },
     {
       "coverage": 80.0,
@@ -1970,15 +1970,15 @@
       "cyclomatic": 9.2,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::fetch_url",
-      "line": 86,
+      "line": 87,
       "uncovered": [
         {
-          "end": 99,
-          "start": 97
+          "end": 100,
+          "start": 98
         },
         {
-          "end": 108,
-          "start": 104
+          "end": 109,
+          "start": 105
         }
       ]
     },
@@ -1989,26 +1989,35 @@
       "cyclomatic": 6.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::get_domain_prefix",
-      "line": 574,
+      "line": 585,
       "uncovered": [
         {
-          "end": 588,
-          "start": 588
+          "end": 599,
+          "start": 599
         },
         {
-          "end": 593,
-          "start": 593
+          "end": 604,
+          "start": 604
         }
       ]
     },
     {
       "coverage": 100.0,
-      "crap": 6.0,
+      "crap": 7.0,
       "crate": "skills-core",
-      "cyclomatic": 6.0,
+      "cyclomatic": 7.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::is_llms_index_url",
-      "line": 549
+      "line": 557
+    },
+    {
+      "coverage": 100.0,
+      "crap": 2.0,
+      "crate": "skills-core",
+      "cyclomatic": 2.0,
+      "file": "crates/skills-core/src/downloader.rs",
+      "function": "SkillDownloader::is_managed_resource_skill",
+      "line": 253
     },
     {
       "coverage": 100.0,
@@ -2017,7 +2026,7 @@
       "cyclomatic": 2.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::is_non_text_content_type",
-      "line": 533
+      "line": 541
     },
     {
       "coverage": 100.0,
@@ -2026,7 +2035,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::is_non_text_url",
-      "line": 517
+      "line": 525
     },
     {
       "coverage": 100.0,
@@ -2035,7 +2044,7 @@
       "cyclomatic": 4.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::is_skills_discovery_index_url",
-      "line": 562
+      "line": 573
     },
     {
       "coverage": 100.0,
@@ -2044,7 +2053,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::new",
-      "line": 80
+      "line": 81
     },
     {
       "coverage": 100.0,
@@ -2053,7 +2062,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::normalize_markdown_formatting",
-      "line": 902
+      "line": 924
     },
     {
       "coverage": 89.1891891891892,
@@ -2062,11 +2071,11 @@
       "cyclomatic": 7.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::parse_llms_txt_links",
-      "line": 692,
+      "line": 703,
       "uncovered": [
         {
-          "end": 719,
-          "start": 716
+          "end": 730,
+          "start": 727
         }
       ]
     },
@@ -2077,26 +2086,26 @@
       "cyclomatic": 5.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::prune_orphaned_auto_files",
-      "line": 424,
+      "line": 432,
       "uncovered": [
         {
-          "end": 426,
-          "start": 426
+          "end": 434,
+          "start": 434
         },
         {
-          "end": 430,
-          "start": 430
+          "end": 438,
+          "start": 438
         }
       ]
     },
     {
       "coverage": 100.0,
-      "crap": 6.0,
+      "crap": 8.0,
       "crate": "skills-core",
-      "cyclomatic": 6.0,
+      "cyclomatic": 8.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::push_resolved_llms_link",
-      "line": 739
+      "line": 750
     },
     {
       "coverage": 95.23809523809523,
@@ -2105,11 +2114,11 @@
       "cyclomatic": 6.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::resolve_relative_url",
-      "line": 763,
+      "line": 785,
       "uncovered": [
         {
-          "end": 785,
-          "start": 785
+          "end": 807,
+          "start": 807
         }
       ]
     },
@@ -2120,7 +2129,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::sanitize_control_characters",
-      "line": 793
+      "line": 815
     },
     {
       "coverage": 100.0,
@@ -2129,7 +2138,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::sanitize_markdown",
-      "line": 911
+      "line": 933
     },
     {
       "coverage": 77.55102040816327,
@@ -2138,11 +2147,11 @@
       "cyclomatic": 9.6,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::save_downloaded_resource",
-      "line": 363,
+      "line": 371,
       "uncovered": [
         {
-          "end": 401,
-          "start": 388
+          "end": 409,
+          "start": 396
         }
       ]
     },
@@ -2153,15 +2162,15 @@
       "cyclomatic": 19.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::smart_slugify",
-      "line": 607,
+      "line": 618,
       "uncovered": [
         {
-          "end": 613,
-          "start": 613
+          "end": 624,
+          "start": 624
         },
         {
-          "end": 618,
-          "start": 618
+          "end": 629,
+          "start": 629
         }
       ]
     },
@@ -2172,7 +2181,7 @@
       "cyclomatic": 3.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::strip_reader_metadata",
-      "line": 505
+      "line": 513
     },
     {
       "coverage": 71.42857142857143,
@@ -2181,17 +2190,26 @@
       "cyclomatic": 3.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::strip_reader_proxy",
-      "line": 493,
+      "line": 501,
       "uncovered": [
         {
-          "end": 495,
-          "start": 495
+          "end": 503,
+          "start": 503
         },
         {
-          "end": 497,
-          "start": 497
+          "end": 505,
+          "start": 505
         }
       ]
+    },
+    {
+      "coverage": 100.0,
+      "crap": 2.0,
+      "crate": "skills-core",
+      "cyclomatic": 2.0,
+      "file": "crates/skills-core/src/downloader.rs",
+      "function": "SkillDownloader::upsert_top_level_target",
+      "line": 257
     },
     {
       "coverage": 100.0,
@@ -2200,7 +2218,7 @@
       "cyclomatic": 3.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "SkillDownloader::verify_sha256",
-      "line": 929
+      "line": 951
     },
     {
       "coverage": 100.0,
@@ -2209,7 +2227,7 @@
       "cyclomatic": 2.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "default_client",
-      "line": 54
+      "line": 55
     },
     {
       "coverage": 100.0,
@@ -2218,7 +2236,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "has_parent_dir_segment",
-      "line": 941
+      "line": 963
     },
     {
       "coverage": 100.0,
@@ -2227,7 +2245,7 @@
       "cyclomatic": 12.0,
       "file": "crates/skills-core/src/downloader.rs",
       "function": "is_standard_param_tag",
-      "line": 947
+      "line": 969
     },
     {
       "coverage": 100.0,
@@ -3448,8 +3466,8 @@
       "line": 2252
     },
     {
-      "coverage": 88.57142857142857,
-      "crap": 13.252268221574344,
+      "coverage": 91.42857142857143,
+      "crap": 13.106425655976677,
       "crate": "skills-core",
       "cyclomatic": 13.0,
       "file": "crates/skills-core/src/installer.rs",
@@ -3459,10 +3477,6 @@
         {
           "end": 1020,
           "start": 1020
-        },
-        {
-          "end": 1040,
-          "start": 1040
         },
         {
           "end": 1052,
@@ -3501,7 +3515,16 @@
       "cyclomatic": 8.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::check_archived_replaced_by",
-      "line": 573
+      "line": 605
+    },
+    {
+      "coverage": 100.0,
+      "crap": 4.0,
+      "crate": "skills-core",
+      "cyclomatic": 4.0,
+      "file": "crates/skills-core/src/lint.rs",
+      "function": "SkillLinter::check_auto_resource_link",
+      "line": 407
     },
     {
       "coverage": 100.0,
@@ -3519,7 +3542,7 @@
       "cyclomatic": 4.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::check_code_blocks",
-      "line": 400
+      "line": 432
     },
     {
       "coverage": 77.55102040816327,
@@ -3528,11 +3551,11 @@
       "cyclomatic": 13.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::check_content_slop",
-      "line": 920,
+      "line": 952,
       "uncovered": [
         {
-          "end": 988,
-          "start": 978
+          "end": 1020,
+          "start": 1010
         }
       ]
     },
@@ -3543,7 +3566,7 @@
       "cyclomatic": 9.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::check_cross_references",
-      "line": 626
+      "line": 658
     },
     {
       "coverage": 100.0,
@@ -3552,7 +3575,7 @@
       "cyclomatic": 7.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::check_duplicate_names",
-      "line": 515
+      "line": 547
     },
     {
       "coverage": 100.0,
@@ -3579,7 +3602,7 @@
       "cyclomatic": 6.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::check_frontmatter_slop",
-      "line": 864
+      "line": 896
     },
     {
       "coverage": 100.0,
@@ -3588,7 +3611,7 @@
       "cyclomatic": 9.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::check_headings",
-      "line": 829
+      "line": 861
     },
     {
       "coverage": 100.0,
@@ -3615,23 +3638,23 @@
       "cyclomatic": 16.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::check_resources_layout",
-      "line": 426,
+      "line": 458,
       "uncovered": [
         {
-          "end": 430,
-          "start": 430
+          "end": 462,
+          "start": 462
         },
         {
-          "end": 440,
-          "start": 440
+          "end": 472,
+          "start": 472
         },
         {
-          "end": 445,
-          "start": 445
+          "end": 477,
+          "start": 477
         },
         {
-          "end": 451,
-          "start": 451
+          "end": 483,
+          "start": 483
         }
       ]
     },
@@ -3657,11 +3680,11 @@
       "cyclomatic": 4.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::contains_word",
-      "line": 1000,
+      "line": 1032,
       "uncovered": [
         {
-          "end": 1023,
-          "start": 1021
+          "end": 1055,
+          "start": 1053
         }
       ]
     },
@@ -3717,17 +3740,17 @@
       "cyclomatic": 13.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::scan_cross_reference_links",
-      "line": 725,
+      "line": 757,
       "uncovered": [
         {
-          "end": 773,
-          "start": 773
+          "end": 805,
+          "start": 805
         }
       ]
     },
     {
-      "coverage": 95.65217391304348,
-      "crap": 14.016109147694584,
+      "coverage": 96.22641509433963,
+      "crap": 14.010532184286356,
       "crate": "skills-core",
       "cyclomatic": 14.0,
       "file": "crates/skills-core/src/lint.rs",
@@ -3735,12 +3758,12 @@
       "line": 347,
       "uncovered": [
         {
-          "end": 389,
-          "start": 389
+          "end": 396,
+          "start": 396
         },
         {
-          "end": 395,
-          "start": 395
+          "end": 402,
+          "start": 402
         }
       ]
     },
@@ -3751,19 +3774,19 @@
       "cyclomatic": 21.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::scan_slash_commands",
-      "line": 659,
+      "line": 691,
       "uncovered": [
         {
-          "end": 684,
-          "start": 684
+          "end": 716,
+          "start": 716
         },
         {
-          "end": 705,
-          "start": 705
+          "end": 737,
+          "start": 737
         },
         {
-          "end": 717,
-          "start": 717
+          "end": 749,
+          "start": 749
         }
       ]
     },
@@ -3774,7 +3797,7 @@
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::starts_with_case_insensitive",
-      "line": 994
+      "line": 1026
     },
     {
       "coverage": 100.0,
@@ -3783,7 +3806,7 @@
       "cyclomatic": 6.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::strip_code_blocks",
-      "line": 1029
+      "line": 1061
     },
     {
       "coverage": 100.0,
@@ -3792,22 +3815,16 @@
       "cyclomatic": 7.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::validate_cross_reference",
-      "line": 778
+      "line": 810
     },
     {
-      "coverage": 0.0,
-      "crap": 2.0,
+      "coverage": 100.0,
+      "crap": 1.0,
       "crate": "skills-core",
       "cyclomatic": 1.0,
       "file": "crates/skills-core/src/lint.rs",
       "function": "SkillLinter::with_base_path",
-      "line": 39,
-      "uncovered": [
-        {
-          "end": 41,
-          "start": 39
-        }
-      ]
+      "line": 39
     },
     {
       "coverage": 100.0,
