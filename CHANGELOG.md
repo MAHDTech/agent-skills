@@ -1,9 +1,27 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.58](https://github.com/MAHDTech/agent-skills/compare/v0.1.57...7f4282fa5c69f305fd690dbeeda4bc3821f09e85) (2026-11-09)
+## [v0.1.59](https://github.com/MAHDTech/agent-skills/compare/v0.1.58...ee8887d38b07b3671932549186dae0f25af88322) (2026-11-12)
 
 ### Features
+
+* **skills:** add DBOS vendor skills from dbos-inc/agent-skills (#326)
+([c3b759c](https://github.com/MAHDTech/agent-skills/commit/c3b759ceff18c8e8c204b930dc14529c3e04cc44)),
+closes [#326](https://github.com/MAHDTech/agent-skills/issues/326)
+
+### Fixes
+
+* **ci:** harden lychee exclusions and ignore flaky ICP gateway (#328)
+([a83324b](https://github.com/MAHDTech/agent-skills/commit/a83324bf0b0fce1b7b2989e34be9d618bfd863b2)),
+closes [#328](https://github.com/MAHDTech/agent-skills/issues/328)
+* **skills:** decouple skills from auto resource links and harden git hooks
+(#321)
+([9a59538](https://github.com/MAHDTech/agent-skills/commit/9a5953803f671634ccb743ba75a088374176c298)),
+closes [#321](https://github.com/MAHDTech/agent-skills/issues/321)
+
+### [v0.1.58](https://github.com/MAHDTech/agent-skills/compare/v0.1.57...v0.1.58) (2026-11-10)
+
+#### Features
 
 * **skills:** add cross-platform interface design guidance (#318)
 ([1d2b8a4](https://github.com/MAHDTech/agent-skills/commit/1d2b8a4cec38e1f485231a7d57b2b01cd5a1974b)),
