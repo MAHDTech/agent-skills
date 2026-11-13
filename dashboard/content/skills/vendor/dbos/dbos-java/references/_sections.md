@@ -9,7 +9,8 @@ skill_name = "dbos-java"
 
 # Section Definitions
 
-This file defines the rule categories for DBOS Java best practices. Rules are automatically assigned to sections based on their filename prefix.
+This file defines the rule categories for DBOS Java best practices. Rules are automatically assigned to sections based
+on their filename prefix.
 
 ---
 
