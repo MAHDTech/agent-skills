@@ -29,8 +29,8 @@ use crate::error::SkillError;
 /// No single directory is read by every agent harness, so the standard set is
 /// the smallest group of global skill directories that covers them:
 ///
-/// - `~/.agents/skills`: Codex, OpenCode, Goose, Grok, Cline, Zed, Pi, Warp.
-/// - `~/.claude/skills`: Claude Code (also read by OpenCode, Goose, and Grok).
+/// - `~/.agents/skills`: Codex, `OpenCode`, Goose, Grok, Cline, Zed, Pi, Warp.
+/// - `~/.claude/skills`: Claude Code (also read by `OpenCode`, Goose, and Grok).
 /// - `~/.gemini/antigravity-cli/skills`: Antigravity CLI.
 /// - `~/.gemini/config/skills`: Antigravity IDE and Antigravity over ACP.
 /// - `~/.cursor/skills`: Cursor.
@@ -45,7 +45,7 @@ pub enum TargetEnvironment {
     /// Cursor IDE application config and skills directory.
     Cursor,
     /// Shared cross-agent skills directory (`~/.agents/skills`), read by Codex,
-    /// OpenCode, Goose, Grok, and other harnesses following the open convention.
+    /// `OpenCode`, Goose, Grok, and other harnesses following the open convention.
     #[serde(alias = "antigravity")]
     Agents {
         /// Optional workspace root override; if None, uses default system location.

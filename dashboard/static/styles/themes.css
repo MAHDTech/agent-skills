@@ -1,54 +1,60 @@
-@layer base {
-    :root,
-    [data-theme="tars"] {
-        --theme-primary: #00f0ff;
-        --theme-bg-dark: #0b0e14;
-        --theme-surface: #151b23;
-        --theme-text-main: #e2f1ff;
-        --theme-muted: #7a94ad;
-        --theme-accent: #ff00e6;
-        --theme-border-color: #2a3644;
-        --theme-status-green: #00ff66;
-        --theme-status-yellow: #ffd700;
-        --theme-status-red: #ff2a2a;
-    }
+/*
+ * MAHDTech palette
+ *
+ * Raw light and dark values, mirrored from the mahdtech.com website so both
+ * sites read as one family. Each semantic token is defined once with
+ * light-dark(); the active scheme follows the system unless the header toggle
+ * pins one through <meta name="color-scheme">.
+ */
 
-    [data-theme="tars-light"] {
-        --theme-primary: #00808b;
-        --theme-bg-dark: #f5f8f8;
-        --theme-surface: #c4e0e2;
-        --theme-text-main: #0b0e14;
-        --theme-muted: #4a5d70;
-        --theme-accent: #d000ba;
-        --theme-border-color: #00a040;
-        --theme-status-green: #00a040;
-        --theme-status-yellow: #b8860b;
-        --theme-status-red: #dc143c;
-    }
+:root {
+    color-scheme: light dark;
 
-    [data-theme="tars-dark"] {
-        --theme-primary: #00f0ff;
-        --theme-bg-dark: #0b0e14;
-        --theme-surface: #083b43;
-        --theme-text-main: #e2f1ff;
-        --theme-muted: #88a3bd;
-        --theme-accent: #ff00e6;
-        --theme-border-color: #151b23;
-        --theme-status-green: #00ff66;
-        --theme-status-yellow: #ffd700;
-        --theme-status-red: #ff2a2a;
-    }
+    /* Surfaces */
+    --surface-canvas: light-dark(#f5f7fb, #070b12);
+    --surface-well: light-dark(#eaeff7, #04070d);
+    --surface-raised: light-dark(#ffffff, #0d1424);
+    --surface-active: light-dark(#e2eaf6, #152038);
+    --surface-glass: light-dark(
+        rgba(245, 247, 251, 0.86),
+        rgba(10, 16, 29, 0.84)
+    );
 
-    [data-theme="tars-synthwave"] {
-        --theme-primary: #2ee2fa;
-        --theme-bg-dark: #0b041c;
-        --theme-surface: #1a0b2e;
-        --theme-text-main: #f0f8ff;
-        --theme-muted: #d8d2fa;
-        --theme-accent: #f92aad;
-        --theme-border-color: #7b3db8;
-        --theme-status-green: #72f1b8;
-        --theme-status-yellow: #fdf129;
-        --theme-status-red: #fe4450;
-    }
+    /* Lines and ink */
+    --border-subtle: light-dark(#cbd5e1, #1e2b42);
+    --border-strong: light-dark(#94a3b8, #33486b);
+    --ink-primary: light-dark(#0b1220, #ecf3ff);
+    --ink-muted: light-dark(#475569, #93a6c4);
+
+    /* Accents */
+    --accent-cyan: light-dark(#0369a1, #38bdf8);
+    --accent-cyan-bright: light-dark(#0284c7, #7dd3fc);
+    --accent-emerald: light-dark(#047857, #34d399);
+    --accent-amber: light-dark(#b45309, #fbbf24);
+    --accent-violet: light-dark(#6d28d9, #a78bfa);
+    --accent-fault: light-dark(#be123c, #fb7185);
+
+    /* Effects */
+    --scrollbar-track: light-dark(#e2e8f0, #0b111e);
+    --scrollbar-thumb: light-dark(#64748b, #475569);
+    --grid-line: light-dark(rgba(148, 163, 184, 0.22), rgba(30, 43, 66, 0.42));
+    --card-shadow-color: light-dark(rgba(15, 23, 42, 0.1), rgba(0, 0, 0, 0.65));
+    --glow-cyan-color: light-dark(
+        rgba(2, 132, 199, 0.16),
+        rgba(56, 189, 248, 0.24)
+    );
+    --backdrop-color: light-dark(rgba(15, 23, 42, 0.45), rgba(4, 7, 13, 0.72));
+
+    accent-color: var(--accent-cyan);
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* The header toggle pins a scheme by rewriting the color-scheme meta tag. */
+:root:has(> head > meta[name="color-scheme"][content="dark"]) {
+    color-scheme: dark;
+}
+
+:root:has(> head > meta[name="color-scheme"][content="light"]) {
+    color-scheme: light;
 }

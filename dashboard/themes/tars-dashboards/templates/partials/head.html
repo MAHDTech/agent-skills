@@ -1,0 +1,69 @@
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  {# Apply a stored theme choice before first paint. The rest lives in js/site.js. #}
+  <script>
+    try {
+      const s = localStorage.getItem("color-scheme");
+      if (s === "light" || s === "dark") {
+        document.querySelector('meta[name="color-scheme"]').content = s;
+      }
+    } catch {}
+  </script>
+
+  {% if page is defined and page.title %}
+    {% set meta_title = page.title ~ " | " ~ config.title %}
+  {% elif section is defined and section.title and section.relative_path != "_index.md" %}
+    {% set meta_title = section.title ~ " | " ~ config.title %}
+  {% elif section is defined %}
+    {% set meta_title = config.title %}
+  {% else %}
+    {% set meta_title = "Page not found | " ~ config.title %}
+  {% endif %}
+
+  {% if page is defined and page.description %}
+    {% set meta_description = page.description %}
+  {% elif section is defined and section.description %}
+    {% set meta_description = section.description %}
+  {% else %}
+    {% set meta_description = config.description %}
+  {% endif %}
+
+  {% if current_url is defined and current_url %}
+    {% set canonical_url = current_url %}
+  {% else %}
+    {% set canonical_url = config.base_url %}
+  {% endif %}
+
+  {% if (page is defined and page.extra.mermaid is defined and page.extra.mermaid) or (section is defined and section.extra.mermaid is defined and section.extra.mermaid) %}
+    {% set uses_mermaid = true %}
+  {% else %}
+    {% set uses_mermaid = false %}
+  {% endif %}
+
+  <title>{{ meta_title }}</title>
+  <meta name="description" content="{{ meta_description }}">
+  <meta name="author" content="{{ config.extra.author }}">
+  <link rel="canonical" href="{{ canonical_url | safe }}">
+
+  <link rel="icon" href="{{ config.extra.logo_path }}" type="image/svg+xml">
+  <link rel="icon" href="/favicon.png" type="image/png">
+
+  <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/JetBrainsMono-Variable.woff2" as="font" type="font/woff2" crossorigin>
+
+  <meta property="og:type" content="{% if page is defined or (section is defined and section.extra.skill is defined) %}article{% else %}website{% endif %}">
+  <meta property="og:site_name" content="{{ config.title }}">
+  <meta property="og:title" content="{{ meta_title }}">
+  <meta property="og:description" content="{{ meta_description }}">
+  <meta property="og:url" content="{{ canonical_url | safe }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ meta_title }}">
+  <meta name="twitter:description" content="{{ meta_description }}">
+
+  <link rel="stylesheet" href="/pagefind/pagefind-component-ui.css">
+  <link rel="stylesheet" href="/build/css/generated.css">
+
+  {% if uses_mermaid %}
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  {% endif %}

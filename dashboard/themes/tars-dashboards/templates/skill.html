@@ -1,80 +1,11 @@
 {% extends "base.html" %}
 
-{# Skill page. A skill is a section (SKILL.md → _index.md) so its sibling
-   reference files can be pages beneath it. Mirrors page.html but for `section`. #}
+{# A skill is a section (SKILL.md becomes _index.md) so its reference files can
+   be pages beneath it. The layout is shared with page.html through ui.doc. #}
+{% block top_overlay %}
+  <div class="reading-progress" aria-hidden="true"></div>
+{% endblock top_overlay %}
 
 {% block content %}
-<div class="flex gap-8">
-  {# Main content #}
-  <article class="prose max-w-none flex-1 min-w-0" data-pagefind-body>
-
-    {# Archive banner #}
-    {% if section.extra.archived %}
-      <div class="p-4 mb-6 rounded-md text-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-muted)">
-        Archived on {{ section.extra.archived }}.{% if section.extra.replaced_by %} Replaced by {{ section.extra.replaced_by }}.{% endif %} Not installed by <code>npx skills add MAHDTech/agent-skills</code>; source: <a href="{{ section.extra.source_url }}" target="_blank" rel="noopener noreferrer">{{ section.extra.source_url }}</a>.
-      </div>
-    {% endif %}
-
-    {# Metadata bar #}
-    <div class="flex flex-wrap gap-4 text-sm !mt-1" style="color: var(--color-muted)">
-      {% if section.reading_time %}
-        <span>{{ section.reading_time }} min read</span>
-      {% endif %}
-    </div>
-
-    {% if section.description %}
-      <p style="color: var(--color-muted)">{{ section.description }}</p>
-    {% endif %}
-
-    <hr>
-
-    {{ section.content | safe }}
-
-    {# Reference files that live alongside this skill (kept out of the sidebar). #}
-    {% if section.pages | length > 0 %}
-      <hr>
-      <h3>Reference</h3>
-      <ul>
-        {% for p in section.pages | sort(attribute="title") %}
-          <li><a href="{{ p.permalink }}">{{ p.title }}</a></li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-
-    {# Freshness: last-modified date computed from git at build time (see bin/dashboard/lib.ts). #}
-    {% set dates_data = load_data(path="skill_dates.toml", required=false) %}
-    {% if dates_data %}
-      {% set skill_key = section.extra.category ~ "/" ~ section.title %}
-      {% if dates_data.dates[skill_key] is defined %}
-        <hr>
-        <p class="text-sm !mt-4" style="color: var(--color-muted)">
-          Last updated {{ dates_data.dates[skill_key] | date(format="%b %d, %Y") }}
-        </p>
-      {% endif %}
-    {% endif %}
-  </article>
-
-  {# TOC sidebar - desktop only #}
-  {% if section.toc %}
-    <aside class="hidden lg:block w-56 shrink-0 sticky top-8 self-start">
-      <nav class="toc">
-        <h3 class="text-sm font-bold mb-2" style="color: var(--color-muted)">ON THIS PAGE</h3>
-        <ul class="text-sm" style="list-style: none; padding-left: 0;">
-          {% for h in section.toc %}
-            <li class="mb-1">
-              <a href="#{{ h.id }}">{{ h.title }}</a>
-              {% if h.children %}
-                <ul style="padding-left: 1rem; list-style: none;">
-                  {% for child in h.children %}
-                    <li class="mt-1"><a href="#{{ child.id }}">{{ child.title }}</a></li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      </nav>
-    </aside>
-  {% endif %}
-</div>
+  {{ <ui.doc node={section} extra={config.extra} is_skill={true} /> }}
 {% endblock content %}

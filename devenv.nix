@@ -34,6 +34,7 @@ let
     ripgrep
     tailwindcss_4
     trivy
+    watchexec
     zola
   ];
 
@@ -245,6 +246,14 @@ in
         require_serial = true;
       };
       deadnix.enable = true;
+      # Tera 2 component arguments take bare braces (`arg={value}`). A quoted
+      # `arg="{value}"` renders the literal text instead of failing the build.
+      tera-templates = {
+        enable = true;
+        name = "Tera Templates";
+        entry = "${pkgs.writeShellScript "tera-templates" config.scripts.tera-templates.exec}";
+        files = "^dashboard/themes/.*/templates/";
+      };
       editorconfig-checker = {
         enable = true;
         excludes = [
@@ -419,7 +428,7 @@ in
       '';
     };
     dashboard = {
-      description = "Manage the dashboard (usage: dashboard --action <build|serve|css|lint>)";
+      description = "Manage the dashboard (usage: dashboard --action <build|serve|css|lint|index>)";
       exec = ''
         cargo run -p ask-cli -- dashboard "$@"
       '';
@@ -431,6 +440,37 @@ in
         ./scripts/codeql-run.sh "$@"
       '';
     };
+    dashboard-watch = {
+      description = "Refresh dashboard content and search index, then repeat on every skill change";
+      exec = ''
+        set -uo pipefail
+        ask dashboard index
+        exec watchexec --postpone --debounce 1s \
+          --watch skills --watch skills-archive \
+          --watch dashboard/themes --watch dashboard/config.toml \
+          -- cargo run --quiet -p ask-cli -- dashboard index
+      '';
+    };
+    dashboard-test = {
+      description = "Build the dashboard into a scratch directory and verify the output";
+      exec = ''
+        ./scripts/test-dashboard.sh "$@"
+      '';
+    };
+    tera-templates = {
+      description = "Reject quoted Tera component arguments in dashboard templates";
+      exec = ''
+        set -euo pipefail
+        targets=("$@")
+        if [ "''${#targets[@]}" -eq 0 ]; then
+          targets=(dashboard/themes)
+        fi
+        if ${pkgs.gnugrep}/bin/grep -rnE '[a-zA-Z0-9_-]+="[{][^{%#]' "''${targets[@]}"; then
+          echo "error: quoted Tera component argument; write arg={value}, not arg=\"{value}\"" >&2
+          exit 1
+        fi
+      '';
+    };
     crap = {
       description = "Run cargo-crap analysis";
       exec = ''
@@ -439,7 +479,17 @@ in
     };
   };
 
+  # `devenv up`: Zola live reload, Tailwind watch, and a watcher that
+  # regenerates dashboard content and the search index when a skill changes.
+  # Skipped under `devenv test`, which would otherwise start them alongside the tests.
+  processes = lib.mkIf (isNative && !config.devenv.isTesting) {
+    zola.exec = "zola --root dashboard serve --port 3000";
+    tailwind.exec = "tailwindcss -i dashboard/css/input.css -o dashboard/static/build/css/generated.css --watch=always";
+    dashboard-watch.exec = "dashboard-watch";
+  };
+
   enterTest = ''
     ./scripts/run-tests.sh
+    ./scripts/test-dashboard.sh
   '';
 }

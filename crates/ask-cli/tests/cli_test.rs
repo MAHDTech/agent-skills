@@ -626,9 +626,11 @@ fn test_cli_action_flag() {
 
     assert!(output_dir.exists());
     let home = std::fs::read_to_string(output_dir.join("index.html")).unwrap();
-    assert!(home.contains("<h2>Sections</h2>"));
+    assert!(home.contains("id=\"categories-heading\""));
+    assert!(home.contains("data-theme-toggle"));
     let skill = std::fs::read_to_string(output_dir.join("skills/tooling/zola/index.html")).unwrap();
-    assert!(skill.contains("id=\"sidebar-active-item\""));
+    assert!(skill.contains("data-sidebar-active"));
+    assert!(skill.contains("--skill zola"));
 
     ask_in_fixture()
         .args(["dashboard", "--action", "lint"])

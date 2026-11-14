@@ -16,8 +16,28 @@ render_emoji = true
 smart_punctuation = true
 
 [markdown.highlighting]
-theme = "dracula"
+theme = "one-dark-pro"
 
 [extra]
 author = "MAHDTech"
 github = "https://github.com/MAHDTech/agent-skills"
+# Branch that "View source" links point at.
+github_branch = "trunk"
+website = "https://mahdtech.com"
+logo_path = "/images/logo.svg"
+install_command = "npx skills add MAHDTech/agent-skills"
+
+# Header navigation. `external` items open in a new tab.
+[[extra.menu_items]]
+name = "Skills"
+url = "/skills/"
+
+[[extra.menu_items]]
+name = "Blog"
+url = "https://mahdtech.com"
+external = true
+
+[[extra.menu_items]]
+name = "GitHub"
+url = "https://github.com/MAHDTech/agent-skills"
+external = true

@@ -375,6 +375,10 @@ pub enum DashboardCommands {
     /// Verify generated documentation markup and anchor link integrity.
     #[command(about = "Verify generated documentation markup and anchor link integrity")]
     Lint,
+
+    /// Regenerate dashboard content and the development search index.
+    #[command(about = "Regenerate dashboard content and the development search index")]
+    Index,
 }
 
 /// Arguments for launching the interactive terminal user interface.

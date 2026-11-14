@@ -61,3 +61,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Dashboard fonts
+
+The skills dashboard ships reduced WOFF2 subsets of [Inter](https://github.com/rsms/inter), copyright The Inter Project Authors, and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono), copyright The JetBrains Mono Project Authors. Both are used under the SIL Open Font License, Version 1.1.
