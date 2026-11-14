@@ -43,7 +43,7 @@ jobs:
 
       - id: release
         name: Prepare the Rust Release
-        uses: tars-cloud/actions/composite/release-rust@26ffb67cc8d374672f646d6dd8829befa844b0e9 # v3.12.0
+        uses: tars-cloud/actions/composite/release-rust@68bf7f5eb020c47825bd5510eee164ef11fbcf9d # v3.14.0
         with:
           command: prepare
           commit-sha: ${{ github.sha }}
