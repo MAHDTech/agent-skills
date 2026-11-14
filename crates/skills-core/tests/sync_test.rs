@@ -842,7 +842,7 @@ fn test_sync_error_into_skill_error_all_variants() {
     let skill_err: SkillError = conflict_err.into();
     assert!(matches!(skill_err, SkillError::SyncConflict { .. }));
 
-    let unreachable_err = SyncError::TargetUnreachable(TargetEnvironment::ClaudeDesktop);
+    let unreachable_err = SyncError::TargetUnreachable(TargetEnvironment::ClaudeCode);
     let skill_err: SkillError = unreachable_err.into();
     assert!(matches!(skill_err, SkillError::TargetUnreachable { .. }));
 
@@ -855,4 +855,39 @@ fn test_sync_error_into_skill_error_all_variants() {
         skill_err,
         SkillError::FrontmatterValidation { .. }
     ));
+}
+
+#[test]
+fn test_prune_legacy_target_dir_removes_only_repository_links() {
+    let temp = tempfile::tempdir().unwrap();
+    let repo = temp.path().join("repo");
+    let skill = repo.join("skills/engineering/example");
+    fs::create_dir_all(&skill).unwrap();
+    let other = temp.path().join("other/foreign");
+    fs::create_dir_all(&other).unwrap();
+    let legacy = temp.path().join("home/.config/claude/skills");
+    fs::create_dir_all(legacy.join("manual")).unwrap();
+    fs::write(legacy.join("installed-skills.json"), "{}").unwrap();
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink(&skill, legacy.join("example")).unwrap();
+        std::os::unix::fs::symlink(&other, legacy.join("foreign")).unwrap();
+
+        let planned = skills_core::sync::prune_legacy_target_dir(&legacy, &repo, true).unwrap();
+        assert_eq!(planned, 1);
+        assert!(legacy.join("example").is_symlink());
+
+        let removed = skills_core::sync::prune_legacy_target_dir(&legacy, &repo, false).unwrap();
+        assert_eq!(removed, 1);
+        assert!(!legacy.join("example").exists());
+        assert!(legacy.join("foreign").is_symlink());
+        assert!(legacy.join("manual").is_dir());
+        assert!(!legacy.join("installed-skills.json").exists());
+        assert!(skill.is_dir());
+    }
+    let missing = temp.path().join("absent");
+    assert_eq!(
+        skills_core::sync::prune_legacy_target_dir(&missing, &repo, false).unwrap(),
+        0
+    );
 }

@@ -39,7 +39,7 @@ If you are working on the skills in this repository, install them from your loca
    cd agent-skills
    ```
 
-2. Install all live skills into ask's four standard targets:
+2. Install all live skills into every standard target whose agent tool is installed:
 
    ```bash
    devenv --no-tui shell -- ask skills --action install
@@ -61,9 +61,9 @@ The repository is authoritative for matching skill names. Bulk install discovers
 
 Bulk uninstall matches names from both the live and archived catalog. It removes matching directories, symlinks, and registry entries even if an installation was not tracked by ask. It leaves unrelated names, backups, and the source repository untouched. Repeated bulk uninstall is safe when matching installations are already absent. Bulk operations continue processing other skills and return a failure if any operation fails.
 
-The `--action install` and `--action uninstall` forms default to all four standard targets. Use `--target antigravity`, `--target antigravity-acp`, `--target claude`, `--target cursor`, or `--target /path/to/skills` to select one destination. To remove one tracked skill, use `devenv --no-tui shell -- ask skills --action uninstall domain-modeling`.
+The `--action install` and `--action uninstall` forms default to every detected standard target. Use `--target agents`, `--target claude`, `--target antigravity`, `--target antigravity-acp`, `--target cursor`, or `--target /path/to/skills` to select one destination. To remove one tracked skill, use `devenv --no-tui shell -- ask skills --action uninstall domain-modeling`.
 
-The existing `devenv --no-tui shell -- ask skills install <source>` and `devenv --no-tui shell -- ask skills uninstall <skill>` subcommands retain their Antigravity-only default. Both accept `--target`.
+The existing `devenv --no-tui shell -- ask skills install <source>` and `devenv --no-tui shell -- ask skills uninstall <skill>` subcommands default to the shared `~/.agents/skills/` target. Both accept `--target`.
 
 ### Synchronization
 
@@ -78,23 +78,27 @@ devenv --no-tui shell -- ask skills --action sync
 devenv --no-tui shell -- ask skills sync --dry-run
 ```
 
-Sync reconciles the live catalog with all four standard targets. It installs missing skills, updates managed installations, and regenerates derived repository files and dashboard content. On Unix, installation uses symlinks; other platforms default to copies. It does not auto-detect installed agent applications.
+Sync reconciles the live catalog with every detected standard target. It installs missing skills, updates managed installations, and regenerates derived repository files and dashboard content. On Unix, installation uses symlinks; other platforms default to copies. A target is skipped, with a message, when its tool's configuration directory (`~/.claude`, `~/.gemini`, or `~/.cursor`) does not exist, so sync never creates directories for tools you do not use. The shared `~/.agents/skills/` target is always synced. Pass `--target` to force a specific destination.
 
 The same command removes obsolete installations sourced from this repository's live or archived catalogs. Renaming `spacetimedb` to `spacetime`, for example, installs the new skill and removes the old installation and registry entry. Cleanup also finds old symlinks that are missing from the registry, including dangling links and relative symlinks. Removed installations are backed up under the target's `.backups/` directory.
 
 Sync preserves untracked directories such as `~/.agents/skills/test1/`, installations from other catalogs, and symlinks pointing outside this repository. A manual skill whose name matches a live repository skill still follows the existing conflict policy: the repository version replaces it with a backup. Use `--dry-run` to inspect installations, updates, and removals without changing files.
 
-The current target resolver uses these locations:
+No single directory is read by every agent harness. The target resolver uses the smallest set of global directories that covers them:
 
-| Target                    | Directory                                                              |
-| ------------------------- | ---------------------------------------------------------------------- |
-| Antigravity ACP (T3 Code) | `~/.gemini/config/skills/`                                             |
-| Antigravity               | `~/.agents/skills/`                                                    |
-| Cursor                    | `~/.cursor/skills/`                                                    |
-| Claude Desktop on Linux   | `$XDG_CONFIG_HOME/claude/skills/`, normally `~/.config/claude/skills/` |
-| Claude Desktop on macOS   | `~/Library/Application Support/Claude/skills/`                         |
+| Target (`--target`)                      | Directory                           | Read by                                                     |
+| ---------------------------------------- | ----------------------------------- | ----------------------------------------------------------- |
+| `agents` (also `codex`, `opencode`, ...) | `~/.agents/skills/`                 | Codex, OpenCode, Goose, Grok, Cline, Zed, Pi, Warp          |
+| `claude` (also `claude-code`)            | `~/.claude/skills/`                 | Claude Code; also OpenCode, Goose, and Grok                 |
+| `antigravity` (also `agy`)               | `~/.gemini/antigravity-cli/skills/` | Antigravity CLI; T3 Code's Antigravity provider             |
+| `antigravity-acp`                        | `~/.gemini/config/skills/`          | Antigravity IDE and Antigravity over ACP, including T3 Code |
+| `cursor`                                 | `~/.cursor/skills/`                 | Cursor; also Grok                                           |
 
-The `claude` option currently selects Claude Desktop, not the `~/.claude/skills/` directory described by older versions of this guide. There is no separate OpenCode or Goose target, and sync does not modify Gemini configuration files.
+ACP clients launch the same agent binary (or an adapter around it), so an agent reached over ACP reads the same directories as its interactive CLI. Codex and Grok over ACP are covered by `~/.agents/skills/`; Antigravity over ACP by the two `~/.gemini/` targets.
+
+OpenCode, Goose, Grok, and Codex have no dedicated target because they already read `~/.agents/skills/`. Tools that read more than one of these directories deduplicate skills by name. Sync does not modify Gemini configuration files.
+
+Earlier releases installed the `claude` target into `$XDG_CONFIG_HOME/claude/skills/` (or `~/Library/Application Support/Claude/skills/` on macOS), which no tool reads. A default sync removes this repository's links from those directories and leaves anything else in place.
 
 Sync prints the reason for each planned action. The CLI uses a repository-wins policy: changed copies, redirected or broken links, untracked destinations, and older repository versions are replaced with the repository's version, with backups. Managed links from another checkout are pointed at the current checkout. Repeated sync converges to an up-to-date installation.
 
@@ -120,5 +124,5 @@ devenv --no-tui shell -- ask skills --action install --target antigravity-acp
 For one skill, use `devenv --no-tui shell -- ask skills install domain-modeling --target antigravity-acp`.
 Bulk install and sync also include this target by default. Skills are installed as
 individual links on Unix, with each `SKILL.md` directly inside its skill directory.
-The existing `antigravity` target continues to use `~/.agents/skills/`.
+The `antigravity` target installs into `~/.gemini/antigravity-cli/skills/` for the Antigravity CLI.
 Run the installation on the environment where T3 Code runs its Antigravity provider.
