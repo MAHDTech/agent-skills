@@ -5,6 +5,7 @@
 
 README.md
 
-dashboard/static/.well-known
+dashboard/static/
+dashboard/themes/
 
 skills/vendor/
