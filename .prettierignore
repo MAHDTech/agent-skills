@@ -9,3 +9,6 @@ dashboard/static/
 dashboard/themes/
 
 skills/vendor/
+
+skills.sh.json
+
