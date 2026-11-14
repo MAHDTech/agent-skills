@@ -1024,8 +1024,17 @@ fn mirror_tree(src: &Path, dst: &Path) -> Result<()> {
         let to = dst.join(&name);
         expected.insert(name);
 
+        // Never follow a symlink in the destination: recursing or writing
+        // through one would modify, and later prune, files outside `dst`.
+        // The link itself is removed and replaced with a real entry.
+        let to_kind = fs::symlink_metadata(&to).ok().map(|meta| meta.file_type());
+        if to_kind.is_some_and(|kind| kind.is_symlink()) {
+            fs::remove_file(&to).map_err(|e| SkillError::io(&to, e))?;
+        }
+        let to_is_dir = to_kind.is_some_and(|kind| kind.is_dir());
+
         if from.is_dir() {
-            if to.exists() && !to.is_dir() {
+            if to_kind.is_some_and(|kind| kind.is_file()) {
                 fs::remove_file(&to).map_err(|e| SkillError::io(&to, e))?;
             }
             mirror_tree(&from, &to)?;
@@ -1033,7 +1042,7 @@ fn mirror_tree(src: &Path, dst: &Path) -> Result<()> {
         }
 
         let wanted = fs::read(&from).map_err(|e| SkillError::io(&from, e))?;
-        if to.is_dir() {
+        if to_is_dir {
             fs::remove_dir_all(&to).map_err(|e| SkillError::io(&to, e))?;
         } else if fs::read(&to).is_ok_and(|current| current == wanted) {
             continue;
@@ -1052,7 +1061,9 @@ fn mirror_tree(src: &Path, dst: &Path) -> Result<()> {
             continue;
         }
         let stale = entry.path();
-        if stale.is_dir() && !stale.is_symlink() {
+        // `file_type` does not follow symlinks, so a stale link is unlinked
+        // and its target is left alone.
+        if entry.file_type().is_ok_and(|kind| kind.is_dir()) {
             fs::remove_dir_all(&stale).map_err(|e| SkillError::io(&stale, e))?;
         } else {
             fs::remove_file(&stale).map_err(|e| SkillError::io(&stale, e))?;
@@ -1891,6 +1902,44 @@ mod tests {
             2,
             "temporary files left behind: {leftovers:?}"
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_mirror_tree_never_writes_or_prunes_through_destination_symlinks() {
+        let temp = tempfile::tempdir().unwrap();
+        let src = temp.path().join("src");
+        let dst = temp.path().join("dst");
+        let outside = temp.path().join("outside");
+        fs::create_dir_all(src.join("linked-dir")).unwrap();
+        fs::write(src.join("linked-dir/new.md"), "new").unwrap();
+        fs::write(src.join("linked-file.md"), "new").unwrap();
+        fs::create_dir_all(&dst).unwrap();
+        fs::create_dir_all(outside.join("dir")).unwrap();
+        fs::write(outside.join("dir/precious.md"), "precious").unwrap();
+        fs::write(outside.join("file.md"), "precious").unwrap();
+        std::os::unix::fs::symlink(outside.join("dir"), dst.join("linked-dir")).unwrap();
+        std::os::unix::fs::symlink(outside.join("file.md"), dst.join("linked-file.md")).unwrap();
+        std::os::unix::fs::symlink(outside.join("dir"), dst.join("stale-link")).unwrap();
+
+        mirror_tree(&src, &dst).unwrap();
+
+        assert_eq!(
+            fs::read_to_string(outside.join("dir/precious.md")).unwrap(),
+            "precious"
+        );
+        assert!(!outside.join("dir/new.md").exists());
+        assert_eq!(
+            fs::read_to_string(outside.join("file.md")).unwrap(),
+            "precious"
+        );
+        assert!(!dst.join("linked-dir").is_symlink());
+        assert_eq!(
+            fs::read_to_string(dst.join("linked-dir/new.md")).unwrap(),
+            "new"
+        );
+        assert!(!dst.join("linked-file.md").is_symlink());
+        assert!(dst.join("stale-link").symlink_metadata().is_err());
     }
 
     #[test]
