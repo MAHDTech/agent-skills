@@ -120,6 +120,13 @@
       ]
     },
     {
+      "name": "dreamwork",
+      "description": "Plan issues with the human, then autonomously research, implement, review and council-check them in isolated T3 Code worktrees, returning to the human only for final UAT before landing. Use only when the user explicitly requests Dreamwork.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "name": "egui",
       "description": "Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures.",
       "files": [

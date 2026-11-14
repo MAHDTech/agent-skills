@@ -86,7 +86,7 @@ fn create_mock_summary() -> DashboardSummary {
         )
         .categories(Vec::new())
         .targets(
-            vec![TargetEnvironment::ClaudeDesktop, TargetEnvironment::Cursor]
+            vec![TargetEnvironment::ClaudeCode, TargetEnvironment::Cursor]
                 .into_iter()
                 .map(|env| {
                     TargetDistribution::builder()

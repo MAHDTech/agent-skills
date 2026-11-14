@@ -158,12 +158,7 @@ async fn run_action(action: &str, args: &SkillsArgs, format: OutputFormat) -> Re
 
 #[allow(tail_expr_drop_order)]
 async fn run_bulk_action(action: &str, args: &SkillsArgs) -> Result<(), CliError> {
-    let targets = args
-        .target
-        .as_deref()
-        .map_or_else(TargetEnvironment::all_standard, |target| {
-            vec![resolve_target_environment(Some(target))]
-        });
+    let targets = resolve_sync_targets(args.target.as_deref());
     let installer = Installer::new();
     let mut failures = Vec::new();
     for target in targets {
@@ -361,12 +356,15 @@ async fn run_show(query: &str, format: OutputFormat) -> Result<(), CliError> {
 
 fn resolve_target_environment(target: Option<&str>) -> TargetEnvironment {
     match target {
-        None | Some("antigravity" | "agy") => TargetEnvironment::Antigravity {
-            workspace_root: None,
-        },
-        Some("claude" | "claude-desktop") => TargetEnvironment::ClaudeDesktop,
+        None | Some("agents" | "codex" | "opencode" | "goose" | "grok") => {
+            TargetEnvironment::Agents {
+                workspace_root: None,
+            }
+        }
+        Some("claude" | "claude-code" | "claude-desktop") => TargetEnvironment::ClaudeCode,
         Some("cursor") => TargetEnvironment::Cursor,
-        Some("antigravity-acp") => TargetEnvironment::AntigravityAcp,
+        Some("antigravity" | "antigravity-cli" | "agy") => TargetEnvironment::AntigravityCli,
+        Some("antigravity-acp" | "antigravity-ide") => TargetEnvironment::AntigravityAcp,
         Some(custom) => TargetEnvironment::Custom(PathBuf::from(custom)),
     }
 }
@@ -559,10 +557,44 @@ fn is_linked_git_worktree(root: &Path) -> bool {
     root.join(".git").is_file()
 }
 
+/// Resolves the targets for bulk and sync operations.
+///
+/// Without an explicit target, only standard targets whose agent tool is
+/// present on this machine are used, so sync never creates configuration
+/// directories for tools that are not installed.
 fn resolve_sync_targets(target: Option<&str>) -> Vec<TargetEnvironment> {
-    target.map_or_else(TargetEnvironment::all_standard, |t| {
-        vec![resolve_target_environment(Some(t))]
-    })
+    target.map_or_else(
+        || {
+            for skipped in TargetEnvironment::all_standard()
+                .iter()
+                .filter(|standard| !standard.is_detected(None))
+            {
+                println!(
+                    "Skipping {}: tool not detected on this machine.",
+                    skipped.display_name()
+                );
+            }
+            TargetEnvironment::detected_standard(None)
+        },
+        |t| vec![resolve_target_environment(Some(t))],
+    )
+}
+
+/// Removes this repository's links from directories earlier releases installed into.
+fn prune_legacy_targets(root: &Path, dry_run: bool) {
+    for dir in TargetEnvironment::legacy_skills_dirs(None) {
+        match skills_core::sync::prune_legacy_target_dir(&dir, root, dry_run) {
+            Ok(0) => {}
+            Ok(count) => println!(
+                "  [Delete] {count} stale link(s) in legacy directory {} (no agent reads it)",
+                dir.display()
+            ),
+            Err(error) => eprintln!(
+                "Warning: could not clean legacy directory {}: {error}",
+                dir.display()
+            ),
+        }
+    }
 }
 
 fn should_sync_repo_only(dry_run: bool, repo_only_flag: bool, root: &Path) -> bool {
@@ -622,6 +654,10 @@ async fn run_sync(options: SyncCommandOptions<'_>) -> Result<(), CliError> {
                 action.target_env.display_name(),
                 action.reason
             );
+        }
+
+        if options.target.is_none() {
+            prune_legacy_targets(&root, options.dry_run);
         }
 
         let summary = syncer.execute_plan(&plan).map_err(SkillError::from)?;
@@ -830,7 +866,7 @@ mod tests {
     fn test_resolve_sync_targets_default_and_single() {
         assert_eq!(
             resolve_sync_targets(None),
-            TargetEnvironment::all_standard()
+            TargetEnvironment::detected_standard(None)
         );
         assert_eq!(
             resolve_sync_targets(Some("cursor")),
@@ -853,7 +889,7 @@ mod tests {
 
         let syncer = build_skill_syncer(root, catalog_dir.clone(), options);
         assert_eq!(syncer.catalog_dir, catalog_dir);
-        assert_eq!(syncer.targets, vec![TargetEnvironment::ClaudeDesktop]);
+        assert_eq!(syncer.targets, vec![TargetEnvironment::ClaudeCode]);
         assert_eq!(syncer.mode, InstallMode::Copy);
         assert_eq!(syncer.conflict_strategy, ConflictStrategy::RemoteWins);
         assert!(!syncer.prune_orphans);

@@ -1,9 +1,9 @@
-name = "tars"
-description = "TARS Cloud documentation theme - dark, brutalist, precision"
-license = "BUSL-1.1"
-min_version = "0.19.0"
+name = "tars-dashboards"
+description = "MAHDTech skills dashboard theme, sharing its design system with mahdtech.com"
+license = "MIT"
+min_version = "0.23.0"
 
 [author]
-name = "TARS Cloud"
+name = "MAHDTech"
 
 [extra]

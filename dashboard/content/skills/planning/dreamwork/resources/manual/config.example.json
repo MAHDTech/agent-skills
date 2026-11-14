@@ -1,0 +1,101 @@
+{
+  "version": 4,
+  "roles": {
+    "researcher": {
+      "targets": [
+        {
+          "providerInstanceId": "codex",
+          "model": "gpt-6.1-sol",
+          "options": {
+            "reasoningEffort": "high"
+          }
+        }
+      ]
+    },
+    "implementer": {
+      "targets": [
+        {
+          "providerInstanceId": "opencode",
+          "model": "opencode/inkling-2-small-free",
+          "options": {}
+        },
+        {
+          "providerInstanceId": "codex",
+          "model": "gpt-6.1-sol",
+          "options": {
+            "reasoningEffort": "medium"
+          }
+        }
+      ]
+    },
+    "reviewer": {
+      "targets": [
+        {
+          "providerInstanceId": "antigravity",
+          "model": "gemini-4-argon",
+          "options": {
+            "thinking_level": "medium"
+          }
+        }
+      ]
+    }
+  },
+  "council": {
+    "min_seats": 2,
+    "seats": [
+      {
+        "name": "Claude Opus",
+        "family": "anthropic",
+        "targets": [
+          {
+            "providerInstanceId": "claudeAgent",
+            "model": "claude-opus-5-5",
+            "options": {
+              "effort": "high"
+            }
+          },
+          {
+            "providerInstanceId": "antigravity",
+            "model": "claude-opus-5-5",
+            "options": {
+              "thinking_level": "high"
+            }
+          }
+        ]
+      },
+      {
+        "name": "GPT Sol",
+        "family": "openai",
+        "targets": [
+          {
+            "providerInstanceId": "codex",
+            "model": "gpt-6.1-sol",
+            "options": {
+              "reasoningEffort": "high"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Gemini Carbon",
+        "family": "google",
+        "targets": [
+          {
+            "providerInstanceId": "antigravity",
+            "model": "gemini-4-carbon",
+            "options": {
+              "thinking_level": "high"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "workflow": {
+    "max_parallel_issues": 2,
+    "max_repair_rounds": 3,
+    "repair_extension_rounds": 2,
+    "max_council_rounds": 2,
+    "max_infrastructure_recovery_attempts": 3
+  }
+}

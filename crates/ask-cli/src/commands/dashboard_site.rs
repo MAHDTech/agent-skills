@@ -702,49 +702,62 @@ fn run_live_reload_step<T, E: std::fmt::Display>(result: Result<T, E>, context: 
     }
 }
 
-fn sync_live_reload_inputs(root: &Path) -> bool {
+/// Regenerates dashboard content and the per-skill freshness sidecar.
+fn sync_live_reload_inputs(root: &Path) -> Result<(), CliError> {
     let options = ArtifactsOptions {
         skip_dashboard: false,
         repo_only: false,
         no_stage: false,
         ..Default::default()
     };
-    run_live_reload_step(
-        ArtifactsEngine::with_options(root, options).generate_all(),
-        "sync artifacts",
-    ) && run_live_reload_step(write_skill_dates(root), "write skill dates")
+    ArtifactsEngine::with_options(root, options).generate_all()?;
+    write_skill_dates(root)
 }
 
-fn prepare_live_reload_site(root: &Path) -> bool {
-    sync_live_reload_inputs(root)
-        && run_live_reload_step(
-            exec_tool(root, "zola", &["--root", "dashboard", "build"], "serve"),
-            "build Zola",
-        )
+/// Regenerates dashboard content and rebuilds the development search index.
+///
+/// The site is rendered into a scratch directory, never `dashboard/public`, so a
+/// running `zola serve` keeps sole ownership of its output directory. Only the
+/// resulting Pagefind bundle is written back, into `dashboard/static/pagefind`.
+pub(crate) fn refresh_dev_site(root: &Path) -> Result<(), CliError> {
+    sync_live_reload_inputs(root)?;
+
+    let staging = StagingDir::new("ask-dashboard-index")?;
+    let site_dir = staging.path().join("site");
+    let site_str = site_dir.to_string_lossy().to_string();
+    exec_tool(
+        root,
+        "zola",
+        &["--root", "dashboard", "build", "--force", "-o", &site_str],
+        "index",
+    )?;
+    exec_tool(
+        root,
+        "pagefind",
+        &[
+            "--site",
+            &site_str,
+            "--output-path",
+            "dashboard/static/pagefind",
+        ],
+        "index",
+    )
 }
 
+/// Rebuilds the development search index, logging instead of failing so the
+/// live-reload loop survives a transient content error.
 pub(crate) fn rebuild_search_indexes(root: &Path) {
-    if !prepare_live_reload_site(root) {
-        return;
-    }
-    let _ = run_live_reload_step(
-        materialize_well_known(root, &root.join("dashboard/public")),
-        "materialize .well-known skills",
-    );
-    let _ = run_live_reload_step(
-        exec_tool(
-            root,
-            "pagefind",
-            &[
-                "--site",
-                "dashboard/public",
-                "--output-path",
-                "dashboard/static/pagefind",
-            ],
-            "serve",
-        ),
-        "index search assets",
-    );
+    let _ = run_live_reload_step(refresh_dev_site(root), "refresh the search index");
+}
+
+/// Regenerates dashboard content and the development search index once.
+#[allow(clippy::unused_async)]
+pub(crate) async fn run_index() -> Result<(), CliError> {
+    let root = resolve_root()?;
+    println!("Refreshing dashboard content and search index...");
+    refresh_dev_site(&root)?;
+    println!("Done! Search index written to dashboard/static/pagefind.");
+    Ok(())
 }
 
 #[cfg(test)]
@@ -1403,7 +1416,7 @@ mod tests {
         )
         .unwrap();
 
-        assert!(sync_live_reload_inputs(root));
+        assert!(sync_live_reload_inputs(root).is_ok());
         let sidecar = root.join("dashboard/skill_dates.toml");
         assert!(sidecar.is_file());
         assert!(
@@ -1415,12 +1428,12 @@ mod tests {
 
         std::fs::remove_file(&sidecar).unwrap();
         std::fs::create_dir_all(&sidecar).unwrap();
-        assert!(!sync_live_reload_inputs(root));
+        assert!(sync_live_reload_inputs(root).is_err());
 
         let broken_temp = tempdir().expect("failed to create temp dir");
         let bad_root = broken_temp.path();
         std::fs::create_dir_all(bad_root.join("README.md")).unwrap();
-        assert!(!sync_live_reload_inputs(bad_root));
+        assert!(sync_live_reload_inputs(bad_root).is_err());
         assert!(!bad_root.join("dashboard/skill_dates.toml").exists());
     }
 

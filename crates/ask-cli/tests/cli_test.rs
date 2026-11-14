@@ -626,9 +626,11 @@ fn test_cli_action_flag() {
 
     assert!(output_dir.exists());
     let home = std::fs::read_to_string(output_dir.join("index.html")).unwrap();
-    assert!(home.contains("<h2>Sections</h2>"));
+    assert!(home.contains("id=\"categories-heading\""));
+    assert!(home.contains("data-theme-toggle"));
     let skill = std::fs::read_to_string(output_dir.join("skills/tooling/zola/index.html")).unwrap();
-    assert!(skill.contains("id=\"sidebar-active-item\""));
+    assert!(skill.contains("data-sidebar-active"));
+    assert!(skill.contains("--skill zola"));
 
     ask_in_fixture()
         .args(["dashboard", "--action", "lint"])
@@ -808,7 +810,7 @@ fn test_dashboard_summary_plain() {
         .stdout(predicate::str::contains("Static Analysis Errors: "))
         .stdout(predicate::str::contains("Static Analysis Warnings: "))
         .stdout(predicate::str::contains("Engineering\t"))
-        .stdout(predicate::str::contains("Antigravity\t"))
+        .stdout(predicate::str::contains("Antigravity CLI\t"))
         .stdout(predicate::str::contains("Catalog Overview Metric").not())
         .stdout(predicate::str::contains("Diagnostic Quality Metric").not())
         .stdout(predicate::str::contains("╭").not())
@@ -990,12 +992,9 @@ fn test_action_bulk_install_uninstall_isolated() {
     let targets = [
         home.join(".agents/skills"),
         home.join(".gemini/config/skills"),
+        home.join(".gemini/antigravity-cli/skills"),
         home.join(".cursor/skills"),
-        if cfg!(target_os = "macos") {
-            home.join("Library/Application Support/Claude/skills")
-        } else {
-            config.join("claude/skills")
-        },
+        home.join(".claude/skills"),
     ];
     for target in &targets {
         std::fs::create_dir_all(target.join("untracked")).unwrap();
@@ -1080,12 +1079,9 @@ fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
     let targets = [
         task_home.join(".agents/skills"),
         task_home.join(".gemini/config/skills"),
+        task_home.join(".gemini/antigravity-cli/skills"),
         task_home.join(".cursor/skills"),
-        if cfg!(target_os = "macos") {
-            task_home.join("Library/Application Support/Claude/skills")
-        } else {
-            task_config.join("claude/skills")
-        },
+        task_home.join(".claude/skills"),
     ];
     let installer = Installer::new();
     for target in &targets {
@@ -1135,7 +1131,7 @@ fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
         .assert()
         .success()
         .stdout(predicate::str::contains(
-            "4 installed, 0 updated, 12 deleted",
+            "5 installed, 0 updated, 15 deleted",
         ));
     for target in &targets {
         assert!(target.join("spacetimedb").symlink_metadata().is_ok());
@@ -1145,7 +1141,7 @@ fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
         .assert()
         .success()
         .stdout(predicate::str::contains(
-            "4 installed, 0 updated, 12 deleted",
+            "5 installed, 0 updated, 15 deleted",
         ));
     for target in &targets {
         for name in ["spacetimedb", "legacy", "retired-link"] {

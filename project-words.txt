@@ -64,6 +64,7 @@ databaseId
 dataclass
 dataclasses
 dbos
+deadnix
 dedup
 deepenable
 deltadb
@@ -198,10 +199,10 @@ outcalls
 pagefind
 pandoc
 pathlib
+pbakaus
 peaceiris
 permessage
 pgrep
-pbakaus
 pkgs
 Pocock
 prefactoring
@@ -262,6 +263,7 @@ skimmable
 slugifying
 spacetimedb
 sqfs
+statix
 stfolder
 stignore
 strokecolor
