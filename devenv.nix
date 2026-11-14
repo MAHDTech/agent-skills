@@ -325,19 +325,7 @@ in
         enable = true;
         excludes = [ "^skills/vendor/" ];
       };
-      prettier = {
-        enable = true;
-        excludes = [
-          "^skills/vendor/"
-          "\\.html$"
-          "README\\.md$"
-          "^agents/AGENTS\\.md$"
-          "^skills\\.sh\\.json$"
-          "^dashboard/static/\\.well-known/"
-          "\\.devcontainer\\.json$"
-          "\\.devcontainer/devcontainer\\.json$"
-        ];
-      };
+      prettier.enable = true;
       ripsecrets.enable = true;
       rustfmt = {
         enable = true;

@@ -1,0 +1,10 @@
+# Read by both prettier hook and zed
+
+.devcontainer.json
+.devcontainer/devcontainer.json
+
+README.md
+
+dashboard/static/.well-known
+
+skills/vendor/
