@@ -121,6 +121,13 @@
       "digest": "sha256:6d34b59573e98766679e9dd217b187af381abf3a1969bf6f69b183e93b32b719"
     },
     {
+      "name": "dreamwork",
+      "type": "skill-md",
+      "description": "Plan issues with the human, then autonomously research, implement, review and council-check them in isolated T3 Code worktrees, returning to the human only for final UAT before landing. Use only when the user explicitly requests Dreamwork.",
+      "url": "/.well-known/agent-skills/dreamwork/SKILL.md",
+      "digest": "sha256:f7f6e2d669a468792d2727f5095e370c7429e42791e88177e98144d32b183b71"
+    },
+    {
       "name": "egui",
       "type": "skill-md",
       "description": "Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures.",
@@ -475,7 +482,7 @@
       "type": "skill-md",
       "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:a0e07c114baa57c3c8ef02047c25d025681fc6ca848077e1b6cf059cd89718dc"
+      "digest": "sha256:d37523d0c153a61fe526096714f2c9c4de2e41559e0c44a73e60ac7373aed3a5"
     },
     {
       "name": "software-factory",

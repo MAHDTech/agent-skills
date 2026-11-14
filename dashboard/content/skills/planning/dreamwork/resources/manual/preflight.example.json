@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "run_id": "<run-id>",
+  "issue_id": "<project-issue-id>",
+  "role": "implementer",
+  "revision_commit": "<40-hex-commit>",
+  "revision_tree": "<40-hex-tree>",
+  "status": "blocked",
+  "tools": [
+    {
+      "name": "<required-tool>",
+      "availability": "unverified",
+      "version": null,
+      "required_for": [
+        "<approved-gate-id>"
+      ],
+      "observation": "Template only; verify the required tool in the assigned checkout."
+    }
+  ],
+  "generated_inputs": [],
+  "services": [],
+  "evidence_inputs": [
+    {
+      "path": "docs/dreamwork/runs/<run-id>/scopes.json",
+      "revision_or_sha256": "<64-hex-sha256>",
+      "availability": "available",
+      "required_for": [
+        "<approved-gate-id>"
+      ],
+      "observation": "Repository-relative path verified in assigned worktree."
+    }
+  ],
+  "blockers": [
+    "Template only; inventory the approved gates in the actual assigned checkout using repository-relative paths only."
+  ],
+  "extensions": {}
+}

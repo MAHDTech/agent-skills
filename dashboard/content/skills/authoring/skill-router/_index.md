@@ -53,6 +53,7 @@ A starting situation that generates work, then merges onto the main flow:
 - `/gh-triage` - reach for this when the GitHub backlog piles up and issues or external PRs need turning into agent-ready briefs.
 - `/wayfinder` - reach for this when the work is too big for one session and the way to the destination isn't visible yet.
 - `/software-factory` - reach for this when a feature is big enough that every decision should be signed off before code exists; it runs four approval gates, then rejoins the flow at `/to-tickets`.
+- `/dreamwork` - reach for this when working in T3 Code and a set of issues should be planned with you, then implemented, reviewed, and council-checked autonomously in isolated worktrees, returning to you only for UAT before landing.
 - `/research` - reach for this when you need facts gathered and verified against primary sources, delegated to a background agent while you keep working.
 
 ## Shaping the backlog
