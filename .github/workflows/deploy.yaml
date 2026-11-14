@@ -49,7 +49,7 @@ jobs:
       - id: report_status
         name: Report Deployment Status
         if: always()
-        uses: tars-cloud/actions/composite/report-status@26ffb67cc8d374672f646d6dd8829befa844b0e9 # v3.12.0
+        uses: tars-cloud/actions/composite/report-status@68bf7f5eb020c47825bd5510eee164ef11fbcf9d # v3.14.0
         with:
           title: Deployment Results
           results: |
