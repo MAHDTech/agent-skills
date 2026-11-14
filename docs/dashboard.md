@@ -22,6 +22,8 @@ This serves the site at <http://127.0.0.1:3000> and runs three processes:
 
 The search index is built from a scratch copy of the site, never `dashboard/public`, so it does not disturb the running server.
 
+Content regeneration only writes files whose content changed, so an unrelated skill edit does not rebuild every page. If port 3000 is busy, Zola falls back to the next free port from 1024 and prints the address it chose.
+
 The individual commands are also available inside the `devenv` shell:
 
 ```bash
