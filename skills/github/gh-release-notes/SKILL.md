@@ -21,7 +21,11 @@ git fetch origin --tags --prune
 PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
 ```
 
-The range is `$PREV_TAG..HEAD`. If no tag exists yet (first release), the range is the entire history - use `git log HEAD` and note it is the initial release. Decide the new version string (e.g. `v1.4.0`) with the user if they have not given one.
+The range is `$PREV_TAG..HEAD`. If no tag exists yet (first release), the range is the entire history - use `git log HEAD` and note it is the initial release. Decide the new version with the user if they have not given one, and set it:
+
+```bash
+VERSION=v1.4.0
+```
 
 ## 2. Gather the changes
 
@@ -37,8 +41,6 @@ git log -1 --format=%as "$PREV_TAG"   # date of the previous tag
 gh pr list --state merged --base "$BASE" --search "merged:>=<that-date>" \
   --json number,title,labels,author,mergedAt
 ```
-
-`$BASE` is the repo's default branch, derived above - never hard-code `main`.
 
 ## 3. Group by type
 
@@ -63,28 +65,29 @@ Rewrite each entry as a user-facing line, not a commit dump:
 - Lead the document with **Breaking changes** and any required migration steps - those are the lines readers cannot skip.
 - Drop entries a reader would not care about; a curated 12-line changelog beats an exhaustive 200-line one.
 
-Write the result to a file (e.g. `RELEASE_NOTES.md`) so you can publish it verbatim.
+Write the result to a temporary file outside the working tree, so it is never swept into a commit:
+
+```bash
+NOTES_FILE=$(mktemp --suffix=.md)
+```
+
+To start from GitHub's own summary, fetch its generated notes without creating a release, then edit them into the grouped form above:
+
+```bash
+gh api "repos/{owner}/{repo}/releases/generate-notes" \
+  -f tag_name="$VERSION" -f previous_tag_name="$PREV_TAG" --jq .body > "$NOTES_FILE"
+```
+
+Omit `-f previous_tag_name` for the first release.
 
 ## 5. Publish the release
 
-Set `$VERSION` to the new tag you decided on in step 1:
+Create the release once, using `$VERSION` from step 1:
 
 ```bash
-VERSION=v1.2.3
+gh release create "$VERSION" --title "$VERSION" --notes-file "$NOTES_FILE"
 ```
 
-To scaffold a first draft from GitHub's own diff, then edit it into the grouped form above:
-
-```bash
-gh release create "$VERSION" --generate-notes --draft
-```
-
-To publish the curated notes you wrote:
-
-```bash
-gh release create "$VERSION" --title "$VERSION" --notes-file RELEASE_NOTES.md
-```
-
-`gh release create` creates the tag on the current commit (or pass `--target <sha>`). Add `--draft` to review on GitHub before it goes live, or `--prerelease` for an RC. Confirm the release URL it prints, and that the tag points at the intended commit.
+`gh release create` creates the tag on the current commit (or pass `--target <sha>`). Add `--draft` to review on GitHub before it goes live, or `--prerelease` for an RC. To publish a draft later, run `gh release edit "$VERSION" --draft=false`. Confirm the release URL it prints, and that the tag points at the intended commit, then delete `$NOTES_FILE`.
 
 Done when the release is published (or drafted, if requested) with grouped, human-readable notes and the correct tag.

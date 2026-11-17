@@ -1,12 +1,15 @@
 ---
 name: guards-debug
-description: Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts.
+description: Diagnose and recover stuck or failing agy-guards sessions, hooks, spokes, or factory shifts from outside an active run. Use only when the user explicitly requests GUARDS debugging.
 argument-hint: "[workspace_root] [session_id]"
+disable-model-invocation: true
 metadata:
   group: guards
 ---
 
 # GUARDS Debug
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Diagnose and recover `agy-guards` sessions, projected hooks, spoke subagents, and unattended factory shifts from **outside** an activated GUARDS conversation.
 

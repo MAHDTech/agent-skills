@@ -119,10 +119,9 @@ The core build, debug, and delivery loop.
 - **[codebase-design](skills/engineering/codebase-design/SKILL.md)** - Design or improve module interfaces and test seams. Use when simplifying caller requirements, reducing shallow abstractions, or making modules easier to test and maintain.
 - **[diagnosing-bugs](skills/engineering/diagnosing-bugs/SKILL.md)** - Diagnose hard bugs, flaky failures, and performance regressions with a reproducible feedback loop. Use to isolate the cause, verify a fix, and add a meaningful regression test.
 - **[domain-modeling](skills/engineering/domain-modeling/SKILL.md)** - Clarify domain terms and relationships while designing software. Use to resolve conflicting terminology, stress-test scenarios, update a glossary, or record a consequential ADR.
-- **[egui](skills/engineering/egui/SKILL.md)** - Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures.
 - **[icp](skills/engineering/icp/SKILL.md)** - Build, secure, test, and deploy Internet Computer (ICP) canisters and full-stack dapps in Motoko, Rust, and TypeScript. Use for canister architecture, stable memory, ICRC and chain-key tokens (ckBTC, ckETH, ckSOL), Internet Identity, vetKeys, HTTPS outcalls, or icp CLI workflows.
 - **[interface-design](skills/engineering/interface-design/SKILL.md)** - Design, build, refine, or critique user interfaces across web, desktop, mobile, terminals, and games. Use for UI/UX decisions, visual systems, interaction flows, and rendered design reviews.
-- **[model-context-protocol](skills/engineering/model-context-protocol/SKILL.md)** - Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing.
+- **[model-context-protocol](skills/engineering/model-context-protocol/SKILL.md)** - Build or debug MCP servers with official SDKs against the stateless 2026-07-28 spec. Use for tool schemas, resources, prompts, server/discover, stdio or Streamable HTTP transports, and MCP Inspector testing.
 - **[nutanix-api-v4](skills/engineering/nutanix-api-v4/SKILL.md)** - Integrate or debug Nutanix v4 REST APIs and official SDKs. Use for OData queries, namespaces, version compatibility, or migrating legacy Nutanix API integrations.
 - **[nutanix-enterprise-ai](skills/engineering/nutanix-enterprise-ai/SKILL.md)** - Configure or troubleshoot Nutanix Enterprise AI (NAI/GPT-in-a-Box). Use for platform deployment, model serving, inference gateways, RBAC, or NAI MCP connectors.
 - **[nutanix-files](skills/engineering/nutanix-files/SKILL.md)** - Configure or troubleshoot Nutanix Files servers and SMB/NFS shares. Use for directory integration, Smart Tiering, recovery, analytics, performance, or Files APIs.
@@ -132,7 +131,6 @@ The core build, debug, and delivery loop.
 - **[productionize-app](skills/engineering/productionize-app/SKILL.md)** - Prepare an entire application for production when explicitly requested. Audit and fix configuration, reliability, security, observability, packaging, and deployment readiness.
 - **[research](skills/engineering/research/SKILL.md)** - Research a technical question using primary sources and save cited findings in the repo. Use for documentation, API, specification, or source-code fact gathering.
 - **[sculpt-code](skills/engineering/sculpt-code/SKILL.md)** - Refactor a scoped diff or selected files for clearer naming, control flow, structure, and less duplication or dead code. Use for cleanup that preserves behavior.
-- **[spacetime](skills/engineering/spacetime/SKILL.md)** - Develop or debug Spacetime/SpacetimeDB modules and real-time clients in Rust, C#, TypeScript, or C++. Use for schemas, backend functions, subscriptions, CLI work, bindings, or migrations.
 - **[tdd](skills/engineering/tdd/SKILL.md)** - Build features or fixes test-first using a red-to-green loop. Use for behavior-focused integration tests, choosing public test seams, and avoiding tests coupled to internals.
 - **[upgrade-dependencies](skills/engineering/upgrade-dependencies/SKILL.md)** - Upgrade packages, frameworks, or language/runtime versions using release notes and a green test baseline. Use for version bumps, breaking migrations, and lockfile changes.
 - **[xai](skills/engineering/xai/SKILL.md)** - Integrate or debug xAI/Grok APIs and SDKs. Use for client configuration, model capabilities, streaming, tool calling, structured output, vision, or search integration.
@@ -142,7 +140,6 @@ The core build, debug, and delivery loop.
 Game engines and game-development workflows.
 
 - **[bevy-development](skills/game-development/bevy-development/SKILL.md)** - Build or modernize Bevy games and simulations in Rust. Use for ECS design, scheduling, input, assets, messages, performance, or migration between Bevy APIs.
-- **[bevy-egui](skills/game-development/bevy-egui/SKILL.md)** - Integrate egui into Bevy with bevy_egui. Use for UI scheduling, HUDs, debug panels, input capture, image textures, multi-window contexts, or rendering UI to game surfaces.
 
 ### Planning
 
@@ -225,7 +222,6 @@ Environments, CLIs, and agent conventions.
 - **[install-skills](skills/tooling/install-skills/SKILL.md)** - Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.
 - **[jj](skills/tooling/jj/SKILL.md)** - Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.
 - **[nix-shell](skills/tooling/nix-shell/SKILL.md)** - Run missing ad-hoc CLI utilities in ephemeral nix shell environments when Nix is installed. Use for one-off diagnostics or conversions, keeping project dependencies in its toolchain.
-- **[oak](skills/tooling/oak/SKILL.md)** - Use Oak version control in repositories with .oak, or for oak.space tasks. Manage change stacks, conflicts, workspaces, dependency mounts, spaces, and Oak CI.
 - **[pagefind](skills/tooling/pagefind/SKILL.md)** - Configure, build, or troubleshoot Pagefind search for a static website. Use for indexing options, content exclusions or weighting, generated assets, and client integration.
 - **[prek](skills/tooling/prek/SKILL.md)** - Run, configure, or troubleshoot Git pre-commit hooks with prek. Use for hook execution, installation, validation, and cache management; distinguish the hook stage from its CLI.
 - **[scratchpad](skills/tooling/scratchpad/SKILL.md)** - Manage temporary scripts, experiment files, and debugging artifacts during a task. Use one session scratch directory, keep the source tree clean, and remove temporary files afterward.
@@ -237,7 +233,7 @@ Environments, CLIs, and agent conventions.
 
 Autonomous GUARDS software factory, debugging, and persistent goal workflows.
 
-- **[guards-debug](skills/guards/guards-debug/SKILL.md)** - Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts.
+- **[guards-debug](skills/guards/guards-debug/SKILL.md)** - Diagnose and recover stuck or failing agy-guards sessions, hooks, spokes, or factory shifts from outside an active run. Use only when the user explicitly requests GUARDS debugging.
 - **[guards-goal](skills/guards/guards-goal/SKILL.md)** - Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /guards-goal or explicitly requests a persistent goal.
 - **[guards-run-factory](skills/guards/guards-run-factory/SKILL.md)** - Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
 
@@ -279,22 +275,6 @@ Skills maintained by this vendor.
 - **[dbos-python](skills/vendor/dbos/dbos-python/SKILL.md)** - DBOS Python SDK (3.x) for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Python code with DBOS, creating workflows and steps, using queues, datasource transactions, or schedules, using DBOSClient from external applications, upgrading DBOS Python 2.x code to 3.x, or building applications that need to be resilient to failures.
 - **[dbos-rust](skills/vendor/dbos/dbos-rust/SKILL.md)** - DBOS Rust SDK (the dbos crate) for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Rust code with DBOS, creating workflows and steps, using queues, using the DBOS Client from external applications, or building Rust applications that need to be resilient to failures.
 - **[dbos-typescript](skills/vendor/dbos/dbos-typescript/SKILL.md)** - DBOS TypeScript SDK for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing TypeScript code with DBOS, creating workflows and steps, using queues, using DBOSClient from external applications, or building applications that need to be resilient to failures.
-
-#### spacetimedb
-
-Skills maintained by this vendor.
-
-- **[cli](skills/vendor/spacetimedb/cli/SKILL.md)** - SpacetimeDB CLI reference for initializing projects, building modules, publishing databases, querying data, and managing servers
-- **[concepts](skills/vendor/spacetimedb/concepts/SKILL.md)** - Understand SpacetimeDB architecture, core concepts, and current capabilities. Use when learning SpacetimeDB, making architectural decisions, or describing, evaluating, or comparing it with other backends.
-- **[cpp-server](skills/vendor/spacetimedb/cpp-server/SKILL.md)** - SpacetimeDB C++ server module SDK reference. Use when writing tables, reducers, or module logic in C++.
-- **[csharp-client](skills/vendor/spacetimedb/csharp-client/SKILL.md)** - SpacetimeDB C#/.NET client SDK reference. Use when building C# clients that connect to SpacetimeDB (console, desktop, or any .NET app).
-- **[csharp-server](skills/vendor/spacetimedb/csharp-server/SKILL.md)** - SpacetimeDB C# server module SDK reference. Use when writing tables, reducers, or module logic in C#.
-- **[mcp](skills/vendor/spacetimedb/mcp/SKILL.md)** - Operate a running SpacetimeDB database through MCP tools rather than the CLI - list databases, read schemas, run SQL, and call reducers. Use when the client exposes spacetimedb MCP tools and the task is to inspect or change data in a live database.
-- **[rust-server](skills/vendor/spacetimedb/rust-server/SKILL.md)** - SpacetimeDB Rust server module SDK reference. Use when writing tables, reducers, or module logic in Rust.
-- **[typescript-client](skills/vendor/spacetimedb/typescript-client/SKILL.md)** - SpacetimeDB TypeScript/React client SDK reference. Use when building web clients that connect to SpacetimeDB.
-- **[typescript-server](skills/vendor/spacetimedb/typescript-server/SKILL.md)** - SpacetimeDB TypeScript server module SDK reference. Use when writing tables, reducers, or module logic in TypeScript.
-- **[unity](skills/vendor/spacetimedb/unity/SKILL.md)** - Integrate SpacetimeDB with Unity game projects. Use when building Unity clients with MonoBehaviour lifecycle, FrameTick, and PlayerPrefs token persistence.
-- **[unreal](skills/vendor/spacetimedb/unreal/SKILL.md)** - SpacetimeDB Unreal Engine client SDK reference. Use when building Unreal Engine clients that connect to SpacetimeDB.
 
 #### splunk
 

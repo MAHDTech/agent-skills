@@ -1,8 +1,6 @@
 ---
 name: pr-build-context
 description: "Prepare a briefing before reviewing a pull request: explain the diff, key files, risks, and questions for the author. Use for PR context, or a whole-repository overview when on its default branch."
-context: fork
-agent: general-purpose
 metadata:
   group: review
 ---

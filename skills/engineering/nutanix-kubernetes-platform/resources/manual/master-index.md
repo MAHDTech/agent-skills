@@ -25,7 +25,7 @@ This directory contains the complete documentation for Nutanix Kubernetes Platfo
 10. **[upgrade-guide.md](./upgrade-guide.md)**
     - Upgrading NKP: Upgrade planning, step-by-step management cluster and workload cluster upgrades, GitOps-managed clusters, verification, and upgrade troubleshooting.
 11. **[troubleshooting.md](./troubleshooting.md)**
-    - Troubleshooting guide: Diagnostic data gathering (`nkp get diagnostics`), discovery commands, application troubleshooting, object locations, and Rook Ceph troubleshooting.
+    - Troubleshooting guide: Diagnostic data gathering (`nkp diagnose`), discovery commands, application troubleshooting, object locations, and Rook Ceph troubleshooting.
 12. **[ai-navigator.md](./ai-navigator.md)**
     - AI Navigator architecture, installation, disabling, usage guidelines, NKP Model Context Protocol (MCP) server overview, and Azure OpenAI integration.
 13. **[nkp-insights-guide.md](./nkp-insights-guide.md)**

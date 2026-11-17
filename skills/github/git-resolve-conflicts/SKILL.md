@@ -1,8 +1,6 @@
 ---
 name: git-resolve-conflicts
 description: Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.
-context: fork
-agent: general-purpose
 metadata:
   group: github
 ---

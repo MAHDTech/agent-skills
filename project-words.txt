@@ -251,6 +251,7 @@ scqa
 sculpt
 secops
 secretspec
+seps
 serde
 sess
 Setext
@@ -263,6 +264,7 @@ skimmable
 slugifying
 spacetimedb
 sqfs
+statelessly
 statix
 stfolder
 stignore
@@ -300,12 +302,14 @@ todoread
 todowrite
 toolsdirectory
 toplevel
+tracestate
 tstack
 unitless
 unmirrored
 unreachability
 unrooted
 unslop
+upserts
 usize
 velero
 venv

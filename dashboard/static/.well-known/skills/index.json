@@ -36,13 +36,6 @@
       ]
     },
     {
-      "name": "bevy-egui",
-      "description": "Integrate egui into Bevy with bevy_egui. Use for UI scheduling, HUDs, debug panels, input capture, image textures, multi-window contexts, or rendering UI to game surfaces.",
-      "files": [
-        "SKILL.md"
-      ]
-    },
-    {
       "name": "cargo-crap",
       "description": "Measure Rust change risk with cargo-crap and coverage data. Use for CRAP scores, cargo-llvm-cov integration, complexity regression gates, CI reports, or badges.",
       "files": [
@@ -122,13 +115,6 @@
     {
       "name": "dreamwork",
       "description": "Plan issues with the human, then autonomously research, implement, review and council-check them in isolated T3 Code worktrees, returning to the human only for final UAT before landing. Use only when the user explicitly requests Dreamwork.",
-      "files": [
-        "SKILL.md"
-      ]
-    },
-    {
-      "name": "egui",
-      "description": "Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures.",
       "files": [
         "SKILL.md"
       ]
@@ -226,7 +212,7 @@
     },
     {
       "name": "guards-debug",
-      "description": "Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts.",
+      "description": "Diagnose and recover stuck or failing agy-guards sessions, hooks, spokes, or factory shifts from outside an active run. Use only when the user explicitly requests GUARDS debugging.",
       "files": [
         "SKILL.md"
       ]
@@ -289,7 +275,7 @@
     },
     {
       "name": "model-context-protocol",
-      "description": "Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing.",
+      "description": "Build or debug MCP servers with official SDKs against the stateless 2026-07-28 spec. Use for tool schemas, resources, prompts, server/discover, stdio or Streamable HTTP transports, and MCP Inspector testing.",
       "files": [
         "SKILL.md"
       ]
@@ -332,13 +318,6 @@
     {
       "name": "nutanix-objects",
       "description": "Configure or troubleshoot Nutanix Objects storage. Use for its S3 APIs, buckets, IAM, WORM policies, replication, cloud tiering, monitoring, or Objects Browser.",
-      "files": [
-        "SKILL.md"
-      ]
-    },
-    {
-      "name": "oak",
-      "description": "Use Oak version control in repositories with .oak, or for oak.space tasks. Manage change stacks, conflicts, workspaces, dependency mounts, spaces, and Oak CI.",
       "files": [
         "SKILL.md"
       ]
@@ -486,13 +465,6 @@
     {
       "name": "software-factory",
       "description": "Guide a feature through Product, Architecture, Program Design, and Slice approval gates, then implement verified vertical slices. Use when asked for the full design-to-delivery factory workflow.",
-      "files": [
-        "SKILL.md"
-      ]
-    },
-    {
-      "name": "spacetime",
-      "description": "Develop or debug Spacetime/SpacetimeDB modules and real-time clients in Rust, C#, TypeScript, or C++. Use for schemas, backend functions, subscriptions, CLI work, bindings, or migrations.",
       "files": [
         "SKILL.md"
       ]

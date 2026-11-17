@@ -1,584 +1,201 @@
 +++
 title = "model-context-protocol"
-description = "Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing."
+description = "Build or debug MCP servers with official SDKs against the stateless 2026-07-28 spec. Use for tool schemas, resources, prompts, server/discover, stdio or Streamable HTTP transports, and MCP Inspector testing."
 sort_by = "title"
 template = "skill.html"
 [extra]
 skill = true
 category = "engineering"
-mermaid = true
+mermaid = false
 +++
 
 
-<!-- cspell:ignore Pydantic modelcontextprotocol fastmcp -->
-
-# Model Context Protocol (MCP) - Server Development
-
-The **Model Context Protocol (MCP)** is an open standard protocol based on JSON-RPC 2.0 that allows AI clients and host applications (such as Claude Desktop, OpenCode, Goose, and IDEs) to securely discover and invoke tools, read contextual resources, and load prompt templates exposed by an **MCP Server**.
-
-Guidance for **building and architecting MCP servers** (not client hosts).
-
----
-
-## When to Reach for This Skill
-
-- Designing and building new MCP servers from scratch in TypeScript, Python, Kotlin, or Go.
-- Defining MCP **tools** with strict parameter schemas (JSON Schema 2020-12 / Zod / Pydantic) and handling tool invocation errors properly.
-- Exposing static or dynamic **resources** via URI schemes, implementing resource templates, and broadcasting change notifications or handling subscriptions.
-- Exposing pre-built **prompts** with typed argument validation and autocompletion.
-- Implementing MCP connection lifecycles: protocol negotiation, capabilities exchange, ping, and cancellation.
-- Configuring transports: `stdio` (with standard I/O safety) vs. Streamable HTTP / Server-Sent Events (SSE).
-- Testing, inspecting, and debugging server endpoints using the official MCP Inspector.
-
----
-
-## Core Protocol Architecture
-
-MCP servers communicate with clients via bidirectional JSON-RPC 2.0 messages over an underlying transport.
-
-```mermaid
-sequenceDiagram
-    participant Client as MCP Client / Host
-    participant Server as MCP Server
-
-    Client->>Server: initialize (protocolVersion, capabilities, clientInfo)
-    Server-->>Client: initialize result (protocolVersion, capabilities, serverInfo, instructions)
-    Client->>Server: notifications/initialized
-    Note over Client,Server: Connection established & operational
-
-    Client->>Server: tools/list
-    Server-->>Client: { tools: [...] }
-
-    Client->>Server: tools/call (name, arguments)
-    Server-->>Client: { content: [...], isError: false }
-
-    Client->>Server: ping
-    Server-->>Client: {}
-```
-
-### JSON-RPC 2.0 Foundations
-
-- **Requests**: Contain `jsonrpc: "2.0"`, an integer or string `id`, `method`, and optional `params`. The server **must** return a response containing the exact same `id`.
-- **Responses**: Contain `jsonrpc: "2.0"`, matching `id`, and either `result` (on success) or `error` (on protocol failure).
-- **Notifications**: Contain `jsonrpc: "2.0"` and `method` without an `id`. Neither side sends a response to notifications.
-
----
-
-## Server Connection Lifecycle
-
-### 1. Handshake (`initialize`)
-
-The initialization exchange establishes protocol compatibility and feature capabilities. The client sends `initialize` as its first request.
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "initialize",
-  "params": {
-    "protocolVersion": "2024-11-05",
-    "capabilities": {
-      "roots": {
-        "listChanged": true
-      },
-      "sampling": {}
-    },
-    "clientInfo": {
-      "name": "example-client",
-      "version": "1.0.0"
-    }
-  }
-}
-```
-
-The server responds declaring supported capabilities and metadata:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "result": {
-    "protocolVersion": "2024-11-05",
-    "capabilities": {
-      "tools": {
-        "listChanged": true
-      },
-      "resources": {
-        "subscribe": true,
-        "listChanged": true
-      },
-      "prompts": {
-        "listChanged": true
-      },
-      "logging": {}
-    },
-    "serverInfo": {
-      "name": "sqlite-mcp-server",
-      "version": "1.0.0"
-    },
-    "instructions": "Use execute_query for read-only SELECT queries. Use execute_mutation for INSERT, UPDATE, DELETE."
-  }
-}
-```
-
-### 2. Client Confirmation (`notifications/initialized`)
-
-After receiving the `initialize` response, the client sends `notifications/initialized`. The server must not send any requests or notifications before receiving this notification.
-
-```json
-{
-  "jsonrpc": "2.0",
-  "method": "notifications/initialized"
-}
-```
-
-### 3. Health & Liveness (`ping`)
-
-Either party can send a `ping` request to verify connection liveness:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 2,
-  "method": "ping"
-}
-```
-
-Server response:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 2,
-  "result": {}
-}
-```
-
----
-
-## Server Primitives
-
-MCP servers expose three fundamental primitives to clients:
-
-| Primitive     | Request Methods                          | Notification Methods                 | Primary Use Case                                               |
-| :------------ | :--------------------------------------- | :----------------------------------- | :------------------------------------------------------------- |
-| **Tools**     | `tools/list`, `tools/call`               | `notifications/tools/list_changed`   | Executable actions with side effects or external data fetching |
-| **Resources** | `resources/list`, `resources/read`, etc. | `notifications/resources/updated`    | Read-only context, application state, and dynamic data streams |
-| **Prompts**   | `prompts/list`, `prompts/get`            | `notifications/prompts/list_changed` | Reusable prompt templates and guided interactive workflows     |
-
----
-
-### 1. Tools
-
-Tools let the model take actions or execute queries.
-
-#### `tools/list`
-
-Servers declare available tools, parameter schemas, and descriptions:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 3,
-  "result": {
-    "tools": [
-      {
-        "name": "read_query",
-        "description": "Execute a read-only SQL query against the SQLite database.",
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "query": {
-              "type": "string",
-              "description": "SQL SELECT query to execute"
-            }
-          },
-          "required": ["query"]
-        }
-      }
-    ]
-  }
-}
-```
-
-#### `tools/call`
-
-Clients execute tools by name with structured arguments:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 4,
-  "method": "tools/call",
-  "params": {
-    "name": "read_query",
-    "arguments": {
-      "query": "SELECT id, name FROM users LIMIT 5;"
-    }
-  }
-}
-```
-
-#### Tool Response & Error Convention
-
-Tool call responses return a `content` array with text, images, or embedded resource objects:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 4,
-  "result": {
-    "content": [
-      {
-        "type": "text",
-        "text": "[{\"id\": 1, \"name\": \"Alice\"}, {\"id\": 2, \"name\": \"Bob\"}]"
-      }
-    ],
-    "isError": false
-  }
-}
-```
-
-> **CRITICAL ERROR HANDLING RULE:**
-> If a tool execution fails due to domain logic (invalid query, resource not found, remote API failure), **do not return a JSON-RPC error**. Return a successful JSON-RPC result with `isError: true` and the failure message inside a text content block. This allows the LLM to inspect the error and self-correct. Reserve JSON-RPC protocol error codes (e.g., `-32601 Method not found`, `-32602 Invalid params`) strictly for protocol-level failures.
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 4,
-  "result": {
-    "content": [
-      {
-        "type": "text",
-        "text": "SQLite Error: no such table: non_existent_table"
-      }
-    ],
-    "isError": true
-  }
-}
-```
-
----
-
-### 2. Resources
-
-Resources provide read-only contextual information to the client.
-
-#### Resource Identification
-
-Resources are identified by unique URIs:
-
-- `file://<project-root>/log.txt`
-- `postgres://db/schema/users`
-- `custom-service://items/123`
-
-#### Listing and Reading Resources
-
-- `resources/list`: Returns known static resources.
-- `resources/templates/list`: Returns URI templates (e.g. `weather://forecast/{city}`) for parameterised resources.
-- `resources/read`: Client requests resource content by URI.
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 5,
-  "method": "resources/read",
-  "params": {
-    "uri": "postgres://db/schema/users"
-  }
-}
-```
-
-Server response (text or binary base64 blob):
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 5,
-  "result": {
-    "contents": [
-      {
-        "uri": "postgres://db/schema/users",
-        "mimeType": "application/json",
-        "text": "{\"table\": \"users\", \"rowCount\": 42}"
-      }
-    ]
-  }
-}
-```
-
-#### Subscriptions
-
-Clients can subscribe to resources using `resources/subscribe` (passing `uri`). When the resource changes, the server sends:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "method": "notifications/resources/updated",
-  "params": {
-    "uri": "postgres://db/schema/users"
-  }
-}
-```
-
----
-
-### 3. Prompts
-
-Prompts allow servers to expose guided prompt templates to users and clients.
-
-- `prompts/list`: Returns available prompt templates and expected arguments.
-- `prompts/get`: Renders a selected prompt with client-supplied argument values.
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 6,
-  "method": "prompts/get",
-  "params": {
-    "name": "code_review",
-    "arguments": {
-      "language": "typescript"
-    }
-  }
-}
-```
-
-Server response contains structured messages ready for LLM consumption:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 6,
-  "result": {
-    "description": "Review TypeScript code for security and patterns",
-    "messages": [
-      {
-        "role": "user",
-        "content": {
-          "type": "text",
-          "text": "Please review this TypeScript code focusing on strict null checks and error handling."
-        }
-      }
-    ]
-  }
-}
-```
-
----
-
-## Server Transports
-
-MCP supports two primary transport mechanisms:
-
-### 1. `stdio` (Standard Input / Output)
-
-Used when the client spawns the server as a local child process.
-
-> **CRITICAL STDIO SAFETY RULE:**
-> The `stdout` stream is strictly reserved for newline-delimited JSON-RPC messages.
-> **NEVER write debugging output, log lines, or errors to `stdout` (`console.log`, `print()`, `fmt.Println`).**
-> Any non-JSON output on `stdout` will corrupt the transport stream and cause the client to disconnect with JSON parse errors.
-> Always write debug logs to `stderr` (`console.error`, `logging.error`, `sys.stderr.write`), or use MCP `notifications/message` logging.
-
-### 2. Streamable HTTP / Server-Sent Events (SSE)
-
-Used when the server is hosted remotely or over a local network.
-
-- **SSE Endpoint** (e.g. `GET /sse`): Client opens an HTTP SSE stream to receive server-sent JSON-RPC messages and notifications.
-- **Message Endpoint** (e.g. `POST /messages?sessionId=...`): Client posts JSON-RPC requests to the server.
-
----
-
-## Implementing MCP Servers: Reference SDKs
-
-### TypeScript Implementation (`@modelcontextprotocol/sdk`)
-
-The modern `@modelcontextprotocol/sdk` provides both a high-level `McpServer` abstraction and low-level transport classes.
+<!-- cspell:ignore modelcontextprotocol MCPServer MRTR httpx traceparent -->
+
+# Model Context Protocol server development
+
+Target protocol revision **`2026-07-28`**. It is stateless: there is no `initialize` handshake and no session. Every request carries its own protocol version and client capabilities, and the server answers each request independently.
+
+The vendored spec and docs in `resources/auto/` are the source of truth. Files prefixed `specification-2026-07-28-` and `docs-2026-07-28-` describe the current revision; files for `2024-11-05` through `2025-11-25` describe legacy revisions, and `-draft-` files describe unreleased work. Read a current file before answering from memory, because most pre-2026 MCP knowledge (handshake, sessions, GET streams, server-initiated requests) is now wrong.
+
+## Lookup protocol
+
+1. Start with `resources/auto/specification-2026-07-28-changelog.md` and `resources/auto/specification-2026-07-28-deprecated.md` whenever a question touches lifecycle, transports, notifications, or a feature you remember from an older revision.
+2. Open the page for the area in question:
+
+| Topic                                                                 | File in `resources/auto/`                                                                                                                                          |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Messages, `_meta` keys, error codes, statelessness, JSON Schema rules | `specification-2026-07-28-basic-index.md`                                                                                                                          |
+| Version negotiation, extensions, legacy compatibility matrix          | `specification-2026-07-28-basic-versioning.md`                                                                                                                     |
+| `server/discover`                                                     | `specification-2026-07-28-server-discover.md`                                                                                                                      |
+| stdio framing, cancellation, shutdown, legacy probe                   | `specification-2026-07-28-basic-transports-stdio.md`                                                                                                               |
+| Streamable HTTP headers, validation, status codes                     | `specification-2026-07-28-basic-transports-streamable-http.md`                                                                                                     |
+| Multi round-trip requests (elicitation, sampling, roots)              | `specification-2026-07-28-basic-patterns-mrtr.md`                                                                                                                  |
+| `subscriptions/listen` change notifications                           | `specification-2026-07-28-basic-patterns-subscriptions.md`                                                                                                         |
+| Progress and cancellation                                             | `specification-2026-07-28-basic-patterns-progress.md`, `specification-2026-07-28-basic-patterns-cancellation.md`                                                   |
+| Tools, results, errors, `x-mcp-header`, stateful handles              | `specification-2026-07-28-server-tools.md`                                                                                                                         |
+| Resources, templates, URI schemes                                     | `specification-2026-07-28-server-resources.md`                                                                                                                     |
+| Prompts, completion, pagination                                       | `specification-2026-07-28-server-prompts.md`, `specification-2026-07-28-server-utilities-completion.md`, `specification-2026-07-28-server-utilities-pagination.md` |
+| `ttlMs` and `cacheScope`                                              | `specification-2026-07-28-server-utilities-caching.md`                                                                                                             |
+| Elicitation                                                           | `specification-2026-07-28-client-elicitation.md`                                                                                                                   |
+| Authorization (HTTP only)                                             | `specification-2026-07-28-basic-authorization-*.md`, `docs-2026-07-28-tutorials-security-authorization.md`                                                         |
+| Exact type definitions                                                | `specification-2026-07-28-schema.md`                                                                                                                               |
+| SDK quickstarts (TypeScript, Python, Java, Kotlin, C#)                | `docs-2026-07-28-develop-build-server.md`                                                                                                                          |
+| Inspector usage                                                       | `docs-2026-07-28-tools-inspector*.md`                                                                                                                              |
+| Extensions (Tasks, Apps, Skills)                                      | `extensions-*.md`, `seps-2663-tasks-extension.md`                                                                                                                  |
+
+- Search with grep across `resources/auto/specification-2026-07-28-*` for a method name, `_meta` key, or error name rather than guessing. Use `resources/auto/llms.txt` to find a page not listed above.
+- When a vendored page and an SDK disagree, trust the page for wire behavior and the SDK's own README or changelog for its API, and tell the user which one you followed.
+
+## Protocol rules
+
+- **Per-request metadata.** Every client request carries `_meta` with `io.modelcontextprotocol/protocolVersion` (required), `io.modelcontextprotocol/clientCapabilities` (required), and optionally `io.modelcontextprotocol/clientInfo` and `io.modelcontextprotocol/logLevel`. A request missing a required field is rejected with `-32602` (HTTP `400`).
+- **Server identity.** Include `io.modelcontextprotocol/serverInfo` in every result's `_meta`. Treat `clientInfo` as display data only, never as a security or behavior switch.
+- **Discovery.** Implement `server/discover`, returning `supportedVersions`, `capabilities`, optional `instructions`, and caching hints. Clients may call it first or skip it.
+- **Version mismatch.** Answer an unsupported version with `UnsupportedProtocolVersionError` (`-32022`) whose `data.supported` lists the versions you serve.
+- **Capabilities per request.** Read client capabilities from the request being handled. If a request needs one the client did not declare (for example elicitation), return `MissingRequiredClientCapabilityError` (`-32021`) listing `data.requiredCapabilities`.
+- **Results.** Every result carries `resultType`: `"complete"` for final results, `"input_required"` for MRTR interim results.
+- **Server-to-client input uses MRTR.** To elicit, sample, or list roots, return an `InputRequiredResult` with `inputRequests` (and an opaque `requestState` if you need to correlate). The client retries the original request with a new JSON-RPC `id` plus `inputResponses`. Servers never send JSON-RPC requests to the client.
+- **Cross-call state uses handles.** Return an explicit, opaque, high-entropy handle from a creation tool and accept it as an argument on later calls. Authorize the caller against the handle on every call, state its lifetime in the tool description, and return a tool execution error for expired handles. Connection or process identity is never a session.
+- **Change notifications.** List changes and resource updates go only to clients that opened `subscriptions/listen` with a matching filter. Send `notifications/subscriptions/acknowledged` first, and tag every notification with `io.modelcontextprotocol/subscriptionId`. Progress and log notifications stay on the response stream of the request they belong to.
+- **Caching hints.** `server/discover`, `tools/list`, `prompts/list`, `resources/list`, `resources/templates/list`, and `resources/read` results include `ttlMs` (integer, `>= 0`) and `cacheScope` (`"public"` or `"private"`). Return `tools/list` in a deterministic order, and do not vary list results per connection.
+- **Error codes.** Use `-32602` for unknown tools, malformed params, and resource not found (not `-32002`). Use `-32603` for internal errors. New application codes go outside `-32768` to `-32000`; `-32020` to `-32099` is reserved for the spec.
+- **Observability.** Propagate OpenTelemetry context through the `traceparent`, `tracestate`, and `baggage` `_meta` keys.
+
+## Server design rules
+
+- **Tools.** Name tools with 1 to 128 ASCII letters, digits, `_`, `-`, or `.`. Write `inputSchema` as JSON Schema 2020-12; for no parameters use `{ "type": "object", "additionalProperties": false }`. Add `outputSchema` when you return `structuredContent`, and also return the serialized JSON as a text block.
+- **Two error channels.** Report API failures, input validation failures, and business-rule failures as a tool result with `isError: true` and a message the model can act on. Reserve JSON-RPC errors for unknown tools, malformed requests, and server faults.
+- **Inputs and outputs.** Validate every argument, resolve file paths against an allowlist, rate limit calls, bound output size, and keep secrets out of errors and content. Never auto-dereference a network `$ref` in a schema.
+- **Resources.** Expose stable URIs (`https://`, `file://`, `git://`, or a custom scheme) and templates for parameterized data. Prefer resource links in tool results over embedding large payloads.
+- **Annotations.** Use tool annotations (read-only, destructive, idempotent hints) to describe behavior, knowing clients treat them as untrusted unless the server is trusted.
+
+## Transports
+
+**stdio.** One newline-delimited JSON-RPC message per line on `stdout`, nothing else. Log to `stderr` only (`console.error` in Node, the `logging` module in Python). Cancellation arrives as `notifications/cancelled`. Exit promptly when `stdin` closes.
+
+**Streamable HTTP.** One endpoint (for example `/mcp`) that accepts POST only. Each request is its own POST answered with `application/json` or a request-scoped `text/event-stream`. Then:
+
+- Require `MCP-Protocol-Version`, `Mcp-Method`, and `Mcp-Name` (for `tools/call`, `resources/read`, `prompts/get`). Reject header and body mismatches with `400` and `HeaderMismatch` (`-32020`).
+- Answer an unknown method with `404` and `-32601`; answer a notification POST with `202`.
+- Treat a closed response stream as cancellation. Streams are not resumable; `Last-Event-ID` is ignored.
+- Answer GET or DELETE with `405`, and ignore any `Mcp-Session-Id` header.
+- Validate `Origin` (`403` when invalid), bind to `127.0.0.1` when local, and send `X-Accel-Buffering: no` on SSE responses.
+- Follow the authorization spec for remote servers; stdio servers read credentials from the environment instead.
+
+## Deprecations
+
+Deprecated features still work during the deprecation window, but new servers adopt the replacement.
+
+| Deprecated                                               | Replacement                                                                           |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Roots                                                    | Pass directories or files via tool parameters, resource URIs, or server configuration |
+| Sampling                                                 | Call LLM provider APIs directly                                                       |
+| Logging (`notifications/message`)                        | `stderr` for stdio; OpenTelemetry for observability                                   |
+| Sampling `includeContext: "thisServer"` / `"allServers"` | Omit the field or use `"none"`                                                        |
+| HTTP+SSE transport (`GET /sse` plus `POST /messages`)    | Streamable HTTP                                                                       |
+| OAuth Dynamic Client Registration                        | Client ID Metadata Documents                                                          |
+
+Removed outright in `2026-07-28`: `initialize` / `notifications/initialized`, `ping`, `logging/setLevel` (log level is now per request via `io.modelcontextprotocol/logLevel`), `resources/subscribe` / `resources/unsubscribe` (now `subscriptions/listen`), `notifications/roots/list_changed`, `notifications/elicitation/complete`, the `Mcp-Session-Id` header, the HTTP GET stream, and core-protocol tasks (now the `io.modelcontextprotocol/tasks` extension).
+
+**Legacy compatibility.** A server that must also serve `2025-11-25` or earlier clients can be dual-era: answer `initialize` with legacy semantics scoped to that process or session, and serve requests carrying modern `_meta` statelessly. A modern-only server names its supported versions in the error it returns to `initialize`. See the compatibility matrix in `resources/auto/specification-2026-07-28-basic-versioning.md`.
+
+## Minimal servers
+
+Both examples follow `resources/auto/docs-2026-07-28-develop-build-server.md`. Check the SDK's own documentation for resource and prompt registration and for HTTP hosting, which that guide does not cover.
+
+TypeScript (`npm install @modelcontextprotocol/server zod`, `"type": "module"`):
 
 ```typescript
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
-import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js"
+import {McpServer} from "@modelcontextprotocol/server"
+import {serveStdio} from "@modelcontextprotocol/server/stdio"
 import {z} from "zod"
 
-// 1. Initialize the MCP Server
-const server = new McpServer({
-  name: "filesystem-server",
-  version: "1.0.0"
-})
+// serveStdio calls this for each instance it needs, so return a fresh server.
+function createServer() {
+  const server = new McpServer({name: "weather", version: "1.0.0"})
 
-// 2. Register a Tool with Zod parameter validation
-server.tool(
-  "calculate_sum",
-  "Calculate the sum of two numbers",
-  {
-    a: z.number().describe("First operand"),
-    b: z.number().describe("Second operand")
-  },
-  async ({a, b}) => {
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Result: ${a + b}`
-        }
-      ]
-    }
-  }
-)
-
-// 3. Register a Dynamic Resource Template
-server.resource("system_status", "status://server", async (uri) => ({
-  contents: [
+  server.registerTool(
+    "get_alerts",
     {
-      uri: uri.href,
-      mimeType: "application/json",
-      text: JSON.stringify({status: "healthy", uptime: process.uptime()})
-    }
-  ]
-}))
+      description: "Get weather alerts for a US state",
+      inputSchema: z.object({
+        state: z.string().length(2).describe("Two-letter state code, e.g. CA")
+      })
+    },
+    async ({state}) => ({
+      content: [{type: "text", text: `No active alerts for ${state}`}]
+    })
+  )
 
-// 4. Connect Transport and Start Server
-async function main() {
-  const transport = new StdioServerTransport()
-  await server.connect(transport)
-  console.error("MCP Server successfully started on stdio")
+  return server
 }
 
-main().catch((error) => {
-  console.error("Fatal error in MCP server:", error)
-  process.exit(1)
+serveStdio(createServer, {
+  onerror: (error) => console.error("Server error:", error)
 })
 ```
 
-### Python Implementation (`mcp` / `FastMCP`)
+`serveStdio` answers both `2026-07-28` clients and legacy `initialize` clients. Wiring `server.connect(new StdioServerTransport())` by hand serves only legacy clients.
 
-The official Python `mcp` SDK provides `FastMCP` for concise decorator-driven server creation.
+Python (MCP SDK 2.0.0 or newer, `uv add "mcp[cli]"`):
 
 ```python
-import sys
-from mcp.server.fastmcp import FastMCP
+import logging
 
-# 1. Initialize FastMCP Server
-mcp = FastMCP(
-    name="system-info-server",
-    instructions="Use this server to query system diagnostics and configuration."
-)
+from mcp.server import MCPServer
 
-# 2. Register a Tool
+logger = logging.getLogger(__name__)
+mcp = MCPServer("weather")
+
+
 @mcp.tool()
-def add_integers(x: int, y: int) -> int:
-    """Add two integers together.
+async def get_alerts(state: str) -> str:
+    """Get weather alerts for a US state.
 
     Args:
-        x: First integer
-        y: Second integer
+        state: Two-letter US state code (e.g. CA, NY)
     """
-    return x + y
+    logger.info("get_alerts %s", state)  # stderr, never print()
+    return f"No active alerts for {state}"
 
-# 3. Register a Resource
-@mcp.resource("config://app")
-def get_app_config() -> str:
-    """Retrieve application configuration parameters."""
-    return '{"environment": "production", "debug": false}'
 
-# 4. Register a Prompt Template
-@mcp.prompt()
-def audit_prompt(service_name: str) -> str:
-    """Generate a prompt template for auditing a service."""
-    return f"Perform a security audit for {service_name}."
-
-# 5. Run Server via stdio
 if __name__ == "__main__":
     mcp.run(transport="stdio")
 ```
 
----
+`MCPServer` builds the tool schema from type hints and the docstring. It replaces the 1.x `FastMCP` import.
 
-## Server Utilities & Advanced Capabilities
+## Testing with MCP Inspector
 
-### 1. Progress Notifications (`notifications/progress`)
-
-For long-running tools, servers emit progress updates referenced by a client-provided `progressToken`:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "method": "notifications/progress",
-  "params": {
-    "progressToken": "req-1234-progress",
-    "progress": 50,
-    "total": 100
-  }
-}
-```
-
-### 2. Logging Notifications (`notifications/message`)
-
-Servers send structured logs without polluting `stdout`:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "method": "notifications/message",
-  "params": {
-    "level": "info",
-    "logger": "database",
-    "data": "Connection pool established with 5 active connections"
-  }
-}
-```
-
-Allowed levels: `debug`, `info`, `notice`, `warning`, `error`, `critical`, `alert`, `emergency`.
-
-### 3. Pagination
-
-Collections (`tools/list`, `resources/list`, `prompts/list`) support pagination via `cursor`:
-
-- Request: `{ "params": { "cursor": "next-page-token" } }`
-- Response: `{ "result": { "tools": [...], "nextCursor": "token-for-following-page" } }`
-
----
-
-## Security & Implementation Guardrails
-
-1. **Path Traversal Protection**: Always sanitize and resolve client-provided file paths against allowed root directories before opening files or executing shell commands.
-2. **Strict Schema Validation**: Validate incoming arguments against the declared schema before execution. Reject unexpected fields or type mismatches early.
-3. **No Unbounded Tool Output**: Limit text content length or row counts returned to clients to prevent blowing through the client's context window.
-4. **Secret Sanitization**: Never echo environment variables, API tokens, or internal credentials in tool error messages or resource content.
-5. **Idempotency Awareness**: Clearly mark in descriptions whether a tool performs mutations or can be safely retried.
-
----
-
-## Testing & Debugging with MCP Inspector
-
-The official **MCP Inspector** is the standard diagnostic tool for inspecting and testing MCP servers interactively.
-
-### Running the Inspector
-
-Run the Inspector against your server command:
+The Inspector (`@modelcontextprotocol/inspector`, Node 22.19.0 or newer) has web, `--cli`, and `--tui` clients. It defaults to the `legacy` protocol era, so pass `--protocol-era modern` to exercise `2026-07-28` behavior, and repeat with `--protocol-era legacy` if the server is dual-era.
 
 ```bash
-# Test a TypeScript/Node server
-npx @modelcontextprotocol/inspector node dist/index.js
+# Modern era over stdio
+npx @modelcontextprotocol/inspector --cli node build/index.js --protocol-era modern --method tools/list
+npx @modelcontextprotocol/inspector --cli node build/index.js --protocol-era modern \
+  --method tools/call --tool-name get_alerts --tool-arg state=CA
 
-# Test a Python FastMCP server
-npx @modelcontextprotocol/inspector python server.py
+# Remote Streamable HTTP server
+npx @modelcontextprotocol/inspector --cli https://example.com/mcp --transport http \
+  --protocol-era modern --method tools/list --strict
+
+# Interactive web UI
+npx @modelcontextprotocol/inspector node build/index.js
 ```
 
-### Diagnostic Checklist
+CLI exit codes: `0` success, `3` auth required, `4` unreachable, `5` tool error or tool not found, `6` `--strict` schema portability failure. On failure a single JSON error line goes to `stderr`. Full flag and method reference: `resources/auto/docs-2026-07-28-tools-inspector-cli.md`; era-specific behavior (logging, subscriptions, tasks): `resources/auto/docs-2026-07-28-tools-inspector-protocol-eras.md`.
 
-- Verify the `initialize` handshake completes cleanly and declared capabilities appear in the Inspector UI.
-- Verify each tool appears with its description and parameter schema.
-- Test edge cases and invalid parameters: verify domain errors return `isError: true` with useful error explanations.
-- Check that nothing unexpected is written to `stdout`.
-- Verify resource templates resolve and subscribe/update notifications fire when data changes.
+## Completion criteria
 
----
+The server work is done when all of these hold:
 
-## Reference Documentation
-
-Official Model Context Protocol specifications and documentation are vendored in `resources/auto/` for deep lookup:
-
-- `resources/auto/llms.txt` - Master listing of all MCP specifications, developer guides, extensions, and SEPs.
+- `--protocol-era modern --method tools/list` exits `0` and lists every tool with its schema; `--strict` also exits `0`.
+- Each tool called with valid arguments exits `0`, and with invalid arguments returns `isError: true` with an actionable message (exit `5`), not a JSON-RPC error.
+- A stdio server writes only JSON-RPC to `stdout`; all diagnostics appear on `stderr`.
+- No code path depends on `initialize`, `ping`, `logging/setLevel`, `resources/subscribe`, session IDs, a GET stream, or server-sent JSON-RPC requests, except an explicit legacy branch of a dual-era server.
+- Cross-call state flows through explicit handles, and user input or LLM calls flow through MRTR `InputRequiredResult`.
+- List and read results carry `ttlMs` and `cacheScope`, and results carry `resultType` and `serverInfo` (verify in the Inspector's raw JSON-RPC view if the SDK sets them for you).
+- A dual-era server also passes `tools/list` with `--protocol-era legacy`.
+- Every spec claim made to the user cites the `resources/auto/specification-2026-07-28-*` page it came from.
 

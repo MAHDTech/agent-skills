@@ -6,7 +6,7 @@
       "type": "skill-md",
       "description": "Build, integrate, or debug Agent Client Protocol agents and clients with official SDKs. Use for ACP sessions, tool calls, schemas, transports, or protocol migrations.",
       "url": "/.well-known/agent-skills/acp/SKILL.md",
-      "digest": "sha256:d669d807183e74861343062373bf516773dc4f25ce17e05500fc4c1cad47f962"
+      "digest": "sha256:3e78305a9208a3724b32bfb898428d3166e5eb8e217edce50af919e61f027873"
     },
     {
       "name": "agent-guidelines",
@@ -35,13 +35,6 @@
       "description": "Build or modernize Bevy games and simulations in Rust. Use for ECS design, scheduling, input, assets, messages, performance, or migration between Bevy APIs.",
       "url": "/.well-known/agent-skills/bevy-development/SKILL.md",
       "digest": "sha256:87bda2514976c9a027de5e3c458bb045d90eda3ba6446ae06f27b25ff5a7b9e2"
-    },
-    {
-      "name": "bevy-egui",
-      "type": "skill-md",
-      "description": "Integrate egui into Bevy with bevy_egui. Use for UI scheduling, HUDs, debug panels, input capture, image textures, multi-window contexts, or rendering UI to game surfaces.",
-      "url": "/.well-known/agent-skills/bevy-egui/SKILL.md",
-      "digest": "sha256:75f62af3216dfd43184656bf6c0e14ba80587ee2afe1550ef0ed8406bef0fa4d"
     },
     {
       "name": "cargo-crap",
@@ -128,13 +121,6 @@
       "digest": "sha256:f7f6e2d669a468792d2727f5095e370c7429e42791e88177e98144d32b183b71"
     },
     {
-      "name": "egui",
-      "type": "skill-md",
-      "description": "Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures.",
-      "url": "/.well-known/agent-skills/egui/SKILL.md",
-      "digest": "sha256:3bffaa3b5b435da4b20f9089968908fdb59f474a14ea4c93250c20abb1045b03"
-    },
-    {
       "name": "estimate-work",
       "type": "skill-md",
       "description": "Estimate a plan or ticket set using relative sizes or time ranges, reference history, named assumptions, and risk. Use when sizing work, forecasting delivery, or deciding whether uncertainty needs a spike.",
@@ -174,7 +160,7 @@
       "type": "skill-md",
       "description": "Curate release notes from commits and merged PRs since the last tag, then create a GitHub release. Use when asked to cut or publish a versioned release, with draft and prerelease options.",
       "url": "/.well-known/agent-skills/gh-release-notes/SKILL.md",
-      "digest": "sha256:b0b8071360694f3d80e607f0130fb54bd91aa9db67468a2567fe06e9b7735f5c"
+      "digest": "sha256:add2b82a41dc934e69f79ef2c0acfe650fa5bbeb9546a728f72644aa3fd4ad7b"
     },
     {
       "name": "gh-resolve-pr-comments",
@@ -209,7 +195,7 @@
       "type": "skill-md",
       "description": "Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.",
       "url": "/.well-known/agent-skills/git-resolve-conflicts/SKILL.md",
-      "digest": "sha256:c467202542e8bb4d9a9cac59f3bd33bbd40906d8a674aa0e32b4cf0401e4db19"
+      "digest": "sha256:8d197980e2503acb4beceb94d8f778164d77ed30f198eb295f94df6ae4612db0"
     },
     {
       "name": "git-update-branch",
@@ -228,9 +214,9 @@
     {
       "name": "guards-debug",
       "type": "skill-md",
-      "description": "Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts.",
+      "description": "Diagnose and recover stuck or failing agy-guards sessions, hooks, spokes, or factory shifts from outside an active run. Use only when the user explicitly requests GUARDS debugging.",
       "url": "/.well-known/agent-skills/guards-debug/SKILL.md",
-      "digest": "sha256:6614a9a33107d92d30b37fe481381378791843674454226b24f903d65f1a5aca"
+      "digest": "sha256:fb73758e0a35743493c7a93f8fdc0c2a0658e120be3d5560656916aeaf8e7532"
     },
     {
       "name": "guards-goal",
@@ -291,9 +277,9 @@
     {
       "name": "model-context-protocol",
       "type": "skill-md",
-      "description": "Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing.",
+      "description": "Build or debug MCP servers with official SDKs against the stateless 2026-07-28 spec. Use for tool schemas, resources, prompts, server/discover, stdio or Streamable HTTP transports, and MCP Inspector testing.",
       "url": "/.well-known/agent-skills/model-context-protocol/SKILL.md",
-      "digest": "sha256:107c8c5aa2ec7f1850fe3c1360cfeb9113b251d2fa43d2477064d76e2140e49a"
+      "digest": "sha256:9a053da061d415e6d0782da12d84c96f533d13f7b69a6c1adf851f6bc94ffc22"
     },
     {
       "name": "nix-shell",
@@ -328,7 +314,7 @@
       "type": "skill-md",
       "description": "Configure, operate, or troubleshoot Nutanix Kubernetes Platform (NKP), Konvoy, or Kommander. Use for NKP cluster lifecycle, image builds, air-gapped installs, or Insights.",
       "url": "/.well-known/agent-skills/nutanix-kubernetes-platform/SKILL.md",
-      "digest": "sha256:6fcb7161ca081f0d8b6ccb484d1cbe71f6a4b471a90d4633d3538f1c05ce89ba"
+      "digest": "sha256:62a065b61b13b16dd9a41faf80c3e351cb7e857db82c708a023155e60feebe3e"
     },
     {
       "name": "nutanix-objects",
@@ -336,13 +322,6 @@
       "description": "Configure or troubleshoot Nutanix Objects storage. Use for its S3 APIs, buckets, IAM, WORM policies, replication, cloud tiering, monitoring, or Objects Browser.",
       "url": "/.well-known/agent-skills/nutanix-objects/SKILL.md",
       "digest": "sha256:9d28b180c72585e09f55a42738fe2770e7384d2a28e0149ca35d010d0eef8ccb"
-    },
-    {
-      "name": "oak",
-      "type": "skill-md",
-      "description": "Use Oak version control in repositories with .oak, or for oak.space tasks. Manage change stacks, conflicts, workspaces, dependency mounts, spaces, and Oak CI.",
-      "url": "/.well-known/agent-skills/oak/SKILL.md",
-      "digest": "sha256:3351de2a0d47e42fa1dbb82d3d04cfab6055408c1ea1672cedff3510864a19bc"
     },
     {
       "name": "optimize-performance",
@@ -363,14 +342,14 @@
       "type": "skill-md",
       "description": "Prepare a briefing before reviewing a pull request: explain the diff, key files, risks, and questions for the author. Use for PR context, or a whole-repository overview when on its default branch.",
       "url": "/.well-known/agent-skills/pr-build-context/SKILL.md",
-      "digest": "sha256:8c03b450ca8360e35060166dceaabd116d7cf80639636650ecfcd8145bf66e6e"
+      "digest": "sha256:92a2fedf7cf71bb4e3ccb10851801275f002d8503b80297e51a3de60e2019d4a"
     },
     {
       "name": "pr-create-test-plan",
       "type": "skill-md",
       "description": "Draft TEST_PLAN.md for a branch's real user flows and integration changes using the project's commands. Use when a reviewer needs manual verification steps and a quick smoke test before merging.",
       "url": "/.well-known/agent-skills/pr-create-test-plan/SKILL.md",
-      "digest": "sha256:bf56454ffdc91bae43e0996fea6b574cffb7cfb0631a6d192e7feeef79be8f2c"
+      "digest": "sha256:0e2729ade7d9fbe6137ccdb9fe92892fa54e8666949357e303a48f1abe3c88ee"
     },
     {
       "name": "pr-edge-cases",
@@ -482,7 +461,7 @@
       "type": "skill-md",
       "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:d37523d0c153a61fe526096714f2c9c4de2e41559e0c44a73e60ac7373aed3a5"
+      "digest": "sha256:1d89598bf01379e5067abdf261241aa5495e92e5a543999a808397055082e967"
     },
     {
       "name": "software-factory",
@@ -490,13 +469,6 @@
       "description": "Guide a feature through Product, Architecture, Program Design, and Slice approval gates, then implement verified vertical slices. Use when asked for the full design-to-delivery factory workflow.",
       "url": "/.well-known/agent-skills/software-factory/SKILL.md",
       "digest": "sha256:c28ba5a0ea9d1ab12fbb220f012e3938e119f1db42ff292edb134644ef28e32f"
-    },
-    {
-      "name": "spacetime",
-      "type": "skill-md",
-      "description": "Develop or debug Spacetime/SpacetimeDB modules and real-time clients in Rust, C#, TypeScript, or C++. Use for schemas, backend functions, subscriptions, CLI work, bindings, or migrations.",
-      "url": "/.well-known/agent-skills/spacetime/SKILL.md",
-      "digest": "sha256:d10f3a467e58df818b7ef419c0dd52b34beb1033359b9b8a8c5a6693bf3075da"
     },
     {
       "name": "store-plan",
@@ -538,7 +510,7 @@
       "type": "skill-md",
       "description": "Maintain an append-only TSV decision trail and audit its evidence against the transcript. Use when explicitly requesting a persistent audit trail for autonomous work, multi-phase migrations, or risky refactors.",
       "url": "/.well-known/agent-skills/total-recall/SKILL.md",
-      "digest": "sha256:9e8e6a669f05fb389e5ad27baa714f2ce2ce4446e06635b767d74f3380d6c547"
+      "digest": "sha256:e222d419776ac6d37b4cd8eaca1e6d1e883ad910018d8d6e4d3d469e232bd8e8"
     },
     {
       "name": "unslop",

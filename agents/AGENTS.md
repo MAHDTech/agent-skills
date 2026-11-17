@@ -15,10 +15,9 @@ description: Single source of truth for agent instructions
 - **codebase-design**: Design or improve module interfaces and test seams. Use when simplifying caller requirements, reducing shallow abstractions, or making modules easier to test and maintain.
 - **diagnosing-bugs**: Diagnose hard bugs, flaky failures, and performance regressions with a reproducible feedback loop. Use to isolate the cause, verify a fix, and add a meaningful regression test.
 - **domain-modeling**: Clarify domain terms and relationships while designing software. Use to resolve conflicting terminology, stress-test scenarios, update a glossary, or record a consequential ADR.
-- **egui**: Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures.
 - **icp**: Build, secure, test, and deploy Internet Computer (ICP) canisters and full-stack dapps in Motoko, Rust, and TypeScript. Use for canister architecture, stable memory, ICRC and chain-key tokens (ckBTC, ckETH, ckSOL), Internet Identity, vetKeys, HTTPS outcalls, or icp CLI workflows.
 - **interface-design**: Design, build, refine, or critique user interfaces across web, desktop, mobile, terminals, and games. Use for UI/UX decisions, visual systems, interaction flows, and rendered design reviews.
-- **model-context-protocol**: Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing.
+- **model-context-protocol**: Build or debug MCP servers with official SDKs against the stateless 2026-07-28 spec. Use for tool schemas, resources, prompts, server/discover, stdio or Streamable HTTP transports, and MCP Inspector testing.
 - **nutanix-api-v4**: Integrate or debug Nutanix v4 REST APIs and official SDKs. Use for OData queries, namespaces, version compatibility, or migrating legacy Nutanix API integrations.
 - **nutanix-enterprise-ai**: Configure or troubleshoot Nutanix Enterprise AI (NAI/GPT-in-a-Box). Use for platform deployment, model serving, inference gateways, RBAC, or NAI MCP connectors.
 - **nutanix-files**: Configure or troubleshoot Nutanix Files servers and SMB/NFS shares. Use for directory integration, Smart Tiering, recovery, analytics, performance, or Files APIs.
@@ -28,7 +27,6 @@ description: Single source of truth for agent instructions
 - **productionize-app**: Prepare an entire application for production when explicitly requested. Audit and fix configuration, reliability, security, observability, packaging, and deployment readiness.
 - **research**: Research a technical question using primary sources and save cited findings in the repo. Use for documentation, API, specification, or source-code fact gathering.
 - **sculpt-code**: Refactor a scoped diff or selected files for clearer naming, control flow, structure, and less duplication or dead code. Use for cleanup that preserves behavior.
-- **spacetime**: Develop or debug Spacetime/SpacetimeDB modules and real-time clients in Rust, C#, TypeScript, or C++. Use for schemas, backend functions, subscriptions, CLI work, bindings, or migrations.
 - **tdd**: Build features or fixes test-first using a red-to-green loop. Use for behavior-focused integration tests, choosing public test seams, and avoiding tests coupled to internals.
 - **upgrade-dependencies**: Upgrade packages, frameworks, or language/runtime versions using release notes and a green test baseline. Use for version bumps, breaking migrations, and lockfile changes.
 - **xai**: Integrate or debug xAI/Grok APIs and SDKs. Use for client configuration, model capabilities, streaming, tool calling, structured output, vision, or search integration.
@@ -36,7 +34,6 @@ description: Single source of truth for agent instructions
 ## Game Development
 
 - **bevy-development**: Build or modernize Bevy games and simulations in Rust. Use for ECS design, scheduling, input, assets, messages, performance, or migration between Bevy APIs.
-- **bevy-egui**: Integrate egui into Bevy with bevy_egui. Use for UI scheduling, HUDs, debug panels, input capture, image textures, multi-window contexts, or rendering UI to game surfaces.
 
 ## Planning
 
@@ -105,7 +102,6 @@ description: Single source of truth for agent instructions
 - **install-skills**: Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.
 - **jj**: Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.
 - **nix-shell**: Run missing ad-hoc CLI utilities in ephemeral nix shell environments when Nix is installed. Use for one-off diagnostics or conversions, keeping project dependencies in its toolchain.
-- **oak**: Use Oak version control in repositories with .oak, or for oak.space tasks. Manage change stacks, conflicts, workspaces, dependency mounts, spaces, and Oak CI.
 - **pagefind**: Configure, build, or troubleshoot Pagefind search for a static website. Use for indexing options, content exclusions or weighting, generated assets, and client integration.
 - **prek**: Run, configure, or troubleshoot Git pre-commit hooks with prek. Use for hook execution, installation, validation, and cache management; distinguish the hook stage from its CLI.
 - **scratchpad**: Manage temporary scripts, experiment files, and debugging artifacts during a task. Use one session scratch directory, keep the source tree clean, and remove temporary files afterward.
@@ -115,7 +111,7 @@ description: Single source of truth for agent instructions
 
 ## GUARDS
 
-- **guards-debug**: Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts.
+- **guards-debug**: Diagnose and recover stuck or failing agy-guards sessions, hooks, spokes, or factory shifts from outside an active run. Use only when the user explicitly requests GUARDS debugging.
 - **guards-goal**: Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /guards-goal or explicitly requests a persistent goal.
 - **guards-run-factory**: Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
 
@@ -153,20 +149,6 @@ description: Single source of truth for agent instructions
 - **dbos-python**: DBOS Python SDK (3.x) for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Python code with DBOS, creating workflows and steps, using queues, datasource transactions, or schedules, using DBOSClient from external applications, upgrading DBOS Python 2.x code to 3.x, or building applications that need to be resilient to failures.
 - **dbos-rust**: DBOS Rust SDK (the dbos crate) for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Rust code with DBOS, creating workflows and steps, using queues, using the DBOS Client from external applications, or building Rust applications that need to be resilient to failures.
 - **dbos-typescript**: DBOS TypeScript SDK for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing TypeScript code with DBOS, creating workflows and steps, using queues, using DBOSClient from external applications, or building applications that need to be resilient to failures.
-
-### spacetimedb
-
-- **cli**: SpacetimeDB CLI reference for initializing projects, building modules, publishing databases, querying data, and managing servers
-- **concepts**: Understand SpacetimeDB architecture, core concepts, and current capabilities. Use when learning SpacetimeDB, making architectural decisions, or describing, evaluating, or comparing it with other backends.
-- **cpp-server**: SpacetimeDB C++ server module SDK reference. Use when writing tables, reducers, or module logic in C++.
-- **csharp-client**: SpacetimeDB C#/.NET client SDK reference. Use when building C# clients that connect to SpacetimeDB (console, desktop, or any .NET app).
-- **csharp-server**: SpacetimeDB C# server module SDK reference. Use when writing tables, reducers, or module logic in C#.
-- **mcp**: Operate a running SpacetimeDB database through MCP tools rather than the CLI - list databases, read schemas, run SQL, and call reducers. Use when the client exposes spacetimedb MCP tools and the task is to inspect or change data in a live database.
-- **rust-server**: SpacetimeDB Rust server module SDK reference. Use when writing tables, reducers, or module logic in Rust.
-- **typescript-client**: SpacetimeDB TypeScript/React client SDK reference. Use when building web clients that connect to SpacetimeDB.
-- **typescript-server**: SpacetimeDB TypeScript server module SDK reference. Use when writing tables, reducers, or module logic in TypeScript.
-- **unity**: Integrate SpacetimeDB with Unity game projects. Use when building Unity clients with MonoBehaviour lifecycle, FrameTick, and PlayerPrefs token persistence.
-- **unreal**: SpacetimeDB Unreal Engine client SDK reference. Use when building Unreal Engine clients that connect to SpacetimeDB.
 
 ### splunk
 

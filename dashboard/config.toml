@@ -1,7 +1,7 @@
 # Use the CNAME for the Base URL.
 base_url = "https://skills.mahdtech.com/"
 title = "Agent Skills"
-description = "A collection of AI agent skills"
+description = "Working on my skill issues"
 theme = "tars-dashboards"
 output_dir = "public"
 # Skill documentation contains literal template and GitHub Actions examples.

@@ -114,12 +114,10 @@ Beyond `/code-review` on the main flow:
 
 - [/interface-design](@/skills/engineering/interface-design/_index.md) - reach for this when planning, building, refining, or critiquing UI/UX across web, desktop, mobile, terminal interfaces, and games. Covers visual vocabulary, interaction, accessibility, and rendered verification; retain framework specialists for API and integration details.
 
-## Game and database development
+## Game development and storage
 
 - `/bevy-development` - reach for this when working in the Bevy game engine (Rust ECS, systems, assets, states, scheduling).
-- `/bevy-egui` - reach for this when integrating egui into Bevy 0.19 (bevy_egui, EguiPrimaryContextPass, input absorption, viewport cameras).
 - `/casita` - reach for this when working with Casita content-addressed repositories (immutable object graphs, CLI, Rust API, synchronization, or garbage collection).
-- `/spacetime` - reach for this when working with Spacetime (formerly SpacetimeDB) backend modules, tables, reducers, procedures, views, or real-time client subscriptions.
 
 ## Cloud, infrastructure, and AI models
 
@@ -159,12 +157,10 @@ Beyond `/code-review` on the main flow:
 - `/scratchpad` - reach for this when temporary or experimental scripts need a gitignored `scratch/` home.
 - `/install-skills` - reach for this when installing, updating, or managing skills from a collection across agent runtimes.
 - [/tailwind](@/skills/tooling/tailwind/_index.md) - reach for this when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
-- `/egui` - reach for this when building immediate-mode GUIs in Rust, custom widgets, styling, canvas painters, or eframe apps.
 - `/cargo-doc` - reach for this when generating, querying, or navigating local Rust documentation and docs.rs with zero hallucination.
 - `/cargo-crap` - reach for this when measuring and gating Change Risk Anti-Patterns (CRAP) metric across Rust codebases by combining cyclomatic complexity with test coverage.
 - [/zola](@/skills/tooling/zola/_index.md) - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
 - [/zed](@/skills/tooling/zed/_index.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
-- [/oak](@/skills/tooling/oak/_index.md) - reach for this when working in an Oak repository (`.oak/`), running `oak` CLI commands, managing change stacks, isolating agents with Oak workspaces, or configuring `.oak/ci/workflows.json`.
 - [/jj](@/skills/tooling/jj/_index.md) - reach for this when working in a Jujutsu (`jj`) repository (`.jj/`), running `jj` CLI commands, writing revset or fileset expressions, managing bookmarks, resolving conflicts, or syncing with GitHub.
 - [/guards-debug](@/skills/guards/guards-debug/_index.md) - reach for this from outside an active run when debugging a stuck or failing agy-guards session, hook, spoke, or factory shift across GUARDS state logs and ~/.gemini transcripts.
 - [/guards-run-factory](@/skills/guards/guards-run-factory/_index.md) - reach for this to run the unattended GUARDS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
