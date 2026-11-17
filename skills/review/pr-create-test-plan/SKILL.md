@@ -1,15 +1,13 @@
 ---
 name: pr-create-test-plan
 description: Draft TEST_PLAN.md for a branch's real user flows and integration changes using the project's commands. Use when a reviewer needs manual verification steps and a quick smoke test before merging.
-context: fork
-agent: general-purpose
 metadata:
   group: review
 ---
 
 # PR Test Plan
 
-Generate a manual test plan for the changes in the current branch. The plan should focus on what a developer/reviewer needs to **manually verify** - real user flows, integration behavior, and observable outcomes. Leave input validation, error branches, and edge cases to unit tests.
+Generate a manual test plan for the changes in the current branch. The plan covers what a developer or reviewer needs to **manually verify**: real user flows, integration behavior, and observable outcomes.
 
 ## Instructions
 
@@ -41,13 +39,13 @@ git log $BASE_BRANCH..HEAD --oneline
 
 Check what's available in the project so you can reference real commands (not generic guesses):
 
-- **Makefile targets**: `make help 2>/dev/null || grep -E '^[a-z_-]+:.*##' Makefile makefiles/*.mk 2>/dev/null`
+- **Task runner targets**: `make help`, or the targets in `Makefile`, `justfile`, or `Taskfile.yml`
 - **Package manager**: Look for `pyproject.toml` (uv/pip), `package.json` (npm/pnpm), `Cargo.toml` (cargo), `go.mod` (go)
 - **Test runners**: Look for `pytest.ini`, `pyproject.toml [tool.pytest]`, `jest.config.*`, `.mocharc.*`
 - **Project docs**: Read `AGENTS.md`, `CONTRIBUTING.md`, or `README.md` for project-specific test/build instructions
 - **CI config**: Check `.github/workflows/`, `Makefile`, or `Taskfile.yml` for existing test commands
 
-**Prefer project Makefile targets and documented commands over raw tool invocations.** If the project has `make test_unit`, use that instead of `uv run pytest tests/unit/`.
+**Prefer the project's task runner targets and documented commands over raw tool invocations.** If the project defines a `test-unit` target, use it instead of calling the test runner directly.
 
 ### Step 4: Categorize changes and confirm with user
 
@@ -66,8 +64,8 @@ Example confirmation format:
 ```text
 I found 3 change areas in this branch:
 
-1. CLI agent mode -- new --agent flag on setup command (cli/commands/setup.py, cli/cli.py)
-2. Skills restructuring -- SKILL.md rewrite, new reference docs, deleted shell scripts
+1. Export command -- new --format flag on the export command (2 source files)
+2. Docs restructuring -- README rewrite, new reference docs, deleted shell scripts
 3. Test fixes -- E2E test stability improvements (4 test files)
 
 Should I generate the test plan for all 3, or would you like to adjust?
@@ -75,78 +73,20 @@ Should I generate the test plan for all 3, or would you like to adjust?
 
 ### Step 5: Generate the test plan
 
-For each confirmed category, generate a test section following these rules:
-
-#### Severity & importance markers
-
-Tag every test step with one of these emojis in the step title:
-
-| Emoji | Meaning          | When to use                                                                  |
-| ----- | ---------------- | ---------------------------------------------------------------------------- |
-| 🔴    | **Critical**     | Core functionality - if this fails, the feature is broken                    |
-| 🟢    | **Expected**     | Standard behavior that should work - moderate confidence but worth verifying |
-| 🔵    | **Nice-to-have** | Polish, UX, non-blocking - skip if short on time                             |
-
-Example: `1a. 🔴 **Pre-register a profile end-to-end**`
-
-#### Formatting rules
-
-- **Numbered sections** with separator lines (`---`) between them
-- **Numbered sub-steps** within each section (1a, 1b, 1c...)
-- Each sub-step has an **emoji tag + bold title** describing what to test
-- Each sub-step has a **copy-paste command** in a fenced code block (or manual UI steps if applicable)
-- Each sub-step has a **"Verify:"** line stating what success looks like
-- **One command per code block** -- never stack multiple commands in one block with comments between them
-- Use **Makefile targets** when available instead of raw tool commands
-- For commands requiring env vars, put them inline: `GROVE_API_URL=http://localhost:8000 make test_e2e_suite`
-
-#### What to focus on (and what to skip)
-
-**DO include - things you must verify manually:**
-
-- Happy-path user flows end-to-end (the main thing the feature does)
-- Integration points - does component A actually talk to component B correctly?
-- State transitions - does data persist, propagate, and display correctly across the system?
-- Resumption / retry behavior - if a multi-step process fails midway, does retry work?
-- UI rendering - does the new section/field/page show up and look right?
-- API response shape - do new fields appear in real responses?
-- Existing behavior preserved - does the change break anything that was already working?
-
-**DO NOT include - leave these for unit tests:**
-
-- Invalid input validation (wrong types, missing fields, malformed data)
-- Boundary values and off-by-one checks
-- Error message wording verification
-- Permission/auth edge cases (401/403 responses)
-- Schema validation failures
-
-#### Quick smoke test section
-
-Always end with a "Quick Smoke Test" section -- the 2-3 commands a reviewer would run if they only have 60 seconds. Tag each with the appropriate emoji.
+For each confirmed category, write one test section. Read [plan-format.md](resources/manual/plan-format.md) first and apply all of it: severity markers, step formatting, what to include and what to leave to unit tests, the closing quick smoke test, and style.
 
 ### Step 6: Write output
 
-1. **Write the plan** to `TEST_PLAN.md` in the repo root
-2. **Print a summary** to the terminal showing the section count and a one-liner per section
+1. **Write the plan** to `TEST_PLAN.md` in the repo root, or to a path the user names. It is a review artifact: leave it uncommitted and say so in the summary.
+2. **Print a summary** to the terminal showing the section count and a one-liner per section.
 
 Terminal summary format:
 
 ```text
-Wrote TEST_PLAN.md with 4 sections:
+Wrote TEST_PLAN.md (uncommitted) with 4 sections:
 
-  1. CLI Agent Mode -- 4 test steps (🔴×2, 🟢×1, 🔵×1)
-  2. Skills Restructuring -- 3 test steps (🔴×1, 🟢×2)
+  1. Export Command -- 4 test steps (🔴×2, 🟢×1, 🔵×1)
+  2. Docs Restructuring -- 3 test steps (🔴×1, 🟢×2)
   3. Automated Tests -- 2 test steps (🟢×2)
   4. Quick Smoke Test -- 3 commands
-
-Run `cat TEST_PLAN.md` to view the full plan.
 ```
-
-## Style Reference
-
-Follow the same style used in creating the pull request:
-
-- **Bold the what**, plain text the how
-- No fluff -- every step must verify something real that a human needs to see
-- Copy-paste ready -- a reviewer should never need to edit a command
-- Separate code blocks -- one command per block, bold header above it

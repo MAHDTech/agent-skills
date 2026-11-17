@@ -32,6 +32,7 @@ Three ways a skill leaves the live set:
 - **Archive** - retire but keep it readable (it shipped, it had users, or its history is worth preserving). `git mv` into `skills-archive/`. The default: shipped skills are never deleted.
 - **Delete** - remove it entirely (a never-promoted `in-progress/` draft, a mistake, nothing worth keeping). `git rm` the directory. Not for anything that ever shipped.
 - **Merge** - its value belongs inside another skill. Fold the content into the survivor, redirect references to the survivor, then archive or delete the emptied shell.
+- **Vendor removal** - a skill under `skills/vendor/<vendor>/` is never archived. Remove its source entry from `vendor-skills.yaml` and `git rm -r skills/vendor/<vendor>` (to drop one skill but keep the vendor, add its exact name to that source's `excludes:` and `git rm -r skills/vendor/<vendor>/<skill>`); Git keeps the history.
 
 ## Steps (archive)
 
@@ -56,16 +57,20 @@ Three ways a skill leaves the live set:
 
    `archived` is required on every skill under `skills-archive/`; `replaced-by` is optional and names a live skill. The dashboard renders its archived banner from these keys, so the body needs no note. Keep the rest of the frontmatter valid: `name` and `description` must still pass lint.
 
-3. **Purge or redirect inbound references.** Sweep the live tree for the old name and fix each hit - repoint to the replacement, or remove the mention:
+3. **Purge or redirect inbound references.** Sweep for the old name in skills and in repository docs, then fix each hit - repoint to the replacement, or remove the mention:
 
    ```bash
-   grep -rn '/<name>' skills --include=SKILL.md
+   rg -n -w '<name>' skills --glob 'SKILL.md' --glob '!skills/vendor/**'
+   rg -n 'skills/<category>/<name>/' docs README.md CONTRIBUTING.md AGENTS.md
    ```
 
    - **Router** (`skills/authoring/skill-router/SKILL.md`) - remove the retired skill's entry. If a replacement took over its slot, the replacement's entry already covers it.
-   - **Any other live skill** that referenced `/<name>` - a mention now pointing at an archived skill is a dangling reference; send it to the replacement or drop it. Skills are self-contained by default, so dropping the sentence is usually right.
+   - **Any other live skill** that names it - a `/<name>` mention, a relative link, or prose such as "use the `<name>` skill" - now points at an archived skill. Send it to the replacement or drop it. Skills are self-contained by default, so dropping the sentence is usually right.
+   - **Repository docs** (audits, plans, ADRs) that link `skills/<category>/<name>/` - repoint the link to `skills-archive/<category>/<name>/` so the link checker passes; leave the historical text as written.
 
-4. **Regenerate the derived artifacts.** `devenv --no-tui shell -- ask skills lint`, then `devenv --no-tui shell -- ask skills sync`. Sync rebuilds the README, `agents/AGENTS.md`, `skills.sh.json`, and the dashboard from the tree, removes the local links for the archived skill, and stages what it changed; commit that.
+4. **Regenerate the derived artifacts.** `devenv --no-tui shell -- ask skills lint`, then `devenv --no-tui shell -- ask skills sync`. Sync rebuilds the README, `agents/AGENTS.md`, `skills.sh.json`, and the dashboard from the tree, and removes the local links for the archived skill.
+
+5. **Verify.** `git add` the moved skill, the regenerated artifacts, and any repointed docs, then run `devenv --no-tui test`. The link checker and dashboard lint fail on any link or page you missed.
 
 ## Avoiding dangling references
 
@@ -77,5 +82,5 @@ An archived skill comes back the same way it left: `git mv skills-archive/<categ
 
 ## Done when
 
-The skill lives under `skills-archive/<category>/<name>/`, its frontmatter carries `metadata.archived` (and `replaced-by` when a successor exists), no live skill (the router included) still references `/<name>`, lint passes, and a second `sync` leaves no further diff.
+The skill lives under `skills-archive/<category>/<name>/`, its frontmatter carries `metadata.archived` (and `replaced-by` when a successor exists), no live skill (the router included) and no repository doc still points at its old path, `devenv --no-tui test` passes, and a second `sync` leaves no further diff.
 

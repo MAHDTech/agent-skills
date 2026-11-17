@@ -16,13 +16,13 @@ An upgrade is a behaviour change you did not write. Read what is coming, move in
 
 The same discipline covers a single package bump, a major-version jump, a framework migration, and a language or runtime update - only the blast radius grows.
 
-Run the suite and the upgrade commands through the project's toolchain - for example `devenv --no-tui shell -- <cmd>` - so the environment is the same before and after.
+Run the suite and the upgrade commands through the project's pinned toolchain or wrapper (for example a devenv or nix shell) so the environment is the same before and after.
 
 ## Phase 1 - Establish the safety net
 
 Before touching a single version, get the affected code **green**: run the suite and confirm it passes on the current versions. That green is your **safety net** - the signal that an upgrade changed behaviour.
 
-If the code path you are upgrading has no tests, that net does not exist yet. Build it first with characterization tests, which pins current behaviour so an upgrade that alters it turns red.
+If the code path you are upgrading has no tests, that net does not exist yet. Build it first: write characterization tests that record current output as the expected value, pinning current behaviour so an upgrade that alters it turns red.
 
 Completion: a green test suite - or fresh characterization tests - covering the code that touches the dependency, run at least once on the current versions.
 
@@ -52,7 +52,7 @@ Completion: each intended version bumped, the dependency tree resolves cleanly, 
 
 Run the suite after each step. Work the breaks the changelog predicted - renamed APIs, changed defaults, removed options - until it is green again.
 
-When a break is **mysterious** - a test fails and the changelog gave no warning - run bug diagnosis, using the red test as the ready-made feedback loop, rather than guessing at the upgrade.
+When a break is **mysterious** - a test fails and the changelog gave no warning - diagnose it with the red test as the ready-made feedback loop: form falsifiable hypotheses and test them one variable at a time rather than guessing at the upgrade.
 
 Completion: the suite is green on the new versions, with every failure understood rather than muted.
 

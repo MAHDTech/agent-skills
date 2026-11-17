@@ -16,7 +16,7 @@ mermaid = false
 
 You don't remember every skill, so ask.
 
-This is a map of the whole collection: a **main flow** that most delivery work travels, a few **on-ramps** that feed onto it, and the standalone skills grouped by what they do. Each entry has a one-line _reach for this when…_ so you can jump straight to the fit.
+This is a map of the whole collection: a **main flow** that most delivery work travels, a few **on-ramps** that feed onto it, and the standalone skills grouped by what they do. Each skill has exactly one entry with a one-line _reach for this when…_ so you can jump straight to the fit.
 
 _This index must be kept in sync - when a skill is added, renamed, or removed, update this file._ The `/skill-creator` and `/skill-archive` skills reference this maintenance rule; `/skill-audit` checks it.
 
@@ -28,7 +28,7 @@ The route most work travels - you have an idea and want it built:
 /grilling  →  /to-spec  →  /to-tickets  →  /tdd  →  /code-review  →  ship via /gh-create-pr
 ```
 
-- `/grilling` - reach for this when a plan or design needs pressure-testing first; it interviews you one question at a time, walking every branch of the decision tree.
+- `/grilling` - reach for this when a plan or design needs pressure-testing first; it interviews you one decision at a time. Run it with `--with-docs` to keep a `CONTEXT.md` glossary and record ADRs while you talk.
 - `/to-spec` - reach for this when a settled conversation should become a spec (PRD) on the tracker: synthesis, no interview.
 - `/to-tickets` - reach for this when a spec or plan should be split into tracer-bullet tickets, each declaring its blocking edges.
 - `/tdd` - reach for this when you want a behaviour built test-first, red-green-refactor, without a full spec.
@@ -38,22 +38,20 @@ Ship via `/gh-create-pr` (see _GitHub and git_).
 
 ### Underneath the flow
 
-Two vocabulary layers the flow leans on - reach for them directly when the _words_, not the process, are the problem:
+Vocabulary the flow leans on - reach for these directly when the _words_, not the process, are the problem:
 
 - `/codebase-design` - reach for this when shaping a module's interface or deciding where a seam goes; the deep-module vocabulary.
-- `/domain-modeling` - reach for this when the domain's terms are fuzzy or overloaded; it pins the ubiquitous language in a `CONTEXT.md` glossary and records ADRs.
-- `/code-comments` - reach for this when writing new code, editing existing files, or auditing code comments to keep comments concise and high-signal.
+- `/code-comments` - reach for this when a file, path, or diff needs its comments audited so they state intent, constraints, and invariants.
 
 ## On-ramps
 
 A starting situation that generates work, then merges onto the main flow:
 
-- `/grilling` (with docs) - reach for this when tackling an ambiguous problem from scratch; run with `--with-docs` to interview while maintaining a `CONTEXT.md` glossary and capturing ADRs.
 - `/diagnosing-bugs` - reach for this when something's broken, flaky, or slow; it builds a red-capable feedback loop before hypothesising, then fixes with a regression test.
 - `/gh-triage` - reach for this when the GitHub backlog piles up and issues or external PRs need turning into agent-ready briefs.
 - `/wayfinder` - reach for this when the work is too big for one session and the way to the destination isn't visible yet.
-- `/software-factory` - reach for this when a feature is big enough that every decision should be signed off before code exists; it runs four approval gates, then rejoins the flow at `/to-tickets`.
-- `/research` - reach for this when you need facts gathered and verified against primary sources, delegated to a background agent while you keep working.
+- `/dreamwork` - reach for this only in T3 Code, when a set of issues should be planned with you, then implemented, reviewed, and council-checked autonomously in isolated worktrees, returning to you for UAT before landing.
+- `/research` - reach for this when you want a question answered from primary sources and saved as a cited note in the repo.
 
 ## Shaping the backlog
 
@@ -74,15 +72,13 @@ Not new features - working on code that already exists:
 
 ## Crossing sessions
 
-- [/guards-goal](@/skills/guards/guards-goal/_index.md) - reach for this when the user wants to set or resume a persistent goal, pursue its full scope, and verify completion using native goal tools or a repository file fallback.
-
 - `/handoff` - reach for this when a thread is full or you need to branch off; it compacts the conversation into a document a fresh session can pick up.
 - `/store-plan` - reach for this when the current plan, decisions, and action items should be saved as a markdown file under `docs/plans/` for later.
 
 ## Reflection and quality
 
-- `/self-review` - reach for this right after implementing, to surface missed work and simplification opportunities.
-- `/scope-sweep` - reach for this as a final breadth pass before calling a scope done, to catch missed items, edge cases, and risks.
+- `/self-review` - reach for this right after implementing, to surface unfinished work and code that breaks project conventions.
+- `/scope-sweep` - reach for this as a final completeness pass before calling a scope done, to catch missed requirements and unfinished tasks.
 - `/critical-thinking` - reach for this when you want your own last response analysed for flaws, biases, and unstated assumptions.
 - `/wtf` - reach for this when your last message did not land, to re-pitch it in plain language rather than explain it again.
 - `/total-recall` - reach for this when you want an append-only TSV decision trail recorded during long-running or autonomous work.
@@ -100,32 +96,29 @@ Beyond `/code-review` on the main flow:
 
 - `/gh-create-issue` - reach for this when conversation context should become a structured GitHub issue.
 - `/gh-create-pr` - reach for this to ship: generate a PR title and description, then commit and open the PR on approval.
-- `/gh-pr-comments` - reach for this when posting PR comments, inline review notes, or thread replies on a user's behalf with secret preflight scanning and account-aware attribution.
+- `/gh-pr-comments` - reach for this when posting PR or issue comments, inline review notes, or thread replies on a user's behalf; it owns the attribution format and secret preflight scan.
 - `/gh-babysit-pr` - reach for this when you want to monitor an open PR through CI checks, review bots, and base-branch updates with `pr-wait`.
 - `/gh-takeover` - reach for this when adopting an unfinished PR, branch, or agent handoff to completion while preserving contributor credit.
 - `/gh-submit-review` - reach for this when a finished review should be posted to a GitHub PR (approve / request-changes / comment) with inline notes.
 - `/gh-resolve-pr-comments` - reach for this when PR review comments need triaging and resolving behind an approval gate.
-- `/git-resolve-conflicts` - reach for this when a merge or rebase leaves conflicts to resolve.
+- `/git-resolve-conflicts` - reach for this when a merge, rebase, or cherry-pick leaves conflicts to resolve.
 - `/git-update-branch` - reach for this when a branch or stale PR has diverged from its base and needs conceptual-conflict checks before a deliberate rebase or merge.
 - `/gh-release-notes` - reach for this when you want release notes or a changelog for a version and to cut a GitHub release.
 
-## Interface design
+## Interface and game development
 
-- [/interface-design](@/skills/engineering/interface-design/_index.md) - reach for this when planning, building, refining, or critiquing UI/UX across web, desktop, mobile, terminal interfaces, and games. Covers visual vocabulary, interaction, accessibility, and rendered verification; retain framework specialists for API and integration details.
-
-## Game and database development
-
+- `/interface-design` - reach for this when planning, building, refining, or critiquing UI/UX across web, desktop, mobile, terminal interfaces, and games; framework specialists still own API details.
 - `/bevy-development` - reach for this when working in the Bevy game engine (Rust ECS, systems, assets, states, scheduling).
-- `/bevy-egui` - reach for this when integrating egui into Bevy 0.19 (bevy_egui, EguiPrimaryContextPass, input absorption, viewport cameras).
+
+## Protocols, platforms, and AI models
+
+- `/acp` - reach for this when building, integrating, or debugging Agent Client Protocol (ACP) agents, clients, or SDKs.
+- `/model-context-protocol` - reach for this when building or debugging MCP servers against the current stateless spec, including transports and Inspector testing.
+- `/agent-router` - reach for this when configuring or troubleshooting AgentRouter AI gateways, unified LLM endpoints, or MCP and A2A routing (including the gateway inside Nutanix Enterprise AI).
 - `/casita` - reach for this when working with Casita content-addressed repositories (immutable object graphs, CLI, Rust API, synchronization, or garbage collection).
-- `/spacetime` - reach for this when working with Spacetime (formerly SpacetimeDB) backend modules, tables, reducers, procedures, views, or real-time client subscriptions.
-
-## Cloud, infrastructure, and AI models
-
-- [/agent-router](@/skills/engineering/agent-router/_index.md) - reach for this when configuring or troubleshooting AgentRouter AI gateways, unified LLM endpoints, or MCP and A2A routing (including the gateway inside Nutanix Enterprise AI).
-- [/icp](@/skills/engineering/icp/_index.md) - reach for this when building, securing, testing, or deploying Internet Computer (ICP) canisters and dapps in Motoko, Rust, or TypeScript (stable memory, ICRC/chain-key tokens, Internet Identity, vetKeys, HTTPS outcalls, or icp CLI).
+- `/icp` - reach for this when building, securing, testing, or deploying Internet Computer (ICP) canisters and dapps in Motoko, Rust, or TypeScript.
 - `/nutanix-api-v4` - reach for this when developing, integrating, or troubleshooting with Nutanix v4 REST APIs or SDKs.
-- `/nutanix-enterprise-ai` - reach for this when deploying, configuring, serving, or troubleshooting LLMs and MCP servers with Nutanix Enterprise AI (NAI v2.8).
+- `/nutanix-enterprise-ai` - reach for this when deploying, configuring, serving, or troubleshooting LLMs and MCP servers with Nutanix Enterprise AI (NAI).
 - `/nutanix-files` - reach for this when managing Nutanix Files, SMB/NFS file shares, Smart Tiering, or file server APIs.
 - `/nutanix-kubernetes-platform` - reach for this when operating, deploying, upgrading, or troubleshooting Nutanix Kubernetes Platform (NKP).
 - `/nutanix-objects` - reach for this when managing Nutanix Objects S3 storage, bucket policies, replication, or REST APIs.
@@ -133,9 +126,8 @@ Beyond `/code-review` on the main flow:
 
 ## Writing
 
-- `/proofread` - reach for this before publishing a post: spelling, grammar, logic, weak arguments, broken links.
-- `/simplify-docs` - reach for this when documentation needs to read more clearly, with edits gated on approval.
-- `/unslop` - reach for this when editing text to cut AI tells, tropes, puffery, and robotic boilerplate, and inject authentic human voice.
+- `/unslop` - reach for this before publishing: cut AI tells and filler, then fix spelling, grammar, and broken links.
+- `/simplify-docs` - reach for this when documentation needs restructuring to read more clearly, with edits gated on approval.
 
 ## Authoring
 
@@ -148,25 +140,27 @@ Beyond `/code-review` on the main flow:
 
 - `/agent-guidelines` - reach for this when you want work checked against the behavioural guidelines for agents.
 - `/antigravity` - reach for this when you need to research or verify Google Antigravity specifications, command-line flags, rules, subagents, or hooks.
-- `/devenv` - reach for this when a repo uses devenv for its shell and dependencies.
-- `/prek` - reach for this when running, configuring, or troubleshooting pre-commit hooks (note: pre-commit CLI is deprecated, use prek).
-- `/herdr` - reach for this when controlling Herdr terminal multiplexer, managing workspaces, tabs, and panes, or coordinating coding agents.
-- [/acp](@/skills/engineering/acp/_index.md) - reach for this when building, integrating, or debugging Agent Client Protocol (ACP) agents, clients, JSON-RPC 2.0 schemas, or SDKs.
-- [/model-context-protocol](@/skills/engineering/model-context-protocol/_index.md) - reach for this when building Model Context Protocol (MCP) servers, exposing tools, resources, prompts, handling transports, and JSON-RPC 2.0 schemas.
-- [/nix-shell](@/skills/tooling/nix-shell/_index.md) - reach for this when running ad-hoc CLI utilities or diagnostic tools in ephemeral Nix shells.
-- [/pagefind](@/skills/tooling/pagefind/_index.md) - reach for this when configuring, indexing, or troubleshooting Pagefind static search for websites.
-- `/scratchpad` - reach for this when temporary or experimental scripts need a gitignored `scratch/` home.
+- `/devenv` - reach for this when a repo uses devenv for its shell and dependencies; every project command then runs through it.
+- `/nix-shell` - reach for this on NixOS in a project without devenv, to run ad-hoc CLI utilities in ephemeral Nix shells.
+- `/prek` - reach for this when running, configuring, or troubleshooting Git pre-commit hooks with prek instead of the pre-commit CLI.
+- `/herdr` - reach for this when controlling the Herdr terminal multiplexer, managing workspaces, tabs, and panes, or coordinating coding agents.
+- `/jj` - reach for this when working in a Jujutsu (`jj`) repository: revsets, filesets, bookmarks, conflicts, or syncing with GitHub.
+- `/scratchpad` - reach for this when temporary or experimental files need one session scratch location outside the source tree.
 - `/install-skills` - reach for this when installing, updating, or managing skills from a collection across agent runtimes.
-- [/tailwind](@/skills/tooling/tailwind/_index.md) - reach for this when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
-- `/egui` - reach for this when building immediate-mode GUIs in Rust, custom widgets, styling, canvas painters, or eframe apps.
-- `/cargo-doc` - reach for this when generating, querying, or navigating local Rust documentation and docs.rs with zero hallucination.
-- `/cargo-crap` - reach for this when measuring and gating Change Risk Anti-Patterns (CRAP) metric across Rust codebases by combining cyclomatic complexity with test coverage.
-- [/zola](@/skills/tooling/zola/_index.md) - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
-- [/zed](@/skills/tooling/zed/_index.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
-- [/oak](@/skills/tooling/oak/_index.md) - reach for this when working in an Oak repository (`.oak/`), running `oak` CLI commands, managing change stacks, isolating agents with Oak workspaces, or configuring `.oak/ci/workflows.json`.
-- [/jj](@/skills/tooling/jj/_index.md) - reach for this when working in a Jujutsu (`jj`) repository (`.jj/`), running `jj` CLI commands, writing revset or fileset expressions, managing bookmarks, resolving conflicts, or syncing with GitHub.
-- [/guards-debug](@/skills/guards/guards-debug/_index.md) - reach for this from outside an active run when debugging a stuck or failing agy-guards session, hook, spoke, or factory shift across GUARDS state logs and ~/.gemini transcripts.
-- [/guards-run-factory](@/skills/guards/guards-run-factory/_index.md) - reach for this to run the unattended GUARDS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
+- `/cargo-doc` - reach for this when generating, querying, or navigating local Rust documentation and docs.rs to confirm exact API signatures.
+- `/cargo-crap` - reach for this when measuring and gating Change Risk Anti-Patterns (CRAP) across Rust codebases by combining complexity with test coverage.
+- `/pagefind` - reach for this when configuring, indexing, or troubleshooting Pagefind static search for websites.
+- `/tailwind` - reach for this when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes.
+- `/zola` - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
+- `/zed` - reach for this when finding or changing Zed editor settings, keybindings, language servers, or per-language formatting.
+
+## GUARDS
+
+The agy-guards Antigravity plugin and its workflows:
+
+- `/guards-goal` - reach for this when you want a persistent goal set or resumed and pursued until every requirement is verified.
+- `/guards-run-factory` - reach for this to run the unattended GUARDS factory over a backlog: headless agy batches, reviews, and rework until it drains or needs a human.
+- `/guards-debug` - reach for this from outside an active run when a GUARDS session, hook, spoke, or factory shift is stuck or failing.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
 

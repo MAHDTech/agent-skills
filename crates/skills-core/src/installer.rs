@@ -25,20 +25,36 @@ use crate::error::SkillError;
 // -----------------------------------------------------------------------------
 
 /// Target AI agent execution environments supported by the installer bridge.
+///
+/// No single directory is read by every agent harness, so the standard set is
+/// the smallest group of global skill directories that covers them:
+///
+/// - `~/.agents/skills`: Codex, `OpenCode`, Goose, Grok, Cline, Zed, Pi, Warp.
+/// - `~/.claude/skills`: Claude Code (also read by `OpenCode`, Goose, and Grok).
+/// - `~/.gemini/antigravity-cli/skills`: Antigravity CLI.
+/// - `~/.gemini/config/skills`: Antigravity IDE and Antigravity over ACP.
+/// - `~/.cursor/skills`: Cursor.
+///
+/// ACP sessions run the same agent binary, so they read the same directories.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum TargetEnvironment {
-    /// Claude Desktop application config and skills directory.
-    ClaudeDesktop,
+    /// Claude Code personal skills directory (`~/.claude/skills`).
+    #[serde(alias = "claude-desktop")]
+    ClaudeCode,
     /// Cursor IDE application config and skills directory.
     Cursor,
-    /// Antigravity CLI global or workspace agent runtime environment.
-    Antigravity {
+    /// Shared cross-agent skills directory (`~/.agents/skills`), read by Codex,
+    /// `OpenCode`, Goose, Grok, and other harnesses following the open convention.
+    #[serde(alias = "antigravity")]
+    Agents {
         /// Optional workspace root override; if None, uses default system location.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         workspace_root: Option<PathBuf>,
     },
-    /// Antigravity ACP global skills, including T3 Code.
+    /// Antigravity CLI global skills (`~/.gemini/antigravity-cli/skills`).
+    AntigravityCli,
+    /// Antigravity IDE and ACP global skills, including T3 Code.
     AntigravityAcp,
     /// Arbitrary user-defined filesystem destination directory.
     Custom(PathBuf),
@@ -49,9 +65,10 @@ impl TargetEnvironment {
     #[must_use]
     pub fn identifier(&self) -> &str {
         match self {
-            Self::ClaudeDesktop => "claude-desktop",
+            Self::ClaudeCode => "claude-code",
             Self::Cursor => "cursor",
-            Self::Antigravity { .. } => "antigravity",
+            Self::Agents { .. } => "agents",
+            Self::AntigravityCli => "antigravity-cli",
             Self::AntigravityAcp => "antigravity-acp",
             Self::Custom(_) => "custom",
         }
@@ -67,9 +84,10 @@ impl TargetEnvironment {
     #[must_use]
     pub fn display_name(&self) -> &str {
         match self {
-            Self::ClaudeDesktop => "Claude Desktop",
+            Self::ClaudeCode => "Claude Code",
             Self::Cursor => "Cursor",
-            Self::Antigravity { .. } => "Antigravity",
+            Self::Agents { .. } => "Shared Agents (Codex, OpenCode, Goose, Grok)",
+            Self::AntigravityCli => "Antigravity CLI",
             Self::AntigravityAcp => "Antigravity ACP",
             Self::Custom(_) => "Custom Workspace",
         }
@@ -79,13 +97,65 @@ impl TargetEnvironment {
     #[must_use]
     pub fn all_standard() -> Vec<Self> {
         vec![
-            Self::ClaudeDesktop,
+            Self::ClaudeCode,
             Self::Cursor,
-            Self::Antigravity {
+            Self::Agents {
                 workspace_root: None,
             },
+            Self::AntigravityCli,
             Self::AntigravityAcp,
         ]
+    }
+
+    /// Returns the standard environments whose agent tool is present under `home_dir`.
+    ///
+    /// A tool counts as present when its configuration directory exists. The
+    /// shared `~/.agents/skills` target is always included because several
+    /// harnesses read it without owning a parent directory.
+    #[must_use]
+    pub fn detected_standard(home_dir: Option<&Path>) -> Vec<Self> {
+        Self::all_standard()
+            .into_iter()
+            .filter(|target| target.is_detected(home_dir))
+            .collect()
+    }
+
+    /// Reports whether the agent tool that owns this target is present under `home_dir`.
+    #[must_use]
+    pub fn is_detected(&self, home_dir: Option<&Path>) -> bool {
+        let default_home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
+        let home = home_dir.unwrap_or(&default_home);
+        match self {
+            Self::ClaudeCode => home.join(".claude").is_dir(),
+            Self::Cursor => home.join(".cursor").is_dir(),
+            Self::AntigravityCli | Self::AntigravityAcp => home.join(".gemini").is_dir(),
+            Self::Agents { .. } | Self::Custom(_) => true,
+        }
+    }
+
+    /// Directories earlier releases installed into that no agent tool reads.
+    ///
+    /// The former Claude Desktop target wrote to these instead of `~/.claude/skills`.
+    #[must_use]
+    pub fn legacy_skills_dirs(home_dir: Option<&Path>) -> Vec<PathBuf> {
+        let default_home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
+        let home = home_dir.unwrap_or(&default_home);
+        let mut dirs_found = vec![
+            home.join(".config").join("claude").join("skills"),
+            home.join("Library")
+                .join("Application Support")
+                .join("Claude")
+                .join("skills"),
+        ];
+        if home_dir.is_none()
+            && let Some(config) = dirs::config_dir()
+        {
+            let xdg = config.join("claude").join("skills");
+            if !dirs_found.contains(&xdg) {
+                dirs_found.push(xdg);
+            }
+        }
+        dirs_found
     }
 
     /// Resolves the default skills directory relative to a user's home directory.
@@ -95,27 +165,16 @@ impl TargetEnvironment {
         let home = home_dir.unwrap_or(&default_home);
 
         match self {
-            Self::ClaudeDesktop => {
-                #[cfg(target_os = "macos")]
-                {
-                    home.join("Library")
-                        .join("Application Support")
-                        .join("Claude")
-                        .join("skills")
-                }
-                #[cfg(not(target_os = "macos"))]
-                {
-                    home.join(".claude").join("skills")
-                }
-            }
+            Self::ClaudeCode => home.join(".claude").join("skills"),
             Self::Cursor => home.join(".cursor").join("skills"),
-            Self::Antigravity { workspace_root } => {
+            Self::Agents { workspace_root } => {
                 if let Some(ws) = workspace_root {
                     ws.join(".agents").join("skills")
                 } else {
                     home.join(".agents").join("skills")
                 }
             }
+            Self::AntigravityCli => home.join(".gemini/antigravity-cli/skills"),
             Self::AntigravityAcp => home.join(".gemini/config/skills"),
             Self::Custom(p) => {
                 if p.is_absolute() {
@@ -715,82 +774,16 @@ impl EnvironmentResolver {
         env: &TargetEnvironment,
         root_override: Option<&Path>,
     ) -> Result<PathBuf, InstallerError> {
-        if let Some(root) = root_override {
+        if root_override.is_none() && dirs::home_dir().is_none() {
             return match env {
-                TargetEnvironment::ClaudeDesktop => Ok(root.join(".claude").join("skills")),
-                TargetEnvironment::Cursor => Ok(root.join(".cursor").join("skills")),
-                TargetEnvironment::Antigravity { workspace_root } => {
-                    if let Some(ws) = workspace_root {
-                        Ok(ws.join(".agents").join("skills"))
-                    } else {
-                        Ok(root.join(".agents").join("skills"))
-                    }
-                }
-                TargetEnvironment::AntigravityAcp => Ok(root.join(".gemini/config/skills")),
-                TargetEnvironment::Custom(p) => {
-                    if p.is_absolute() {
-                        Ok(p.clone())
-                    } else {
-                        Ok(root.join(p))
-                    }
-                }
+                TargetEnvironment::Custom(p) => Ok(p.clone()),
+                TargetEnvironment::Agents {
+                    workspace_root: Some(_),
+                } => Ok(env.default_skills_dir(None)),
+                _ => Err(InstallerError::EnvironmentNotResolvable(env.clone())),
             };
         }
-
-        match env {
-            TargetEnvironment::ClaudeDesktop => {
-                #[cfg(target_os = "macos")]
-                {
-                    if let Some(home) = dirs::home_dir() {
-                        Ok(home
-                            .join("Library")
-                            .join("Application Support")
-                            .join("Claude")
-                            .join("skills"))
-                    } else {
-                        Err(InstallerError::EnvironmentNotResolvable(env.clone()))
-                    }
-                }
-                #[cfg(not(target_os = "macos"))]
-                {
-                    if let Some(config) = dirs::config_dir() {
-                        Ok(config.join("claude").join("skills"))
-                    } else if let Some(home) = dirs::home_dir() {
-                        Ok(home.join(".claude").join("skills"))
-                    } else {
-                        Err(InstallerError::EnvironmentNotResolvable(env.clone()))
-                    }
-                }
-            }
-            TargetEnvironment::Cursor => {
-                if let Some(home) = dirs::home_dir() {
-                    Ok(home.join(".cursor").join("skills"))
-                } else {
-                    Err(InstallerError::EnvironmentNotResolvable(env.clone()))
-                }
-            }
-            TargetEnvironment::Antigravity { workspace_root } => {
-                if let Some(ws) = workspace_root {
-                    Ok(ws.join(".agents").join("skills"))
-                } else if let Some(home) = dirs::home_dir() {
-                    Ok(home.join(".agents").join("skills"))
-                } else {
-                    Err(InstallerError::EnvironmentNotResolvable(env.clone()))
-                }
-            }
-            TargetEnvironment::AntigravityAcp => dirs::home_dir()
-                .map(|home| home.join(".gemini/config/skills"))
-                .ok_or_else(|| InstallerError::EnvironmentNotResolvable(env.clone())),
-            TargetEnvironment::Custom(p) => {
-                if p.is_absolute() {
-                    Ok(p.clone())
-                } else if let Some(home) = dirs::home_dir() {
-                    Ok(home.join(p))
-                } else {
-                    Ok(p.clone())
-                }
-            }
-        }
+        Ok(env.default_skills_dir(root_override))
     }
 
     /// Resolves the canonical path to `installed-skills.json`.

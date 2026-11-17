@@ -13,8 +13,6 @@
         "code-comments",
         "codebase-design",
         "diagnosing-bugs",
-        "domain-modeling",
-        "egui",
         "icp",
         "interface-design",
         "model-context-protocol",
@@ -27,7 +25,6 @@
         "productionize-app",
         "research",
         "sculpt-code",
-        "spacetime",
         "tdd",
         "upgrade-dependencies",
         "xai"
@@ -37,19 +34,18 @@
       "title": "Game Development",
       "description": "Game engines and game-development workflows.",
       "skills": [
-        "bevy-development",
-        "bevy-egui"
+        "bevy-development"
       ]
     },
     {
       "title": "Planning",
       "description": "Turn ideas into specs, tickets, and multi-session plans.",
       "skills": [
+        "dreamwork",
         "estimate-work",
         "grilling",
         "handoff",
         "prioritize-backlog",
-        "software-factory",
         "store-plan",
         "to-spec",
         "to-tickets",
@@ -99,7 +95,6 @@
       "title": "Writing",
       "description": "Proofreading and documentation polish.",
       "skills": [
-        "proofread",
         "simplify-docs",
         "unslop"
       ]
@@ -127,7 +122,6 @@
         "install-skills",
         "jj",
         "nix-shell",
-        "oak",
         "pagefind",
         "prek",
         "scratchpad",
@@ -182,23 +176,6 @@
         "dbos-python",
         "dbos-rust",
         "dbos-typescript"
-      ]
-    },
-    {
-      "title": "Vendor Skills / spacetimedb",
-      "description": "Skills maintained by this vendor.",
-      "skills": [
-        "cli",
-        "concepts",
-        "cpp-server",
-        "csharp-client",
-        "csharp-server",
-        "mcp",
-        "rust-server",
-        "typescript-client",
-        "typescript-server",
-        "unity",
-        "unreal"
       ]
     },
     {

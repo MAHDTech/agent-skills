@@ -1,6 +1,6 @@
 +++
 title = "casita"
-description = "Use for Casita CLI or Rust API work: immutable object storage, imports, roots and retention, verified sync, Casitar archives, integrity checks, or garbage collection."
+description = "Store, sync, and verify immutable content-addressed object graphs with the Casita CLI or Rust API. Use for imports, named roots and retention, sync, Casitar archives, integrity checks, or garbage collection."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -10,22 +10,15 @@ mermaid = true
 +++
 
 
-# Casita Development and Operations
+# Casita development and operations
 
-Casita is a verified content-addressed repository engine for immutable object graphs, source code, and build artifacts. Written in Rust, it modernizes and separates the storage layer of Nix into a standalone system featuring BLAKE3 payload hashing, FastCDC chunk deduplication, canonical directory graphs, verified repository synchronization, and reachability-based garbage collection.
+Casita is a verified content-addressed repository engine for immutable object graphs, source code, and build artifacts. Written in Rust, it separates the storage layer of Nix into a standalone system: BLAKE3 payload hashing, FastCDC chunk deduplication, canonical directory graphs, verified repository synchronization, and reachability-based garbage collection.
 
-## When to Use This Skill
-
-- Storing, inspecting, checking out, or synchronizing code and build artifacts with the `casita` CLI.
-- Developing applications using the supported (`casita::Repository`) or experimental (`casita::experimental::Repository<PS, SS>`) Rust APIs.
-- Designing or implementing custom importers, object formats, or storage backends.
-- Configuring named roots, retention policies (`permanent` vs `evictable`), and automated garbage collection under disk pressure.
-- Packaging or restoring complete closure-verified graphs using portable Casitar (`.casitar`) archives.
-- Operating local, SSH, or S3 repositories and verifying repository integrity with `casita fsck`.
+Verify exact flags, method names, and signatures in the vendored docs before writing commands or code; the reference map is at the end of this skill.
 
 ---
 
-## 1. Core Architecture and Identity Model
+## 1. Identity model
 
 Casita separates byte storage from graph semantics through two distinct identity layers:
 
@@ -40,7 +33,7 @@ graph TD
     BlobFile -->|FastCDC Chunking| Chunk3[Chunk C]
 ```
 
-### Identity Layers
+### Identity layers
 
 - **`BlobId`**: The BLAKE3 digest of the complete plaintext bytes. Equal byte streams always share the exact same `BlobId`, regardless of which importer wrote them or how they are chunked or compressed.
 - **`ObjectKey`**: A namespace-qualified string identifying a semantic object (e.g., `casita.directory.v1:<blake3>`, native Git commit SHA, or IPLD CID).
@@ -49,130 +42,40 @@ graph TD
 
 ---
 
-## 2. Command-Line Interface (CLI) Workflows
+## 2. CLI essentials
 
-The `casita` CLI operates either on a specified repository (`--repository <PATH>`) or on the default per-user workspace.
-
-### Repository Initialization
+The `casita` CLI operates on a specified repository (`--repository <PATH>`) or on the default per-user workspace. Full syntax for every command is in `resources/auto/reference-cli-index.md`.
 
 ```bash
+# Create ./cache/blobs (payloads) and ./cache/casita.sqlite (metadata)
 casita --repository ./cache init
-```
 
-Initializes the local repository profile, creating `./cache/blobs` for payloads and `./cache/casita.sqlite` for metadata.
-
-### Importing and Checking Out Files
-
-```bash
-# Import a local directory under a permanent root
+# Import a directory under a named root, then materialize it elsewhere
 casita --repository ./cache import ./project --root projects/demo
-
-# List direct directory contents by object key or BLAKE3 digest
-casita --repository ./cache tree list casita.directory.v1:...
-
-# Materialize a complete directory graph into an empty destination
 casita --repository ./cache checkout casita.directory.v1:... ./restored --no-root
-```
 
-- When `--root` is omitted during directory import, Casita assigns an automatic name under `auto/`.
-- `checkout` creates an `auto/checkout/...` retention root by default to protect restored files from GC; pass `--no-root` to avoid creating this retention pin.
-- Repeat imports skip unchanged files by comparing inode, size, and timestamps. Use `--filesystem-rehash` to force a full content re-read.
-
-### Named Roots and Retention Management
-
-```bash
-# Set or repoint a root to an object key
-casita --repository ./cache root set releases/current casita.directory.v1:...
-
-# Set a root with evictable retention (eligible for disk-pressure GC)
+# Pin a rebuildable cache as evictable, and list roots with their retention
 casita --repository ./cache root set cargo/cache casita.directory.v1:... --retention evictable
-
-# Update retention policy on an existing root
-casita --repository ./cache root retention cargo/cache permanent
-
-# List all roots (use --long to display retention policies)
 casita --repository ./cache root ls --long
 
-# Remove a specific root or a prefix tree
-casita --repository ./cache root rm releases/old
-casita --repository ./cache root rm --prefix staging/
-```
-
-### Repository Synchronization
-
-Sync copies selected objects or roots from a source endpoint to a destination endpoint:
-
-```bash
-# Sync a root between two local repositories
+# Copy a root to another repository, verified at the destination
 casita sync --from ./cache --to ./mirror --root projects/demo
 
-# Incremental sync reusing destination-verified closures
-casita sync --from ./cache --to ./mirror --root projects/demo --incremental
-
-# Read metadata from one store and blob bytes from another
-casita sync --from ./metadata-store --from-blobs ./blob-store --to ./mirror --root projects/demo
-
-# Sync from an SSH endpoint (requires remote casita in PATH)
-casita sync --from ssh://user@remote.host/var/casita --to ./cache --root projects/demo
-```
-
-### Garbage Collection and Maintenance
-
-```bash
-# Preview collection without modifying repository state
+# Preview collection, then audit integrity
 casita --repository ./cache gc --dry-run
-
-# Run active collection (removes unrooted records, then unreferenced blobs/chunks)
-casita --repository ./cache gc
-
-# Reclaim space inside sparse packs
-casita --repository ./cache vacuum
-
-# Check repository integrity (audits records, closures, manifests, and chunks)
 casita --repository ./cache fsck --audit-only
 ```
 
-- Manual `casita gc` and `vacuum` never delete named roots, including roots marked `evictable`.
-- Automated disk pressure: on local profiles, starting a mutation when disk usage exceeds 80% triggers a nonblocking GC pass. If usage remains at or above 75%, it evicts least-recently-used `evictable` roots until usage drops below 75%. Permanent roots are never evicted automatically.
-
-### Running Built Artifacts Directly
-
-```bash
-# Run an executable located inside a retained root graph
-casita run cargo/builds/uv -- --version
-casita run go/builds/server --bin server -- --port 8080
-```
-
-`casita run` recursively locates the target binary, materializes the tree into an isolated runtime directory, executes it with the caller's environment and arguments, and cleans up on exit.
+- Directory import without `--root` assigns an automatic name under `auto/`. Repeat imports skip unchanged files by inode, size, and timestamps; `--filesystem-rehash` forces a full re-read.
+- Manual `casita gc` and `vacuum` never delete named roots, including `evictable` ones. On local profiles, a mutation started above 80% disk usage triggers a nonblocking GC pass, and if usage stays at or above 75%, least-recently-used `evictable` roots are evicted until usage drops below 75%. Permanent roots are never evicted automatically.
+- Casitar archives (`archive create`, `inspect`, `verify`, `import`) package a closure-verified graph for offline transport; see `resources/auto/guides-casitar-index.md`.
+- Importers: filesystem, tar, Git, Casitar, and OCI; see `resources/auto/concepts-imports-index.md` and the per-importer `resources/auto/guides-*-index.md` files.
 
 ---
 
-## 3. Portable Casitar Archives (`.casitar`)
+## 3. Rust API
 
-Casitar packages a complete, closure-verified Casita object graph into a single portable binary stream or file for offline transport.
-
-```bash
-# Export one or more roots into an archive
-casita --repository ./source archive create --root releases/current --output release.casitar
-
-# Inspect structural framing, frame counts, and BLAKE3 digest without opening a repo
-casita archive inspect release.casitar
-
-# Verify complete closure and format validity inside an isolated temporary repo
-casita archive verify release.casitar
-
-# Import the archive into a destination repository with explicit root mappings
-casita --repository ./destination archive import release.casitar --root releases/imported
-
-# Or use the common importer interface
-casita --repository ./destination import -i casitar release.casitar --casitar-root releases/imported
-```
-
----
-
-## 4. Supported Rust API
-
-Use the non-generic `casita::Repository` for standard applications:
+Use the non-generic `casita::Repository` for standard applications (`resources/auto/reference-rust-api-index.md`):
 
 ```rust
 use casita::import::BlobImport;
@@ -180,121 +83,51 @@ use casita::{ObjectKey, Repository, RootName};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Open a persistent local repository or an ephemeral memory repository
+    // Persistent local repository; Repository::memory() gives an ephemeral one
     let repo = Repository::local("./cache").await?;
-    // let mem_repo = Repository::memory()?;
 
-    // Import raw bytes as a blob under a named root
     let root = RootName::try_from("data/config")?;
     let payload = b"{\"environment\": \"production\"}\n";
     let key: ObjectKey = repo.import(BlobImport::new(payload.as_slice(), root)).await?;
     println!("Published object key: {key}");
 
-    // Inspect collection without modifying data
-    let preview = repo.preview_collection().await?;
-    println!("Collectible records: {}", preview.logical_objects);
+    // Physical collection: unreachable records, then unreferenced blobs and chunks
+    repo.collect().await?;
 
-    // Run garbage collection
-    let outcome = repo.collect().await?;
-    println!("Collection reclaimed {} bytes", outcome.payload_bytes_deleted);
-
+    // Finish payload writes and cleanup before runtime shutdown
+    repo.flush().await?;
     Ok(())
 }
 ```
 
----
+For custom storage tiers, backends, or publication loops, enable the `experimental` Cargo feature and use `casita::experimental::Repository<PS, SS>` (`resources/auto/reference-experimental-rust-api-index.md`):
 
-## 5. Experimental Rust API (`casita::experimental`)
-
-When building custom storage tiers, specialized backends, or custom mutation loops, enable the `experimental` Cargo feature:
-
-```rust
-use casita::experimental::{
-    CombinedBlobStore, MemoryBlobStore, MemoryMetadataStore, MutationSession, Repository,
-};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // 1. Tiered Blob Storage: near tier with fallback to far tier
-    let near = MemoryBlobStore::new();
-    let far = MemoryBlobStore::new();
-    let payloads = CombinedBlobStore::new(near, far);
-    let metadata = MemoryMetadataStore::new()?;
-    let repo = Repository::new(payloads, metadata);
-
-    // 2. Mutation Sessions: stage payloads before publishing root records
-    let mut session = repo.begin_mutation().await?;
-    let blob_id = session.stage_blob(b"hello world").await?;
-    println!("Staged blob ID: {blob_id}");
-
-    // 3. Logical Collection for shared stores (pruning metadata only)
-    let outcome = repo.collect_logical().await?;
-    if let Some(rev) = outcome.revision {
-        println!("Pruned logical records at revision {rev}");
-    }
-
-    Ok(())
-}
-```
+- Compose backends with `Repository::new(payloads, metadata)`; `CombinedBlobStore::new(near, far)` reads near first, falls back to far, and writes only to near.
+- Acquire a `MutationSession` with `Repository::mutation_session().await`, stage payloads (`stage_blob`, `stage_object`, `stage_directory`), stage children before parents, then publish (`publish_unrooted`, `publish_rooted`, `publish_if_roots_match`).
+- When several repositories share one payload store, use logical collection (`preview_logical_collection`, `collect_logical`). Its preview and outcome report record counts, not bytes reclaimed.
 
 ---
 
-## 6. Supported Importers and Formats
+## 4. Pitfalls
 
-| Format / Importer | Namespace                | Input Sources                  | Key Guarantees                                                                                         |
-| :---------------- | :----------------------- | :----------------------------- | :----------------------------------------------------------------------------------------------------- |
-| **Filesystem**    | `casita.directory.v1`    | Directory paths on disk        | Canonical directory Merkle tree, file executable bit, inline symlinks; does not follow external links. |
-| **Tar**           | `casita.directory.v1`    | Uncompressed POSIX tar streams | Streams tar archive directly into directory graph without extracting to disk.                          |
-| **Git**           | `git/...`                | Working trees or bare repos    | Preserves native Git object IDs and refs; optional byte-for-byte full-clone pack cache.                |
-| **Casitar**       | Multiple (closure union) | `.casitar` binary files/pipes  | Closure-complete offline interchange; atomic destination root publication.                             |
-| **OCI**           | Container image layout   | Container registries via HTTPS | Stores layers and config; creates optional merged container rootfs (`--oci-rootfs-root`).              |
-
----
-
-## 7. Integrity Verification and Error Handling
-
-Casita uses explicit, typed error categories and deterministic integrity checks:
-
-### Error Categories (`RepositoryErrorCategory`)
-
-- `Absent`: Requested object, root, record, or payload not found.
-- `InvalidData`: Payload bytes failed identity, canonical encoding, or link validation.
-- `ImmutableConflict`: Exact immutable key already exists with different payload or links.
-- `StaleRevision`: Compare-and-swap expected an earlier repository revision.
-- `DestinationConflict`: Target directory is occupied or non-empty during checkout.
-- `Busy`: Nonblocking operation could not acquire required ownership lock.
-- `Corrupt`: Committed repository state violates an invariant (detected by `fsck`).
-
-### Verification Guarantees
-
-- **Chunked Reads**: Each FastCDC chunk digest is validated against its `ChunkId` upon fetch.
-- **Sequential Reads**: Full sequential read validates the complete `BlobId` (BLAKE3) at EOF.
-- **Verified Reads (`open_verified` / `cat --verified`)**: Uses Bao outboards to authenticate blocks before returning bytes to the caller, preventing unauthenticated reads.
-- **Integrity Audit (`casita fsck --audit-only`)**: Checks root closures, payload presence, format relations, manifests, and unreferenced residue.
+- **Use evictable roots for rebuildable build caches**: Keep intermediate compilation caches (e.g. Cargo `target/`) under `--retention evictable` so disk-pressure GC can reclaim space automatically.
+- **Use `--no-root` on temporary checkouts**: By default, `casita checkout` registers an `auto/checkout/...` root to prevent GC. Pass `--no-root` when checking out ephemeral build trees.
+- **Use Bao verified reads when authentication is required upfront**: Standard sequential reads verify the complete BLAKE3 hash at EOF. If an operation seeks or aborts early, use `open_verified`.
+- **Use `collect_logical()` when sharing payload backends**: When several repositories share one blob store (e.g. multi-tenant S3), use logical collection so one repository does not delete blobs still needed by another.
+- **Change repository state only through the `casita` CLI or Rust API**: `casita.sqlite` and its WAL files are owned by Casita's locks and revision checks.
+- **Map destination roots explicitly in Casitar imports**: Casitar archives never guess destination root names, so pass `--casitar-root` or `--casitar-root-prefix`.
 
 ---
 
-## 8. Best Practices and Pitfalls
+## 5. Reference map
 
-- **Do use evictable roots for rebuildable build caches**: Keep intermediate compilation caches (e.g. Cargo `target/`) under `--retention evictable` so disk-pressure GC can reclaim space automatically.
-- **Do use `--no-root` on temporary checkouts**: By default, `casita checkout` registers an `auto/checkout/...` root to prevent GC. Pass `--no-root` when checking out ephemeral build trees.
-- **Do use Bao verified reads when authentication is required upfront**: Standard sequential reads verify the complete BLAKE3 hash at EOF. If an operation seeks or aborts early, use `open_verified`.
-- **Do use `collect_logical()` when sharing payload backends**: When several repositories share one blob store (e.g. multi-tenant S3), use logical collection so one repository does not delete blobs still needed by another.
-- **Don't mutate metadata databases directly**: Never edit `casita.sqlite` or WAL files directly with external tools; always perform operations through the `casita` CLI or Rust API.
-- **Don't ignore destination mapping in Casitar imports**: Casitar archives never guess destination root names. Always explicitly specify `--casitar-root` or `--casitar-root-prefix`.
+Search `resources/auto/llms-full.txt` for the complete docs, or open the topic file:
 
----
-
-## 9. Further Reference and Detailed Guides
-
-Consult `resources/auto/llms.txt` or `resources/auto/llms-full.txt`, and inspect topic guides under `resources/auto/`:
-
-- **CLI and Commands**: `resources/auto/reference-cli-index.md` and `resources/auto/getting-started-index.md`
-- **Rust APIs**: `resources/auto/reference-rust-api-index.md` and `resources/auto/reference-experimental-rust-api-index.md`
-- **Concepts and Architecture**: `resources/auto/concepts-index.md`, `resources/auto/concepts-blob-storage-index.md`, `resources/auto/concepts-directory-storage-index.md`, and `resources/auto/concepts-responsibilities-index.md`
-- **Lifecycle and Maintenance**: `resources/auto/concepts-roots-and-retention-index.md`, `resources/auto/concepts-garbage-collection-index.md`, and `resources/auto/concepts-shared-payload-services-index.md`
-- **Synchronization and Transport**: `resources/auto/guides-sync-index.md` and `resources/auto/guides-casitar-index.md`
-- **Integrations and Operations**: `resources/auto/guides-operations-index.md`, `resources/auto/integrations-cargo-index.md`, and `resources/auto/integrations-ipc-index.md`
-- **Integrity and Errors**: `resources/auto/reference-errors-index.md` and `resources/auto/reference-object-formats-index.md`
-- **Complete Docs**: `resources/auto/llms.txt` and `resources/auto/llms-full.txt`
+- CLI: `resources/auto/reference-cli-index.md` and `resources/auto/getting-started-index.md`
+- Rust APIs: `resources/auto/reference-rust-api-index.md`, `resources/auto/reference-experimental-rust-api-index.md`, and `resources/auto/reference-cargo-features-index.md`
+- Concepts: `resources/auto/concepts-index.md`, `resources/auto/concepts-blob-storage-index.md`, and `resources/auto/concepts-directory-storage-index.md`
+- Roots, retention, and collection: `resources/auto/concepts-roots-and-retention-index.md`, `resources/auto/concepts-garbage-collection-index.md`, and `resources/auto/concepts-shared-payload-services-index.md`
+- Sync and archives: `resources/auto/guides-sync-index.md` and `resources/auto/guides-casitar-index.md`
+- Operations and integrations: `resources/auto/guides-operations-index.md`, `resources/auto/integrations-cargo-index.md`, and `resources/auto/integrations-ipc-index.md`
+- Error categories, retry guidance, and verification: `resources/auto/reference-errors-index.md`, `resources/auto/concepts-verification-index.md`, and `resources/auto/reference-object-formats-index.md`
 

@@ -27,7 +27,7 @@ The orchestration process that inspects all skills in the repository and synchro
 
 ### Skills Installer
 
-The local developer mechanism (`ask skills install/uninstall`) that symlinks skill directories into local AI agent tool directories (`~/.agents/skills/` for Antigravity, `~/.gemini/config/skills/` for Antigravity ACP, `~/.cursor/skills/` for Cursor, and `$XDG_CONFIG_HOME/claude/skills/` or `~/.config/claude/skills/` on Linux and `~/Library/Application Support/Claude/skills/` on macOS for Claude Desktop, with `~/.claude/skills/` as a fallback).
+The local developer mechanism (`ask skills install/uninstall`) that symlinks skill directories into local AI agent tool directories (`~/.agents/skills/` shared by Codex, OpenCode, Goose, and Grok, `~/.claude/skills/` for Claude Code, `~/.gemini/antigravity-cli/skills/` for Antigravity CLI, `~/.gemini/config/skills/` for Antigravity IDE and ACP, and `~/.cursor/skills/` for Cursor).
 
 ### Dashboard
 

@@ -7,1249 +7,510 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-vdxcvpsm">\<head\><!-- Anti-FOUC masking style: hides text elements while non-default language strings hydrate -->\<style\>
-  /* Native cross-document View Transitions declaration enabled at byte 0 */
-  @view-transition {
-    navigation: auto;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    @view-transition {
-      navigation: none;
+# Model Context Protocol (MCP)
+
+Available on: Antigravity App, Antigravity CLI, Antigravity IDE
+
+Antigravity supports the [Model Context Protocol (MCP)](https://modelcontextprotocol.io), an open standard that lets AI agents and editors securely connect to local developer tools, databases, file parsers, and external remote APIs. This integration provides the AI model with real-time context and execution capabilities beyond your immediate workspace.
+
+In this guide, you’ll learn how to connect and configure MCP servers across Antigravity products.
+
+## What is MCP?
+
+MCP acts as a universal bridge between Antigravity and your broader development environment. Instead of manually copying and pasting database schemas, logs, or API specifications into prompts or chat panels, MCP lets Antigravity fetch structured context directly or execute safe actions on your behalf when needed.
+
+### Add context
+
+With MCP, Antigravity can use live data from connected MCP servers to inform its reasoning and suggestions:
+
+*   When writing a SQL query, Antigravity can inspect your live Neon, Supabase, or AlloyDB schema to suggest correct table and column names.
+*   When debugging deployment failures, Antigravity can pull recent build logs directly from Netlify or Heroku.
+
+### Add custom tools
+
+With MCP, Antigravity can execute specific, safe actions defined by your connected servers:
+
+*   Create a Linear issue for a `TODO` item.
+*   Search Notion or GitHub for authentication patterns.
+
+## Getting started by surface
+
+### Antigravity App
+
+In the Antigravity App, you can manage your MCP servers in the **MCP Servers** section of the **Customizations** page.
+
+To view and update your MCP servers:
+
+1.  Click **Customizations** in the sidebar.
+2.  Click **Installed** and scroll to the **MCP Servers** section.
+
+To install an MCP server from the **MCP Servers** section:
+
+1.  Click **Add MCP Server** (**+**). This opens a searchable list of available MCP servers.
+2.  Search or scroll to an MCP server you’d like to install.
+3.  Click **Add**.
+
+To manage an MCP server, click **More actions** (**⋮**) next to it, and then choose **Restart**, **Disable**, or **Delete**. To find your configuration file, click **Copy Config File Path** in the section header.
+
+### Antigravity CLI
+
+Antigravity CLI supports both local `stdio` processes and remote host MCP server configurations. The simplest path to installing an MCP server on Antigravity CLI is by using the **Interactive MCP Manager**. You can also manually edit your global server setup or workspace-level `mcp_config.json`.
+
+#### Interactive MCP manager
+
+Type `/mcp` inside the prompt panel and press Enter to open the interactive **MCP Manager Overlay**. This panel lets you perform the following actions:
+
+*   View live status rings for active, disconnected, or loading servers.
+*   Manually reload server configurations or inspect real-time connection logs.
+
+#### Global and workspace server configs
+
+Antigravity CLI loads MCP server definitions from two configuration files:
+
+*   **Global configuration**: `~/.gemini/config/mcp_config.json`, which applies to all your projects.
+*   **Workspace configuration**: `\<workspace\>/.agents/mcp_config.json`, which applies only to that workspace.
+
+Enabled [plugins](/docs/plugins) can also add MCP servers (defined in a plugin’s `<plugin-root>/mcp_config.json` file; see [Build plugins](/docs/build-plugins#mcp-servers)).
+
+Edit either file directly using the standard [MCP server configuration structure](/docs/mcp#mcp-configuration-structure). For example, the following entry connects to a remote server and raises its [timeout](/docs/mcp#mcp-server-timeouts) to 600 seconds (10 minutes) for long-running tools:
+
+```json
+{
+  "mcpServers": {
+    "my-remote-server": {
+      "serverUrl": "https://api.example.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_TOKEN"
+      },
+      "timeoutSeconds": 600
     }
   }
+}
+```
 
-  html[data-i18n-pending="true"] main,
-  html[data-i18n-pending="true"] footer,
-  html[data-i18n-pending="true"] nav.sidebar,
-  html[data-i18n-pending="true"] .right-sidebar,
-  html[data-i18n-pending="true"] [data-header] nav,
-  html[data-i18n-pending="true"] [data-header] .download-button,
-  html[data-i18n-pending="true"] [data-header] .cta-button,
-  html[data-i18n-pending="true"] .docs-nav-links,
-  html[data-i18n-pending="true"] .header-download-btn,
-  html[data-i18n-pending="true"] .header-cta-btn,
-  html[data-i18n-pending="true"] .rc-pill,
-  html[data-i18n-pending="true"] .subnav-bar,
-  html[data-i18n-pending="true"] site-search button > span {
-    opacity: 0 !important;
+Remote servers
+
+Remote MCP servers must use the Streamable HTTP transport. Set the server’s endpoint in `serverUrl` (`url` also works). The legacy HTTP+SSE transport and the `httpUrl` field aren’t supported.
+
+### Antigravity IDE
+
+In Antigravity IDE, the easiest way to manage MCP servers is through the built-in MCP Store. In the MCP Store, you can browse, discover, and install supported MCP servers. You can also install custom servers by updating your `mcp_config.json`.
+
+To use the MCP Store:
+
+1.  Click **…** at the top of the editor’s agent side panel and select **MCP Servers**.
+2.  Hover over any supported server and click **Install** (or click a server to view details and then click **Install**).
+3.  Follow any on-screen prompts.
+
+Once installed, resources and tools from the server are automatically available to the editor.
+
+To connect to a custom MCP server not listed in the store:
+
+1.  Click **…** at the top of the editor’s agent side panel and select **MCP Servers**.
+2.  Click **Manage MCP Servers**.
+3.  Click **View raw config**.
+4.  Modify the `mcp_config.json` file with your custom [MCP server configuration](/docs/mcp#mcp-configuration-structure).
+
+The configuration file is located globally at `~/.gemini/config/mcp_config.json` (or locally in your workspace under `.agents/mcp_config.json`).
+
+Antigravity SDK
+
+In Python applications built using the [Antigravity SDK](/docs/sdk/overview), you can connect MCP servers (`stdio`, `SSE`, or `HTTP`) programmatically under a unified execution pipeline alongside built-in tools and custom Python functions. The SDK automatically discovers servers configured in your workspace’s `.agents/mcp_config.json` file. For dedicated documentation and examples, refer to the [Antigravity SDK MCP guide](/docs/sdk/mcp).
+
+## MCP configuration structure
+
+Whether configuring custom servers for the Antigravity App, Antigravity IDE, Antigravity CLI, or a [plugin](/docs/plugins) (`<plugin-root>/mcp_config.json`), `mcp_config.json` follows a standardized JSON schema. The root object contains an `mcpServers` map where each key is a unique server identifier:
+
+```json
+{
+  "mcpServers": {
+    "sqlite-explorer": {
+      "command": "node",
+      "args": ["/usr/local/bin/sqlite-mcp-server.js"],
+      "env": {
+        "SQLITE_DB_PATH": "/var/data/app.db"
+      }
+    },
+    "my-remote-server": {
+      "serverUrl": "https://api.example.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_TOKEN"
+      }
+    }
   }
-</style><!-- Synchronous early bootstrap: canonical redirect, slow-connection detection, locale sync, and speculationrules -->\<script\>
-  // 0. Suppress benign Chromium View Transition abort / skip rejections during rapid clicks
-  window.addEventListener('unhandledrejection', function (event) {
-    if (
-      event &&
-      event.reason &&
-      typeof event.reason.message === 'string' &&
-      (event.reason.message.indexOf('Transition was aborted') !== -1 ||
-        event.reason.message.indexOf('Transition was skipped') !== -1)
-    ) {
-      event.preventDefault();
+}
+```
+
+### MCP configuration properties
+
+Each server entry under `mcpServers` must specify **one transport property** (`command` for a local `stdio` server, or `serverUrl` for a remote Streamable HTTP server) and can include any of the optional properties below:
+
+| Property | Type | Default | Description |
+| :-- | :-- | :-- | :-- |
+| **`command`** | `string` | _Required for `stdio`_ | Executable path or command name used to launch a local `stdio` MCP server process. |
+| **`serverUrl`** | `string` | _Required for remote_ | Endpoint URL of a remote MCP server that uses the Streamable HTTP transport. You can also use `url`. |
+| **`args`** | `string[]` | `[]` | Command-line arguments passed to the `command` executable (`stdio` transport only). |
+| **`env`** | `object` | `{}` | Key-value map of environment variables injected into the local `stdio` server process. |
+| **`cwd`** | `string` | — | Working directory used when spawning a local `stdio` server process. |
+| **`headers`** | `object` | `{}` | Custom HTTP request headers sent with remote `serverUrl` connections (for example, `Authorization` or API key headers). |
+| **`authProviderType`** | `string` | — | Built-in authentication provider. Set to `"google_credentials"` to attach Google Application Default Credentials (ADC). |
+| **`oauth`** | `object` | — | Manual OAuth 2.0 client credentials (`clientId` and optional `clientSecret`) for remote servers that do not support Client ID Metadata Documents (CIMD) or Dynamic Client Registration (DCR). |
+| **`disabled`** | `boolean` | `false` | When `true`, suspends the server connection without removing its configuration from `mcp_config.json`. |
+| **`enabledTools`** | `string[]` | — | Allowlist of tool names exposed to the agent from this server. When set, all other tools on the server are hidden. |
+| **`disabledTools`** | `string[]` | `[]` | Denylist of tool names withheld from the agent. |
+| **`tools`** | `object` | — | Per-tool settings keyed by tool name (`tools.\<toolName\>`). `eager` (boolean) registers the tool upfront instead of lazily (see [Tool loading](/docs/mcp#tool-loading-lazy-vs-eager)). `background` (`"off"` or `"always"`) controls background execution: `"always"` runs the tool’s calls as background tasks, and `"off"` runs them in the foreground. |
+| **`timeoutSeconds`** | `integer` | `180` per tool call, `300` to connect | Timeout, in seconds, for connecting to the server and listing its tools, and for each tool call. A negative value, such as `-1`, turns both off. See [MCP server timeouts](/docs/mcp#mcp-server-timeouts). |
+
+### MCP server timeouts
+
+By default, Antigravity waits up to 5 minutes for an MCP server to connect and list its tools, and up to 3 minutes for each tool call. A tool call that runs longer fails with an error that names the server and the limit, for example:
+
+```text
+MCP tool call to server "sqlite-explorer" timed out after 3m0s
+```
+
+If a server’s tools need more time, set `timeoutSeconds` in that server’s entry:
+
+*   A positive value, in seconds, replaces both limits. For example, `600` lets each tool call run for up to 10 minutes.
+*   A negative value, such as `-1`, turns off both limits.
+*   `0`, or leaving `timeoutSeconds` unset, keeps the defaults.
+
+Because the same value limits how long the server has to connect, a small value can stop a slow-starting server from connecting.
+
+The following example lets each tool call on the `sqlite-explorer` server run for up to 10 minutes:
+
+```json
+{
+  "mcpServers": {
+    "sqlite-explorer": {
+      "command": "node",
+      "args": ["/usr/local/bin/sqlite-mcp-server.js"],
+      "timeoutSeconds": 600
     }
-  });
-
-  // 1. Canonical hostname redirect (www.antigravity.google -> antigravity.google)
-  try {
-    var host = (window.location && window.location.hostname) || '';
-    if (host === 'www.antigravity.google') {
-      var pathname = window.location.pathname || '/';
-      var search = window.location.search || '';
-      var hash = window.location.hash || '';
-      window.location.replace(
-        'https://antigravity.google' + pathname + search + hash
-      );
-    }
-  } catch (_) {}
-
-  // 2. Early slow-connection & Save-Data detection
-  try {
-    var __agyConn =
-      navigator.connection ||
-      navigator.mozConnection ||
-      navigator.webkitConnection;
-    var __agySaveData = Boolean(__agyConn && __agyConn.saveData);
-    var __agyHasRtt =
-      !__agyConn || typeof __agyConn.rtt !== 'number' || __agyConn.rtt > 0;
-    var __agyEffType = __agyConn && __agyConn.effectiveType;
-    var __agyIsSlowEff =
-      __agyHasRtt &&
-      (__agyEffType === 'slow-2g' ||
-        __agyEffType === '2g' ||
-        __agyEffType === '3g');
-    var __agyIsLowDownlink = Boolean(
-      __agyHasRtt &&
-        __agyConn &&
-        !__agyEffType &&
-        typeof __agyConn.downlink === 'number' &&
-        __agyConn.downlink > 0 &&
-        __agyConn.downlink < 1.5
-    );
-    var __agyIsSlow = __agySaveData || __agyIsSlowEff || __agyIsLowDownlink;
-    var __agyTier = __agySaveData
-      ? 'save-data'
-      : __agyIsSlow
-        ? 'slow'
-        : 'fast';
-
-    document.documentElement.setAttribute('data-connection', __agyTier);
-    if (document.documentElement.dataset) {
-      document.documentElement.dataset.connection = __agyTier;
-    }
-
-    window.__agyIsSlowConnection = function () {
-      try {
-        var c =
-          navigator.connection ||
-          navigator.mozConnection ||
-          navigator.webkitConnection;
-        if (c) {
-          if (c.saveData) {
-            document.documentElement.setAttribute(
-              'data-connection',
-              'save-data'
-            );
-            return true;
-          }
-          var hasRtt = typeof c.rtt !== 'number' || c.rtt > 0;
-          if (
-            hasRtt &&
-            (c.effectiveType === 'slow-2g' ||
-              c.effectiveType === '2g' ||
-              c.effectiveType === '3g' ||
-              (!c.effectiveType &&
-                typeof c.downlink === 'number' &&
-                c.downlink > 0 &&
-                c.downlink < 1.5))
-          ) {
-            document.documentElement.setAttribute('data-connection', 'slow');
-            return true;
-          }
-          document.documentElement.setAttribute('data-connection', 'fast');
-          return false;
-        }
-      } catch (_) {}
-      var attr = document.documentElement.getAttribute('data-connection');
-      return attr === 'slow' || attr === 'save-data';
-    };
-  } catch (e) {
-    window.__agyIsSlowConnection = function () {
-      return false;
-    };
   }
+}
+```
 
-  // 3. Sync ?hl= / ?lang= URL parameters to localStorage and set anti-FOUC masking
-  try {
-    var __agyNonDefault = [
-      'en-GB',
-      'en-CA',
-      'hi',
-      'ja',
-      'ko',
-      'zh-CN',
-      'zh-TW',
-      'id',
-      'th',
-      'de',
-      'fr-FR',
-      'it',
-      'pl',
-      'pt-BR',
-      'es-ES',
-      'es-MX'
-    ];
-    var __agyParams = new URLSearchParams(window.location.search);
-    var __agyHl = __agyParams.get('hl') || __agyParams.get('lang');
-    if (
-      __agyHl &&
-      (__agyHl === 'en-US' || __agyNonDefault.indexOf(__agyHl) !== -1)
-    ) {
-      window.localStorage.setItem('antigravity_locale', __agyHl);
-    }
-    var __agyLoc = window.localStorage.getItem('antigravity_locale');
-    if (__agyLoc && __agyNonDefault.indexOf(__agyLoc) !== -1) {
-      document.documentElement.lang = __agyLoc;
-      document.documentElement.setAttribute('data-i18n-pending', 'true');
-      window.__agyI18nTimer = window.setTimeout(function () {
-        document.documentElement.removeAttribute('data-i18n-pending');
-      }, 350);
-    }
-  } catch (e) {}
+## Tool loading: lazy vs. eager
 
-  // 4. Adaptive Speculation Rules: dynamically injected ONLY on fast connections
-  try {
-    if (
-      typeof window.__agyIsSlowConnection === 'function' &&
-      !window.__agyIsSlowConnection() &&
-      'supports' in HTMLScriptElement &&
-      HTMLScriptElement.supports('speculationrules')
-    ) {
-      var __agySpecScript = document.createElement('script');
-      __agySpecScript.type = 'speculationrules';
-      __agySpecScript.textContent = JSON.stringify({
-        prefetch: [
-          {
-            where: {
-              and: [
-                { href_matches: '/*' },
-                { not: { href_matches: '/api/*' } },
-                { not: { selector_matches: '[download], [target=_blank]' } }
-              ]
-            },
-            eagerness: 'moderate'
-          }
-        ]
-      });
-      (document.head || document.documentElement).appendChild(__agySpecScript);
-    }
-  } catch (e) {}
-</script><!-- Client runtime modules: i18n dictionary runtime and adaptive network/transitions manager --><script type="module" src="/_astro/SharedHeadBootstrap.astro_astro_type_script_index_0_lang.DdvTdmaD.js"></script><!-- Google Glue Cookie Notification Bar stylesheet (deferred print->all) --><link href="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.css" rel="stylesheet" media="print" onload="this.media='all'" />\<noscript\><link href="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.css" rel="stylesheet" /></noscript><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>\<title\>MCP | Google Antigravity Docs</title><link rel="canonical" href="https://antigravity.google/docs/mcp/"/><link rel="sitemap" href="/sitemap-index.xml"/><link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48"/><link rel="icon" type="image/png" href="/apple-touch-icon.png" sizes="180x180"/><link rel="icon" type="image/png" href="/assets/image/antigravity-logo.png" sizes="276x276"/><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"/><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" sizes="180x180"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@20..48,100..700,0..1,-50..200,0..100&display=block" media="print" onload="this.media='all'"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.2.9"/><meta name="generator" content="Starlight v0.41.5"/><meta property="og:title" content="MCP | Google Antigravity Docs"/><meta property="og:type" content="article"/><meta property="og:url" content="https://antigravity.google/docs/mcp/"/><meta property="og:locale" content="en"/><meta property="og:site_name" content="Google Antigravity Docs"/><meta property="og:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta property="og:image:secure_url" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="Antigravity supports the Model Context Protocol (MCP), an open standard that lets AI agents and editors securely connect to local developer tools…"/><meta property="og:description" content="Antigravity supports the Model Context Protocol (MCP), an open standard that lets AI agents and editors securely connect to local developer tools…"/><meta name="twitter:title" content="MCP | Google Antigravity Docs"/><meta name="twitter:description" content="Antigravity supports the Model Context Protocol (MCP), an open standard that lets AI agents and editors securely connect to local developer tools…"/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"MCP","description":"Antigravity supports the Model Context Protocol (MCP), an open standard that lets AI agents and editors securely connect to local developer tools…","url":"https://antigravity.google/docs/mcp/","mainEntityOfPage":{"@type":"WebPage","@id":"https://antigravity.google/docs/mcp/"},"author":{"@type":"Organization","name":"Google Antigravity","url":"https://antigravity.google/"},"publisher":{"@type":"Organization","name":"Google","url":"https://www.google.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://antigravity.google/docs/overview/"},{"@type":"ListItem","position":2,"name":"MCP","item":"https://antigravity.google/docs/mcp/"}]}]}</script>\<script\>
-  window.dataLayer = window.dataLayer || [];
-  window.__agyGtmLoaded = window.__agyGtmLoaded || false;
-  window.__agyLastPageViewPath = window.__agyLastPageViewPath || '';
+Connected MCP servers can expose dozens of tools with large JSON schemas. Loading every tool definition into the model’s context window on every turn consumes tokens and increases latency, even when those tools aren’t used. To keep context usage low, Antigravity supports both **lazy** and **eager** tool loading.
 
-  var __agySegmentMql =
-    typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia(
-          '(horizontal-viewport-segments: 2), (vertical-viewport-segments: 2)'
-        )
-      : null;
-  var __agyUa =
-    typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
-  var __agyIsFoldableUA =
-    /Pixel Fold|SM-F9|SM-F7|Galaxy Z Fold|Surface Duo/i.test(__agyUa);
-  var __agyIsIpad =
-    /ipad/i.test(__agyUa) ||
-    (typeof navigator !== 'undefined' &&
-      navigator.maxTouchPoints > 0 &&
-      /macintosh/i.test(__agyUa));
-  var __agyOs = 'unknown';
-  if (/iphone|ipod/i.test(__agyUa)) __agyOs = 'iphone';
-  else if (__agyIsIpad) __agyOs = 'ipad';
-  else if (/googlebook|cros/i.test(__agyUa)) __agyOs = 'googlebook';
-  else if (/android/i.test(__agyUa)) __agyOs = 'android';
-  else if (/windows/i.test(__agyUa)) __agyOs = 'windows';
-  else if (/macintosh|mac os x/i.test(__agyUa)) __agyOs = 'mac';
-  else if (/linux/i.test(__agyUa)) __agyOs = 'linux';
+### Lazy loading (default)
 
-  function __agyDetectViewport() {
-    const width = Math.round(
-      window.innerWidth ||
-        (document.documentElement && document.documentElement.clientWidth) ||
-        1440
-    );
-    const height = Math.round(
-      window.innerHeight ||
-        (document.documentElement && document.documentElement.clientHeight) ||
-        900
-    );
-    const orientation = width >= height ? 'landscape' : 'portrait';
-    const minDim = Math.min(width, height);
-    const maxDim = Math.max(width, height);
-    const aspectRatio = minDim > 0 ? maxDim / minDim : 1;
+By default, all enabled MCP tools are **lazy-loaded**:
 
-    const hasSegments =
-      Boolean(
-        window.visualViewport &&
-          window.visualViewport.segments &&
-          window.visualViewport.segments.length > 1
-      ) ||
-      Boolean(
-        typeof navigator !== 'undefined' &&
-          navigator.devicePosture &&
-          navigator.devicePosture.type === 'folded'
-      ) ||
-      Boolean(__agySegmentMql && __agySegmentMql.matches);
-    const isFoldableUnfolded =
-      minDim >= 600 && maxDim <= 1150 && aspectRatio <= 1.3;
-    const isFoldableCover =
-      (width >= 320 &&
-        width <= 368 &&
-        height >= 700 &&
-        height / width >= 2.0) ||
-      (height >= 320 &&
-        height <= 368 &&
-        width >= 700 &&
-        width / height >= 2.0);
+1.  **Schema caching on disk**: When an MCP server connects, Antigravity writes each tool’s JSON schema (`name`, `description`, and `parameters`) to `<app-data-dir>/mcp/\<serverName\>/\<toolName\>.json` (`~/.gemini/antigravity/mcp/\<serverName\>/` in the Antigravity App and Antigravity IDE, or `~/.gemini/antigravity-cli/mcp/\<serverName\>/` in the Antigravity CLI), along with an optional `instructions.md` file if the server provides instructions during initialization.
+2.  **Compact system prompt**: Antigravity includes the exact `<app-data-dir>/mcp/\<serverName\>` directory path in the agent’s system prompt (so you don’t need to know the path for the agent to work) and lists each server’s tool names, grouped under `Eager` and `Lazy`, instead of full declarations.
+3.  **On-demand invocation**: When the agent needs a lazy-loaded tool, it reads `<app-data-dir>/mcp/\<serverName\>/\<toolName\>.json` to inspect the tool’s parameters and then invokes the tool through the built-in `call_mcp_tool` tool (passing `ServerName`, `ToolName`, and `Arguments`).
 
-    let viewportCategory = 'desktop';
-    if (
-      hasSegments ||
-      __agyIsFoldableUA ||
-      isFoldableUnfolded ||
-      isFoldableCover
-    ) {
-      viewportCategory = 'foldable';
-    } else if (width < 600) {
-      viewportCategory = 'mobile';
-    } else if (width <= 1024 || __agyIsIpad) {
-      viewportCategory = 'tablet';
-    }
+### Eager loading
 
-    return {
-      viewportCategory: viewportCategory,
-      formFactor: viewportCategory,
-      viewportWidth: width,
-      viewportHeight: height,
-      orientation: orientation,
-      operatingSystem: __agyOs,
-    };
-  }
+When an enabled tool is configured with `"eager": true`, Antigravity registers its full description and parameter schema upfront in the model’s native tool declarations as `mcp_\<serverName\>_\<toolName\>` (listed under `Eager` in the system prompt).
 
-  function __agyRecordPageView() {
-    const currentPath = window.location.pathname || '/';
-    if (window.__agyLastPageViewPath === currentPath) return;
+*   **Direct invocation**: The agent calls `mcp_\<serverName\>_\<toolName\>` directly in a single turn without reading the schema file from disk or calling `call_mcp_tool`.
+*   **Higher token footprint**: Because the tool’s full schema is sent to the model on every turn, reserve eager loading for frequently used core tools where saving an extra file-read step outweighs the per-turn token cost.
 
-    if (
-      window.agyAnalytics &&
-      typeof window.agyAnalytics.trackPageView === 'function'
-    ) {
-      window.agyAnalytics.trackPageView();
-      return;
-    }
+Note
 
-    window.__agyLastPageViewPath = currentPath;
-    const vp = __agyDetectViewport();
-    const eventParams = {
-      pagePath: currentPath,
-      locale: document.documentElement.lang || 'en-US',
-      viewportCategory: vp.viewportCategory,
-      formFactor: vp.formFactor,
-      viewportWidth: vp.viewportWidth,
-      viewportHeight: vp.viewportHeight,
-      orientation: vp.orientation,
-      operatingSystem: vp.operatingSystem,
-    };
-    if (document.title) {
-      eventParams.pageTitle = document.title;
-    }
-    if (document.referrer) {
-      eventParams.referrer = document.referrer;
-    }
-    try {
-      const sp = new URLSearchParams(window.location.search || '');
-      const utmSource = sp.get('utm_source');
-      const utmMedium = sp.get('utm_medium');
-      const utmCampaign = sp.get('utm_campaign');
-      const utmTerm = sp.get('utm_term');
-      const utmContent = sp.get('utm_content');
-      if (utmSource) {
-        eventParams.utm_source = utmSource;
-        eventParams.utmSource = utmSource;
-      }
-      if (utmMedium) {
-        eventParams.utm_medium = utmMedium;
-        eventParams.utmMedium = utmMedium;
-      }
-      if (utmCampaign) {
-        eventParams.utm_campaign = utmCampaign;
-        eventParams.utmCampaign = utmCampaign;
-      }
-      if (utmTerm) {
-        eventParams.utm_term = utmTerm;
-        eventParams.utmTerm = utmTerm;
-      }
-      if (utmContent) {
-        eventParams.utm_content = utmContent;
-        eventParams.utmContent = utmContent;
-      }
-    } catch (_err) {
-      // Ignore URLSearchParams errors
-    }
+If Antigravity is unable to write a server’s tool schema files to disk during initialization, it automatically falls back to eagerly loading all enabled tools for that server.
 
-    const entry = {
-      event: 'page_view',
-      pagePath: currentPath,
-      viewportCategory: vp.viewportCategory,
-      formFactor: vp.formFactor,
-      viewportWidth: vp.viewportWidth,
-      viewportHeight: vp.viewportHeight,
-      orientation: vp.orientation,
-      operatingSystem: vp.operatingSystem,
-      eventParams: eventParams,
-    };
-    if (eventParams.pageTitle) entry.pageTitle = eventParams.pageTitle;
-    if (eventParams.referrer) entry.referrer = eventParams.referrer;
-    if (eventParams.utm_source) {
-      entry.utm_source = eventParams.utm_source;
-      entry.utmSource = eventParams.utmSource;
-    }
-    if (eventParams.utm_medium) {
-      entry.utm_medium = eventParams.utm_medium;
-      entry.utmMedium = eventParams.utmMedium;
-    }
-    if (eventParams.utm_campaign) {
-      entry.utm_campaign = eventParams.utm_campaign;
-      entry.utmCampaign = eventParams.utmCampaign;
-    }
-    if (eventParams.utm_term) {
-      entry.utm_term = eventParams.utm_term;
-      entry.utmTerm = eventParams.utmTerm;
-    }
-    if (eventParams.utm_content) {
-      entry.utm_content = eventParams.utm_content;
-      entry.utmContent = eventParams.utmContent;
-    }
+### Configure eager tools
 
-    window.dataLayer.push(entry);
-    window.dataLayer.push({ eventParams: undefined });
-  }
+To eagerly load specific tools from an MCP server, add a `tools` map to the server’s entry in `mcp_config.json` and set `"eager": true` for each tool you want pre-registered:
 
-  __agyRecordPageView();
-
-  window.glueCookieNotificationBarLoaded = function () {
-    if (window.__agyGtmLoaded) return;
-    window.__agyGtmLoaded = true;
-    (function (w, d, s, l, i) {
-      w[l] = w[l] || [];
-      w[l].push({
-        'gtm.start': new Date().getTime(),
-        event: 'gtm.js',
-      });
-      const f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s),
-        dl = l != 'dataLayer' ? '&l=' + l : '';
-      j.async = true;
-      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-      f.parentNode.insertBefore(j, f);
-    })(window, document, 'script', 'dataLayer', 'GTM-M4N2ZKXQ');
-    __agyRecordPageView();
-  };
-
-  document.addEventListener('astro:page-load', function () {
-    __agyRecordPageView();
-  });
-</script><script type="module" src="/_astro/AnalyticsBootstrap.astro_astro_type_script_index_0_lang.ucmpGtgL.js"></script><script defer src="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.js" data-glue-cookie-notification-bar-category="2A" data-glue-cookie-notification-bar-language="" data-glue-cookie-notification-bar-site-id=""></script>\<script\>
-	window.StarlightThemeProvider = (() => {
-		const storedTheme =
-			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
-		const theme =
-			storedTheme ||
-			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
-		return {
-			updatePickers(theme = storedTheme || 'auto') {
-				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
-					const select = picker.querySelector('select');
-					if (select) select.value = theme;
-					/** @type {HTMLTemplateElement | null} */
-					const tmpl = document.querySelector(`#theme-icons`);
-					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
-					if (newIcon) {
-						const oldIcon = picker.querySelector('svg.label-icon');
-						if (oldIcon) {
-							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
-						}
-					}
-				});
-			},
-		};
-	})();
-</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/_astro/index.BfSTt1zY.css"><link rel="stylesheet" href="/_astro/SharedHeadBootstrap.Ca7GHXLM.css">\<style\>@layer starlight.components{svg:where(.astro-n5k4ipy7){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em}}
-</style><link rel="stylesheet" href="/_astro/AnnouncementPill.ubgfVsjK.css">\<style\>.button{font-size:var(--base-size);line-height:var(--cta-line-height);letter-spacing:var(--cta-letter-spacing);border-radius:var(--shape-corner-rounded,999px);cursor:pointer;text-align:center;border:1px solid #0000;justify-content:center;align-self:flex-start;align-items:center;height:fit-content;padding:10px 24px;font-family:Google Sans Flex,sans-serif;font-weight:450;text-decoration:none;transition:all .15s ease-out;display:inline-flex}.button span{text-decoration:none}.button .icon{color:currentColor;margin:0 var(--space-sm) 0 0;flex-shrink:0;align-items:center;line-height:0;display:inline-flex}.button:disabled{cursor:not-allowed}.button-primary{background:var(--theme-primary-primary,#1a73e8);color:var(--theme-primary-on-primary,#fff)}.button-primary:hover,.button-primary:focus-visible{background:var(--theme-button-states-primary-hovered,#1557b0);outline:none}.button-primary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-primary-inverse{background:var(--palette-grey-0);color:var(--palette-grey-1200)}.button-primary-inverse:hover,.button-primary-inverse:focus-visible{background:var(--theme-surface-surface-container-high);outline:none}.button-primary-inverse:active{background:var(--theme-surface-surface-container-high)}.button-primary-inverse:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary{color:var(--theme-surface-on-surface);background:var(--theme-secondary-button);backdrop-filter:blur(6px);border:1px solid var(--theme-outline-variant)}.button-secondary:hover,.button-secondary:focus-visible{background:var(--theme-button-secondary-hover);outline:none}.button-secondary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary-inverse{color:var(--theme-surface-surface);background:var(--theme-nav-button-hover);backdrop-filter:blur(8px);border:1px solid var(--theme-inverse-outline-variant)}.button-secondary-inverse:hover,.button-secondary-inverse:focus-visible{background:var(--theme-button-secondary-inverse-hover);outline:none}.button-secondary-inverse:disabled{background:var(--palette-grey-1100);color:var(--palette-grey-50-20)}.button-text,.button-nav{background:0 0}.button-text{color:var(--theme-text-on-text)}.button-text:hover,.button-text:focus-visible{background:var(--theme-button-states-hovered);outline:none}.button-text:active{background:var(--theme-button-states-pressed)}.button-text:disabled{color:var(--theme-button-states-on-disabled)}.button-compact{min-block-size:36px;padding:6px 16px}.download-button,.button-nav{font-size:var(--cta-sm-size);line-height:var(--cta-sm-line-height);letter-spacing:var(--cta-sm-letter-spacing);font-weight:450}.button-nav{color:var(--theme-surface-on-surface-variant)}.button-nav:hover,.button-nav:focus-visible{color:#000;background:var(--theme-nav-button-hover);outline:none}@media (width<=767px){.button-nav{width:100%}}.dropdown-nav{padding-right:8px}.dropdown-icon,.play-icon{letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;-webkit-font-smoothing:antialiased;text-rendering:optimizelegibility;font-feature-settings:"liga";-webkit-font-feature-settings:"liga";font-variation-settings:"FILL" 0, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48;margin:0 0 0 var(--space-xs);transition:transform .3s all;direction:ltr;flex-shrink:0;justify-content:center;align-items:center;font-family:Google Symbols;font-size:1.5em;font-weight:300;line-height:1;display:inline-flex}.dropdown-icon svg,.play-icon svg{fill:currentColor;display:block}.button.dropdown-open .dropdown-icon,.button[aria-expanded=true] .dropdown-icon,.dropdown-open>.dropdown-icon{transform:rotate(-180deg)}.play-icon{font-variation-settings:"FILL" 1, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48}@media (width<=1024px){.nav-button{padding:var(--space-md);width:100%}}
-</style><script type="module" src="/_astro/page.LAbJoB63.js"></script>\<style\>@layer starlight.components{.card:where(.astro-zts4jgjd){--sl-card-border:var(--sl-color-purple);--sl-card-bg:var(--sl-color-purple-low);border:1px solid var(--sl-color-gray-5);background-color:var(--sl-color-black);flex-direction:column;gap:clamp(.5rem,.125rem + 1vw,1rem);padding:clamp(1rem,.125rem + 3vw,2.5rem)}.card:where(.astro-zts4jgjd):nth-child(4n+1){--sl-card-border:var(--sl-color-orange);--sl-card-bg:var(--sl-color-orange-low)}.card:where(.astro-zts4jgjd):nth-child(4n+3){--sl-card-border:var(--sl-color-green);--sl-card-bg:var(--sl-color-green-low)}.card:where(.astro-zts4jgjd):nth-child(4n+4){--sl-card-border:var(--sl-color-red);--sl-card-bg:var(--sl-color-red-low)}.card:where(.astro-zts4jgjd):nth-child(4n+5){--sl-card-border:var(--sl-color-blue);--sl-card-bg:var(--sl-color-blue-low)}.title:where(.astro-zts4jgjd){font-weight:600;font-size:var(--sl-text-h4);color:var(--sl-color-white);line-height:var(--sl-line-height-headings);align-items:center;gap:1rem}.card:where(.astro-zts4jgjd) .icon:where(.astro-zts4jgjd){border:1px solid var(--sl-card-border);background-color:var(--sl-card-bg);border-radius:.25rem;flex-shrink:0;padding:.2em}.card:where(.astro-zts4jgjd) .body:where(.astro-zts4jgjd){font-size:clamp(var(--sl-text-sm), calc(.5rem + 1vw), var(--sl-text-body));margin:0}}
-</style>\<style\>@layer starlight.components{.card-grid:where(.astro-lmor3ela){grid-template-columns:100%;gap:1rem;display:grid}.card-grid:where(.astro-lmor3ela)>*{margin-top:0!important}@media (width>=50rem){.card-grid:where(.astro-lmor3ela){grid-template-columns:1fr 1fr;gap:1.5rem}.stagger:where(.astro-lmor3ela){--stagger-height:5rem;padding-bottom:var(--stagger-height)}.stagger:where(.astro-lmor3ela)>:nth-child(2n){transform:translateY(var(--stagger-height))}}}
-</style>\<style\>@layer starlight.components{.sl-link-card:where(.astro-vodiqeol){border:1px solid var(--sl-color-gray-5);box-shadow:var(--sl-shadow-sm);border-radius:.5rem;grid-template-columns:1fr auto;gap:.5rem;padding:1rem;display:grid;position:relative}a:where(.astro-vodiqeol){line-height:var(--sl-line-height-headings);text-decoration:none}a:where(.astro-vodiqeol):before{content:"";position:absolute;inset:0}.stack:where(.astro-vodiqeol){flex-direction:column;gap:.5rem}.title:where(.astro-vodiqeol){color:var(--sl-color-white);font-weight:600;font-size:var(--sl-text-lg)}.description:where(.astro-vodiqeol){color:var(--sl-color-gray-3);line-height:1.5}.icon:where(.astro-vodiqeol){color:var(--sl-color-gray-3)}.sl-link-card:where(.astro-vodiqeol):hover{background:var(--sl-color-gray-7,var(--sl-color-gray-6));border-color:var(--sl-color-gray-2)}.sl-link-card:where(.astro-vodiqeol):hover .icon:where(.astro-vodiqeol){color:var(--sl-color-white)}}
-</style>\<style\>@layer starlight.components{.sl-steps{--bullet-size:calc(var(--sl-line-height) * 1rem);--bullet-margin:.375rem;counter-reset:steps-counter var(--sl-steps-start,0);padding-inline-start:0;list-style:none}.sl-steps>li{counter-increment:steps-counter;padding-inline-start:calc(var(--bullet-size) + 1rem);min-height:calc(var(--bullet-size) + var(--bullet-margin));padding-bottom:1px;position:relative}.sl-steps>li+li{margin-top:0}.sl-steps>li:before{content:counter(steps-counter);top:0;width:var(--bullet-size);height:var(--bullet-size);line-height:var(--bullet-size);font-size:var(--sl-text-xs);text-align:center;color:var(--sl-color-white);background-color:var(--sl-color-gray-6);box-shadow:inset 0 0 0 1px var(--sl-color-gray-5);border-radius:99rem;font-weight:600;position:absolute;inset-inline-start:0}.sl-steps>li:after{--guide-width:1px;content:"";top:calc(var(--bullet-size) + var(--bullet-margin));bottom:var(--bullet-margin);width:var(--guide-width);background-color:var(--sl-color-hairline-light);position:absolute;inset-inline-start:calc((var(--bullet-size) - var(--guide-width)) / 2)}}@layer starlight.content{.sl-steps>li>:first-child{--lh:calc(1em * var(--sl-line-height));--shift-y:calc(.5 * (var(--bullet-size) - var(--lh)));transform:translateY(var(--shift-y));margin-bottom:var(--shift-y)}.sl-steps>li>:first-child:where(h1,h2,h3,h4,h5,h6){--lh:calc(1em * var(--sl-line-height-headings))}@supports (--prop:1lh){.sl-steps>li>:first-child{--lh:1lh}}}
-</style>\<style\>@layer starlight.components{starlight-tabs:where(.astro-hbt4ddzs){display:block}.tablist-wrapper:where(.astro-hbt4ddzs){overflow-x:auto}:where(.astro-hbt4ddzs)[role=tablist]{border-bottom:2px solid var(--sl-color-gray-5);padding:0;list-style:none;display:flex}.tab:where(.astro-hbt4ddzs){display:flex}.tab:where(.astro-hbt4ddzs)>:where(.astro-hbt4ddzs)[role=tab]{--sl-tab-color-border:var(--sl-color-gray-5);line-height:var(--sl-line-height-headings);box-shadow:0 2px 0 var(--sl-tab-color-border);color:var(--sl-color-gray-3);outline-offset:var(--sl-outline-offset-inside);overflow-wrap:initial;align-items:center;gap:.5rem;padding:.275rem 1.25rem;text-decoration:none;display:flex}.tab:where(.astro-hbt4ddzs) :where(.astro-hbt4ddzs)[role=tab][aria-selected=true]{--sl-tab-color-border:var(--sl-color-text-accent);color:var(--sl-color-white);font-weight:600}.tablist-wrapper:where(.astro-hbt4ddzs)~[role=tabpanel]{margin-top:1rem}}
-</style></head><body class="astro-vdxcvpsm"><a class="sl-skip-link astro-vxeigawq" href="#_top">Skip to content</a><div class="page sl-flex astro-gqpr5s5a"><header class="header astro-gqpr5s5a"><div class="header-stack astro-mtusqnhg" data-analytics-nav="docs_header"><!-- Row 1: Logo and Search / Controls --><div class="header-main astro-mtusqnhg"><div class="title-wrapper sl-flex astro-mtusqnhg"><a href="/" class="site-title sl-flex astro-clw6ags5"><img class="light:sl-hidden print:hidden astro-clw6ags5" alt src="/_astro/antigravity_product_lockup_dark.YcYY_PSr.svg" width="1687" height="217"><img class="dark:sl-hidden print:block astro-clw6ags5" alt src="/_astro/antigravity_product_lockup_full_color.cUD_Se6a.svg" width="1687" height="217"><span class="sr-only astro-clw6ags5" translate="no">Google Antigravity Docs</span></a></div><div class="sl-flex search-wrapper print:hidden astro-mtusqnhg"><site-search id="doc-search-root" class="agy-hybrid-search" data-i18n-ignore="true" data-index-version="60cca000"><button type="button" data-open-modal id="doc-search-trigger" class="agy-search-trigger" aria-label="Search documentation" aria-keyshortcuts="Control+K Meta+K /"><span class="agy-search-trigger__left"><svg class="agy-search-trigger__icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span class="agy-search-trigger__text">Search<span class="agy-search-trigger__text-suffix"> docs...</span></span></span><kbd class="agy-search-trigger__kbd" aria-hidden="true">⌘K</kbd></button><dialog id="doc-search-modal" class="agy-search-dialog" aria-label="Search"><div class="dialog-frame sl-flex"><div id="starlight__search" class="agy-search-container"><div class="agy-search-header"><div class="agy-search-input-wrap"><svg class="agy-search-input-icon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input id="doc-search-input" class="pagefind-ui__search-input" type="search" placeholder="Search documentation..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Search documentation" aria-controls="doc-search-results-list"><button type="button" class="agy-search-clear" data-clear-search hidden aria-label="Clear search query" title="Clear search"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></button></div><div class="agy-search-header__actions"><button type="button" class="agy-shortcuts-toggle agy-search-help-btn" data-toggle-shortcuts aria-expanded="false" aria-controls="doc-search-shortcuts-panel" aria-label="Keyboard shortcuts" title="Keyboard shortcuts"><span aria-hidden="true">?</span></button><button type="button" data-close-modal class="agy-search-close" aria-label="Close search"><span class="agy-search-close__kbd" aria-hidden="true">ESC</span><span class="agy-search-close__touch" aria-hidden="true">Cancel</span></button></div></div><div class="agy-search-filters" role="toolbar" aria-label="Filter results by product surface"><button type="button" class="agy-surface-pill active" data-surface-filter="all" data-surface-label="All" aria-pressed="true"><span class="agy-surface-pill__label">All</span></button><button type="button" class="agy-surface-pill" data-surface-filter="2-0" data-surface-label="Antigravity App" aria-pressed="false"><span class="agy-surface-pill__label">App</span><span class="agy-surface-pill__mute" data-exclude-surface="2-0" aria-hidden="true" title="Exclude Antigravity App from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="cli" data-surface-label="Antigravity CLI" aria-pressed="false"><span class="agy-surface-pill__label">CLI</span><span class="agy-surface-pill__mute" data-exclude-surface="cli" aria-hidden="true" title="Exclude Antigravity CLI from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="antigravity-ide" data-surface-label="Antigravity IDE" aria-pressed="false"><span class="agy-surface-pill__label">IDE</span><span class="agy-surface-pill__mute" data-exclude-surface="antigravity-ide" aria-hidden="true" title="Exclude Antigravity IDE from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="ide" data-surface-label="IDE Extensions" aria-pressed="false"><span class="agy-surface-pill__label">Extensions</span><span class="agy-surface-pill__mute" data-exclude-surface="ide" aria-hidden="true" title="Exclude IDE Extensions from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="sdk" data-surface-label="Antigravity SDK" aria-pressed="false"><span class="agy-surface-pill__label">SDK</span><span class="agy-surface-pill__mute" data-exclude-surface="sdk" aria-hidden="true" title="Exclude Antigravity SDK from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="blog" data-surface-label="Blog" aria-pressed="false"><span class="agy-surface-pill__label">Blog</span><span class="agy-surface-pill__mute" data-exclude-surface="blog" aria-hidden="true" title="Exclude Blog from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="releases" data-surface-label="Releases" aria-pressed="false"><span class="agy-surface-pill__label">Releases</span><span class="agy-surface-pill__mute" data-exclude-surface="releases" aria-hidden="true" title="Exclude Releases from results">×</span></button></div><div id="doc-search-status" class="agy-search-status" data-search-status data-i18n-ignore="true" role="status" aria-live="polite" aria-atomic="true" hidden></div><div id="doc-search-results" class="pagefind-ui__results-area agy-search-results-area" data-results-container data-i18n-ignore="true"><div class="agy-search-suggestions" data-search-suggestions><p class="agy-search-suggestions__heading" data-discovery-heading>Explore Antigravity</p><div class="agy-discover-grid" data-discovery-grid><a class="agy-discover-card agy-search-card" data-doc-card="getting-started" href="/docs/getting-started/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Getting Started</span><span class="agy-discover-card__desc agy-search-card-desc">Install & launch your first agent</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="remote-control" href="/docs/remote-control/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Remote Control</span><span class="agy-discover-card__desc agy-search-card-desc">Drive desktop & CLI sessions from any browser</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="skills" href="/docs/skills/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Agent Skills & Rules</span><span class="agy-discover-card__desc agy-search-card-desc">Reusable workflows & workspace instructions</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="subagents" href="/docs/subagents/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Subagents & Teamwork</span><span class="agy-discover-card__desc agy-search-card-desc">Parallel multi-agent orchestration</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="sdk" href="/docs/sdk/overview/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Antigravity SDK</span><span class="agy-discover-card__desc agy-search-card-desc">Build custom Python agents & hooks</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="permissions" href="/docs/permissions/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Permissions & Sandbox</span><span class="agy-discover-card__desc agy-search-card-desc">File access controls & safe execution</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a></div><div class="agy-try-searching"><span class="agy-try-searching__label" data-try-searching-label>Try searching</span><div class="agy-try-searching__chips" data-suggestion-chips><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="Remote Control" data-query="Remote Control">Remote Control</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="agent skills" data-query="agent skills">Agent skills</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="custom subagents" data-query="custom subagents">Custom subagents</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="IDE extensions" data-query="IDE extensions">IDE extensions</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="sandbox permissions" data-query="sandbox permissions">Sandbox permissions</button></div></div></div><ol id="doc-search-results-list" class="pagefind-ui__results agy-search-results-list" data-results-list data-i18n-ignore="true"></ol></div><div class="agy-related-topics" data-related-topics data-i18n-ignore="true" hidden></div><div id="doc-search-shortcuts-panel" class="agy-search-footer agy-search-help-popover" data-shortcuts-panel hidden><div class="agy-search-footer__hints"><span class="agy-footer-hint">\<kbd\>↑</kbd>\<kbd\>↓</kbd><span data-footer-hint="navigate">Navigate</span></span><span class="agy-footer-hint">\<kbd\>↵</kbd> <span data-footer-hint="open">Open</span></span><span class="agy-footer-hint">\<kbd\>esc</kbd> <span data-footer-hint="close">Close</span></span></div></div></div></div></dialog></site-search><script type="module" src="/_astro/SearchOverride.astro_astro_type_script_index_0_lang.DyJlY0iY.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-mtusqnhg"><div class="header-cta-group astro-mtusqnhg"><a class="top-nav-btn remote-control-btn astro-mtusqnhg" href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" title="Launch Remote Control"><span class="btn-icon astro-mtusqnhg" aria-hidden="true">🚀</span> Remote Control</a><a href="/download" class="call-to-action--nav button button-primary button-compact download-button dropdown-nav" aria-haspopup="false" aria-expanded="false" data-analytics-event="download-cta" data-module-name="header" data-page-position="main nav" class="astro-mtusqnhg"><span>Download</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.979 19.804 4.588 19.413C4.196 19.021 4.00067 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.804 19.021 19.413 19.413C19.021 19.804 18.55 20 18 20H6Z"></path></svg></span></a><script type="module">var e=/^\d+\.\d+\.\d+$/,t=/^\d+$/;function n(n){let r=Array.isArray(n)?n:n&&typeof n==`object`&&Array.isArray(n.versions)?n.versions:null;if(!r||r.length===0)return null;let i=r[0];if(!i||typeof i!=`object`)return null;let{version:a,execution_id:o}=i;return typeof a!=`string`||!e.test(a)||typeof o!=`string`||!t.test(o)?null:{version:a,executionId:o}}function r(e,t,n){let r=`https://storage.googleapis.com/antigravity-public/antigravity-hub/${e}-${t}`;return n===`darwin-arm`||n===`darwin-x64`?`${r}/${n}/Antigravity.dmg`:n===`windows-x64`?`${r}/windows-x64/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-x64.exe`}`:n===`windows-arm64`?`${r}/windows-arm/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-arm64.exe`}`:n===`linux-x64`?`${r}/linux-x64/Antigravity.tar.gz`:n===`linux-arm`?`${r}/linux-arm/Antigravity.tar.gz`:`${r}/${n}/Antigravity.dmg`}var i=null,a=null;async function o(){return i&&Date.now()-i.fetchedAt<3e5?i.build:a||(a=(async()=>{let e=new AbortController,t=setTimeout(()=>e.abort(),8e3);try{let t=await fetch(`https://antigravity-hub-auto-updater-974169037036.us-central1.run.app/releases`,{cache:`no-store`,signal:e.signal});if(!t.ok)return null;let r=n(await t.json());return r&&(i={build:r,fetchedAt:Date.now()}),r}catch{return null}finally{clearTimeout(t),a=null}})(),a)}function s(e,t=document){t.querySelectorAll(`a[data-hub-platform]`).forEach(t=>{let n=t.getAttribute(`data-hub-platform`);n&&(t.href=r(e.version,e.executionId,n),t.setAttribute(`data-hub-version`,e.version))}),t.querySelectorAll(`[data-hub-latest-version]`).forEach(t=>{t.textContent=`v${e.version}`})}async function c(){if(!document.querySelector(`a[data-hub-platform]`))return;let e=await o();e&&s(e)}var l=!1;function u(){document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,()=>{c()}):c(),l||(l=!0,document.addEventListener(`astro:page-load`,()=>{c()}),window.addEventListener(`agy:page-ready`,()=>{c()}))}u();</script></div><div class="sl-flex social-icons astro-mtusqnhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-r2p65idu"><span class="sr-only astro-r2p65idu">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-r2p65idu"><option value="dark" class="astro-r2p65idu">Dark</option><option value="light" class="astro-r2p65idu">Light</option><option value="auto" selected class="astro-r2p65idu">Auto</option></select><svg aria-hidden="true" class="icon caret astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
-	StarlightThemeProvider.updatePickers();
-</script><script type="module">var e=`starlight-theme`,t=e=>e===`auto`||e===`dark`||e===`light`?e:`auto`,n=()=>t(typeof localStorage<`u`&&localStorage.getItem(e));function r(t){typeof localStorage<`u`&&localStorage.setItem(e,t===`light`||t===`dark`?t:``)}var i=()=>matchMedia(`(prefers-color-scheme: light)`).matches?`light`:`dark`;function a(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e===`auto`?i():e,r(e)}matchMedia(`(prefers-color-scheme: light)`).addEventListener(`change`,()=>{n()===`auto`&&a(`auto`)});var o=class extends HTMLElement{constructor(){super(),a(n()),this.querySelector(`select`)?.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&a(t(e.currentTarget.value))})}};customElements.define(`starlight-theme-select`,o);</script></div><div class="sl-flex print:hidden docs-lang-wrapper astro-mtusqnhg"><div class="language-selector docs-language-selector astro-mtusqnhg astro-fe4j42sm" data-language-selector data-custom-select-wrapper="language" data-custom-select-open="false" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language"><span class="language-selector__icon astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><circle cx="12" cy="12" r="10" class="astro-fe4j42sm"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" class="astro-fe4j42sm"></path><path d="M2 12h20" class="astro-fe4j42sm"></path></svg></span><span class="language-selector__code astro-fe4j42sm" data-language-code aria-hidden="true" translate="no">EN</span><span class="language-selector__chevron astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><polyline points="6 9 12 15 18 9" class="astro-fe4j42sm"></polyline></svg></span><select class="language-selector__select astro-fe4j42sm" data-language-select tabindex="-1" aria-label="Select language" title="English (United States)"><option value="en-US" selected class="astro-fe4j42sm">English (United States)</option><option value="id" class="astro-fe4j42sm">Bahasa Indonesia (Indonesia)</option><option value="de" class="astro-fe4j42sm">Deutsch (Deutschland)</option><option value="en-CA" class="astro-fe4j42sm">English (Canada)</option><option value="en-GB" class="astro-fe4j42sm">English (United Kingdom)</option><option value="es-ES" class="astro-fe4j42sm">Español (España)</option><option value="es-MX" class="astro-fe4j42sm">Español (México)</option><option value="fr-FR" class="astro-fe4j42sm">Français (France)</option><option value="it" class="astro-fe4j42sm">Italiano (Italia)</option><option value="pl" class="astro-fe4j42sm">Polski (Polska)</option><option value="pt-BR" class="astro-fe4j42sm">Português (Brasil)</option><option value="hi" class="astro-fe4j42sm">हिन्दी (भारत)</option><option value="th" class="astro-fe4j42sm">ไทย (ประเทศไทย)</option><option value="ja" class="astro-fe4j42sm">日本語 (日本)</option><option value="zh-CN" class="astro-fe4j42sm">简体中文 (中国)</option><option value="zh-TW" class="astro-fe4j42sm">繁體中文 (台灣)</option><option value="ko" class="astro-fe4j42sm">한국어 (대한민국)</option></select></div>\<script\>
-  (function () {
-    try {
-      var valid = [
-        'en-US',
-        'id',
-        'de',
-        'en-CA',
-        'en-GB',
-        'es-ES',
-        'es-MX',
-        'fr-FR',
-        'it',
-        'pl',
-        'pt-BR',
-        'hi',
-        'th',
-        'ja',
-        'zh-CN',
-        'zh-TW',
-        'ko',
-      ];
-      var shortLabels = {
-        'en-US': 'EN',
-        'en-GB': 'EN-GB',
-        'en-CA': 'EN-CA',
-        hi: 'HI',
-        ja: 'JA',
-        ko: 'KO',
-        'zh-CN': 'ZH-CN',
-        'zh-TW': 'ZH-TW',
-        id: 'ID',
-        th: 'TH',
-        de: 'DE',
-        'fr-FR': 'FR',
-        it: 'IT',
-        pl: 'PL',
-        'pt-BR': 'PT',
-        'es-ES': 'ES',
-        'es-MX': 'ES-MX',
-      };
-      var active = window.__agyActiveLocale;
-      if (!active) {
-        var stored = window.localStorage.getItem('antigravity_locale');
-        active = 'en-US';
-        if (stored !== null) {
-          if (valid.indexOf(stored) !== -1) {
-            active = stored;
-          } else {
-            window.localStorage.setItem('antigravity_locale', 'en-US');
-            active = 'en-US';
-          }
-        } else {
-          var langs =
-            navigator.languages && navigator.languages.length
-              ? navigator.languages
-              : [navigator.language || 'en-US'];
-          for (var i = 0; i < langs.length; i++) {
-            var raw = String(langs[i] || '')
-              .trim()
-              .replace(/_/g, '-');
-            if (!raw) continue;
-            var lower = raw.toLowerCase();
-            var exactIdx = -1;
-            for (var j = 0; j < valid.length; j++) {
-              if (valid[j].toLowerCase() === lower) {
-                exactIdx = j;
-                break;
-              }
-            }
-            if (exactIdx !== -1) {
-              active = valid[exactIdx];
-              break;
-            }
-            var parts = lower.split('-');
-            var base = parts[0];
-            var subtag = parts[1] || '';
-            var region = parts[2] || subtag;
-            if (base === 'zh') {
-              active =
-                subtag === 'tw' ||
-                subtag === 'hk' ||
-                subtag === 'mo' ||
-                subtag === 'hant' ||
-                region === 'tw' ||
-                region === 'hk' ||
-                region === 'mo'
-                  ? 'zh-TW'
-                  : 'zh-CN';
-              break;
-            }
-            if (base === 'id' || base === 'in') {
-              active = 'id';
-              break;
-            }
-            if (base === 'th') {
-              active = 'th';
-              break;
-            }
-            if (base === 'it') {
-              active = 'it';
-              break;
-            }
-            if (base === 'pl') {
-              active = 'pl';
-              break;
-            }
-            if (base === 'es') {
-              active = subtag === 'es' ? 'es-ES' : 'es-MX';
-              break;
-            }
-            if (base === 'pt') {
-              active = 'pt-BR';
-              break;
-            }
-            if (base === 'fr') {
-              active = 'fr-FR';
-              break;
-            }
-            if (base === 'de') {
-              active = 'de';
-              break;
-            }
-            if (base === 'ja') {
-              active = 'ja';
-              break;
-            }
-            if (base === 'ko') {
-              active = 'ko';
-              break;
-            }
-            if (base === 'hi') {
-              active = 'hi';
-              break;
-            }
-            if (base === 'en') {
-              active =
-                subtag === 'gb' ||
-                subtag === 'uk' ||
-                subtag === 'au' ||
-                subtag === 'nz' ||
-                subtag === 'ie'
-                  ? 'en-GB'
-                  : subtag === 'ca'
-                    ? 'en-CA'
-                    : 'en-US';
-              break;
-            }
-          }
-          if (active !== 'en-US') {
-            window.localStorage.setItem('antigravity_locale', active);
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-              event: 'language_auto_detect',
-              eventParams: {
-                locale: active,
-                browserLanguage: langs[0] || '',
-                pagePath: window.location.pathname,
-              },
-            });
-            window.dataLayer.push({ eventParams: undefined });
-          }
-        }
-        window.__agyActiveLocale = active;
-      }
-      if (document.documentElement.lang !== active) {
-        document.documentElement.lang = active;
-      }
-      var selects = document.querySelectorAll('select[data-language-select]');
-      for (var k = 0; k < selects.length; k++) {
-        if (selects[k].value !== active) {
-          selects[k].value = active;
-        }
-      }
-      var codes = document.querySelectorAll('[data-language-code]');
-      var shortCode = shortLabels[active] || 'EN';
-      for (var m = 0; m < codes.length; m++) {
-        if (codes[m].textContent !== shortCode) {
-          codes[m].textContent = shortCode;
-        }
-      }
-    } catch (e) {
-      document.documentElement.lang = 'en-US';
-    }
-  })();
-</script><script type="module" src="/_astro/LanguageSelector.astro_astro_type_script_index_0_lang.B8alFdNs.js"></script></div></div><!-- Row 2: Subnav Bar below logo and controls (Get Started, Features, etc.) --><nav class="subnav-bar print:hidden astro-mtusqnhg" aria-label="Documentation sections"><div class="subnav-container astro-mtusqnhg"><div class="subnav-left astro-mtusqnhg"><a href="/docs/overview/" class="subnav-pill astro-mtusqnhg">Get Started</a><a href="/docs/features/" class="subnav-pill active astro-mtusqnhg" aria-current="page">Features</a><a href="/docs/sdk/overview/" class="subnav-pill astro-mtusqnhg">SDK</a></div><div class="subnav-right astro-mtusqnhg"><a href="/docs/changelog/" class="subnav-pill astro-mtusqnhg">Changelog</a><a href="/blog/" class="subnav-pill external-link blog-link astro-mtusqnhg">Blog <span class="arrow astro-mtusqnhg" aria-hidden="true">↗</span></a></div></div></nav><!-- Row 3: Dismissible Top Banners under Docs Menu --><div class="docs-top-banner-slot print:hidden astro-mtusqnhg" data-docs-announcement-slot="top-banner"><script type="module" src="/_astro/AnnouncementPill.astro_astro_type_script_index_0_lang.BbFE-USi.js"></script><div class="announcement-pill announcement-pill--surface-docs announcement-pill--host-docs announcement-pill--placement-top-banner announcement-pill--dark is-interactive astro-mtusqnhg astro-pyiv6lj6" role="region" aria-label="New announcement" data-announcement-pill data-pill-surface="docs" data-pill-host-surface="docs" data-pill-placement="top-banner" data-pill-variant="dark" data-pill-icon-name="spark" data-pill-badge="New" data-cta-text="Learn more" data-destination="/blog/gemini-4-argon-in-google-antigravity" data-pill-storage-key="agy_announcement_dismissed_docs" data-pill-fingerprint="New|Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity|/blog/gemini-4-argon-in-google-antigravity" data-pill-ttl-ms="604800000" data-analytics-event="announcement-pill" data-module-name="docs_top_banner" data-page-position="top-banner"><a href="/blog/gemini-4-argon-in-google-antigravity" class="pill-main-link astro-pyiv6lj6" data-pill-link><span class="pill-badge astro-pyiv6lj6" data-pill-badge><span class="pill-icon astro-pyiv6lj6" data-pill-icon aria-hidden="true"><svg class="pill-spark-icon astro-pyiv6lj6" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M8 0.5C8.5 4.6 11.4 7.5 15.5 8C11.4 8.5 8.5 11.4 8 15.5C7.5 11.4 4.6 8.5 0.5 8C4.6 7.5 7.5 4.6 8 0.5Z" fill="currentColor" class="astro-pyiv6lj6"></path></svg></span><span class="pill-badge-label astro-pyiv6lj6" data-pill-badge-label>New</span></span><span class="pill-text astro-pyiv6lj6" data-pill-text>Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity</span><span class="pill-cta astro-pyiv6lj6" data-pill-cta><span class="pill-cta-label astro-pyiv6lj6" data-pill-cta-label>Learn more</span><svg class="pill-arrow astro-pyiv6lj6" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="astro-pyiv6lj6"></path></svg></span></a><button type="button" class="pill-dismiss astro-pyiv6lj6" data-pill-dismiss data-analytics-event="" aria-label="Dismiss New announcement" title="Dismiss announcement"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true" class="astro-pyiv6lj6"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" class="astro-pyiv6lj6"></path></svg></button></div>\<script\>
-        (() => {
-          try {
-            const pills = document.querySelectorAll(
-              '[data-announcement-pill]:not([data-prechecked])',
-            );
-            pills.forEach((pill) => {
-              pill.setAttribute('data-prechecked', 'true');
-              const key = pill.getAttribute('data-pill-storage-key');
-              const fp = pill.getAttribute('data-pill-fingerprint');
-              if (!key) return;
-              const raw = window.localStorage.getItem(key);
-              if (!raw) return;
-              const parsed = JSON.parse(raw);
-              if (
-                parsed &&
-                parsed.fingerprint === fp &&
-                typeof parsed.expiresAt === 'number' &&
-                Date.now() < parsed.expiresAt
-              ) {
-                pill.hidden = true;
-                pill.setAttribute('data-pill-dismissed', 'true');
-              }
-            });
-
-            const homeSlot = document.querySelector('[data-home-banner-slot]');
-            if (homeSlot) {
-              const visibleHome = homeSlot.querySelectorAll(
-                '[data-announcement-pill]:not([hidden])',
-              );
-              if (visibleHome.length === 0) {
-                document.documentElement.style.setProperty(
-                  '--home-banner-offset',
-                  '0px',
-                );
-              } else {
-                const slotHeightPx = Math.ceil(
-                  homeSlot.getBoundingClientRect().height,
-                );
-                if (slotHeightPx > 0) {
-                  document.documentElement.style.setProperty(
-                    '--home-banner-offset',
-                    `${slotHeightPx}px`,
-                  );
-                }
-              }
-            }
-
-            const docsSlot = document.querySelector(
-              '[data-docs-announcement-slot="top-banner"]',
-            );
-            const docsHeader = document.querySelector('header.header');
-            if (docsSlot && docsHeader) {
-              const visibleDocs = docsSlot.querySelectorAll(
-                '[data-announcement-pill]:not([hidden])',
-              );
-              if (visibleDocs.length === 0) {
-                document.documentElement.style.removeProperty(
-                  '--sl-nav-height',
-                );
-              } else {
-                const headerHeightPx = Math.ceil(
-                  docsHeader.getBoundingClientRect().height,
-                );
-                if (headerHeightPx > 0) {
-                  document.documentElement.style.setProperty(
-                    '--sl-nav-height',
-                    `${headerHeightPx}px`,
-                    'important',
-                  );
-                }
-              }
-            }
-          } catch {}
-        })();
-      </script></div></div></header><nav class="sidebar print:hidden astro-gqpr5s5a" aria-label="Main"><starlight-menu-button class="print:hidden astro-vvx7mffu"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-vvx7mffu"><svg aria-hidden="true" class="open-menu astro-vvx7mffu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-vvx7mffu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg></button></starlight-menu-button><script type="module">var e=class extends HTMLElement{btn=this.querySelector(`button`);constructor(){super(),this.btn.addEventListener(`click`,()=>this.toggleExpanded());let e=this.closest(`nav`);e&&e.addEventListener(`keyup`,e=>this.closeOnEscape(e)),matchMedia(`(min-width: 50em)`).addEventListener(`change`,()=>this.setExpanded(!1))}setExpanded(e){this.setAttribute(`aria-expanded`,String(e)),document.body.toggleAttribute(`data-mobile-menu-expanded`,e),document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}toggleExpanded(){this.setExpanded(this.getAttribute(`aria-expanded`)!==`true`)}closeOnEscape(e){e.code===`Escape`&&(this.setExpanded(!1),this.btn.focus())}};customElements.define(`starlight-menu-button`,e);</script><div id="starlight__sidebar" class="sidebar-pane astro-gqpr5s5a"><div class="sidebar-content sl-flex astro-gqpr5s5a"><div class="sidebar-wrapper astro-s3sbtxwf" data-default-section="features" data-analytics-nav="docs_sidebar"><sl-sidebar-state-persist data-hash="1m4v1wn" class="astro-f5yvicm7"><script aria-hidden="true">
-		(() => {
-			try {
-				if (!matchMedia('(min-width: 50em)').matches) return;
-				/** @type {HTMLElement | null} */
-				const target = document.querySelector('sl-sidebar-state-persist');
-				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
-				if (!target || !state || target.dataset.hash !== state.hash) return;
-				window._starlightScrollRestore = state.scroll;
-				customElements.define(
-					'sl-sidebar-restore',
-					class SidebarRestore extends HTMLElement {
-						connectedCallback() {
-							try {
-								const idx = parseInt(this.dataset.index || '');
-								const details = this.closest('details');
-								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
-							} catch {}
-						}
-					}
-				);
-			} catch {}
-		})();
-	</script><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="get-started"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Get Started</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/overview/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/getting-started/" class="astro-ojxuodky"><span class="astro-ojxuodky">Quickstart</span></a></li><li class="astro-ojxuodky"><a href="/docs/install/" class="astro-ojxuodky"><span class="astro-ojxuodky">Authenticate</span></a></li><li class="astro-ojxuodky"><a href="/docs/models/" class="astro-ojxuodky"><span class="astro-ojxuodky">Choose a model</span></a></li><li class="astro-ojxuodky"><a href="/docs/build-with-google/" class="astro-ojxuodky"><span class="astro-ojxuodky">Build with Google</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">IDE Extensions</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/ide/extensions/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/vscode/" class="astro-ojxuodky"><span class="astro-ojxuodky">Visual Studio Code</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/visual-studio/" class="astro-ojxuodky"><span class="astro-ojxuodky">Visual Studio</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/jetbrains/" class="astro-ojxuodky"><span class="astro-ojxuodky">JetBrains IDEs</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/zed/" class="astro-ojxuodky"><span class="astro-ojxuodky">Zed</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/xcode/" class="astro-ojxuodky"><span class="astro-ojxuodky">Xcode</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">CLI reference</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/cli/reference/" class="astro-ojxuodky"><span class="astro-ojxuodky">CLI commands</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/features/" class="astro-ojxuodky"><span class="astro-ojxuodky">CLI features</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/using/" class="astro-ojxuodky"><span class="astro-ojxuodky">CLI settings and tips</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/troubleshooting/" class="astro-ojxuodky"><span class="astro-ojxuodky">CLI troubleshooting</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/best-practices/" class="astro-ojxuodky"><span class="astro-ojxuodky">CLI best practices</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/credits/" class="astro-ojxuodky"><span class="astro-ojxuodky">CLI AI credits</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Migrations</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/cli/gcli-migration/" class="astro-ojxuodky"><span class="astro-ojxuodky">Gemini CLI</span></a></li><li class="astro-ojxuodky"><a href="/docs/firebase-studio-migration/" class="astro-ojxuodky"><span class="astro-ojxuodky">Firebase Studio</span></a></li><li class="astro-ojxuodky"><a href="/docs/migration/workflows-to-skills/" class="astro-ojxuodky"><span class="astro-ojxuodky">Workflows to Skills</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Resources</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/plans/" class="astro-ojxuodky"><span class="astro-ojxuodky">Plans</span></a></li><li class="astro-ojxuodky"><a href="/docs/enterprise/" class="astro-ojxuodky"><span class="astro-ojxuodky">Enterprise Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/faq/" class="astro-ojxuodky"><span class="astro-ojxuodky">FAQ</span></a></li></ul></section></div><div class="sidebar-sections is-active astro-s3sbtxwf" data-sidebar-section="features"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">LEARN</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/features/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/remote-control/" class="astro-ojxuodky"><span class="astro-ojxuodky">Remote Control</span></a></li><li class="astro-ojxuodky"><a href="/docs/marketplace/" class="astro-ojxuodky"><span class="astro-ojxuodky">Marketplace</span></a></li><li class="astro-ojxuodky"><a href="/docs/plugins/" class="astro-ojxuodky"><span class="astro-ojxuodky">Plugins</span></a></li><li class="astro-ojxuodky"><a href="/docs/sandbox/" class="astro-ojxuodky"><span class="astro-ojxuodky">Terminal sandbox</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/review-changes-editor/" class="astro-ojxuodky"><span class="astro-ojxuodky">Review changes</span></a></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Terminal</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/cli/modes/" class="astro-ojxuodky"><span class="astro-ojxuodky">Execution modes</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/headless/" class="astro-ojxuodky"><span class="astro-ojxuodky">Headless mode</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/statusline/" class="astro-ojxuodky"><span class="astro-ojxuodky">Status line customization</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/title/" class="astro-ojxuodky"><span class="astro-ojxuodky">Terminal title customization</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Browser</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/ide/browser/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/browser-recordings/" class="astro-ojxuodky"><span class="astro-ojxuodky">Browser recordings</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/allowlist-denylist/" class="astro-ojxuodky"><span class="astro-ojxuodky">Allowlist and denylist</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/separate-chrome-profile/" class="astro-ojxuodky"><span class="astro-ojxuodky">Separate Chrome profile</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Artifacts</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/artifacts/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/implementation-plan/" class="astro-ojxuodky"><span class="astro-ojxuodky">Implementation plan</span></a></li><li class="astro-ojxuodky"><a href="/docs/walkthrough/" class="astro-ojxuodky"><span class="astro-ojxuodky">Walkthrough</span></a></li><li class="astro-ojxuodky"><a href="/docs/screenshots/" class="astro-ojxuodky"><span class="astro-ojxuodky">Visual screenshots</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/artifacts/" class="astro-ojxuodky"><span class="astro-ojxuodky">Reviewing artifacts (CLI)</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Projects</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/projects/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/prompting/" class="astro-ojxuodky"><span class="astro-ojxuodky">Prompting and interaction</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/conversations/" class="astro-ojxuodky"><span class="astro-ojxuodky">Managing conversations</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Permissions</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/permissions/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Editor features</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/ide/tab/" class="astro-ojxuodky"><span class="astro-ojxuodky">Tab completion</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/agent-side-panel/" class="astro-ojxuodky"><span class="astro-ojxuodky">Agent side panel</span></a></li><li class="astro-ojxuodky"><a href="/docs/agent/" class="astro-ojxuodky"><span class="astro-ojxuodky">Agent overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/tools/" class="astro-ojxuodky"><span class="astro-ojxuodky">Task groups</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Settings</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="6"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/settings/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/agent-settings/" class="astro-ojxuodky"><span class="astro-ojxuodky">Agent settings</span></a></li><li class="astro-ojxuodky"><a href="/docs/artifact-review/" class="astro-ojxuodky"><span class="astro-ojxuodky">Artifact review</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/vim-editor-mode/" class="astro-ojxuodky"><span class="astro-ojxuodky">Vim editor mode</span></a></li></ul></details></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">SLASH COMMANDS</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/slash-commands/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/agents/" class="astro-ojxuodky"><span class="astro-ojxuodky">/agents</span></a></li><li class="astro-ojxuodky"><a href="/docs/boost/" class="astro-ojxuodky"><span class="astro-ojxuodky">/boost</span></a></li><li class="astro-ojxuodky"><a href="/docs/commands/browser/" class="astro-ojxuodky"><span class="astro-ojxuodky">/browser</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/btw/" class="astro-ojxuodky"><span class="astro-ojxuodky">/btw</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/changelog/" class="astro-ojxuodky"><span class="astro-ojxuodky">/changelog</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/codesearch/" class="astro-ojxuodky"><span class="astro-ojxuodky">/codesearch</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/context/" class="astro-ojxuodky"><span class="astro-ojxuodky">/context</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/credits/" class="astro-ojxuodky"><span class="astro-ojxuodky">/credits</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/diff/" class="astro-ojxuodky"><span class="astro-ojxuodky">/diff</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/effort/" class="astro-ojxuodky"><span class="astro-ojxuodky">/effort</span></a></li><li class="astro-ojxuodky"><a href="/docs/commands/goal/" class="astro-ojxuodky"><span class="astro-ojxuodky">/goal</span></a></li><li class="astro-ojxuodky"><a href="/docs/commands/grill-me/" class="astro-ojxuodky"><span class="astro-ojxuodky">/grill-me</span></a></li><li class="astro-ojxuodky"><a href="/docs/commands/learn/" class="astro-ojxuodky"><span class="astro-ojxuodky">/learn</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/permissions/" class="astro-ojxuodky"><span class="astro-ojxuodky">/permissions</span></a></li><li class="astro-ojxuodky"><a href="/docs/plan/" class="astro-ojxuodky"><span class="astro-ojxuodky">/plan</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/resume/" class="astro-ojxuodky"><span class="astro-ojxuodky">/resume</span></a></li><li class="astro-ojxuodky"><a href="/docs/commands/schedule/" class="astro-ojxuodky"><span class="astro-ojxuodky">/schedule</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/statusline/" class="astro-ojxuodky"><span class="astro-ojxuodky">/statusline</span></a></li><li class="astro-ojxuodky"><a href="/docs/teamwork/" class="astro-ojxuodky"><span class="astro-ojxuodky">/teamwork-preview</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/title/" class="astro-ojxuodky"><span class="astro-ojxuodky">/title</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/usage/" class="astro-ojxuodky"><span class="astro-ojxuodky">/usage</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/voice/" class="astro-ojxuodky"><span class="astro-ojxuodky">/voice</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">EXTEND</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/mcp/" aria-current="page" class="astro-ojxuodky"><span class="astro-ojxuodky">MCP</span></a></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Skills</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="7"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/skills/" class="astro-ojxuodky"><span class="astro-ojxuodky">Agent skills</span></a></li><li class="astro-ojxuodky"><a href="/docs/rules/" class="astro-ojxuodky"><span class="astro-ojxuodky">Rules</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/workflows/" class="astro-ojxuodky"><span class="astro-ojxuodky">IDE workflows</span></a></li></ul></details></li><li class="astro-ojxuodky"><a href="/docs/subagents/" class="astro-ojxuodky"><span class="astro-ojxuodky">Custom subagents</span></a></li><li class="astro-ojxuodky"><a href="/docs/hooks/" class="astro-ojxuodky"><span class="astro-ojxuodky">Lifecycle hooks</span></a></li><li class="astro-ojxuodky"><a href="/docs/sidecars/" class="astro-ojxuodky"><span class="astro-ojxuodky">Sidecars</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="sdk"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">ANTIGRAVITY SDK</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/sdk/overview/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview and quickstart</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/local-models/" class="astro-ojxuodky"><span class="astro-ojxuodky">Local models</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/personas/" class="astro-ojxuodky"><span class="astro-ojxuodky">Personas</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/tools/" class="astro-ojxuodky"><span class="astro-ojxuodky">Tools and skills</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/mcp/" class="astro-ojxuodky"><span class="astro-ojxuodky">MCP</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/policies/" class="astro-ojxuodky"><span class="astro-ojxuodky">Policies</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/subagents/" class="astro-ojxuodky"><span class="astro-ojxuodky">Subagents</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/structured-output/" class="astro-ojxuodky"><span class="astro-ojxuodky">Structured output</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/lifecycle/" class="astro-ojxuodky"><span class="astro-ojxuodky">Lifecycle and hooks</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="changelog"></div><script aria-hidden="true">
-		(() => {
-			const scroller = document.getElementById('starlight__sidebar');
-			if (!window._starlightScrollRestore || !scroller) return;
-			scroller.scrollTop = window._starlightScrollRestore;
-			delete window._starlightScrollRestore;
-		})();
-	</script></sl-sidebar-state-persist><div class="md:sl-hidden astro-s3sbtxwf"><div class="mobile-preferences sl-flex astro-b5gddk54"><div class="social-icons astro-b5gddk54"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-r2p65idu"><span class="sr-only astro-r2p65idu">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-r2p65idu"><option value="dark" class="astro-r2p65idu">Dark</option><option value="light" class="astro-r2p65idu">Light</option><option value="auto" selected class="astro-r2p65idu">Auto</option></select><svg aria-hidden="true" class="icon caret astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
-	StarlightThemeProvider.updatePickers();
-</script><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></div></div></div></nav><div class="main-frame astro-gqpr5s5a"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-abfeecmu"><aside class="right-sidebar-container print:hidden astro-abfeecmu"><div class="right-sidebar astro-abfeecmu"><div class="lg:sl-hidden astro-q5mffni3"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-sgnutmzh"><nav aria-labelledby="starlight__on-this-page--mobile" data-analytics-nav="docs_toc" class="astro-sgnutmzh"><details id="starlight__mobile-toc" class="astro-sgnutmzh"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-sgnutmzh"><span class="toggle sl-flex astro-sgnutmzh">On this page<svg aria-hidden="true" class="caret astro-sgnutmzh" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="
-             m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1
-             1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002
-             1.002 0 0 0 0-1.42Z
-            " class="astro-sgnutmzh"></path></svg></span><span class="display-current astro-sgnutmzh"></span></summary><div class="dropdown astro-sgnutmzh"><ul class="isMobile astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#_top" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Overview</span></a></li><li class="astro-sgnutmzh"><a href="#what-is-mcp" class="astro-sgnutmzh"><span class="astro-sgnutmzh">What is MCP?</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#add-context" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Add context</span></a></li><li class="astro-sgnutmzh"><a href="#add-custom-tools" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Add custom tools</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#getting-started-by-surface" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Getting started by surface</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#interactive-mcp-manager" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Interactive MCP manager</span></a></li><li class="astro-sgnutmzh"><a href="#global-and-workspace-server-configs" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Global and workspace server configs</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#mcp-configuration-structure" class="astro-sgnutmzh"><span class="astro-sgnutmzh">MCP configuration structure</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#mcp-configuration-properties" class="astro-sgnutmzh"><span class="astro-sgnutmzh">MCP configuration properties</span></a></li><li class="astro-sgnutmzh"><a href="#mcp-server-timeouts" class="astro-sgnutmzh"><span class="astro-sgnutmzh">MCP server timeouts</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#mcp-authentication" class="astro-sgnutmzh"><span class="astro-sgnutmzh">MCP authentication</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#google-credentials" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Google credentials</span></a></li><li class="astro-sgnutmzh"><a href="#oauth" class="astro-sgnutmzh"><span class="astro-sgnutmzh">OAuth</span></a></li><li class="astro-sgnutmzh"><a href="#custom-headers" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Custom headers</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#mcp-permissions-and-access-control" class="astro-sgnutmzh"><span class="astro-sgnutmzh">MCP permissions and access control</span></a></li><li class="astro-sgnutmzh"><a href="#supported-mcp-servers" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Supported MCP servers</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#example-search-google-developer-docs" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Example: search Google developer docs</span></a></li></ul></li></ul></div></details></nav></mobile-starlight-toc><script type="module" src="/_astro/MobileTableOfContentsOverride.astro_astro_type_script_index_0_lang.BhmNkhRh.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-q5mffni3"><div class="sl-container astro-q5mffni3"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page" data-analytics-nav="docs_toc"><h2 id="starlight__on-this-page">On this page</h2><ul class="starlight-toc-list">\<li\><a href="#_top"><span>Overview</span></a></li>\<li\><a href="#what-is-mcp"><span>What is MCP?</span></a>\<ul\>\<li\><a href="#add-context"><span>Add context</span></a></li>\<li\><a href="#add-custom-tools"><span>Add custom tools</span></a></li></ul></li>\<li\><a href="#getting-started-by-surface"><span>Getting started by surface</span></a>\<ul\>\<li\><a href="#interactive-mcp-manager"><span>Interactive MCP manager</span></a></li>\<li\><a href="#global-and-workspace-server-configs"><span>Global and workspace server configs</span></a></li></ul></li>\<li\><a href="#mcp-configuration-structure"><span>MCP configuration structure</span></a>\<ul\>\<li\><a href="#mcp-configuration-properties"><span>MCP configuration properties</span></a></li>\<li\><a href="#mcp-server-timeouts"><span>MCP server timeouts</span></a></li></ul></li>\<li\><a href="#mcp-authentication"><span>MCP authentication</span></a>\<ul\>\<li\><a href="#google-credentials"><span>Google credentials</span></a></li>\<li\><a href="#oauth"><span>OAuth</span></a></li>\<li\><a href="#custom-headers"><span>Custom headers</span></a></li></ul></li>\<li\><a href="#mcp-permissions-and-access-control"><span>MCP permissions and access control</span></a></li>\<li\><a href="#supported-mcp-servers"><span>Supported MCP servers</span></a>\<ul\>\<li\><a href="#example-search-google-developer-docs"><span>Example: search Google developer docs</span></a></li></ul></li></ul></nav></starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){e!==this._current&&(this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e)}connectedCallback(){this.init(),window.addEventListener(`agy:page-ready`,this.reinit)}disconnectedCallback(){window.removeEventListener(`agy:page-ready`,this.reinit),this.cleanup()}cleanup(){this._current=null,this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}reinit=()=>{this.cleanup(),this.init()};init=()=>{let e=Array.from(this.querySelectorAll(`a`));if(!e.length)return;let t=[],n=new Map,r=document.getElementById(`_top`);if(r){let i=e.find(e=>e.hash===`#_top`);if(i){n.set(`_top`,i);let e=i.closest(`li`);e&&t.push({link:i,li:e,heading:r,tabpanel:null,surfacePane:null})}}e.forEach(e=>{let r=decodeURIComponent(e.hash.slice(1));if(!r||r===`_top`)return;let i=document.getElementById(r),a=e.closest(`li`);if(i&&a){n.set(r,e);let o=i.closest(`[role="tabpanel"]`),s=i.closest(`.surface-pane`);t.push({link:e,li:a,heading:i,tabpanel:o,surfacePane:s})}});let i=e=>e?e.hidden||e.hasAttribute(`hidden`)||e.style.display===`none`:!1,a=e=>{if(!e)return!1;if(e.hidden||e.hasAttribute(`hidden`))return!0;if(e.style.display)return e.style.display===`none`;let t=e.getAttribute(`data-surface-pane`);return t?t!==`hub`:getComputedStyle(e).display===`none`},o=!1,s=()=>{o||(o=!0,requestAnimationFrame(c))},c=()=>{if(o=!1,window.innerWidth<800||this.offsetParent===null)return;let e=t.filter(e=>e.heading.id===`_top`||!e.heading.hidden&&e.heading.style.display!==`none`&&!i(e.tabpanel)&&!a(e.surfacePane));if(!e.length)return;let r=e[0];if(window.scrollY>10)for(let t of e)if(t.heading.getBoundingClientRect().top<=130)r=t;else break;let s=n.get(r.heading.id);s&&(this.current=s)},l=(e=!1)=>{window.innerWidth<800||(t.forEach(e=>{let t=i(e.tabpanel)||a(e.surfacePane),n=t?`none`:``;e.li.style.display!==n&&(e.li.style.display=n),t?e.li.getAttribute(`data-tab-hidden`)!==`true`&&e.li.setAttribute(`data-tab-hidden`,`true`):e.li.hasAttribute(`data-tab-hidden`)&&e.li.removeAttribute(`data-tab-hidden`)}),e?c():s())},u=e=>{let t=e.target?.closest(`a`);if(!t||!this.contains(t))return;let n=decodeURIComponent(t.hash.slice(1));if(!n)return;let r=document.getElementById(n);if(r){let e=r.closest(`.surface-pane[data-surface-pane]`);if(e&&a(e)){let t=e.getAttribute(`data-surface-pane`);t&&(document.querySelector(`.surface-card-btn[data-surface-id="${t}"]`)?.click(),requestAnimationFrame(()=>{l()}))}let t=r.closest(`starlight-tabs [role="tabpanel"]`);if(t){let e=t.closest(`starlight-tabs`);if(e){let n=Array.from(e.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(t);n!==-1&&(e.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{l()}))}}}};this.addEventListener(`click`,u),this._cleanup.push(()=>{this.removeEventListener(`click`,u)});let d=document.querySelectorAll(`[role="tabpanel"], .surface-pane`);if(d.length>0){let e=0,t,n=()=>{e||=requestAnimationFrame(()=>{e=0,clearTimeout(t),t=setTimeout(()=>{l()},0)})};this._observer=new MutationObserver(n),d.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})}),document.addEventListener(`ag-surface-changed`,n),this._cleanup.push(()=>{document.removeEventListener(`ag-surface-changed`,n)})}this._onScroll=s,window.addEventListener(`scroll`,this._onScroll,{passive:!0}),l(!0)}};customElements.get(`starlight-toc`)||customElements.define(`starlight-toc`,e);</script></div></div></div></aside><div class="main-pane astro-abfeecmu"><main data-pagefind-body class="astro-vdxcvpsm" lang="en" dir="ltr"><div class="content-panel astro-oil7k7jf"><div class="sl-container astro-oil7k7jf"><div class="pagefind-search-meta sr-only astro-hkwnjoai" data-i18n-ignore="true"><span data-pagefind-meta="title" class="astro-hkwnjoai">MCP</span><span data-pagefind-meta="surface" class="astro-hkwnjoai">2-0</span><span data-pagefind-meta="surfaceLabel" class="astro-hkwnjoai">Antigravity App</span><span data-pagefind-meta="section" class="astro-hkwnjoai">Features</span><span data-pagefind-weight="6" class="astro-hkwnjoai">MCP Antigravity App Features</span><span data-pagefind-filter="surface:2-0" class="astro-hkwnjoai">Antigravity App</span><span data-pagefind-filter="surface:cli" class="astro-hkwnjoai">Antigravity CLI</span><span data-pagefind-filter="surface:antigravity-ide" class="astro-hkwnjoai">Antigravity IDE</span></div><div class="breadcrumbs-row astro-hkwnjoai" data-pagefind-ignore><nav aria-label="Breadcrumb" class="starlight-breadcrumbs astro-hkwnjoai"><span class="breadcrumb-item  astro-hkwnjoai" title="Features">Features</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item  astro-hkwnjoai" title="Extend">Extend</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item breadcrumb-last astro-hkwnjoai" title="MCP">MCP</span></nav><div id="md-actions-root" class="markdown-dropdown-wrapper astro-pyacvpuh" data-pathname="/docs/mcp/"><button type="button" class="call-to-action--nav button button-primary button-compact markdown-trigger-btn dropdown-nav" aria-haspopup="true" aria-expanded="false" aria-label="Markdown Options" class="astro-pyacvpuh"><span>Markdown</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><div class="markdown-dropdown-menu astro-pyacvpuh" data-md-menu hidden><button type="button" class="markdown-menu-item astro-pyacvpuh" data-copy-md><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M318.46-230.77q-23.53,0-40.61-17.08t-17.08-40.61V-802.31q0-23.53 17.08-40.61T318.46-860H712.31q23.53,0 40.61,17.08T770-802.31v513.84q0,23.53-17.08,40.61t-40.61,17.08H318.46Zm0-45.38H712.31q4.62,0 8.46-3.85t3.85-8.46V-802.31q0-4.62-3.85-8.46t-8.46-3.85H318.46q-4.62,0-8.46,3.85t-3.85,8.46v513.84q0,4.62 3.85,8.46t8.46,3.85ZM207.69-120q-23.53,0-40.61-17.08T150-177.7V-736.92h45.38V-177.7q0,4.62 3.85,8.46t8.46,3.85H646.92V-120H207.69Zm98.46-156.15q0,0 0-3.85t0-8.46V-802.31q0-4.62 0-8.46t0-3.85q0,0 0,3.85t0,8.46v513.84q0,4.62 0,8.46t0,3.85Z"></path></svg><span class="item-label astro-pyacvpuh">Copy Markdown</span></button><a href="#" data-view-md-link target="_blank" rel="noopener noreferrer" class="markdown-menu-item astro-pyacvpuh"><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg><span class="item-label astro-pyacvpuh">View Markdown</span></a></div></div>\<script\>
-  (() => {
-    function setupMarkdownDropdown() {
-      const wrappers = document.querySelectorAll('.markdown-dropdown-wrapper');
-      wrappers.forEach((wrapper) => {
-        const currentPath = (
-          wrapper.dataset.pathname || window.location.pathname
-        ).replace(/\/$/, '');
-        const mdUrl = `${currentPath}.md`;
-
-        const viewLink = wrapper.querySelector('[data-view-md-link]');
-        if (viewLink) {
-          viewLink.href = mdUrl;
-        }
-
-        if (wrapper.dataset.mdInitialized === 'true') return;
-        wrapper.dataset.mdInitialized = 'true';
-
-        const triggerBtn = wrapper.querySelector(
-          '.markdown-trigger-btn, .button'
-        );
-        const menu = wrapper.querySelector('[data-md-menu]');
-        const copyBtn = wrapper.querySelector('[data-copy-md]');
-
-        if (!triggerBtn || !menu) return;
-
-        const toggleMenu = (e) => {
-          e.stopPropagation();
-          const isHidden = menu.hasAttribute('hidden');
-          if (isHidden) {
-            menu.removeAttribute('hidden');
-            triggerBtn.setAttribute('aria-expanded', 'true');
-          } else {
-            menu.setAttribute('hidden', '');
-            triggerBtn.setAttribute('aria-expanded', 'false');
-          }
-        };
-
-        triggerBtn.addEventListener('click', toggleMenu);
-
-        if (copyBtn) {
-          copyBtn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const label = copyBtn.querySelector('.item-label');
-            const originalText = label?.textContent || 'Copy Markdown';
-            const activePath = (
-              wrapper.dataset.pathname || window.location.pathname
-            ).replace(/\/$/, '');
-            const activeMdUrl = `${activePath}.md`;
-
-            try {
-              if (label) label.textContent = 'Fetching...';
-              const response = await fetch(activeMdUrl);
-              if (!response.ok) {
-                throw new Error(`Failed to fetch markdown: ${response.status}`);
-              }
-              const htmlText = await response.text();
-              const parsedDoc = new DOMParser().parseFromString(
-                htmlText,
-                'text/html'
-              );
-              const preElement = parsedDoc.querySelector('pre');
-              const markdownText = preElement
-                ? preElement.textContent || ''
-                : htmlText;
-              await navigator.clipboard.writeText(markdownText);
-
-              if (label) {
-                label.textContent = 'Copied!';
-                setTimeout(() => {
-                  label.textContent = originalText;
-                  menu.setAttribute('hidden', '');
-                  triggerBtn.setAttribute('aria-expanded', 'false');
-                }, 1200);
-              }
-            } catch (err) {
-              console.error('Error copying markdown:', err);
-              if (label) label.textContent = 'Error copying';
-              setTimeout(() => {
-                if (label) label.textContent = originalText;
-              }, 2000);
-            }
-          });
-        }
-      });
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupMarkdownDropdown, {
-        once: true,
-      });
-    } else {
-      setupMarkdownDropdown();
-    }
-
-    if (!window.__agyMarkdownActionsBound) {
-      window.__agyMarkdownActionsBound = true;
-      document.addEventListener(
-        'click',
-        (e) => {
-          const openMenus = document.querySelectorAll(
-            '.markdown-dropdown-wrapper [data-md-menu]:not([hidden])'
-          );
-          openMenus.forEach((menu) => {
-            const wrapper = menu.closest('.markdown-dropdown-wrapper');
-            if (wrapper && !wrapper.contains(e.target)) {
-              menu.setAttribute('hidden', '');
-              const triggerBtn = wrapper.querySelector(
-                '.markdown-trigger-btn, .button'
-              );
-              if (triggerBtn) {
-                triggerBtn.setAttribute('aria-expanded', 'false');
-              }
-            }
-          });
+```json
+{
+  "mcpServers": {
+    "sqlite-explorer": {
+      "command": "node",
+      "args": ["/usr/local/bin/sqlite-mcp-server.js"],
+      "env": {
+        "SQLITE_DB_PATH": "/var/data/app.db"
+      },
+      "tools": {
+        "read_query": {
+          "eager": true
         },
-        { passive: true }
-      );
-      document.addEventListener('astro:page-load', setupMarkdownDropdown);
-      window.addEventListener('agy:page-ready', setupMarkdownDropdown);
+        "list_tables": {
+          "eager": true
+        }
+      }
     }
-  })();
-</script></div><div class="surface-chips-row not-content astro-hkwnjoai" data-pagefind-ignore><span class="surface-chips-label astro-hkwnjoai">Available on:</span><div class="surface-chips-list astro-hkwnjoai"><span class="surface-chip surface-chip-2-0 astro-hkwnjoai"><svg class="surface-chip-icon astro-hkwnjoai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" class="astro-hkwnjoai"></rect><line x1="8" y1="21" x2="16" y2="21" class="astro-hkwnjoai"></line><line x1="12" y1="17" x2="12" y2="21" class="astro-hkwnjoai"></line></svg><span class="astro-hkwnjoai">Antigravity App</span></span><span class="surface-chip surface-chip-cli astro-hkwnjoai"><svg class="surface-chip-icon astro-hkwnjoai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5" class="astro-hkwnjoai"></polyline><line x1="12" y1="19" x2="20" y2="19" class="astro-hkwnjoai"></line></svg><span class="astro-hkwnjoai">Antigravity CLI</span></span><span class="surface-chip surface-chip-antigravity-ide astro-hkwnjoai"><svg class="surface-chip-icon astro-hkwnjoai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="2" class="astro-hkwnjoai"></rect><line x1="2" y1="9" x2="22" y2="9" class="astro-hkwnjoai"></line><polyline points="8 14 6 16 8 18" class="astro-hkwnjoai"></polyline><polyline points="16 14 18 16 16 18" class="astro-hkwnjoai"></polyline></svg><span class="astro-hkwnjoai">Antigravity IDE</span></span></div></div><script type="module" src="/_astro/StarlightPageTitleOverride.astro_astro_type_script_index_0_lang.DMV6_9UE.js"></script></div></div><div class="content-panel astro-oil7k7jf"><div class="sl-container astro-oil7k7jf"><div class="sl-markdown-content"><div class="sl-heading-wrapper level-h1"><h1 id="model-context-protocol-mcp">Model Context Protocol (MCP)</h1><a class="sl-anchor-link" href="#model-context-protocol-mcp"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Model Context Protocol (MCP)”</span></a></div>
-<p>Antigravity supports the <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">Model Context Protocol (MCP)</a>, an open standard that lets AI agents and editors securely connect to local developer tools, databases, file parsers, and external remote APIs. This integration provides the AI model with real-time context and execution capabilities beyond your immediate workspace.</p>
-<p>In this guide, you’ll learn how to connect and configure MCP servers across Antigravity products.</p>
-<div class="sl-heading-wrapper level-h2"><h2 id="what-is-mcp">What is MCP?</h2><a class="sl-anchor-link" href="#what-is-mcp"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “What is MCP?”</span></a></div>
-<p>MCP acts as a universal bridge between Antigravity and your broader development environment. Instead of manually copying and pasting database schemas, logs, or API specifications into prompts or chat panels, MCP lets Antigravity fetch structured context directly or execute safe actions on your behalf when needed.</p>
-<div class="sl-heading-wrapper level-h3"><h3 id="add-context">Add context</h3><a class="sl-anchor-link" href="#add-context"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Add context”</span></a></div>
-<p>With MCP, Antigravity can use live data from connected MCP servers to inform its reasoning and suggestions:</p>
-\<ul\>
-\<li\>When writing a SQL query, Antigravity can inspect your live Neon, Supabase, or AlloyDB schema to suggest correct table and column names.</li>
-\<li\>When debugging deployment failures, Antigravity can pull recent build logs directly from Netlify or Heroku.</li>
-</ul>
-<div class="sl-heading-wrapper level-h3"><h3 id="add-custom-tools">Add custom tools</h3><a class="sl-anchor-link" href="#add-custom-tools"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Add custom tools”</span></a></div>
-<p>With MCP, Antigravity can execute specific, safe actions defined by your connected servers:</p>
-\<ul\>
-\<li\>Create a Linear issue for a <code dir="auto">TODO</code> item.</li>
-\<li\>Search Notion or GitHub for authentication patterns.</li>
-</ul>
-<div class="sl-heading-wrapper level-h2"><h2 id="getting-started-by-surface">Getting started by surface</h2><a class="sl-anchor-link" href="#getting-started-by-surface"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Getting started by surface”</span></a></div>
-\<script\>
-(() => {
-	class StarlightTabsRestore extends HTMLElement {
-		connectedCallback() {
-			const starlightTabs = this.closest('starlight-tabs');
-			if (!(starlightTabs instanceof HTMLElement) || typeof localStorage === 'undefined') return;
-			const syncKey = starlightTabs.dataset.syncKey;
-			if (!syncKey) return;
-			const label = localStorage.getItem(`starlight-synced-tabs__${syncKey}`);
-			if (!label) return;
-			const tabs = [...starlightTabs?.querySelectorAll('[role="tab"]')];
-			const tabIndexToRestore = tabs.findIndex(
-				(tab) => tab instanceof HTMLAnchorElement && tab.textContent?.trim() === label
-			);
-			const panels = starlightTabs?.querySelectorAll(':scope > [role="tabpanel"]');
-			const newTab = tabs[tabIndexToRestore];
-			const newPanel = panels[tabIndexToRestore];
-			if (tabIndexToRestore < 1 || !newTab || !newPanel) return;
-			tabs[0]?.setAttribute('aria-selected', 'false');
-			tabs[0]?.setAttribute('tabindex', '-1');
-			panels?.[0]?.setAttribute('hidden', 'true');
-			newTab.removeAttribute('tabindex');
-			newTab.setAttribute('aria-selected', 'true');
-			newPanel.removeAttribute('hidden');
-		}
-	}
-	customElements.define('starlight-tabs-restore', StarlightTabsRestore);
-})()
-</script><starlight-tabs data-sync-key="surface" class="astro-hbt4ddzs"><div class="tablist-wrapper not-content astro-hbt4ddzs"><ul role="tablist" class="astro-hbt4ddzs"><li role="presentation" class="tab astro-hbt4ddzs"><a role="tab" href="#tab-panel-97" id="tab-97" aria-selected="true" tabindex="0" class="astro-hbt4ddzs">Antigravity App</a></li><li role="presentation" class="tab astro-hbt4ddzs"><a role="tab" href="#tab-panel-98" id="tab-98" aria-selected="false" tabindex="-1" class="astro-hbt4ddzs">Antigravity CLI</a></li><li role="presentation" class="tab astro-hbt4ddzs"><a role="tab" href="#tab-panel-99" id="tab-99" aria-selected="false" tabindex="-1" class="astro-hbt4ddzs">Antigravity IDE</a></li></ul></div><div id="tab-panel-97" aria-labelledby="tab-97" role="tabpanel"><div class="sl-heading-wrapper level-h3"><h3 id="sr-tab-1" class="sr-only" data-pagefind-ignore="" data-sr-tab-heading="true">Antigravity App</h3><a class="sl-anchor-link" href="#sr-tab-1"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">Section titled “Antigravity App”</span></a></div><p>In the Antigravity App, you can manage your MCP servers through the <strong>Installed MCP Servers</strong> section of your <strong>Settings</strong>.</p><p>To view and update your MCP servers:</p><ol role="list" class="sl-steps">
-\<li\>Click the <strong>Settings</strong> button on the bottom left of your screen.</li>
-\<li\>Select <strong>Customizations</strong> and review the <strong>Installed MCP Servers</strong> section.</li>
-</ol><p>To install an MCP server from the <strong>Installed MCP Servers</strong> section:</p><ol role="list" class="sl-steps">
-\<li\>Click <strong>Add MCP</strong>. This connects you to the MCP Store, a searchable list of available MCP servers.</li>
-\<li\>Search or scroll down to an MCP server you’d like to install.</li>
-\<li\>Click <strong>Add</strong>.</li>
-</ol><p>To manage your MCP servers from this screen:</p>\<ul\>
-\<li\><strong>Uninstall</strong>: Click the trash can icon next to the MCP server in the list.</li>
-\<li\><strong>Disable or enable</strong>: Click the toggle switch next to the MCP server in the list.</li>
-\<li\><strong>Refresh</strong>: Click the refresh button.</li>
-</ul></div><div id="tab-panel-98" aria-labelledby="tab-98" role="tabpanel" hidden><div class="sl-heading-wrapper level-h3"><h3 id="sr-tab-2" class="sr-only" data-pagefind-ignore="" data-sr-tab-heading="true">Antigravity CLI</h3><a class="sl-anchor-link" href="#sr-tab-2"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “Antigravity CLI”</span></a></div><p>Antigravity CLI supports both local <code dir="auto">stdio</code> processes and remote host MCP server configurations. The simplest path to installing an MCP server on Antigravity CLI is by using the <strong>Interactive MCP Manager</strong>. You can also manually edit your global server setup or workspace-level <code dir="auto">mcp_config.json</code>.</p><div class="sl-heading-wrapper level-h4"><h4 id="interactive-mcp-manager">Interactive MCP manager</h4><a class="sl-anchor-link" href="#interactive-mcp-manager"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “Interactive MCP manager”</span></a></div><p>Type <code dir="auto">/mcp</code> inside the prompt panel and press \<kbd\>Enter</kbd> to open the interactive <strong>MCP Manager Overlay</strong>. This panel lets you perform the following actions:</p>\<ul\>
-\<li\>View live status rings for active, disconnected, or loading servers.</li>
-\<li\>Manually reload server configurations or inspect real-time connection logs.</li>
-</ul><div class="sl-heading-wrapper level-h4"><h4 id="global-and-workspace-server-configs">Global and workspace server configs</h4><a class="sl-anchor-link" href="#global-and-workspace-server-configs"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “Global and workspace server configs”</span></a></div><p>Antigravity CLI loads MCP server definitions from two configuration files:</p>\<ul\>
-\<li\><strong>Global configuration</strong>: <code dir="auto">~/.gemini/config/mcp_config.json</code>, which applies to all your projects.</li>
-\<li\><strong>Workspace configuration</strong>: <code dir="auto">&#x3C;workspace>/.agents/mcp_config.json</code>, which applies only to that workspace.</li>
-</ul><p>Enabled <a href="/docs/plugins">plugins</a> can also add MCP servers.</p><p>Edit either file directly using the standard <a href="/docs/mcp#mcp-configuration-structure">MCP server configuration structure</a>. For example, the following entry connects to a remote server and raises its <a href="/docs/mcp#mcp-server-timeouts">timeout</a> to 600 seconds (10 minutes) for long-running tools:</p><pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">  "mcpServers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "my-remote-server"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "serverUrl"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"https://api.example.com/mcp/"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "headers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "Authorization"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Bearer YOUR_API_TOKEN"</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">      },</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "timeoutSeconds"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">600</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre><aside aria-label="Remote servers" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Remote servers</p><div class="starlight-aside__content"><p>Remote MCP servers must use the Streamable HTTP transport. Set the server’s endpoint in <code dir="auto">serverUrl</code> (<code dir="auto">url</code> also works). The legacy HTTP+SSE transport and the <code dir="auto">httpUrl</code> field aren’t supported.</p></div></aside></div><div id="tab-panel-99" aria-labelledby="tab-99" role="tabpanel" hidden><div class="sl-heading-wrapper level-h3"><h3 id="sr-tab-3" class="sr-only" data-pagefind-ignore="" data-sr-tab-heading="true">Antigravity IDE</h3><a class="sl-anchor-link" href="#sr-tab-3"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">Section titled “Antigravity IDE”</span></a></div><p>In Antigravity IDE, the easiest way to manage MCP servers is through the built-in MCP Store. In the MCP Store, you can browse, discover, and install supported MCP servers. You can also install custom servers by updating your <code dir="auto">mcp_config.json</code>.</p><p>To use the MCP Store:</p><ol role="list" class="sl-steps">
-\<li\>Click <strong>…</strong> at the top of the editor’s agent side panel and select <strong>MCP Servers</strong>.</li>
-\<li\>Hover over any supported server and click <strong>Install</strong> (or click a server to view details and then click <strong>Install</strong>).</li>
-\<li\>Follow any on-screen prompts.</li>
-</ol><p>Once installed, resources and tools from the server are automatically available to the editor.</p><p>To connect to a custom MCP server not listed in the store:</p><ol role="list" class="sl-steps">
-\<li\>Click <strong>…</strong> at the top of the editor’s agent side panel and select <strong>MCP Servers</strong>.</li>
-\<li\>Click <strong>Manage MCP Servers</strong>.</li>
-\<li\>Click <strong>View raw config</strong>.</li>
-\<li\>Modify the <code dir="auto">mcp_config.json</code> file with your custom <a href="/docs/mcp#mcp-configuration-structure">MCP server configuration</a>.</li>
-</ol><p>The configuration file is located globally at <code dir="auto">~/.gemini/config/mcp_config.json</code> (or locally in your workspace under <code dir="auto">.agents/mcp_config.json</code>).</p></div><starlight-tabs-restore class="astro-hbt4ddzs"></starlight-tabs-restore></starlight-tabs><script type="module">var e=class e extends HTMLElement{static#e=new Map;tabs;panels;#t;#n=`starlight-synced-tabs__`;constructor(){super();let t=this.querySelector(`[role="tablist"]`);if(this.tabs=[...t.querySelectorAll(`[role="tab"]`)],this.panels=[...this.querySelectorAll(`:scope > [role="tabpanel"]`)],this.#t=this.dataset.syncKey,this.#t){let t=e.#e.get(this.#t)??[];t.push(this),e.#e.set(this.#t,t)}this.tabs.forEach((e,n)=>{e.addEventListener(`click`,e=>{e.preventDefault();let r=t.querySelector(`[aria-selected="true"]`);e.currentTarget!==r&&this.switchTab(e.currentTarget,n)}),e.addEventListener(`keydown`,e=>{let t=this.tabs.indexOf(e.currentTarget),n=e.key===`ArrowLeft`?t-1:e.key===`ArrowRight`?t+1:e.key===`Home`?0:e.key===`End`?this.tabs.length-1:null;n!==null&&this.tabs[n]&&(e.preventDefault(),this.switchTab(this.tabs[n],n))})})}switchTab(t,n,r=!0){if(!t)return;let i=r?this.getBoundingClientRect().top:0;this.tabs.forEach(e=>{e.setAttribute(`aria-selected`,`false`),e.setAttribute(`tabindex`,`-1`)}),this.panels.forEach(e=>{e.hidden=!0});let a=this.panels[n];a&&(a.hidden=!1),t.removeAttribute(`tabindex`),t.setAttribute(`aria-selected`,`true`),r&&(t.focus(),e.#i(this,t),window.scrollTo({top:window.scrollY+(this.getBoundingClientRect().top-i),behavior:`instant`}))}#r(e){!this.#t||typeof localStorage>`u`||localStorage.setItem(this.#n+this.#t,e)}static#i(t,n){let r=t.#t,i=e.#a(n);if(!r||!i)return;let a=e.#e.get(r);if(a){for(let n of a){if(n===t)continue;let r=n.tabs.findIndex(t=>e.#a(t)===i);r!==-1&&n.switchTab(n.tabs[r],r,!1)}t.#r(i)}}static#a(e){return e.textContent?.trim()}};customElements.define(`starlight-tabs`,e);</script>
-<aside aria-label="Antigravity SDK" class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path fill-rule="evenodd" d="M1.44 8.855v-.001l3.527-3.516c.34-.344.802-.541 1.285-.548h6.649l.947-.947c3.07-3.07 6.207-3.072 7.62-2.868a1.821 1.821 0 0 1 1.557 1.557c.204 1.413.203 4.55-2.868 7.62l-.946.946v6.649a1.845 1.845 0 0 1-.549 1.286l-3.516 3.528a1.844 1.844 0 0 1-3.11-.944l-.858-4.275-4.52-4.52-2.31-.463-1.964-.394A1.847 1.847 0 0 1 .98 10.693a1.843 1.843 0 0 1 .46-1.838Zm5.379 2.017-3.873-.776L6.32 6.733h4.638l-4.14 4.14Zm8.403-5.655c2.459-2.46 4.856-2.463 5.89-2.33.134 1.035.13 3.432-2.329 5.891l-6.71 6.71-3.561-3.56 6.71-6.711Zm-1.318 15.837-.776-3.873 4.14-4.14v4.639l-3.364 3.374Z" clip-rule="evenodd"></path><path d="M9.318 18.345a.972.972 0 0 0-1.86-.561c-.482 1.435-1.687 2.204-2.934 2.619a8.22 8.22 0 0 1-1.23.302c.062-.365.157-.79.303-1.229.415-1.247 1.184-2.452 2.62-2.935a.971.971 0 1 0-.62-1.842c-.12.04-.236.084-.35.13-2.02.828-3.012 2.588-3.493 4.033a10.383 10.383 0 0 0-.51 2.845l-.001.016v.063c0 .536.434.972.97.972H2.24a7.21 7.21 0 0 0 .878-.065c.527-.063 1.248-.19 2.02-.447 1.445-.48 3.205-1.472 4.033-3.494a5.828 5.828 0 0 0 .147-.407Z"></path></svg>Antigravity SDK</p><div class="starlight-aside__content"><p>In Python applications built using the <a href="/docs/sdk/overview">Antigravity SDK</a>, you can connect MCP servers (<code dir="auto">stdio</code>, <code dir="auto">SSE</code>, or <code dir="auto">HTTP</code>) programmatically under a unified execution pipeline alongside built-in tools and custom Python functions. The SDK automatically discovers servers configured in your workspace’s <code dir="auto">.agents/mcp_config.json</code> file. For dedicated documentation and examples, refer to the <a href="/docs/sdk/mcp">Antigravity SDK MCP guide</a>.</p></div></aside>
-<div class="sl-heading-wrapper level-h2"><h2 id="mcp-configuration-structure">MCP configuration structure</h2><a class="sl-anchor-link" href="#mcp-configuration-structure"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “MCP configuration structure”</span></a></div>
-<p>Whether configuring custom servers for the Antigravity App, Antigravity IDE, or Antigravity CLI, <code dir="auto">mcp_config.json</code> follows a standardized JSON schema. The root object contains an <code dir="auto">mcpServers</code> map where each key is a unique server identifier:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">  "mcpServers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "sqlite-explorer"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "command"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"node"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "args"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"/usr/local/bin/sqlite-mcp-server.js"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "env"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "SQLITE_DB_PATH"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"/var/data/app.db"</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">      }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    },</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "my-remote-server"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "serverUrl"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"https://api.example.com/mcp/"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "headers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "Authorization"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Bearer YOUR_API_TOKEN"</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">      }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<div class="sl-heading-wrapper level-h3"><h3 id="mcp-configuration-properties">MCP configuration properties</h3><a class="sl-anchor-link" href="#mcp-configuration-properties"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “MCP configuration properties”</span></a></div>
-<p>Each server entry under <code dir="auto">mcpServers</code> must specify <strong>one transport property</strong> (<code dir="auto">command</code> for a local <code dir="auto">stdio</code> server, or <code dir="auto">serverUrl</code> for a remote Streamable HTTP server) and can include any of the optional properties below:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th align="left">Property</th><th align="left">Type</th><th align="left">Default</th><th align="left">Description</th></tr></thead>\<tbody\><tr><td align="left"><strong><code dir="auto">command</code></strong></td><td align="left"><code dir="auto">string</code></td><td align="left"><em>Required for <code dir="auto">stdio</code></em></td><td align="left">Executable path or command name used to launch a local <code dir="auto">stdio</code> MCP server process.</td></tr><tr><td align="left"><strong><code dir="auto">serverUrl</code></strong></td><td align="left"><code dir="auto">string</code></td><td align="left"><em>Required for remote</em></td><td align="left">Endpoint URL of a remote MCP server that uses the Streamable HTTP transport. You can also use <code dir="auto">url</code>.</td></tr><tr><td align="left"><strong><code dir="auto">args</code></strong></td><td align="left"><code dir="auto">string[]</code></td><td align="left"><code dir="auto">[]</code></td><td align="left">Command-line arguments passed to the <code dir="auto">command</code> executable (<code dir="auto">stdio</code> transport only).</td></tr><tr><td align="left"><strong><code dir="auto">env</code></strong></td><td align="left"><code dir="auto">object</code></td><td align="left"><code dir="auto">{}</code></td><td align="left">Key-value map of environment variables injected into the local <code dir="auto">stdio</code> server process.</td></tr><tr><td align="left"><strong><code dir="auto">cwd</code></strong></td><td align="left"><code dir="auto">string</code></td><td align="left">—</td><td align="left">Working directory used when spawning a local <code dir="auto">stdio</code> server process.</td></tr><tr><td align="left"><strong><code dir="auto">headers</code></strong></td><td align="left"><code dir="auto">object</code></td><td align="left"><code dir="auto">{}</code></td><td align="left">Custom HTTP request headers sent with remote <code dir="auto">serverUrl</code> connections (for example, <code dir="auto">Authorization</code> or API key headers).</td></tr><tr><td align="left"><strong><code dir="auto">authProviderType</code></strong></td><td align="left"><code dir="auto">string</code></td><td align="left">—</td><td align="left">Built-in authentication provider. Set to <code dir="auto">"google_credentials"</code> to attach Google Application Default Credentials (ADC).</td></tr><tr><td align="left"><strong><code dir="auto">oauth</code></strong></td><td align="left"><code dir="auto">object</code></td><td align="left">—</td><td align="left">Manual OAuth 2.0 client credentials (<code dir="auto">clientId</code> and optional <code dir="auto">clientSecret</code>) for remote servers that do not support Dynamic Client Registration (DCR).</td></tr><tr><td align="left"><strong><code dir="auto">disabled</code></strong></td><td align="left"><code dir="auto">boolean</code></td><td align="left"><code dir="auto">false</code></td><td align="left">When <code dir="auto">true</code>, suspends the server connection without removing its configuration from <code dir="auto">mcp_config.json</code>.</td></tr><tr><td align="left"><strong><code dir="auto">enabledTools</code></strong></td><td align="left"><code dir="auto">string[]</code></td><td align="left">—</td><td align="left">Allowlist of tool names exposed to the agent from this server. When set, all other tools on the server are hidden.</td></tr><tr><td align="left"><strong><code dir="auto">disabledTools</code></strong></td><td align="left"><code dir="auto">string[]</code></td><td align="left"><code dir="auto">[]</code></td><td align="left">Denylist of tool names withheld from the agent.</td></tr><tr><td align="left"><strong><code dir="auto">timeoutSeconds</code></strong></td><td align="left"><code dir="auto">integer</code></td><td align="left"><code dir="auto">180</code> per tool call, <code dir="auto">300</code> to connect</td><td align="left">Timeout, in seconds, for connecting to the server and listing its tools, and for each tool call. A negative value, such as <code dir="auto">-1</code>, turns both off. See <a href="/docs/mcp#mcp-server-timeouts">MCP server timeouts</a>.</td></tr></tbody></table>
-<div class="sl-heading-wrapper level-h3"><h3 id="mcp-server-timeouts">MCP server timeouts</h3><a class="sl-anchor-link" href="#mcp-server-timeouts"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “MCP server timeouts”</span></a></div>
-<p>By default, Antigravity waits up to 5 minutes for an MCP server to connect and list its tools, and up to 3 minutes for each tool call. A tool call that runs longer fails with an error that names the server and the limit, for example:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="text" dir="ltr"><code><span class="line"><span>MCP tool call to server "sqlite-explorer" timed out after 3m0s</span></span></code></pre>
-<p>If a server’s tools need more time, set <code dir="auto">timeoutSeconds</code> in that server’s entry:</p>
-\<ul\>
-\<li\>A positive value, in seconds, replaces both limits. For example, <code dir="auto">600</code> lets each tool call run for up to 10 minutes.</li>
-\<li\>A negative value, such as <code dir="auto">-1</code>, turns off both limits.</li>
-\<li\><code dir="auto">0</code>, or leaving <code dir="auto">timeoutSeconds</code> unset, keeps the defaults.</li>
-</ul>
-<p>Because the same value limits how long the server has to connect, a small value can stop a slow-starting server from connecting.</p>
-<p>The following example lets each tool call on the <code dir="auto">sqlite-explorer</code> server run for up to 10 minutes:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">  "mcpServers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "sqlite-explorer"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "command"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"node"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "args"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"/usr/local/bin/sqlite-mcp-server.js"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "timeoutSeconds"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">600</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<div class="sl-heading-wrapper level-h2"><h2 id="mcp-authentication">MCP authentication</h2><a class="sl-anchor-link" href="#mcp-authentication"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “MCP authentication”</span></a></div>
-<p>Connected MCP servers can securely authenticate against external services using built-in Google credentials, automatic OAuth flows, or custom HTTP headers.</p>
-<div class="sl-heading-wrapper level-h3"><h3 id="google-credentials">Google credentials</h3><a class="sl-anchor-link" href="#google-credentials"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Google credentials”</span></a></div>
-<p>Set <code dir="auto">authProviderType</code> to <code dir="auto">"google_credentials"</code> to use Google Application Default Credentials (ADC):</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">  "mcpServers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "my-gcp-service"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "serverUrl"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"https://example.googleapis.com/mcp/"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "authProviderType"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"google_credentials"</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<p>This requires Application Default Credentials to be configured locally. To set them up, run:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">gcloud</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> auth</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> application-default</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> login</span></span></code></pre>
-<p>If you previously logged in, ensure your quota project is set by running:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">gcloud</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> auth</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> application-default</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> set-quota-project</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> {QUOTA_PROJECT}</span></span></code></pre>
-<div class="sl-heading-wrapper level-h3"><h3 id="oauth">OAuth</h3><a class="sl-anchor-link" href="#oauth"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “OAuth”</span></a></div>
-<p>Antigravity automatically handles OAuth for servers that support dynamic client registration (DCR). For these servers, no additional configuration is needed:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">  "mcpServers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "oauth-server"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "serverUrl"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"https://api.example.com/mcp/"</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<p>If the server doesn’t support dynamic client registration, you can provide your client credentials manually:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">  "mcpServers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "oauth-server"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "serverUrl"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"https://api.example.com/mcp/"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "oauth"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "clientId"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"your-client-id"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "clientSecret"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"your-client-secret"</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">      }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<p>If you provide client credentials manually, ensure the following URL is registered as a redirect URI in your OAuth provider:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="text" dir="ltr"><code><span class="line"><span>https://antigravity.google/oauth-callback</span></span></code></pre>
-<p>To connect to an OAuth-enabled server:</p>
-<ol role="list" class="sl-steps">
-\<li\>
-<p>Open <a href="/docs/settings"><strong>Agent settings</strong></a> with \<kbd\>Cmd</kbd> + \<kbd\>,</kbd> (macOS) or \<kbd\>Ctrl</kbd> + \<kbd\>,</kbd> (Windows and Linux).</p>
-</li>
-\<li\>
-<p>Navigate to the <strong>Customizations</strong> tab and click <strong>Authenticate</strong> next to the server.</p>
-<p><img src="/assets/image/docs/tools/mcp-oauth-authenticate.png" alt="Click Authenticate"></p>
-</li>
-\<li\>
-<p>Complete authentication in your browser and copy the authorization code.</p>
-<p><img src="/assets/image/docs/tools/mcp-oauth-copy-code.png" alt="Copy authorization code"></p>
-</li>
-\<li\>
-<p>Paste the code back into the settings panel and click <strong>Submit</strong>.</p>
-<p><img src="/assets/image/docs/tools/mcp-oauth-paste-code.png" alt="Paste auth code"></p>
-</li>
-</ol>
-<p>Once authenticated, the server reconnects automatically.</p>
-<p><img src="/assets/image/docs/tools/mcp-oauth-authenticated.png" alt="Authenticated server"></p>
-<p>Access tokens are stored in <code dir="auto">~/.gemini/antigravity/mcp_oauth_tokens.json</code>. Expired tokens are refreshed automatically, and invalid tokens are removed.</p>
-<div class="sl-heading-wrapper level-h3"><h3 id="custom-headers">Custom headers</h3><a class="sl-anchor-link" href="#custom-headers"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Custom headers”</span></a></div>
-<p>For remote servers that require custom HTTP headers (such as API keys or bearer tokens), add them to the <code dir="auto">headers</code> object. For example:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">  "mcpServers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "my-remote-server"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "serverUrl"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"https://api.example.com/mcp/"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">      "headers"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "Authorization"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Bearer YOUR_API_TOKEN"</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">      }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<div class="sl-heading-wrapper level-h2"><h2 id="mcp-permissions-and-access-control">MCP permissions and access control</h2><a class="sl-anchor-link" href="#mcp-permissions-and-access-control"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “MCP permissions and access control”</span></a></div>
-<p>Access to Model Context Protocol tools and resources is governed by Antigravity’s <a href="/docs/permissions">permissions system</a>. By default, unconfigured MCP tools run in <strong>Ask</strong> mode, requiring your approval before execution. You can allow specific tools or entire servers in your policy configuration:</p>
-\<ul\>
-\<li\><strong><code dir="auto">mcp(server/tool)</code></strong>: Matches a specific tool on a specific server.</li>
-\<li\><strong><code dir="auto">mcp(server/*)</code></strong>: Matches all tools on a specified server.</li>
-\<li\><strong><code dir="auto">mcp(*)</code></strong>: Global wildcard matching any MCP tool across all connected servers.</li>
-</ul>
-<div class="sl-heading-wrapper level-h2"><h2 id="supported-mcp-servers">Supported MCP servers</h2><a class="sl-anchor-link" href="#supported-mcp-servers"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Supported MCP servers”</span></a></div>
-<p>The MCP Store features direct integrations for a wide variety of developer platforms, databases, and productivity services:</p>
-\<details open\>\<summary\>Databases and storage (15 servers)</summary><div class="columns-2">\<ul\>
-\<li\><a href="https://cloud.google.com/alloydb/docs/ai/use-alloydb-mcp" target="_blank" rel="noopener noreferrer">AlloyDB for PostgreSQL</a></li>
-\<li\><a href="https://cloud.google.com/bigquery/docs/use-bigquery-mcp" target="_blank" rel="noopener noreferrer">BigQuery</a></li>
-\<li\><a href="https://docs.cloud.google.com/bigtable/docs/use-bigtable-mcp" target="_blank" rel="noopener noreferrer">Bigtable Admin remote MCP</a></li>
-\<li\><a href="https://clickhouse.com/docs/use-cases/AI/MCP" target="_blank" rel="noopener noreferrer">ClickHouse</a></li>
-\<li\><a href="https://docs.cloud.google.com/sql/docs/mysql/use-cloudsql-mcp" target="_blank" rel="noopener noreferrer">Cloud SQL (MySQL, PostgreSQL, SQL Server, Managed)</a></li>
-\<li\><a href="https://docs.cloud.google.com/dataplex/docs/use-remote-mcp" target="_blank" rel="noopener noreferrer">Dataplex</a></li>
-\<li\><a href="https://mcp-toolbox.dev/documentation/introduction/" target="_blank" rel="noopener noreferrer">MCP Toolbox for Databases</a></li>
-\<li\><a href="https://github.com/mongodb-js/mongodb-mcp-server" target="_blank" rel="noopener noreferrer">MongoDB</a></li>
-\<li\><a href="https://neo4j.com/docs/mcp/current/" target="_blank" rel="noopener noreferrer">Neo4j</a></li>
-\<li\><a href="https://github.com/neondatabase-labs/mcp-server-neon" target="_blank" rel="noopener noreferrer">Neon</a></li>
-\<li\><a href="https://github.com/pinecone-io/pinecone-mcp" target="_blank" rel="noopener noreferrer">Pinecone</a></li>
-\<li\><a href="https://github.com/prisma/prisma?tab=readme-ov-file#mcp-server" target="_blank" rel="noopener noreferrer">Prisma</a></li>
-\<li\><a href="https://github.com/redis/mcp-redis" target="_blank" rel="noopener noreferrer">Redis</a></li>
-\<li\><a href="https://docs.cloud.google.com/spanner/docs/use-spanner-mcp" target="_blank" rel="noopener noreferrer">Spanner</a></li>
-\<li\><a href="https://github.com/supabase-community/supabase-mcp" target="_blank" rel="noopener noreferrer">Supabase</a></li>
-</ul></div></details>
-\<details open\>\<summary\>Developer tools and CI/CD (17 servers)</summary><div class="columns-2">\<ul\>
-\<li\><a href="https://docs.cloud.google.com/apigee/docs/reference/apis/apihub/mcp" target="_blank" rel="noopener noreferrer">Apigee MCP</a></li>
-\<li\><a href="https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/" target="_blank" rel="noopener noreferrer">Atlassian</a></li>
-\<li\><a href="https://docs.cloud.google.com/sdk/use-gcloud-mcp" target="_blank" rel="noopener noreferrer">Cloud CLI Execution</a></li>
-\<li\><a href="https://app.softwareforge.ai/docs/introduction" target="_blank" rel="noopener noreferrer">Forge</a></li>
-\<li\><a href="https://github.com/github/github-mcp-server" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-\<li\><a href="https://docs.gitlab.com/orbit/remote/access/mcp/" target="_blank" rel="noopener noreferrer">GitLab Orbit</a></li>
-\<li\><a href="https://docs.cloud.google.com/kubernetes-engine/docs/how-to/use-gke-mcp" target="_blank" rel="noopener noreferrer">GKE OneMCP</a></li>
-\<li\><a href="https://github.com/harness/mcp-server" target="_blank" rel="noopener noreferrer">Harness</a></li>
-\<li\><a href="https://github.com/heroku/heroku-mcp-server" target="_blank" rel="noopener noreferrer">Heroku</a></li>
-\<li\><a href="https://developers.home.google.com/mcp/developer" target="_blank" rel="noopener noreferrer">Home Developer MCP</a></li>
-\<li\><a href="https://linear.app/changelog/2025-05-01-mcp" target="_blank" rel="noopener noreferrer">Linear</a></li>
-\<li\><a href="https://help.mabl.com/hc/en-us/articles/47299375773844-mabl-MCP-overview" target="_blank" rel="noopener noreferrer">mabl</a></li>
-\<li\><a href="https://github.com/netlify/netlify-mcp" target="_blank" rel="noopener noreferrer">Netlify</a></li>
-\<li\><a href="https://docs.agents.opsera.ai/" target="_blank" rel="noopener noreferrer">Opsera AI Agents</a></li>
-\<li\><a href="https://github.com/postmanlabs/postman-mcp-server" target="_blank" rel="noopener noreferrer">Postman</a></li>
-\<li\><a href="https://github.com/SonarSource/sonarqube-mcp-server" target="_blank" rel="noopener noreferrer">SonarQube</a></li>
-\<li\><a href="https://vercel.com/docs/agent-resources/vercel-mcp" target="_blank" rel="noopener noreferrer">Vercel</a></li>
-</ul></div></details>
-\<details open\>\<summary\>Frontend and design (8 servers)</summary><div class="columns-2">\<ul\>
-\<li\><a href="https://www.canva.dev/docs/mcp/" target="_blank" rel="noopener noreferrer">Canva</a></li>
-\<li\><a href="https://github.com/ChromeDevTools/chrome-devtools-mcp" target="_blank" rel="noopener noreferrer">Chrome DevTools</a></li>
-\<li\><a href="https://dart.dev/tools/mcp-server" target="_blank" rel="noopener noreferrer">Dart</a></li>
-\<li\><a href="https://help.figma.com/hc/en-us/articles/32132100833559-Guide-to-the-Dev-Mode-MCP-Server" target="_blank" rel="noopener noreferrer">Figma Dev Mode MCP</a></li>
-\<li\><a href="https://www.locofy.ai/docs/export-and-deployment/locofy-mcp/" target="_blank" rel="noopener noreferrer">Locofy</a></li>
-\<li\><a href="https://docs.lovable.dev/integrations/lovable-mcp-server" target="_blank" rel="noopener noreferrer">Lovable MCP</a></li>
-\<li\><a href="https://developers.miro.com/docs/miro-mcp" target="_blank" rel="noopener noreferrer">Miro</a></li>
-\<li\><a href="https://mobbin.com/mcp" target="_blank" rel="noopener noreferrer">Mobbin MCP</a></li>
-</ul></div></details>
-\<details open\>\<summary\>Security (4 servers)</summary><div class="columns-2">\<ul\>
-\<li\><a href="https://github.com/CrowdStrike/falcon-mcp" target="_blank" rel="noopener noreferrer">CrowdStrike</a></li>
-\<li\><a href="https://docs.endorlabs.com/setup-deployment/mcp/antigravity" target="_blank" rel="noopener noreferrer">Endor Labs</a></li>
-\<li\><a href="https://splunkbase.splunk.com/app/7931" target="_blank" rel="noopener noreferrer">Splunk</a></li>
-\<li\><a href="https://www.wiz.io/blog/introducing-wiz-mcp" target="_blank" rel="noopener noreferrer">Wiz</a></li>
-</ul></div></details>
-\<details open\>\<summary\>Analytics, AI, and cloud (33 servers)</summary><div class="columns-2">\<ul\>
-\<li\><a href="https://github.com/airweave-ai/airweave" target="_blank" rel="noopener noreferrer">Airweave</a></li>
-\<li\><a href="https://docs.antimetal.com/connect" target="_blank" rel="noopener noreferrer">Antimetal</a></li>
-\<li\><a href="https://github.com/Arize-ai/arize-tracing-assistant" target="_blank" rel="noopener noreferrer">Arize</a></li>
-\<li\><a href="https://docs.cloud.google.com/audit-manager/docs/reference/auditmanager/mcp" target="_blank" rel="noopener noreferrer">Cloud Audit Manager</a></li>
-\<li\><a href="https://courtroom5.com/" target="_blank" rel="noopener noreferrer">Courtroom5</a></li>
-\<li\><a href="https://docs.daloopa.com/docs/mcp" target="_blank" rel="noopener noreferrer">Daloopa</a></li>
-\<li\><a href="https://developers.docusign.com/platform/mcp-server/" target="_blank" rel="noopener noreferrer">Docusign</a></li>
-\<li\><a href="https://docs.exa.ai/reference/exa-mcp" target="_blank" rel="noopener noreferrer">Exa</a></li>
-\<li\><a href="https://developer.factset.com/mcp/factset-ai-ready-data-mcp" target="_blank" rel="noopener noreferrer">FactSet AI-Ready Data</a></li>
-\<li\><a href="https://finnhub.io/mcp" target="_blank" rel="noopener noreferrer">Finnhub</a></li>
-\<li\><a href="https://firebase.google.com/docs/ai-assistance/mcp-server" target="_blank" rel="noopener noreferrer">Firebase</a></li>
-\<li\><a href="https://docs.fiscal.ai/docs/guides/mcp-integration" target="_blank" rel="noopener noreferrer">Fiscal.ai</a></li>
-\<li\><a href="https://cloud.google.com/docs/quotas/overview" target="_blank" rel="noopener noreferrer">Google Cloud Quotas</a></li>
-\<li\><a href="https://developers.google.com/knowledge/mcp" target="_blank" rel="noopener noreferrer">Google Developer Knowledge</a></li>
-\<li\><a href="https://github.com/grafana/ai-marketplace/tree/main/plugins/grafana-cloud-mcp" target="_blank" rel="noopener noreferrer">Grafana Cloud</a></li>
-\<li\><a href="https://github.com/guidepointglobal/mcp-skills-plugins" target="_blank" rel="noopener noreferrer">Guidepoint</a></li>
-\<li\><a href="https://developers.harvey.ai/guides/harvey_mcp" target="_blank" rel="noopener noreferrer">Harvey</a></li>
-\<li\><a href="https://docs.imanage.com/ai/mcpserver-user-help/en-US/iManage_MCP_Server_Help.html" target="_blank" rel="noopener noreferrer">iManage</a></li>
-\<li\><a href="https://www.legalzoom.com/ai" target="_blank" rel="noopener noreferrer">LegalZoom</a></li>
-\<li\><a href="https://mcp-toolbox.dev/documentation/connect-to/ides/looker_mcp/" target="_blank" rel="noopener noreferrer">Looker</a></li>
-\<li\><a href="https://developers.lseg.com/" target="_blank" rel="noopener noreferrer">LSEG</a></li>
-\<li\><a href="https://docs.cloud.google.com/gemini/enterprise/docs/connectors/netdocuments" target="_blank" rel="noopener noreferrer">NetDocuments</a></li>
-\<li\><a href="https://github.com/makenotion/notion-mcp-server" target="_blank" rel="noopener noreferrer">Notion</a></li>
-\<li\><a href="https://docs.parallel.ai/search/search-mcp" target="_blank" rel="noopener noreferrer">Parallel Search</a></li>
-\<li\><a href="https://developer.paypal.com/tools/mcp-server/" target="_blank" rel="noopener noreferrer">PayPal</a></li>
-\<li\><a href="https://github.com/ppl-ai/modelcontextprotocol" target="_blank" rel="noopener noreferrer">Perplexity Ask</a></li>
-\<li\><a href="https://posthog.com/mcp" target="_blank" rel="noopener noreferrer">PostHog</a></li>
-\<li\><a href="https://docs.cloud.google.com/gemini/enterprise/docs/connectors/relativity" target="_blank" rel="noopener noreferrer">Relativity</a></li>
-\<li\><a href="https://github.com/kensho-technologies/kfinance" target="_blank" rel="noopener noreferrer">S&#x26;P Global</a></li>
-\<li\><a href="https://developer.salesforce.com/docs/platform/hosted-mcp-servers/guide/sobject-all.html" target="_blank" rel="noopener noreferrer">Salesforce</a></li>
-\<li\><a href="https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking" target="_blank" rel="noopener noreferrer">Sequential Thinking</a></li>
-\<li\><a href="https://github.com/stripe/agent-toolkit/tree/main/modelcontextprotocol" target="_blank" rel="noopener noreferrer">Stripe</a></li>
-\<li\><a href="https://windsor.ai/documentation/windsor-mcp/" target="_blank" rel="noopener noreferrer">Windsor AI</a></li>
-</ul></div></details>
-<div class="sl-heading-wrapper level-h3"><h3 id="example-search-google-developer-docs">Example: search Google developer docs</h3><a class="sl-anchor-link" href="#example-search-google-developer-docs"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Example: search Google developer docs”</span></a></div>
-<p>The <a href="https://developers.google.com/knowledge/mcp" target="_blank" rel="noopener noreferrer">Google Developer Knowledge MCP server</a> lets Antigravity search and read official, up-to-date Google developer documentation, including Android, Firebase, Google Cloud, Google Maps Platform, and the Antigravity docs on this site, so the agent can check the current API before it writes code rather than relying only on its training data. It exposes three tools: <code dir="auto">search_documents</code>, <code dir="auto">get_documents</code>, and <code dir="auto">answer_query</code>.</p>
-<p>Install <strong>Google Developer Knowledge</strong> from the MCP Store as described in <a href="#getting-started-by-surface">Getting started by surface</a>. It connects with your Google credentials, so no API key is needed. For other setups, such as Antigravity CLI or a shared workspace config, follow the <a href="https://developers.google.com/knowledge/mcp?tab=google-antigravity#configure-ide" target="_blank" rel="noopener noreferrer">Antigravity steps</a> in the Developer Knowledge documentation.</p>
-<p>Once connected, you can ask the agent to ground its work in the docs. For example:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="text" dir="ltr"><code><span class="line"><span>Look up the current Antigravity hooks documentation and add a PreToolUse hook that blocks shell commands which modify files outside this workspace.</span></span></code></pre>
-<aside aria-label="Tip" class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path fill-rule="evenodd" d="M1.44 8.855v-.001l3.527-3.516c.34-.344.802-.541 1.285-.548h6.649l.947-.947c3.07-3.07 6.207-3.072 7.62-2.868a1.821 1.821 0 0 1 1.557 1.557c.204 1.413.203 4.55-2.868 7.62l-.946.946v6.649a1.845 1.845 0 0 1-.549 1.286l-3.516 3.528a1.844 1.844 0 0 1-3.11-.944l-.858-4.275-4.52-4.52-2.31-.463-1.964-.394A1.847 1.847 0 0 1 .98 10.693a1.843 1.843 0 0 1 .46-1.838Zm5.379 2.017-3.873-.776L6.32 6.733h4.638l-4.14 4.14Zm8.403-5.655c2.459-2.46 4.856-2.463 5.89-2.33.134 1.035.13 3.432-2.329 5.891l-6.71 6.71-3.561-3.56 6.71-6.711Zm-1.318 15.837-.776-3.873 4.14-4.14v4.639l-3.364 3.374Z" clip-rule="evenodd"></path><path d="M9.318 18.345a.972.972 0 0 0-1.86-.561c-.482 1.435-1.687 2.204-2.934 2.619a8.22 8.22 0 0 1-1.23.302c.062-.365.157-.79.303-1.229.415-1.247 1.184-2.452 2.62-2.935a.971.971 0 1 0-.62-1.842c-.12.04-.236.084-.35.13-2.02.828-3.012 2.588-3.493 4.033a10.383 10.383 0 0 0-.51 2.845l-.001.016v.063c0 .536.434.972.97.972H2.24a7.21 7.21 0 0 0 .878-.065c.527-.063 1.248-.19 2.02-.447 1.445-.48 3.205-1.472 4.033-3.494a5.828 5.828 0 0 0 .147-.407Z"></path></svg>Tip</p><div class="starlight-aside__content"><p>Pair the server with the <a href="https://developers.google.com/knowledge/mcp#agent-skill" target="_blank" rel="noopener noreferrer"><code dir="auto">retrieving-developer-knowledge</code></a> agent skill, which tells the agent which tool to pick and how to fall back to the <a href="https://developers.google.com/knowledge/api" target="_blank" rel="noopener noreferrer">Developer Knowledge API</a> if the MCP server isn’t available.</p></div></aside></div><footer class="sl-flex docs-footer docs-footer-wrapper astro-4mgpquaz" data-pagefind-ignore><div class="meta sl-flex astro-4mgpquaz"></div><div class="pagination-links print:hidden astro-jgq3vlii" dir="ltr"><a href="/docs/cli/commands/voice/" rel="prev" class="astro-jgq3vlii"><svg aria-hidden="true" class="astro-jgq3vlii astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-jgq3vlii">Previous<br class="astro-jgq3vlii"><span class="link-title astro-jgq3vlii">/voice</span></span></a><a href="/docs/skills/" rel="next" class="astro-jgq3vlii"><svg aria-hidden="true" class="astro-jgq3vlii astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-jgq3vlii">Next<br class="astro-jgq3vlii"><span class="link-title astro-jgq3vlii">Agent skills</span></span></a></div><nav class="docs-legal-nav print:hidden astro-4mgpquaz" data-analytics-nav="docs_footer" aria-label="Google legal and cookie links"><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/" target="_blank" rel="noopener noreferrer">About Google</a><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/products/" target="_blank" rel="noopener noreferrer">Google Products</a><a class="docs-footer-link astro-4mgpquaz" href="https://policies.google.com/privacy?hl=en-US" target="_blank" rel="noopener noreferrer">Privacy</a><a class="docs-footer-link astro-4mgpquaz" href="/terms">Terms</a><a aria-hidden="true" class="docs-footer-link glue-cookie-notification-bar-control astro-4mgpquaz">Manage cookies</a></nav><template data-download-survey-template><dialog class="dls" data-download-survey aria-labelledby="dls-title" aria-describedby="dls-subtitle" data-nosnippet><div class="dls-card"><button type="button" class="dls-close" data-dls-dismiss="close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"></path></svg></button><div class="dls-body"><div class="dls-ask" data-dls-view="ask"><p class="dls-status" data-dls-status><svg class="dls-status-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="10"></circle><path d="M6 10.4l2.6 2.6L14 7.6"></path></svg><span data-download-survey-text>Your download has started</span></p><h2 class="dls-title" id="dls-title" data-download-survey-text>How did you hear about us?</h2><p class="dls-subtitle" id="dls-subtitle" data-download-survey-text>Pick one. It helps us reach more people like you.</p><div class="dls-options" role="group" aria-labelledby="dls-title" data-dls-options><button type="button" class="dls-option" data-dls-answer="search"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>Search engine</span></button><button type="button" class="dls-option" data-dls-answer="ai_assistant"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>AI assistant</span></button><button type="button" class="dls-option" data-dls-answer="youtube"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>YouTube</span></button><button type="button" class="dls-option" data-dls-answer="x"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>X (Twitter)</span></button><button type="button" class="dls-option" data-dls-answer="linkedin"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>LinkedIn</span></button><button type="button" class="dls-option" data-dls-answer="reddit"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>Reddit</span></button><button type="button" class="dls-option" data-dls-answer="hacker_news"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>Hacker News</span></button><button type="button" class="dls-option" data-dls-answer="friend_or_colleague"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>Friend or colleague</span></button><button type="button" class="dls-option" data-dls-answer="news_or_blog"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>News or blog</span></button><button type="button" class="dls-option" data-dls-answer="event"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>Event or conference</span></button><button type="button" class="dls-option" data-dls-answer="google_product"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>Another Google product</span></button><button type="button" class="dls-option" data-dls-answer="other"><svg class="dls-option-check" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4l3 3 6.6-6.8"></path></svg><span data-download-survey-text>Other</span></button></div><div class="dls-actions"><button type="button" class="dls-skip" data-dls-dismiss="skip"><span data-download-survey-text>Skip</span></button></div></div><div class="dls-thanks" data-dls-view="thanks" role="status" aria-live="polite" aria-labelledby="dls-thanks-title" tabindex="-1" hidden><div class="dls-thanks-content" data-dls-thanks-content><svg class="dls-thanks-mark" viewBox="0 0 52 52" aria-hidden="true" focusable="false"><circle cx="26" cy="26" r="24"></circle><path d="M16 27l7 7 14-15"></path></svg><p class="dls-thanks-title" id="dls-thanks-title" data-download-survey-text>Thanks for letting us know!</p></div></div></div></div></dialog></template><script type="module" src="/_astro/DownloadSurvey.astro_astro_type_script_index_0_lang.DWzR8tN5.js"></script></footer></div></div></main></div></div></div></div></body></html>
+  }
+}
+```
+
+Any enabled tools on the server not listed with `"eager": true` remain lazy-loaded by default. Eager vs. lazy loading is evaluated after `enabledTools` and `disabledTools` are applied, so `"eager": true` only affects enabled tools; a tool marked `"eager": true` that is also in `disabledTools`, or missing from a non-empty `enabledTools` list, stays hidden.
+
+## MCP authentication
+
+Connected MCP servers can securely authenticate against external services using built-in Google credentials, automatic OAuth flows, or custom HTTP headers.
+
+### Google credentials
+
+Set `authProviderType` to `"google_credentials"` to use Google Application Default Credentials (ADC):
+
+```json
+{
+  "mcpServers": {
+    "my-gcp-service": {
+      "serverUrl": "https://example.googleapis.com/mcp/",
+      "authProviderType": "google_credentials"
+    }
+  }
+}
+```
+
+This requires Application Default Credentials to be configured locally. To set them up, run:
+
+```bash
+gcloud auth application-default login
+```
+
+If you previously logged in, ensure your quota project is set by running:
+
+```bash
+gcloud auth application-default set-quota-project {QUOTA_PROJECT}
+```
+
+### OAuth
+
+Antigravity automatically handles OAuth 2.0 with Proof Key for Code Exchange (PKCE) for remote MCP servers that support [Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document) or [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591). For these servers, no additional client configuration is needed:
+
+```json
+{
+  "mcpServers": {
+    "oauth-server": {
+      "serverUrl": "https://api.example.com/mcp/"
+    }
+  }
+}
+```
+
+When connecting to an OAuth-protected MCP server, Antigravity discovers the server’s Protected Resource Metadata (`/.well-known/oauth-protected-resource`, whose `resource` value must match the MCP server URL) and the first entry in `authorization_servers` (`/.well-known/oauth-authorization-server` or `/.well-known/openid-configuration`), then resolves client credentials in the following order:
+
+1.  **Manual client credentials**: Uses `oauth.clientId` (and optional `oauth.clientSecret`) if specified in `mcp_config.json`.
+2.  **Client ID Metadata Document (CIMD)**: Uses Antigravity’s hosted metadata URL as the `client_id` if the authorization server metadata includes `"client_id_metadata_document_supported": true` (for a few built-in integrations, Antigravity uses its own pre-registered client before trying CIMD).
+3.  **Dynamic Client Registration (DCR)**: Registers a client dynamically if the authorization server metadata includes a `registration_endpoint`.
+
+#### Client ID Metadata Document (CIMD)
+
+Antigravity publishes its OAuth Client ID Metadata Document at the following URL. In the Antigravity IDE, CIMD support requires version 2.6.0 or later:
+
+```text
+https://antigravity.google/oauth/client-metadata.json
+```
+
+MCP servers and OAuth authorization servers can use CIMD to authenticate Antigravity clients without requiring dynamic client registration or manual per-user `clientId` setup:
+
+1.  Advertise `"client_id_metadata_document_supported": true`, `"code_challenge_methods_supported": ["S256"]` (PKCE is required), and a non-empty `issuer` in your authorization server metadata (`/.well-known/oauth-authorization-server` or `/.well-known/openid-configuration`).
+2.  When initiating the OAuth flow, Antigravity sends `client_id=https://antigravity.google/oauth/client-metadata.json`, `redirect_uri=https://antigravity.google/oauth-callback`, an `S256` PKCE challenge, and the RFC 8707 `resource` parameter in the authorization and token requests.
+3.  Your authorization server can either fetch and validate the JSON document from `https://antigravity.google/oauth/client-metadata.json` dynamically, or pre-allowlist that URL as a public client ID with `https://antigravity.google/oauth-callback` as the redirect URI.
+
+For reference, `https://antigravity.google/oauth/client-metadata.json` serves the following metadata:
+
+```json
+{
+  "client_id": "https://antigravity.google/oauth/client-metadata.json",
+  "client_name": "Google Antigravity",
+  "client_uri": "https://antigravity.google",
+  "logo_uri": "https://antigravity.google/assets/image/brand/antigravity-icon__full-color.png",
+  "redirect_uris": [
+    "https://antigravity.google/oauth-callback"
+  ],
+  "grant_types": [
+    "authorization_code",
+    "refresh_token"
+  ],
+  "response_types": [
+    "code"
+  ],
+  "token_endpoint_auth_method": "none"
+}
+```
+
+#### Manual client credentials
+
+If the server supports neither CIMD nor dynamic client registration, you can provide your client credentials manually:
+
+```json
+{
+  "mcpServers": {
+    "oauth-server": {
+      "serverUrl": "https://api.example.com/mcp/",
+      "oauth": {
+        "clientId": "your-client-id",
+        "clientSecret": "your-client-secret"
+      }
+    }
+  }
+}
+```
+
+If you provide client credentials manually, ensure the following URL is registered as a redirect URI in your OAuth provider:
+
+```text
+https://antigravity.google/oauth-callback
+```
+
+#### Authenticate a server
+
+To connect to an OAuth-enabled server:
+
+1.  In the Antigravity App, click **Customizations** in the sidebar, and then click **Installed**.
+    
+2.  Under **MCP Servers**, click **Authenticate** next to the server.
+    
+    ![The MCP Servers section of the Customizations page with the bookmarks-docs server, a red status dot, an Authenticate button, and an Unauthorized error](/assets/image/docs/tools/mcp-oauth-authenticate.png)
+    
+3.  Complete authentication in your browser and copy the authorization code.
+    
+    ![Copy authorization code](/assets/image/docs/tools/mcp-oauth-copy-code.png)
+    
+4.  Paste the code into the **Enter authorization code** field and click **Submit**.
+    
+    ![The bookmarks-docs server in the MCP Servers section with an Enter authorization code field and Submit and Cancel buttons](/assets/image/docs/tools/mcp-oauth-paste-code.png)
+    
+
+Once authenticated, the server reconnects automatically.
+
+![The bookmarks-docs server in the MCP Servers section with a green status dot, a Sign out button, and 2 tools enabled](/assets/image/docs/tools/mcp-oauth-authenticated.png)
+
+Access tokens are stored in `~/.gemini/antigravity/mcp_oauth_tokens.json`. Expired tokens are refreshed automatically, and invalid tokens are removed.
+
+### Custom headers
+
+For remote servers that require custom HTTP headers (such as API keys or bearer tokens), add them to the `headers` object. For example:
+
+```json
+{
+  "mcpServers": {
+    "my-remote-server": {
+      "serverUrl": "https://api.example.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_TOKEN"
+      }
+    }
+  }
+}
+```
+
+## MCP permissions and access control
+
+Access to Model Context Protocol tools and resources is governed by Antigravity’s [permissions system](/docs/permissions). By default, unconfigured MCP tools run in **Ask** mode, requiring your approval before execution. You can allow specific tools or entire servers in your policy configuration:
+
+*   **`mcp(server/tool)`**: Matches a specific tool on a specific server.
+*   **`mcp(server/*)`**: Matches all tools on a specified server.
+*   **`mcp(*)`**: Global wildcard matching any MCP tool across all connected servers.
+
+## Supported MCP servers
+
+The MCP Store features direct integrations for a wide variety of developer platforms, databases, and productivity services:
+
+**Databases and storage (15 servers):**
+
+*   [AlloyDB for PostgreSQL](https://cloud.google.com/alloydb/docs/ai/use-alloydb-mcp)
+*   [BigQuery](https://cloud.google.com/bigquery/docs/use-bigquery-mcp)
+*   [Bigtable Admin remote MCP](https://docs.cloud.google.com/bigtable/docs/use-bigtable-mcp)
+*   [ClickHouse](https://clickhouse.com/docs/use-cases/AI/MCP)
+*   [Cloud SQL (MySQL, PostgreSQL, SQL Server, Managed)](https://docs.cloud.google.com/sql/docs/mysql/use-cloudsql-mcp)
+*   [Dataplex](https://docs.cloud.google.com/dataplex/docs/use-remote-mcp)
+*   [MCP Toolbox for Databases](https://mcp-toolbox.dev/documentation/introduction/)
+*   [MongoDB](https://github.com/mongodb-js/mongodb-mcp-server)
+*   [Neo4j](https://neo4j.com/docs/mcp/current/)
+*   [Neon](https://github.com/neondatabase-labs/mcp-server-neon)
+*   [Pinecone](https://github.com/pinecone-io/pinecone-mcp)
+*   [Prisma](https://github.com/prisma/prisma?tab=readme-ov-file#mcp-server)
+*   [Redis](https://github.com/redis/mcp-redis)
+*   [Spanner](https://docs.cloud.google.com/spanner/docs/use-spanner-mcp)
+*   [Supabase](https://github.com/supabase-community/supabase-mcp)
+
+**Developer tools and CI/CD (17 servers):**
+
+*   [Apigee MCP](https://docs.cloud.google.com/apigee/docs/reference/apis/apihub/mcp)
+*   [Atlassian](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/)
+*   [Cloud CLI Execution](https://docs.cloud.google.com/sdk/use-gcloud-mcp)
+*   [Forge](https://app.softwareforge.ai/docs/introduction)
+*   [GitHub](https://github.com/github/github-mcp-server)
+*   [GitLab Orbit](https://docs.gitlab.com/orbit/remote/access/mcp/)
+*   [GKE OneMCP](https://docs.cloud.google.com/kubernetes-engine/docs/how-to/use-gke-mcp)
+*   [Harness](https://github.com/harness/mcp-server)
+*   [Heroku](https://github.com/heroku/heroku-mcp-server)
+*   [Home Developer MCP](https://developers.home.google.com/mcp/developer)
+*   [Linear](https://linear.app/changelog/2025-05-01-mcp)
+*   [mabl](https://help.mabl.com/hc/en-us/articles/47299375773844-mabl-MCP-overview)
+*   [Netlify](https://github.com/netlify/netlify-mcp)
+*   [Opsera AI Agents](https://docs.agents.opsera.ai/)
+*   [Postman](https://github.com/postmanlabs/postman-mcp-server)
+*   [SonarQube](https://github.com/SonarSource/sonarqube-mcp-server)
+*   [Vercel](https://vercel.com/docs/agent-resources/vercel-mcp)
+
+**Frontend and design (8 servers):**
+
+*   [Canva](https://www.canva.dev/docs/mcp/)
+*   [Chrome DevTools](https://github.com/ChromeDevTools/chrome-devtools-mcp)
+*   [Dart](https://dart.dev/tools/mcp-server)
+*   [Figma Dev Mode MCP](https://help.figma.com/hc/en-us/articles/32132100833559-Guide-to-the-Dev-Mode-MCP-Server)
+*   [Locofy](https://www.locofy.ai/docs/export-and-deployment/locofy-mcp/)
+*   [Lovable MCP](https://docs.lovable.dev/integrations/lovable-mcp-server)
+*   [Miro](https://developers.miro.com/docs/miro-mcp)
+*   [Mobbin MCP](https://mobbin.com/mcp)
+
+**Security (4 servers):**
+
+*   [CrowdStrike](https://github.com/CrowdStrike/falcon-mcp)
+*   [Endor Labs](https://docs.endorlabs.com/setup-deployment/mcp/antigravity)
+*   [Splunk](https://splunkbase.splunk.com/app/7931)
+*   [Wiz](https://www.wiz.io/blog/introducing-wiz-mcp)
+
+**Analytics, AI, and cloud (33 servers):**
+
+*   [Airweave](https://github.com/airweave-ai/airweave)
+*   [Antimetal](https://docs.antimetal.com/connect)
+*   [Arize](https://github.com/Arize-ai/arize-tracing-assistant)
+*   [Cloud Audit Manager](https://docs.cloud.google.com/audit-manager/docs/reference/auditmanager/mcp)
+*   [Courtroom5](https://courtroom5.com/)
+*   [Daloopa](https://docs.daloopa.com/docs/mcp)
+*   [Docusign](https://developers.docusign.com/platform/mcp-server/)
+*   [Exa](https://docs.exa.ai/reference/exa-mcp)
+*   [FactSet AI-Ready Data](https://developer.factset.com/mcp/factset-ai-ready-data-mcp)
+*   [Finnhub](https://finnhub.io/mcp)
+*   [Firebase](https://firebase.google.com/docs/ai-assistance/mcp-server)
+*   [Fiscal.ai](https://docs.fiscal.ai/docs/guides/mcp-integration)
+*   [Google Cloud Quotas](https://cloud.google.com/docs/quotas/overview)
+*   [Google Developer Knowledge](https://developers.google.com/knowledge/mcp)
+*   [Grafana Cloud](https://github.com/grafana/ai-marketplace/tree/main/plugins/grafana-cloud-mcp)
+*   [Guidepoint](https://github.com/guidepointglobal/mcp-skills-plugins)
+*   [Harvey](https://developers.harvey.ai/guides/harvey_mcp)
+*   [iManage](https://docs.imanage.com/ai/mcpserver-user-help/en-US/iManage_MCP_Server_Help.html)
+*   [LegalZoom](https://www.legalzoom.com/ai)
+*   [Looker](https://mcp-toolbox.dev/documentation/connect-to/ides/looker_mcp/)
+*   [LSEG](https://developers.lseg.com/)
+*   [NetDocuments](https://docs.cloud.google.com/gemini/enterprise/docs/connectors/netdocuments)
+*   [Notion](https://github.com/makenotion/notion-mcp-server)
+*   [Parallel Search](https://docs.parallel.ai/search/search-mcp)
+*   [PayPal](https://developer.paypal.com/tools/mcp-server/)
+*   [Perplexity Ask](https://github.com/ppl-ai/modelcontextprotocol)
+*   [PostHog](https://posthog.com/mcp)
+*   [Relativity](https://docs.cloud.google.com/gemini/enterprise/docs/connectors/relativity)
+*   [S&P Global](https://github.com/kensho-technologies/kfinance)
+*   [Salesforce](https://developer.salesforce.com/docs/platform/hosted-mcp-servers/guide/sobject-all.html)
+*   [Sequential Thinking](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking)
+*   [Stripe](https://github.com/stripe/agent-toolkit/tree/main/modelcontextprotocol)
+*   [Windsor AI](https://windsor.ai/documentation/windsor-mcp/)
+
+### Example: search Google developer docs
+
+The [Google Developer Knowledge MCP server](https://developers.google.com/knowledge/mcp) lets Antigravity search and read official, up-to-date Google developer documentation, including Android, Firebase, Google Cloud, Google Maps Platform, and the Antigravity docs on this site, so the agent can check the current API before it writes code rather than relying only on its training data. It exposes three tools: `search_documents`, `get_documents`, and `answer_query`.
+
+Install **Google Developer Knowledge** from the MCP Store as described in [Getting started by surface](#getting-started-by-surface). It connects with your Google credentials, so no API key is needed. For other setups, such as Antigravity CLI or a shared workspace config, follow the [Antigravity steps](https://developers.google.com/knowledge/mcp?tab=google-antigravity#configure-ide) in the Developer Knowledge documentation.
+
+Once connected, you can ask the agent to ground its work in the docs. For example:
+
+```prompt
+Look up the current Antigravity hooks documentation and add a PreToolUse hook that blocks shell commands which modify files outside this workspace.
+```
+
+Tip
+
+Pair the server with the [`retrieving-developer-knowledge`](https://developers.google.com/knowledge/mcp#agent-skill) agent skill, which tells the agent which tool to pick and how to fall back to the [Developer Knowledge API](https://developers.google.com/knowledge/api) if the MCP server isn’t available.

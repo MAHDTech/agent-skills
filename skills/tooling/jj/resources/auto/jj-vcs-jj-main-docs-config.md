@@ -37,8 +37,8 @@ You can enable JSON Schema validation in your editor by adding a `#:schema`
 reference at the top of your TOML config files. See [JSON Schema Support] for
 details.
 
-See the [TOML site] and the [syntax guide] for a detailed description of the
-syntax. We cover some of the basics below.
+See the [TOML site] and the [syntax guide (v1.1.0)][TOML syntax pinned] for a
+detailed description of the syntax. We cover some of the basics below.
 
 The first thing to remember is that the value of a setting (the part to the
 right of the `=` sign) should be surrounded in quotes if it's a string.
@@ -46,9 +46,9 @@ right of the `=` sign) should be surrounded in quotes if it's a string.
 [config dir]: https://github.com/jj-vcs/jj/blob/main/cli/src/config/
 [JSON Schema Support]: #json-schema-support
 [specified on the command-line]: #specifying-config-on-the-command-line
-[syntax guide]: https://toml.io/en/latest
 [the user config files]: #user-config-files
 [TOML site]: https://toml.io/en/
+[TOML syntax pinned]: https://toml.io/en/v1.1.0
 
 ### Dotted style and headings
 
@@ -401,7 +401,10 @@ Some ready-to-use trailer templates are available for frequently used trailers:
 * `format_signed_off_by_trailer(commit)` creates a "Signed-off-by" trailer
   using the committer info.
 * `format_gerrit_change_id_trailer(commit)` creates a "Change-Id" trailer
-  suitable to be used with Gerrit. It is based Jujutsu's change id.
+  suitable to be used with Gerrit. It is based on Jujutsu's change ID. See the
+  [Gerrit docs](gerrit.md#change-id-management).
+* `format_gerrit_link_trailer(commit)` creates a "Link" trailer suitable to be
+  used with Gerrit. See the [Gerrit docs](gerrit.md#alternative-link-trailer).
 
 Existing trailers are also accessible via `commit.trailers()`.
 
@@ -618,6 +621,18 @@ To prevent rewriting commits authored by other users:
 Ancestors of the configured set are also immutable. The root commit is always
 immutable even if the set is empty.
 
+!!! warning
+
+    Functions such as `remote_bookmarks()` may include hidden revisions.
+    Mentioning them in `immutable_heads()`, even in a negated expression, can
+    temporarily make those revisions and their ancestors reachable. For example,
+    those hidden revisions may then appear in `mutable()`.
+
+    To exclude bookmarks by name, negate the name pattern:
+    `remote_bookmarks(~'private/*')`. Negating the entire revset instead, as
+    in `~remote_bookmarks('private/*')`, brings revisions pointed to by
+    `private/*` bookmarks into the evaluation.
+
 Immutable commits (other than the root commit) can be rewritten using the
 `--ignore-immutable` CLI flag.
 
@@ -758,8 +773,16 @@ graph.style = "square"
 The symbols used to represent commits or operations can be customized via
 templates.
 
-- `templates.log_node` for commits (with `Option\<Commit\>` keywords)
-- `templates.op_log_node` for operations (with `Operation` keywords)
+- `templates.log_node` for commits. `self` is an
+  [`Option\<Commit\>`][template-type-commit] object, where an unset value (see
+  [`Option` type][template-type-option]) corresponds to the node of an
+  `(elided revisions)` line.
+- `templates.op_log_node` for operations. `self` is an
+  [`Operation`][template-type-operation] object.
+
+[template-type-commit]: templates.md#commit-type
+[template-type-operation]: templates.md#operation-type
+[template-type-option]: templates.md#option-type
 
 For example:
 
@@ -770,7 +793,9 @@ coalesce(
   if(!self, "🮀"),
   if(current_working_copy, "@"),
   if(root, "┴"),
-  if(immutable, "●", "○"),
+  if(immutable, "●"),
+  if(empty, "◌"),
+  "○",
 )
 '''
 op_log_node = 'if(current_operation, "@", "○")'
@@ -792,13 +817,13 @@ Can be customized by the `format_short_id()` template alias.
 
 ```toml
 [template-aliases]
-# Highlight unique prefix and show at least 12 characters (default)
+# Highlight unique prefix and show at least 12 characters (default config uses 8).
 'format_short_id(id)' = 'id.shortest(12)'
-# Just the shortest possible unique prefix
+# Just the shortest possible unique prefix.
 'format_short_id(id)' = 'id.shortest()'
-# Show unique prefix and the rest surrounded by brackets
+# Show unique prefix and the rest of a 12-character prefix surrounded by brackets.
 'format_short_id(id)' = 'id.shortest(12).prefix() ++ "[" ++ id.shortest(12).rest() ++ "]"'
-# Always show 12 characters
+# Always show 12 characters without highlighting the unique prefix.
 'format_short_id(id)' = 'id.short(12)'
 ```
 
@@ -1055,10 +1080,12 @@ l.definition = ["log", "-r", "(main..@):: | (main..@)-"]
 l.doc = "Log pending changes"
 ```
 
-This alias syntax can only run a single jj command. However, you may want to
-execute multiple jj commands with a single alias, or run arbitrary scripts that
-complement your version control workflow. This can be done, but be aware of the
-danger:
+### Alias arbitrary commands
+
+The alias syntax above can only run a single jj command. However, you may want
+to execute multiple jj commands with a single alias, or run arbitrary scripts
+that complement your version control workflow. This can be done, but be aware of
+the danger:
 
 !!! warning
 
@@ -1789,28 +1816,30 @@ to do with signing commits on modification of a change (e.g., rebasing or edits)
   author.
 
 To sign commits only when pushing, set `signing.behavior = "drop"` and
-`git.sign-on-push = true`:
+`revsets.git-sign-on-push` to a revset of commits to sign:
 
 ```toml
 # Configure signing backend as before, but lazily signing only on push.
 [signing]
+# Avoid doing any signing on commit creation
 behavior = "drop"
 backend = "ssh"
 key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGj+J6N6SO+4P8dOZqfR1oiay2yxhhHnagH52avUqw5h"
 
-[git]
-sign-on-push = true
+[revsets]
+# Sign all non-signed commits on push
+# Could be "~signed()", or any other revset
+git-sign-on-push = "~signed() & mine()"
 ```
 
 With this setup, commits are not signed when they are created or rewritten. At
-push time, `git.sign-on-push` only signs commits that are not yet signed (that
-are mutable and authored by you, behaving like `own` even though write-time
-signing uses `drop`).
+push time, `revsets.git-sign-on-push` is evaluated and all matching mutable
+commits to be pushed will be signed beforehand.
 
 This is useful when the signing backend requires user interaction or is slow,
 because the signing work is deferred to push time. If `signing.behavior` is set
 to `own` or `force`, commits may already be signed when written, and
-`git.sign-on-push` would have little or nothing left to sign.
+`revsets.git-sign-on-push` would have little or nothing left to sign.
 
 The commits are signed in their own transaction which is committed before
 the push starts. If the push fails, the commits stay signed and retrying
@@ -1857,7 +1886,8 @@ namely SHA-256.
 
 Currently, the object hash function can only be set when initializing a new Git
 repository. The setting `git.object-hash` controls the default choice for that
-purpose. It can take the values `sha1` (default) and `sha256`.
+purpose. It can take the values `sha1` (default) and `sha256`. `jj git clone`
+uses the object hash function of the remote repository instead.
 
 Note that at the moment there is no interopability between the formats, and not
 all code forges support SHA-256 repositories yet.
@@ -2064,9 +2094,10 @@ unset, all commits are eligible to be pushed.
 private-commits = "description('wip:*') | description('private:*')"
 ```
 
-If a commit is in `git.private-commits` but is already on the remote, then it is
-not considered a private commit. Commits that are immutable are also excluded
-from the private set.
+If a commit is in `git.private-commits` but is already on the remote being
+pushed to, then it is not considered a private commit. Commits that are on
+other remotes are still considered private, since the remote being pushed to
+may be more public.
 
 Private commits prevent their descendants from being pushed, since doing so
 would require pushing the private commit as well.

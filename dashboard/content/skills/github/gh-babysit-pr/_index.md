@@ -27,10 +27,10 @@ resources/manual/pr-wait <pr> [--repo owner/name] [--until ready|green|any-chang
 - **Single watcher rule:** Run at most one `resources/manual/pr-wait` process per PR. Every watcher on a GitHub account shares one rate limit, and `resources/manual/pr-wait` holds a per-PR `flock` lock in `$XDG_STATE_HOME/pr-wait` (defaulting to `~/.local/state/pr-wait/`). Only the parent workflow that owns the PR watches it; delegated review or implementation subagents must never start a second watcher.
 - **Execution mode:** Run `resources/manual/pr-wait` through your agent runtime's background command monitor so stdout event lines wake you on changes, or run it as a single foreground command that exits on its own.
 - **Stop conditions (`--until`):**
-  - `ready` (default): required checks green (or all non-advisory checks when none are marked required), every `--require-bot <login>` review bot finished on the current head without failing checks, zero unresolved review threads, and clean merge state.
+  - `ready` (default): required checks green (or every check when none are marked required), every `--require-bot <login>` review bot finished on the current head without failing checks, zero unresolved review threads, and clean merge state.
   - `green`: required checks green on the current head, ignoring review threads and `BEHIND` state.
   - `any-change`: exit `0` after the first poll that prints a new event.
-- **Optional bot gates (`--require-bot`):** Pass `--require-bot greptile`, `--require-bot macroscope`, or any custom bot login when the repository or user requires specific review bots to finish on the head commit before declaring readiness.
+- **Optional bot gates (`--require-bot`):** Pass `--require-bot <login>` for each review bot that the repository or user requires to finish on the head commit before declaring readiness.
 - **Exit codes:**
   - `0`: `--until` is satisfied or the PR merged.
   - `1`: action is required (failed required or `--require-bot` check, `DIRTY` merge conflicts, `BEHIND` merge state on `ready`, unresolved review threads on `ready`, PR closed without merge, or persistent GitHub unreachability).
@@ -57,12 +57,12 @@ gh api "repos/$OWNER/$REPO/commits/$SHA/check-runs"
 
 - **Latest head only:** Act only on check runs, reviews, and threads that apply to the latest pushed commit.
 - **Verify against source:** Read the referenced code and tests before changing anything. Separate repository defects from transient CI or infrastructure flakes.
-- **Gating vs advisory bots:** Wait on review bots passed via `--require-bot`. Treat CodeRabbit as advisory unless explicitly required via `--require-bot coderabbit`: evaluate useful catches, never hold readiness or a merge waiting for it. When replying to Macroscope findings in a repo that carries `.macroscope/check-run-agents/*.md`, read those local rule files first because Macroscope findings cite them.
+- **Required vs advisory bots:** A review bot gates readiness only when it is passed via `--require-bot` or its check is marked required on the repository. Treat every other bot as advisory: evaluate its findings on their merits, and never hold readiness or a merge waiting for it. When a bot finding cites repo-local rule files, read those files before replying.
 - **Diff-bloat guard:** Review loops often inflate a PR one defensive tweak at a time. Check `git diff --shortstat` against the base branch after each fix round:
   - Prefer fixes that delete or narrow code over adding new helpers, configuration flags, caches, locks, or speculative wrappers.
   - Fix genuine bugs within the user's intended scope.
   - Decline false positives, speculative edge-case guards, unneeded extra compatibility layers, or out-of-scope nits with a concise `file:line`, test, or behavior explanation, and record valid out-of-scope ideas as follow-ups rather than expanding the PR.
-- **Attributed replies before resolution:** Format every comment posted on the user's behalf with `/gh-pr-comments` (including its secret preflight scan and human-account `[!NOTE]` attribution). When multiple open threads need structured triage, use `/gh-resolve-pr-comments`. Resolve a review thread only after GitHub returns the confirmed URL for your reply.
+- **Attributed replies before resolution:** On a human account, start every comment posted on the user's behalf with the `> [!NOTE]` callout `> 🤖 **<model> on behalf of <user>**`, and scan the full outgoing payload for secrets and private details before posting. Follow `/gh-pr-comments` for the full checklist when it is installed. When multiple open threads need structured triage, use `/gh-resolve-pr-comments`. Resolve a review thread only after GitHub returns the confirmed URL for your reply.
 
 ## 4. Reconcile base-branch movement and readiness
 

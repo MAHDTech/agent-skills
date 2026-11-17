@@ -1,6 +1,6 @@
 +++
 title = "guards-debug"
-description = "Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts."
+description = "Diagnose and recover stuck or failing agy-guards sessions, hooks, spokes, or factory shifts from outside an active run. Use only when the user explicitly requests GUARDS debugging."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,6 +12,8 @@ mermaid = false
 
 # GUARDS Debug
 
+**Invocation:** Start only when the user explicitly requests this workflow.
+
 Diagnose and recover `agy-guards` sessions, projected hooks, spoke subagents, and unattended factory shifts from **outside** an activated GUARDS conversation.
 
 Inside an active GUARDS run, self-protection hooks restrict reads to `<workspace_root>` and block `~/.gemini/`, `guards.sqlite3`, and `agy-guards` control commands (leaving only internal `/guards-check-health`). Run this workflow from an external shell or agent session started outside `<workspace_root>`.
@@ -21,7 +23,7 @@ Inside an active GUARDS run, self-protection hooks restrict reads to `<workspace
 - **Stay outside `<workspace_root>`:** Never launch a second `agy` host inside `<workspace_root>` while diagnosing it; single-`agy` ownership scans `/proc` (`cwd` and `--add-dir`) and activated callers in `$XDG_STATE_HOME/agy-guards/hook-callers/` (or `~/.local/state/agy-guards/hook-callers/`) trigger self-protection denials.
 - **Never expose raw credentials:** Never print or copy secret values from `~/.config/agy-guards/credentials` (`$GUARDS_CREDENTIALS_FILE` / `$XDG_CONFIG_HOME/agy-guards/credentials`) or `~/.gemini/*/antigravity-oauth-token`. Check credential health via `agy-guards doctor`.
 - **Bound `monitor` calls:** Never run bare `agy-guards monitor <workspace_root> <session_id> --follow` synchronously on a stalled non-terminal session; `--follow` loops every 500ms until a terminal state and blocks the agent turn indefinitely. Default to non-following dumps (`--json` or `--since <secs>`), or wrap live tailing with `timeout 15s` or a background task.
-- **Snapshot before recovery:** Capture diagnostic logs and uncommitted spoke worktree diffs before running `approve`, `gc`, `reset`, or terminating stuck processes.
+- **Snapshot before recovery, confirm before acting:** Capture diagnostic logs and uncommitted spoke worktree diffs before proposing `approve`, `gc`, `reset`, or terminating stuck processes, and run each of those only after explicit user confirmation.
 - **Preserve store and receipt integrity:** Never mutate `guards.sqlite3` with raw SQL or hand-edit `~/.gemini/config/hooks.json` or `agy-guards-installation.receipt.json`. Use `agy-guards` subcommands and `agy-guards-installer`.
 
 ## 1. Establish external vantage and live processes
@@ -99,7 +101,7 @@ Join evidence across the three runtime layers:
 3. **Unattended factory shifts** (see [../guards-run-factory/SKILL.md](@/skills/guards/guards-run-factory/_index.md)):
    - Inspect `<workspace_parent>/guards-factory/<repo-name>/` (or `--state-dir`) for `FACTORY_START_FAILURE.md`, `FACTORY_LEDGER.ndjson` (`seq`, `channel`, `conversation`, `payload`), and `FACTORY_REPORT.md`, plus workspace lock files under `~/.local/share/guards-factory/locks/`.
 
-## 4. Snapshot evidence and execute autonomous recovery
+## 4. Snapshot evidence and run confirmed recovery
 
 Before running any recovery action, save a diagnostic bundle to a temporary scratch directory so bug evidence survives cleanup or resets:
 
@@ -112,7 +114,7 @@ agy-guards monitor <workspace_root> <session_id> --json >"$snap_dir/monitor.json
 
 If spoke worktrees exist under `~/.gemini/antigravity-cli/worktrees/<hubConversationId>/`, also capture `git -C <spoke_worktree> status --porcelain` and `git -C <spoke_worktree> diff` into `"$snap_dir"` before reaping them.
 
-Once evidence is preserved, recover stuck state autonomously using the narrowest sufficient action first:
+Diagnosis and snapshotting run without asking. Every recovery command below changes run state, opens a human gate, kills a process, or deletes data, so propose it to the user with the evidence that justifies it and run it only after they explicitly confirm that specific command. Propose the narrowest sufficient action first:
 
 1. **Open a verified parked bundle gate:**
 
@@ -147,7 +149,7 @@ Once evidence is preserved, recover stuck state autonomously using the narrowest
      agy-guards reset --factory
      ```
 
-Re-run `agy-guards doctor <workspace_root>` after recovery to confirm clean state.
+After each confirmed action, re-run `agy-guards doctor <workspace_root>` to confirm clean state before proposing the next one.
 
 ## 5. Produce the root-cause report
 
@@ -156,5 +158,5 @@ Conclude every investigation with a concise, evidence-backed report:
 1. **Symptom and scope:** workspace, `<session_id>` (or factory shift), GUARDS phase, and failure mode.
 2. **Correlated timeline:** ordered events joining `agy-guards` (`audit.log` / `server.log` / `guards.sqlite3`) with `~/.gemini/` (`transcript.jsonl`, `tasks/`, `messages/`, `cli.log`) or `FACTORY_LEDGER.ndjson` via `<conversationId>` and `call_id`.
 3. **Root cause and source boundary:** exact invariant, hook policy, MCP schema/transport mismatch, transcript window limit, or host condition responsible. When the `plugin-agy-guards` checkout (`crates/agy-guards/` and `antigravity/`) is present locally, cite the responsible files and functions using [failure-modes.md](@/skills/guards/guards-debug/resources/manual/failure-modes.md); modify plugin source code only if the user asked for a fix.
-4. **Recovery and verification:** path to saved diagnostic snapshot (clean up temporary scratch files if no longer needed), autonomous recovery commands executed, and final `agy-guards doctor` status.
+4. **Recovery and verification:** path to saved diagnostic snapshot (clean up temporary scratch files if no longer needed), recovery commands the user confirmed and you executed, and final `agy-guards doctor` status.
 

@@ -29,13 +29,13 @@ Workflow for generating, querying, and verifying Rust crate documentation locall
 
 For practical CLI query recipes:
 
-- `resources/manual/cargo-doc-recipes.md` - Command recipes for filtering and searching local rustdoc HTML and `docs.rs`.
+- [resources/manual/cargo-doc-recipes.md](resources/manual/cargo-doc-recipes.md) - extra recipes: item link lists, module URLs, and where the cargo doc flag reference lives.
 
 ---
 
 ## 1. Targeted Documentation Builds
 
-Generating docs for an entire dependency tree is slow. Scope builds strictly to the crates you need using `--no-deps`:
+Bare `cargo doc` documents every dependency, which is slow in large workspaces. Scope builds to the crates you need with `-p` and `--no-deps`, and add `--all-features` when the item may be feature-gated:
 
 ```bash
 # Build docs for a specific third-party crate:
@@ -61,11 +61,11 @@ Once generated, navigate `target/doc/` directly without opening a browser.
 
 ### Step 1: Locate the Master Item Index
 
-Every crate contains an `all.html` file listing every public type, trait, function, and macro in that crate:
+Every crate contains an `all.html` file listing every public type, trait, function, and macro. Search it first to confirm the exact spelling and module path:
 
 ```bash
 # Verify if a type exists in the local documentation:
-cat target/doc/egui/all.html | grep -i "CentralPanel"
+grep -i "CentralPanel" target/doc/egui/all.html
 ```
 
 ### Step 2: Inspect Specific Structs and Traits
@@ -124,12 +124,7 @@ When uncertain between two similar methods or signatures:
    - Missing imports: `help: consider importing this item: 'use ...'`
 4. Adjust code based on the compiler's diagnostic output.
 
----
+## Completion criteria
 
-## 5. Best Practices and Traps
-
-- **Do:** Always pass `--no-deps` when inspecting third-party crates to prevent slow transitive documentation builds.
-- **Do:** Pass `--all-features` if the method or type you seek is gated behind an optional Cargo feature.
-- **Do:** Use `cat target/doc/<crate>/all.html | grep -i "<symbol>"` as your first step to confirm exact spelling and module paths.
-- **Don't:** Run bare `cargo doc` in large workspaces without flags; it compiles documentation for hundreds of dependencies unnecessarily.
-- **Don't:** Guess method signatures from memory when the compiler or `cargo doc` can provide the verified ground truth in seconds.
+- Every external API used in the change was confirmed in `target/doc/` or on docs.rs for the version in `Cargo.lock`.
+- `cargo check` exits 0.

@@ -113,16 +113,14 @@ The core build, debug, and delivery loop.
 
 - **[acp](skills/engineering/acp/SKILL.md)** - Build, integrate, or debug Agent Client Protocol agents and clients with official SDKs. Use for ACP sessions, tool calls, schemas, transports, or protocol migrations.
 - **[agent-router](skills/engineering/agent-router/SKILL.md)** - Configure, route, or troubleshoot AgentRouter AI gateways, unified LLM endpoints, and MCP or A2A servers, including the gateway powering Nutanix Enterprise AI (NAI).
-- **[casita](skills/engineering/casita/SKILL.md)** - Use for Casita CLI or Rust API work: immutable object storage, imports, roots and retention, verified sync, Casitar archives, integrity checks, or garbage collection.
+- **[casita](skills/engineering/casita/SKILL.md)** - Store, sync, and verify immutable content-addressed object graphs with the Casita CLI or Rust API. Use for imports, named roots and retention, sync, Casitar archives, integrity checks, or garbage collection.
 - **[characterization-tests](skills/engineering/characterization-tests/SKILL.md)** - Capture existing behavior of untested or legacy code before a refactor or upgrade. Use for deterministic characterization tests or golden masters, including surprising current behavior.
-- **[code-comments](skills/engineering/code-comments/SKILL.md)** - Write or review code comments for non-obvious intent, constraints, and invariants. Use to trim redundant or stale comments and audit comment quality in a specified scope or diff.
+- **[code-comments](skills/engineering/code-comments/SKILL.md)** - Audit and rewrite code comments in a specified file, path, or diff so they state non-obvious intent, constraints, and invariants. Use when the user asks for a comment audit or comment cleanup.
 - **[codebase-design](skills/engineering/codebase-design/SKILL.md)** - Design or improve module interfaces and test seams. Use when simplifying caller requirements, reducing shallow abstractions, or making modules easier to test and maintain.
 - **[diagnosing-bugs](skills/engineering/diagnosing-bugs/SKILL.md)** - Diagnose hard bugs, flaky failures, and performance regressions with a reproducible feedback loop. Use to isolate the cause, verify a fix, and add a meaningful regression test.
-- **[domain-modeling](skills/engineering/domain-modeling/SKILL.md)** - Clarify domain terms and relationships while designing software. Use to resolve conflicting terminology, stress-test scenarios, update a glossary, or record a consequential ADR.
-- **[egui](skills/engineering/egui/SKILL.md)** - Build or debug Rust interfaces using egui or eframe. Use for widget layout, custom painting, themes, retained state, or verifying egui API signatures.
-- **[icp](skills/engineering/icp/SKILL.md)** - Build, secure, test, and deploy Internet Computer (ICP) canisters and full-stack dapps in Motoko, Rust, and TypeScript. Use for canister architecture, stable memory, ICRC and chain-key tokens (ckBTC, ckETH, ckSOL), Internet Identity, vetKeys, HTTPS outcalls, or icp CLI workflows.
+- **[icp](skills/engineering/icp/SKILL.md)** - Build, secure, and deploy Internet Computer (ICP) canisters and dapps in Motoko, Rust, or TypeScript. Use for canister state and upgrades, ICRC or chain-key tokens, identity, HTTPS outcalls, or icp CLI work.
 - **[interface-design](skills/engineering/interface-design/SKILL.md)** - Design, build, refine, or critique user interfaces across web, desktop, mobile, terminals, and games. Use for UI/UX decisions, visual systems, interaction flows, and rendered design reviews.
-- **[model-context-protocol](skills/engineering/model-context-protocol/SKILL.md)** - Build or debug MCP servers with official SDKs. Use for tool schemas, resources, prompts, lifecycle negotiation, stdio or HTTP transports, and MCP Inspector testing.
+- **[model-context-protocol](skills/engineering/model-context-protocol/SKILL.md)** - Build or debug MCP servers with official SDKs against the stateless 2026-07-28 spec. Use for tool schemas, resources, prompts, server/discover, stdio or Streamable HTTP transports, and MCP Inspector testing.
 - **[nutanix-api-v4](skills/engineering/nutanix-api-v4/SKILL.md)** - Integrate or debug Nutanix v4 REST APIs and official SDKs. Use for OData queries, namespaces, version compatibility, or migrating legacy Nutanix API integrations.
 - **[nutanix-enterprise-ai](skills/engineering/nutanix-enterprise-ai/SKILL.md)** - Configure or troubleshoot Nutanix Enterprise AI (NAI/GPT-in-a-Box). Use for platform deployment, model serving, inference gateways, RBAC, or NAI MCP connectors.
 - **[nutanix-files](skills/engineering/nutanix-files/SKILL.md)** - Configure or troubleshoot Nutanix Files servers and SMB/NFS shares. Use for directory integration, Smart Tiering, recovery, analytics, performance, or Files APIs.
@@ -130,9 +128,8 @@ The core build, debug, and delivery loop.
 - **[nutanix-objects](skills/engineering/nutanix-objects/SKILL.md)** - Configure or troubleshoot Nutanix Objects storage. Use for its S3 APIs, buckets, IAM, WORM policies, replication, cloud tiering, monitoring, or Objects Browser.
 - **[optimize-performance](skills/engineering/optimize-performance/SKILL.md)** - Improve an existing hot path using benchmarks and profiling. Use for latency, throughput, or memory targets; route newly introduced slowdowns to regression diagnosis.
 - **[productionize-app](skills/engineering/productionize-app/SKILL.md)** - Prepare an entire application for production when explicitly requested. Audit and fix configuration, reliability, security, observability, packaging, and deployment readiness.
-- **[research](skills/engineering/research/SKILL.md)** - Research a technical question using primary sources and save cited findings in the repo. Use for documentation, API, specification, or source-code fact gathering.
+- **[research](skills/engineering/research/SKILL.md)** - Research a technical question against primary sources and save the cited findings as a Markdown note in the repo. Use when the user wants a saved, cited research note, not a quick doc lookup.
 - **[sculpt-code](skills/engineering/sculpt-code/SKILL.md)** - Refactor a scoped diff or selected files for clearer naming, control flow, structure, and less duplication or dead code. Use for cleanup that preserves behavior.
-- **[spacetime](skills/engineering/spacetime/SKILL.md)** - Develop or debug Spacetime/SpacetimeDB modules and real-time clients in Rust, C#, TypeScript, or C++. Use for schemas, backend functions, subscriptions, CLI work, bindings, or migrations.
 - **[tdd](skills/engineering/tdd/SKILL.md)** - Build features or fixes test-first using a red-to-green loop. Use for behavior-focused integration tests, choosing public test seams, and avoiding tests coupled to internals.
 - **[upgrade-dependencies](skills/engineering/upgrade-dependencies/SKILL.md)** - Upgrade packages, frameworks, or language/runtime versions using release notes and a green test baseline. Use for version bumps, breaking migrations, and lockfile changes.
 - **[xai](skills/engineering/xai/SKILL.md)** - Integrate or debug xAI/Grok APIs and SDKs. Use for client configuration, model capabilities, streaming, tool calling, structured output, vision, or search integration.
@@ -142,27 +139,26 @@ The core build, debug, and delivery loop.
 Game engines and game-development workflows.
 
 - **[bevy-development](skills/game-development/bevy-development/SKILL.md)** - Build or modernize Bevy games and simulations in Rust. Use for ECS design, scheduling, input, assets, messages, performance, or migration between Bevy APIs.
-- **[bevy-egui](skills/game-development/bevy-egui/SKILL.md)** - Integrate egui into Bevy with bevy_egui. Use for UI scheduling, HUDs, debug panels, input capture, image textures, multi-window contexts, or rendering UI to game surfaces.
 
 ### Planning
 
 Turn ideas into specs, tickets, and multi-session plans.
 
+- **[dreamwork](skills/planning/dreamwork/SKILL.md)** - Plan issues with the human, then implement and review them autonomously in T3 Code worktrees until final UAT. Use only when the user explicitly requests Dreamwork in T3 Code.
 - **[estimate-work](skills/planning/estimate-work/SKILL.md)** - Estimate a plan or ticket set using relative sizes or time ranges, reference history, named assumptions, and risk. Use when sizing work, forecasting delivery, or deciding whether uncertainty needs a spike.
-- **[grilling](skills/planning/grilling/SKILL.md)** - Interview the user one decision at a time before coding. Use when explicitly asked to stress-test a design, or when an explicitly started software-factory or wayfinder workflow requires its planning interview.
+- **[grilling](skills/planning/grilling/SKILL.md)** - Interview the user one decision at a time before coding, optionally recording a glossary and ADRs. Use when explicitly asked to stress-test a design, or when a wayfinder run needs its planning interview.
 - **[handoff](skills/planning/handoff/SKILL.md)** - Summarize the current conversation into a temporary handoff for another agent or session. Use when transferring unfinished work; reference durable artifacts, suggest relevant skills, and redact secrets.
-- **[prioritize-backlog](skills/planning/prioritize-backlog/SKILL.md)** - Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use for generic backlog grooming with value-effort, RICE, or WSJF; excludes the automated .guards/issues backlog.
-- **[software-factory](skills/planning/software-factory/SKILL.md)** - Guide a feature through Product, Architecture, Program Design, and Slice approval gates, then implement verified vertical slices. Use when asked for the full design-to-delivery factory workflow.
+- **[prioritize-backlog](skills/planning/prioritize-backlog/SKILL.md)** - Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use when grooming a backlog with value-effort, RICE, or WSJF scoring, whatever tracker it lives in.
 - **[store-plan](skills/planning/store-plan/SKILL.md)** - Save an agreed conversation plan, decisions, action items, and open questions to a reviewable Markdown file in docs/plans/. Use when a durable repository plan is needed rather than a temporary handoff.
 - **[to-spec](skills/planning/to-spec/SKILL.md)** - Synthesize the current conversation into a product spec or PRD and publish it to the project's issue tracker. Use when asked to formalize discussed requirements and testing decisions without a new interview.
-- **[to-tickets](skills/planning/to-tickets/SKILL.md)** - Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .guards/issues automation.
+- **[to-tickets](skills/planning/to-tickets/SKILL.md)** - Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use when the user asks to turn a plan into buildable slices.
 - **[wayfinder](skills/planning/wayfinder/SKILL.md)** - Chart a large, ambiguous effort as an issue-tracker map of investigation tickets. Use when asked to map unknown decisions or work one frontier ticket per session, rather than slice known implementation work.
 
 ### Review
 
 Review diffs, pull requests, and test plans.
 
-- **[code-review](skills/review/code-review/SKILL.md)** - Review a diff against a fixed commit, branch, tag, or merge-base for repository standards and spec compliance. Use for branch or PR review with two parallel agents, reporting the axes separately.
+- **[code-review](skills/review/code-review/SKILL.md)** - Review a diff against a fixed commit, branch, or tag for repository standards and spec compliance. Use only when the user explicitly requests a branch or PR review, not to hunt edge cases or draft test plans.
 - **[pr-build-context](skills/review/pr-build-context/SKILL.md)** - Prepare a briefing before reviewing a pull request: explain the diff, key files, risks, and questions for the author. Use for PR context, or a whole-repository overview when on its default branch.
 - **[pr-create-test-plan](skills/review/pr-create-test-plan/SKILL.md)** - Draft TEST_PLAN.md for a branch's real user flows and integration changes using the project's commands. Use when a reviewer needs manual verification steps and a quick smoke test before merging.
 - **[pr-edge-cases](skills/review/pr-edge-cases/SKILL.md)** - Probe branch changes, uncommitted work, or specified files for logic errors, missing tests, boundary cases, races, and integration failures. Use to identify what could break before a merge, with file-line findings.
@@ -174,13 +170,13 @@ GitHub and git workflows via the gh CLI.
 
 - **[gh-babysit-pr](skills/github/gh-babysit-pr/SKILL.md)** - Monitor an open pull request through CI checks, review bots, and base-branch updates with pr-wait. Use only when the user explicitly asks to watch, monitor, or babysit a PR.
 - **[gh-create-issue](skills/github/gh-create-issue/SKILL.md)** - Create a structured GitHub issue from the current conversation with gh CLI. Use when asked to file an issue that preserves the problem, discussion, constraints, and agreed implementation plan.
-- **[gh-create-pr](skills/github/gh-create-pr/SKILL.md)** - Draft a problem-first Conventional Commit PR title and description with secret scanning and REST fallback. Use when asked to create or update a PR after approval.
-- **[gh-pr-comments](skills/github/gh-pr-comments/SKILL.md)** - Format and preflight-scan GitHub comments posted on a user's behalf with account-aware attribution. Use when posting PR comments, inline review notes, or thread replies.
+- **[gh-create-pr](skills/github/gh-create-pr/SKILL.md)** - Draft a problem-first Conventional Commit PR title and description, then create or update the PR once the user approves the draft. Use when asked to open or update a pull request.
+- **[gh-pr-comments](skills/github/gh-pr-comments/SKILL.md)** - Format and preflight-scan GitHub comments posted on a user's behalf with account-aware attribution. Use when posting PR or issue comments, inline review notes, or thread replies.
 - **[gh-release-notes](skills/github/gh-release-notes/SKILL.md)** - Curate release notes from commits and merged PRs since the last tag, then create a GitHub release. Use when asked to cut or publish a versioned release, with draft and prerelease options.
 - **[gh-resolve-pr-comments](skills/github/gh-resolve-pr-comments/SKILL.md)** - Triage and address human and AI bot PR review comments, push back on false positives, and reply before resolving threads. Use when asked to handle PR feedback.
 - **[gh-submit-review](skills/github/gh-submit-review/SKILL.md)** - Publish a GitHub PR review with verdict, inline findings, secret scanning, and human-account attribution. Use when asked to submit a completed PR review.
 - **[gh-takeover](skills/github/gh-takeover/SKILL.md)** - Adopt and finish an inherited pull request, branch, or agent handoff while preserving contributor credit. Use only when the user explicitly asks to take over existing work.
-- **[gh-triage](skills/github/gh-triage/SKILL.md)** - Triage GitHub issues and external PRs: categorize, verify claims, interview as needed, and post agent-ready briefs. Use when asked to change backlog states or run a maintainer triage session.
+- **[gh-triage](skills/github/gh-triage/SKILL.md)** - Triage GitHub issues and external PRs: categorize, verify claims, interview as needed, and post agent-ready briefs. Use when asked to run a maintainer triage session or change issue and PR triage labels or states.
 - **[git-resolve-conflicts](skills/github/git-resolve-conflicts/SKILL.md)** - Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.
 - **[git-update-branch](skills/github/git-update-branch/SKILL.md)** - Assess stale or diverged PRs for conceptual conflicts and update a branch against its base via rebase or merge. Use when asked to modernize or update a branch or PR.
 
@@ -188,9 +184,9 @@ GitHub and git workflows via the gh CLI.
 
 Self-critique and review of your own work.
 
-- **[critical-thinking](skills/reflection/critical-thinking/SKILL.md)** - Stress-test your immediately preceding response for hidden assumptions, weak evidence, logical gaps, and practical risks. Use to challenge your own advice before the user acts, in the response's language.
-- **[scope-sweep](skills/reflection/scope-sweep/SKILL.md)** - Run a final breadth check after the core work and review to catch missed requirements, incomplete tasks, edge cases, and operational risks. Use before declaring a scope complete, with evidence for remaining gaps.
-- **[self-review](skills/reflection/self-review/SKILL.md)** - Review your implementation diff for unfinished work, non-idiomatic code, duplication, and unnecessary complexity. Use after a task to apply focused fixes, with file-and-line evidence for each change.
+- **[critical-thinking](skills/reflection/critical-thinking/SKILL.md)** - Stress-test your immediately preceding response for hidden assumptions, weak evidence, logical gaps, and practical risks. Use to challenge your own advice before the user acts, not to review a code diff.
+- **[scope-sweep](skills/reflection/scope-sweep/SKILL.md)** - Check finished work for incomplete tasks, missed requirements, unhandled scope, and operational follow-ups. Use before declaring a scope complete, citing evidence for each remaining gap.
+- **[self-review](skills/reflection/self-review/SKILL.md)** - Review your implementation diff for unfinished work, non-idiomatic code, and inconsistency with project conventions. Use after a task to apply focused fixes, with file-and-line evidence for each change.
 - **[total-recall](skills/reflection/total-recall/SKILL.md)** - Maintain an append-only TSV decision trail and audit its evidence against the transcript. Use when explicitly requesting a persistent audit trail for autonomous work, multi-phase migrations, or risky refactors.
 - **[wtf](skills/reflection/wtf/SKILL.md)** - Rewrite your own last response more briefly and plainly when the user signals confusion, such as "huh" or "in English". Use for confusion about your message, not requests to explain an error, output, or regex.
 
@@ -198,9 +194,8 @@ Self-critique and review of your own work.
 
 Proofreading and documentation polish.
 
-- **[proofread](skills/writing/proofread/SKILL.md)** - Proofread a post before publication for spelling, grammar, repetition, links, and weak reasoning. Use for error correction that preserves the author's voice; ask before logic changes or a skimmability pass.
 - **[simplify-docs](skills/writing/simplify-docs/SKILL.md)** - Simplify a README, setup guide, or technical reference for fast scanning and execution. Use for structural documentation rewrites that lead with the shortest successful path, previewing edits for approval.
-- **[unslop](skills/writing/unslop/SKILL.md)** - Edit writing to remove AI cliches, filler, robotic phrasing, and decorative formatting while preserving meaning and facts. Use when text needs a natural human voice, varied rhythm, and plain language.
+- **[unslop](skills/writing/unslop/SKILL.md)** - Edit writing to remove AI cliches, filler, and robotic phrasing, then fix spelling, grammar, and links. Use when a post, README, or doc needs plain language before publication.
 
 ### Authoring
 
@@ -215,7 +210,7 @@ Create and maintain the skills themselves.
 
 Environments, CLIs, and agent conventions.
 
-- **[agent-guidelines](skills/tooling/agent-guidelines/SKILL.md)** - Apply coding discipline before and during implementation: state assumptions, keep changes minimal and scoped, and verify behavior against concrete success criteria.
+- **[agent-guidelines](skills/tooling/agent-guidelines/SKILL.md)** - Apply coding discipline while implementing: state assumptions, keep changes minimal and scoped, and verify against concrete success criteria. Use when writing or editing code, not when reviewing finished work.
 - **[antigravity](skills/tooling/antigravity/SKILL.md)** - Look up Google Antigravity/AGY CLI, IDE, and SDK behavior. Use for its settings, commands, keybindings, agent permissions, hooks, or plugin integration.
 - **[cargo-crap](skills/tooling/cargo-crap/SKILL.md)** - Measure Rust change risk with cargo-crap and coverage data. Use for CRAP scores, cargo-llvm-cov integration, complexity regression gates, CI reports, or badges.
 - **[cargo-doc](skills/tooling/cargo-doc/SKILL.md)** - Verify Rust crate APIs with local cargo doc output or docs.rs. Use to inspect exact signatures, methods, traits, and feature-gated items for the project version.
@@ -223,21 +218,20 @@ Environments, CLIs, and agent conventions.
 - **[herdr](skills/tooling/herdr/SKILL.md)** - Operate Herdr panes, workspaces, or agent sessions when HERDR_ENV=1. Also use for Herdr setup, configuration, keybindings, and troubleshooting questions.
 - **[install-skills](skills/tooling/install-skills/SKILL.md)** - Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.
 - **[jj](skills/tooling/jj/SKILL.md)** - Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.
-- **[nix-shell](skills/tooling/nix-shell/SKILL.md)** - Run missing ad-hoc CLI utilities in ephemeral nix shell environments when Nix is installed. Use for one-off diagnostics or conversions, keeping project dependencies in its toolchain.
-- **[oak](skills/tooling/oak/SKILL.md)** - Use Oak version control in repositories with .oak, or for oak.space tasks. Manage change stacks, conflicts, workspaces, dependency mounts, spaces, and Oak CI.
+- **[nix-shell](skills/tooling/nix-shell/SKILL.md)** - Run missing ad-hoc CLI utilities in ephemeral nix shell environments when Nix is installed and the project has no devenv or Nix dev shell. Use for one-off diagnostics or conversions.
 - **[pagefind](skills/tooling/pagefind/SKILL.md)** - Configure, build, or troubleshoot Pagefind search for a static website. Use for indexing options, content exclusions or weighting, generated assets, and client integration.
 - **[prek](skills/tooling/prek/SKILL.md)** - Run, configure, or troubleshoot Git pre-commit hooks with prek. Use for hook execution, installation, validation, and cache management; distinguish the hook stage from its CLI.
 - **[scratchpad](skills/tooling/scratchpad/SKILL.md)** - Manage temporary scripts, experiment files, and debugging artifacts during a task. Use one session scratch directory, keep the source tree clean, and remove temporary files afterward.
 - **[tailwind](skills/tooling/tailwind/SKILL.md)** - Style components or build CSS with Tailwind CSS v4. Use for utility classes, CSS-first theme variables, imports, and CLI stylesheet compilation.
 - **[zed](skills/tooling/zed/SKILL.md)** - Configure or troubleshoot Zed editor settings, keybindings, and language servers. Use to verify Zed option names and update user or project settings in the correct scope.
-- **[zola](skills/tooling/zola/SKILL.md)** - Build, serve, or customize an existing Zola site. Use for Tera templates, shortcodes, taxonomies, config.toml options, theme changes, or Zola build and link checks.
+- **[zola](skills/tooling/zola/SKILL.md)** - Build, serve, or customize an existing Zola site. Use for Tera templates and components, taxonomies, zola.toml options, theme changes, or Zola build and link checks.
 
 ### GUARDS
 
 Autonomous GUARDS software factory, debugging, and persistent goal workflows.
 
-- **[guards-debug](skills/guards/guards-debug/SKILL.md)** - Debug and recover the agy-guards Antigravity plugin from outside an active run using agy-guards doctor, inspect, monitor, GUARDS state logs, and ~/.gemini session transcripts. Use for stuck or failing GUARDS sessions, hooks, spokes, or factory shifts.
-- **[guards-goal](skills/guards/guards-goal/SKILL.md)** - Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /guards-goal or explicitly requests a persistent goal.
+- **[guards-debug](skills/guards/guards-debug/SKILL.md)** - Diagnose and recover stuck or failing agy-guards sessions, hooks, spokes, or factory shifts from outside an active run. Use only when the user explicitly requests GUARDS debugging.
+- **[guards-goal](skills/guards/guards-goal/SKILL.md)** - Set or resume a persistent goal and pursue it until every requirement is verified or blocked. Use only when the user explicitly asks for a goal that persists across turns.
 - **[guards-run-factory](skills/guards/guards-run-factory/SKILL.md)** - Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
 
 ### Vendor Skills
@@ -278,22 +272,6 @@ Skills maintained by this vendor.
 - **[dbos-python](skills/vendor/dbos/dbos-python/SKILL.md)** - DBOS Python SDK (3.x) for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Python code with DBOS, creating workflows and steps, using queues, datasource transactions, or schedules, using DBOSClient from external applications, upgrading DBOS Python 2.x code to 3.x, or building applications that need to be resilient to failures.
 - **[dbos-rust](skills/vendor/dbos/dbos-rust/SKILL.md)** - DBOS Rust SDK (the dbos crate) for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing Rust code with DBOS, creating workflows and steps, using queues, using the DBOS Client from external applications, or building Rust applications that need to be resilient to failures.
 - **[dbos-typescript](skills/vendor/dbos/dbos-typescript/SKILL.md)** - DBOS TypeScript SDK for building reliable, fault-tolerant applications with durable workflows. Use this skill when writing TypeScript code with DBOS, creating workflows and steps, using queues, using DBOSClient from external applications, or building applications that need to be resilient to failures.
-
-#### spacetimedb
-
-Skills maintained by this vendor.
-
-- **[cli](skills/vendor/spacetimedb/cli/SKILL.md)** - SpacetimeDB CLI reference for initializing projects, building modules, publishing databases, querying data, and managing servers
-- **[concepts](skills/vendor/spacetimedb/concepts/SKILL.md)** - Understand SpacetimeDB architecture, core concepts, and current capabilities. Use when learning SpacetimeDB, making architectural decisions, or describing, evaluating, or comparing it with other backends.
-- **[cpp-server](skills/vendor/spacetimedb/cpp-server/SKILL.md)** - SpacetimeDB C++ server module SDK reference. Use when writing tables, reducers, or module logic in C++.
-- **[csharp-client](skills/vendor/spacetimedb/csharp-client/SKILL.md)** - SpacetimeDB C#/.NET client SDK reference. Use when building C# clients that connect to SpacetimeDB (console, desktop, or any .NET app).
-- **[csharp-server](skills/vendor/spacetimedb/csharp-server/SKILL.md)** - SpacetimeDB C# server module SDK reference. Use when writing tables, reducers, or module logic in C#.
-- **[mcp](skills/vendor/spacetimedb/mcp/SKILL.md)** - Operate a running SpacetimeDB database through MCP tools rather than the CLI - list databases, read schemas, run SQL, and call reducers. Use when the client exposes spacetimedb MCP tools and the task is to inspect or change data in a live database.
-- **[rust-server](skills/vendor/spacetimedb/rust-server/SKILL.md)** - SpacetimeDB Rust server module SDK reference. Use when writing tables, reducers, or module logic in Rust.
-- **[typescript-client](skills/vendor/spacetimedb/typescript-client/SKILL.md)** - SpacetimeDB TypeScript/React client SDK reference. Use when building web clients that connect to SpacetimeDB.
-- **[typescript-server](skills/vendor/spacetimedb/typescript-server/SKILL.md)** - SpacetimeDB TypeScript server module SDK reference. Use when writing tables, reducers, or module logic in TypeScript.
-- **[unity](skills/vendor/spacetimedb/unity/SKILL.md)** - Integrate SpacetimeDB with Unity game projects. Use when building Unity clients with MonoBehaviour lifecycle, FrameTick, and PlayerPrefs token persistence.
-- **[unreal](skills/vendor/spacetimedb/unreal/SKILL.md)** - SpacetimeDB Unreal Engine client SDK reference. Use when building Unreal Engine clients that connect to SpacetimeDB.
 
 #### splunk
 

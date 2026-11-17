@@ -1,220 +1,318 @@
 @import "tailwindcss";
 @source "../content";
 @source "../themes/tars-dashboards/templates";
+@source "../themes/tars-dashboards/static/js";
 @import "../static/styles/foundation.css";
 
-/* ── Archive-only: Prose (rendered markdown styling) ───────────── */
+/* ── Rendered Markdown ─────────────────────────────────────────── */
 
-@layer utilities {
-    .prose {
-        @apply leading-normal;
-    }
-    .prose > * + * {
-        @apply mt-4;
-    }
-    .prose strong {
-        @apply font-bold;
-        color: var(--color-text-main);
-    }
-    .prose h1 {
-        @apply text-2xl font-bold mt-8;
-        color: var(--color-primary);
-    }
-    .prose h2 {
-        @apply text-xl font-bold mt-8;
-        color: var(--color-text-main);
-        border-bottom: 1px solid var(--color-border);
-        padding-bottom: 0.25rem;
-    }
-    .prose h3 {
-        @apply text-lg font-bold mt-6;
-        color: var(--color-text-main);
-    }
-    .prose h4 {
-        @apply text-base font-bold mt-4;
-        color: var(--color-muted);
-    }
-    .prose p {
-        @apply mt-4;
-    }
-    .prose a {
-        color: var(--color-primary);
-        text-decoration: none;
-    }
-    .prose a:hover {
-        text-decoration: underline;
-        text-shadow: var(--shadow-glow-cyan);
-    }
-    .prose blockquote {
-        @apply pl-4 italic;
-        border-left: 3px solid var(--color-primary);
-        color: var(--color-muted);
-    }
-    .prose kbd,
-    .prose p code,
-    .prose ol code,
-    .prose ul code,
-    .prose blockquote code,
-    .prose h1 code,
-    .prose h2 code,
-    .prose h3 code,
-    .prose h4 code {
-        @apply mx-0.5 px-1.5 py-0.5 font-mono text-sm;
-        background: var(--color-surface);
-        color: var(--color-primary);
-        border: 1px solid var(--color-border);
-    }
-    .prose pre:not(.mermaid) {
-        @apply block my-4 p-4 font-mono text-sm overflow-x-auto;
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-    }
-    .prose pre.mermaid {
-        @apply block my-4 font-mono text-sm overflow-x-auto;
-    }
-    /* pl-10, not pl-6: the dashboard font is monospace, so numeric markers are
-       wide, and some skills have 10-23 item lists (2-digit markers). With
-       list-style-position: outside, too little padding lets the marker overflow
-       the <main class="overflow-x-hidden"> clip edge and get cut on the left.
-       2.5rem clears a 2-digit monospace marker. */
-    .prose ul {
-        @apply pl-10 list-disc;
-    }
-    .prose ol {
-        @apply pl-10 list-decimal;
-    }
-    .prose li + li {
-        @apply mt-1;
-    }
-    .prose td,
-    .prose th {
-        @apply px-3 py-2;
-        border: 1px solid var(--color-border);
-    }
-    .prose th {
-        background: var(--color-surface);
-        color: var(--color-primary);
-        @apply font-bold text-left;
-    }
-    .prose tbody tr:nth-child(odd) {
-        background: rgba(21, 27, 35, 0.5);
-    }
-    .prose table {
-        @apply my-4 w-full;
-    }
-    .prose img {
-        @apply my-4;
-        border: 1px solid var(--color-border);
-    }
-    .prose details {
-        @apply my-4;
-        border: 1px solid var(--color-border);
-        background: var(--color-surface);
-    }
-    .prose summary {
-        @apply cursor-pointer select-none px-3 py-2 font-medium;
-        color: var(--color-primary);
-    }
-    .prose details > *:not(summary) {
-        @apply px-3 pb-3;
-    }
-    .prose hr {
-        @apply my-8 h-0 p-0;
-        border: 0;
-        border-top: 1px solid var(--color-border);
-    }
-    .prose mark {
-        @apply mx-0.5 px-1 py-0.5;
-        background: rgba(0, 240, 255, 0.15);
-        color: var(--color-primary);
-    }
-    .prose del {
-        color: var(--color-muted);
-    }
-    .prose dl {
-        @apply my-4;
-    }
-    .prose dt {
-        @apply font-semibold;
-        color: var(--color-text-main);
-    }
-    .prose dd {
-        @apply ml-4;
-        color: var(--color-muted);
-    }
-    .prose .footnote-definition:first-of-type {
-        @apply mt-4 border-0 pt-0;
-    }
-    .prose .footnote-definition {
-        @apply mt-2 text-sm grid grid-cols-[max-content_1fr] gap-x-2 items-start;
-        color: var(--color-muted);
-    }
-    .prose .footnote-definition-label {
-        @apply text-xs col-start-1;
-        color: var(--color-primary);
-    }
-    .prose .footnote-definition p {
-        @apply m-0 col-start-2;
-    }
-    .prose .footnote-reference {
-        @apply text-xs align-text-top;
-    }
-
-    /* TOC sidebar */
-    .toc ul {
-        @apply list-disc ml-4;
-    }
-    .toc li + li {
-        @apply mt-1;
-    }
-    .toc a {
-        color: var(--color-muted);
-        text-decoration: none;
-        @apply text-sm;
-    }
-    .toc a:hover {
-        color: var(--color-primary);
-    }
+.prose-mahd {
+    color: var(--color-text-primary);
+    line-height: 1.75;
+    font-size: 1rem;
+    overflow-wrap: anywhere;
 }
 
-/* ── Archive-only: Mermaid ─────────────────────────────────────── */
+.prose-mahd > :first-child {
+    margin-top: 0;
+}
 
-.mermaid {
+.prose-mahd > :last-child {
+    margin-bottom: 0;
+}
+
+.prose-mahd :is(h1, h2, h3, h4) {
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    scroll-margin-top: 5.5rem;
+}
+
+.prose-mahd h1 {
+    font-size: 1.9rem;
+    line-height: 1.2;
+    margin-top: 2.6rem;
+    margin-bottom: 1rem;
+}
+
+.prose-mahd h2 {
+    font-size: 1.45rem;
+    margin-top: 2.4rem;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.prose-mahd h3 {
+    font-size: 1.15rem;
+    margin-top: 1.8rem;
+    margin-bottom: 0.65rem;
+}
+
+.prose-mahd h4 {
+    font-size: 1rem;
+    margin-top: 1.4rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-muted);
+}
+
+.prose-mahd :is(p, ul, ol, blockquote, pre, table, dl, details) {
+    margin-bottom: 1.3rem;
+}
+
+/* Nested lists sit tight against their parent item. */
+.prose-mahd li > :is(ul, ol) {
+    margin-top: 0.4rem;
+    margin-bottom: 0;
+}
+
+.prose-mahd ul {
+    list-style-type: disc;
+    padding-inline-start: 1.4rem;
+}
+
+.prose-mahd ol {
+    list-style-type: decimal;
+    padding-inline-start: 1.9rem;
+}
+
+.prose-mahd li + li {
+    margin-top: 0.4rem;
+}
+
+.prose-mahd li > p {
+    margin-bottom: 0.5rem;
+}
+
+.prose-mahd strong {
+    font-weight: 650;
+}
+
+.prose-mahd a {
+    color: var(--color-accent-cyan);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-weight: 500;
+}
+
+.prose-mahd a:hover {
+    color: var(--color-accent-cyan-bright);
+}
+
+/* Zola wraps each heading in a self-link; keep it looking like a heading. */
+.prose-mahd :is(h1, h2, h3, h4) > a {
+    color: inherit;
+    font-weight: inherit;
+    text-decoration: none;
+}
+
+.prose-mahd :is(h1, h2, h3, h4) > a:hover::after {
+    content: " #";
+    color: var(--color-accent-cyan);
+}
+
+.prose-mahd :not(pre) > code,
+.prose-mahd kbd {
+    background-color: var(--color-well);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.14rem 0.4rem;
+    font-size: 0.86em;
+    color: var(--color-accent-cyan);
+}
+
+/* Code blocks stay dark in both schemes, matching the highlight theme. */
+.prose-mahd pre:not(.mermaid) {
+    color-scheme: dark;
+    background-color: #0b101b !important;
+    color: #e6f1ff;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 8px;
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    position: relative;
+}
+
+.prose-mahd pre code {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    color: inherit;
+}
+
+.prose-mahd pre.mermaid {
     background: transparent !important;
+    overflow-x: auto;
+    text-align: center;
 }
 
-/* ── Archive-only: Collapsible sidebar ─────────────────────────── */
+.prose-mahd blockquote {
+    border-inline-start: 3px solid var(--color-accent-cyan);
+    background-color: var(--color-well);
+    border-radius: 0 6px 6px 0;
+    padding: 0.85rem 1.1rem;
+    color: var(--color-text-muted);
+}
 
-.sidebar-summary::-webkit-details-marker,
-.sidebar-summary::marker {
+.prose-mahd blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* Wide tables scroll inside the card instead of stretching the page. */
+.prose-mahd table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.prose-mahd :is(th, td) {
+    border: 1px solid var(--color-border);
+    padding: 0.6rem 0.8rem;
+    text-align: start;
+    vertical-align: top;
+}
+
+.prose-mahd th {
+    background-color: var(--color-well);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.prose-mahd img {
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+}
+
+.prose-mahd hr {
+    margin-block: 2rem;
+    border: 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.prose-mahd details {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background-color: var(--color-well);
+}
+
+.prose-mahd summary {
+    cursor: pointer;
+    user-select: none;
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+    color: var(--color-accent-cyan);
+}
+
+.prose-mahd details > :not(summary) {
+    padding-inline: 0.75rem;
+}
+
+.prose-mahd mark {
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    background-color: color-mix(
+        in oklab,
+        var(--color-accent-cyan) 18%,
+        transparent
+    );
+    color: inherit;
+}
+
+.prose-mahd del {
+    color: var(--color-text-muted);
+}
+
+.prose-mahd dt {
+    font-weight: 600;
+}
+
+.prose-mahd dd {
+    margin-inline-start: 1rem;
+    color: var(--color-text-muted);
+}
+
+.prose-mahd .footnote-definition {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.prose-mahd .footnote-definition p {
+    margin: 0;
+}
+
+.prose-mahd .footnote-definition-label,
+.prose-mahd .footnote-reference {
+    font-size: 0.75rem;
+    color: var(--color-accent-cyan);
+}
+
+/* ── Sidebar tree ──────────────────────────────────────────────── */
+
+.sidebar-summary {
+    list-style: none;
+}
+
+.sidebar-summary::-webkit-details-marker {
     display: none;
+}
+
+.sidebar-chevron {
+    display: inline-block;
+    font-size: 0.6rem;
+    color: var(--color-text-muted);
+    transition: transform 150ms ease;
 }
 
 .sidebar-section[open] > .sidebar-summary .sidebar-chevron {
     transform: rotate(90deg);
 }
 
-.sidebar-chevron {
-    transition: transform 150ms ease;
-    display: inline-block;
-    font-size: 0.6rem;
+@layer components {
+    .sidebar-link {
+        display: block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 5px;
+        color: var(--color-text-muted);
+        transition:
+            color 150ms,
+            background-color 150ms;
+    }
+
+    .sidebar-link:hover {
+        color: var(--color-accent-cyan);
+    }
+
+    .sidebar-link[aria-current="page"] {
+        color: var(--color-accent-cyan);
+        font-weight: 600;
+        background-color: var(--color-surface-active);
+    }
 }
 
-/* ── Pagefind Component UI Overrides ────────────────────────────── */
+/* ── Pagefind search modal ─────────────────────────────────────── */
 
 :root,
 pagefind-modal {
-    --pf-text: var(--color-text-main);
-    --pf-text-secondary: var(--color-muted);
-    --pf-text-muted: var(--color-muted);
-    --pf-background: var(--color-surface);
+    --pf-text: var(--color-text-primary);
+    --pf-text-secondary: var(--color-text-muted);
+    --pf-text-muted: var(--color-text-muted);
+    --pf-background: var(--color-surface-raised);
     --pf-border: var(--color-border);
-    --pf-border-focus: var(--color-primary);
-    --pf-outline-focus: var(--color-primary);
-    --pf-font: var(--font-mono);
-    --pf-mark: var(--color-primary);
-    --pf-hover: rgba(255, 255, 255, 0.05);
-    --pf-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.8);
-    --pf-modal-backdrop: rgba(0, 0, 0, 0.8);
-    --pf-border-radius: 0px;
+    --pf-border-focus: var(--color-accent-cyan);
+    --pf-outline-focus: var(--color-accent-cyan);
+    --pf-font: var(--font-sans);
+    --pf-mark: var(--color-accent-cyan);
+    --pf-hover: var(--color-surface-active);
+    --pf-shadow-lg: 0 18px 40px -12px var(--card-shadow-color);
+    --pf-modal-backdrop: var(--backdrop-color);
+    --pf-border-radius: 8px;
 }

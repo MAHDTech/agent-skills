@@ -21,7 +21,8 @@ pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), CliErr
             "build" => dashboard_site::run_build(None).await,
             "serve" => dashboard_site::run_serve(3000).await,
             "css" => dashboard_site::run_css().await,
-            "lint" => dashboard_site::run_lint().await,
+            "lint" => dashboard_site::run_lint(false).await,
+            "index" => dashboard_site::run_index().await,
             other => Err(CliError::Io(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 format!("Unknown dashboard action: '{other}'"),
@@ -43,7 +44,8 @@ pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), CliErr
             }
             DashboardCommands::Serve { port } => dashboard_site::run_serve(*port).await,
             DashboardCommands::Css => dashboard_site::run_css().await,
-            DashboardCommands::Lint => dashboard_site::run_lint().await,
+            DashboardCommands::Lint { fix } => dashboard_site::run_lint(*fix).await,
+            DashboardCommands::Index => dashboard_site::run_index().await,
         }
     } else {
         run_summary(format).await

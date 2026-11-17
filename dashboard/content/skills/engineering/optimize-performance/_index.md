@@ -14,9 +14,9 @@ mermaid = false
 
 You cannot make faster what you cannot measure. Every phase here defends one rule: **measure, don't guess.** Profile to find where the resource actually goes, change one thing, and let the numbers - not intuition - say whether it worked.
 
-This is deliberate optimisation of code that was never fast enough. For code that _was_ fast and got slow - a performance **regression** - run bug diagnosis, which bisects the slowdown like any other bug.
+This is deliberate optimisation of code that was never fast enough. Code that _was_ fast and got slow is a performance **regression**: bisect it like any other bug instead.
 
-Run measurements through the project's toolchain - for example `devenv --no-tui shell -- <cmd>` - so results are comparable across runs.
+Run measurements through the project's pinned toolchain or wrapper (for example a devenv or nix shell) so results are comparable across runs.
 
 ## Phase 1 - Set the target
 
@@ -26,7 +26,7 @@ Optimisation with no target never ends. Before profiling, write down:
 - The **workload** it is measured on.
 - The **current** number and the **target** number. "p99 under 200ms" or "2× the throughput", never just "faster".
 
-Without a target you cannot tell success from a rabbit hole, and you will trade readability for speed nobody needs.
+Without a target you cannot tell success from a rabbit hole.
 
 ## Phase 2 - Build the benchmark harness
 
@@ -42,7 +42,7 @@ Completion: one command you have run at least once that prints the metric on the
 
 ## Phase 3 - Profile to find the bottleneck
 
-Never optimise from a guess about where the resource goes - you will be wrong, and you will pay readability for nothing. **Profile** the workload and read where the cost is actually spent: a CPU / sampling profiler, a heap / allocation profiler, a query plan or slow-query log, a flame graph - whatever fits the metric.
+Locate the cost with evidence before changing anything: **profile** the workload and read where the cost is actually spent: a CPU / sampling profiler, a heap / allocation profiler, a query plan or slow-query log, a flame graph - whatever fits the metric.
 
 Rank the costs. The **bottleneck** is the biggest slice. **Amdahl's law**: speeding up code that is 5% of the runtime caps your win at 5%, however clever the change - so optimising **cold code** is wasted effort. Attack the hot slice first.
 
@@ -63,7 +63,5 @@ Stop when the metric meets the **target** from Phase 1. Then confirm:
 
 - [ ] Target met on the representative workload, shown against the recorded baseline.
 - [ ] The full test suite still passes - you changed _how_ the code computes, not _what_ it computes.
-- [ ] Readability cost accounted for. A change that beats a target you had already met, at the price of legibility, is a bad trade - revert it. Where fast code reads as strange, leave a comment saying why.
-
-Chasing speed past the target spends readability for a win nobody asked for.
+- [ ] Readability cost accounted for. Every change that cost legibility must have been needed to reach the target; revert any that beat a target already met. Where fast code reads as strange, leave a comment saying why.
 

@@ -27,7 +27,7 @@ pub use dashboard::{
     calculate_prompt_tokens, calculate_skill_metric, calculate_target_distributions,
     calculate_target_distributions_with_root, calculate_total_tokens,
 };
-pub use downloader::SkillDownloader;
+pub use downloader::{ResourceDownloadReport, SkillDownloader};
 pub use error::{Result, SkillError};
 pub use installer::{
     EnvironmentResolver, FileLockGuard, InstallMode, InstallOptions, InstallResult, InstalledSkill,

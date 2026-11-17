@@ -1,7 +1,7 @@
 //! Multi-target skill synchronization engine.
 //!
 //! Provides two-phase reconciliation between local skill catalogs (source of truth)
-//! and multiple target agent execution environments (Claude Desktop, Cursor, Antigravity, Custom).
+//! and multiple target agent execution environments (Claude Code, shared agents, Antigravity, Cursor, Custom).
 //! Supports side-effect-free drift planning, SemVer-aware upgrade/conflict detection,
 //! orphan pruning, atomic rollouts with automated backups, and dry-run guarantees.
 // cspell:words Syncer syncer commondir gitdir
@@ -23,6 +23,62 @@ use crate::installer::{
 };
 use crate::models::SkillFrontmatter;
 use crate::parser::SkillParser;
+
+// -----------------------------------------------------------------------------
+// Legacy Target Cleanup
+// -----------------------------------------------------------------------------
+
+/// Removes this repository's skill links from a directory no agent tool reads.
+///
+/// Only symlinks resolving inside `repo_root` are removed, along with the
+/// installer's registry and lock files. Everything else, including backups and
+/// unrelated entries, is preserved. The directory itself is removed when it ends
+/// up empty. Returns the number of links removed (or that would be, on dry run).
+pub fn prune_legacy_target_dir(
+    dir: &Path,
+    repo_root: &Path,
+    dry_run: bool,
+) -> std::io::Result<usize> {
+    let entries = match fs::read_dir(dir) {
+        Ok(entries) => entries,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(0),
+        Err(error) => return Err(error),
+    };
+    let canonical_root = repo_root.canonicalize().ok();
+    let mut removed = 0;
+    for entry in entries {
+        let path = entry?.path();
+        let Ok(link) = fs::read_link(&path) else {
+            continue;
+        };
+        let destination = if link.is_absolute() {
+            link
+        } else {
+            dir.join(link)
+        };
+        let owned = destination.starts_with(repo_root)
+            || canonical_root
+                .as_deref()
+                .is_some_and(|root| destination.starts_with(root));
+        if owned {
+            if !dry_run {
+                fs::remove_file(&path)?;
+            }
+            removed += 1;
+        }
+    }
+    if removed > 0 && !dry_run {
+        for name in ["installed-skills.json", "installed-skills.lock"] {
+            match fs::remove_file(dir.join(name)) {
+                Err(error) if error.kind() != std::io::ErrorKind::NotFound => return Err(error),
+                _ => {}
+            }
+        }
+        // Fails harmlessly when backups or unrelated entries remain.
+        let _ = fs::remove_dir(dir);
+    }
+    Ok(removed)
+}
 
 // -----------------------------------------------------------------------------
 // Domain Types & Enums
@@ -1201,7 +1257,7 @@ mod tests {
     fn test_plan_helpers() {
         let action1 = SyncAction {
             skill_id: "skill-a".to_string(),
-            target_env: TargetEnvironment::ClaudeDesktop,
+            target_env: TargetEnvironment::ClaudeCode,
             kind: SyncActionKind::Install,
             source_version: Some("1.0.0".to_string()),
             target_version: None,
@@ -1238,7 +1294,7 @@ mod tests {
     fn test_sync_error_conversions_to_skill_error() {
         let conflict_err = SyncError::UnresolvedConflict {
             skill_id: "test-skill".to_string(),
-            target: TargetEnvironment::ClaudeDesktop,
+            target: TargetEnvironment::ClaudeCode,
             reason: "local modifications detected".to_string(),
         };
         let skill_err: SkillError = conflict_err.into();
@@ -1249,7 +1305,7 @@ mod tests {
                 reason,
             } => {
                 assert_eq!(skill_id, "test-skill");
-                assert_eq!(target, "ClaudeDesktop");
+                assert_eq!(target, "ClaudeCode");
                 assert_eq!(reason, "local modifications detected");
             }
             other => panic!("Expected SkillError::SyncConflict, got: {other:?}"),

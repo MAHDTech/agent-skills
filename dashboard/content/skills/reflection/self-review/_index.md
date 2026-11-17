@@ -1,6 +1,6 @@
 +++
 title = "self-review"
-description = "Review your implementation diff for unfinished work, non-idiomatic code, duplication, and unnecessary complexity. Use after a task to apply focused fixes, with file-and-line evidence for each change."
+description = "Review your implementation diff for unfinished work, non-idiomatic code, and inconsistency with project conventions. Use after a task to apply focused fixes, with file-and-line evidence for each change."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,13 +12,14 @@ mermaid = false
 
 # Self-Review
 
-Post-implementation reflection pass. Run after completing a task to catch loose ends and simplify before calling it done.
+Post-implementation reflection pass. Run after completing a task to catch loose ends before calling it done.
 
 ## Instructions
 
-1. **Determine scope** - use the current branch diff unless the user specifies otherwise:
-   - `git diff <base-branch>...HEAD --name-only` (the branch your work targets)
-   - Fall back to staged changes if no branch diff exists
+1. **Determine scope** - unless the user specifies otherwise, review committed branch work plus every staged and unstaged change:
+   - `git diff <base-branch>...HEAD --name-only` for commits on the branch your work targets
+   - `git diff HEAD --name-only` for uncommitted work, staged and unstaged
+   - Include new untracked files from `git status --short`
 2. **Read all changed files in full** before reviewing.
 3. **Answer each question below.** For every finding, cite `file_path:line_number` and fix it directly.
 4. **If everything looks good**, say so briefly - don't invent busywork.
@@ -40,21 +41,9 @@ Post-implementation reflection pass. Run after completing a task to catch loose 
 - Does naming follow the project's existing conventions (check surrounding files)?
 - Are there language-specific antipatterns? (e.g., Python: bare `except`, mutable default args; Go: exported names that shouldn't be; JS/TS: `any` types that should be narrowed)
 
-### 3. More modular?
+### 3. Obvious clutter?
 
-> Scope: this is a light post-diff pass over what you just changed. For a deeper, staged cleanup - untangling oversized modules, collapsing duplicated logic across the codebase, reducing engineering debt - reach for code refactoring instead.
-
-- Are there functions doing more than one thing that should be split?
-- Is there duplicated logic across the diff that should be extracted?
-- Are responsibilities in the right files/modules, or did something land in the wrong place?
-- **Counter-check:** Don't extract abstractions for one-time code. Three similar lines is fine.
-
-### 4. Simpler?
-
-- Can any code path be removed or collapsed? (dead branches, unreachable conditions)
-- Are there over-engineered patterns? (unnecessary factories, abstractions with one implementation, config for things that won't change)
-- Can complex conditionals be simplified or inverted for early returns?
-- Is there defensive code for impossible states? (internal callers you control, framework guarantees)
+- Is there duplicated logic, a dead branch, or an abstraction with one caller introduced in this diff? Collapse it if the fix stays inside the diff; otherwise note it for the user.
 
 ## Output
 

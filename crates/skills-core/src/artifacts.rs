@@ -578,7 +578,7 @@ impl ArtifactsEngine {
             return Ok(false);
         }
 
-        let dashboard_content_dir = self
+        let target_dir = self
             .output_root()
             .join("dashboard")
             .join("content")
@@ -587,14 +587,43 @@ impl ArtifactsEngine {
         let skill_filter = self.options.skill_filter.as_deref();
         let has_filter = category_filter.is_some() || skill_filter.is_some();
 
-        prepare_dashboard_dir(&dashboard_content_dir, has_filter)?;
+        // A full regeneration renders into a scratch directory and is then
+        // mirrored into place. Rewriting every file in place makes file
+        // watchers such as `zola serve` rebuild the site once per batch of
+        // events, even when nothing changed.
+        if !has_filter {
+            let scratch =
+                std::env::temp_dir().join(format!("ask-dashboard-content-{}", generate_nonce()));
+            let rendered = self
+                .render_dashboard_content(&scratch, live_skills, archived_skills, has_filter)
+                .and_then(|()| mirror_tree(&scratch, &target_dir));
+            let _ = fs::remove_dir_all(&scratch);
+            return rendered.map(|()| true);
+        }
+
+        self.render_dashboard_content(&target_dir, live_skills, archived_skills, has_filter)?;
+        Ok(true)
+    }
+
+    /// Renders the dashboard content tree into `dashboard_content_dir`.
+    fn render_dashboard_content(
+        &self,
+        dashboard_content_dir: &Path,
+        live_skills: &[Skill],
+        archived_skills: &[Skill],
+        has_filter: bool,
+    ) -> Result<()> {
+        let category_filter = self.options.category_filter.as_deref();
+        let skill_filter = self.options.skill_filter.as_deref();
+
+        prepare_dashboard_dir(dashboard_content_dir, has_filter)?;
 
         let skills_root = self.workspace_root.join("skills");
         let archive_root = self.workspace_root.join("skills-archive");
 
         let mut weight = 1usize;
         self.generate_live_categories(
-            &dashboard_content_dir,
+            dashboard_content_dir,
             live_skills,
             category_filter,
             skill_filter,
@@ -604,7 +633,7 @@ impl ArtifactsEngine {
         )?;
 
         self.generate_archive_section(
-            &dashboard_content_dir,
+            dashboard_content_dir,
             archived_skills,
             category_filter,
             skill_filter,
@@ -614,7 +643,7 @@ impl ArtifactsEngine {
             weight,
         )?;
 
-        Ok(true)
+        Ok(())
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -979,6 +1008,68 @@ impl ArtifactsEngine {
             }
         }
     }
+}
+
+/// Makes `dst` match `src`: writes files that are new or whose bytes differ,
+/// then removes files and directories that `src` no longer has. Files that are
+/// already identical are left untouched, so their modification times survive.
+fn mirror_tree(src: &Path, dst: &Path) -> Result<()> {
+    fs::create_dir_all(dst).map_err(|e| SkillError::io(dst, e))?;
+
+    let mut expected = std::collections::HashSet::new();
+    for entry in fs::read_dir(src).map_err(|e| SkillError::io(src, e))? {
+        let entry = entry.map_err(|e| SkillError::io(src, e))?;
+        let name = entry.file_name();
+        let from = entry.path();
+        let to = dst.join(&name);
+        expected.insert(name);
+
+        // Never follow a symlink in the destination: recursing or writing
+        // through one would modify, and later prune, files outside `dst`.
+        // The link itself is removed and replaced with a real entry.
+        let to_kind = fs::symlink_metadata(&to).ok().map(|meta| meta.file_type());
+        if to_kind.is_some_and(|kind| kind.is_symlink()) {
+            fs::remove_file(&to).map_err(|e| SkillError::io(&to, e))?;
+        }
+        let to_is_dir = to_kind.is_some_and(|kind| kind.is_dir());
+
+        if from.is_dir() {
+            if to_kind.is_some_and(|kind| kind.is_file()) {
+                fs::remove_file(&to).map_err(|e| SkillError::io(&to, e))?;
+            }
+            mirror_tree(&from, &to)?;
+            continue;
+        }
+
+        let wanted = fs::read(&from).map_err(|e| SkillError::io(&from, e))?;
+        if to_is_dir {
+            fs::remove_dir_all(&to).map_err(|e| SkillError::io(&to, e))?;
+        } else if fs::read(&to).is_ok_and(|current| current == wanted) {
+            continue;
+        }
+        let tmp = to.with_extension(format!("tmp.{}", generate_nonce()));
+        fs::write(&tmp, &wanted).map_err(|e| SkillError::io(&tmp, e))?;
+        fs::rename(&tmp, &to).map_err(|e| {
+            let _ = fs::remove_file(&tmp);
+            SkillError::io(&to, e)
+        })?;
+    }
+
+    for entry in fs::read_dir(dst).map_err(|e| SkillError::io(dst, e))? {
+        let entry = entry.map_err(|e| SkillError::io(dst, e))?;
+        if expected.contains(&entry.file_name()) {
+            continue;
+        }
+        let stale = entry.path();
+        // `file_type` does not follow symlinks, so a stale link is unlinked
+        // and its target is left alone.
+        if entry.file_type().is_ok_and(|kind| kind.is_dir()) {
+            fs::remove_dir_all(&stale).map_err(|e| SkillError::io(&stale, e))?;
+        } else {
+            fs::remove_file(&stale).map_err(|e| SkillError::io(&stale, e))?;
+        }
+    }
+    Ok(())
 }
 
 fn prepare_dashboard_dir(dashboard_content_dir: &Path, has_filter: bool) -> Result<()> {
@@ -1766,6 +1857,90 @@ mod tests {
     use super::*;
     use std::fs;
     use tempfile::tempdir;
+
+    #[test]
+    fn test_mirror_tree_writes_only_changes_and_prunes_stale_entries() {
+        let temp = tempfile::tempdir().unwrap();
+        let src = temp.path().join("src");
+        let dst = temp.path().join("dst");
+        fs::create_dir_all(src.join("kept")).unwrap();
+        fs::write(src.join("kept/same.md"), "same").unwrap();
+        fs::write(src.join("kept/changed.md"), "new").unwrap();
+        fs::write(src.join("added.md"), "added").unwrap();
+        fs::create_dir_all(dst.join("kept")).unwrap();
+        fs::create_dir_all(dst.join("stale-dir")).unwrap();
+        fs::write(dst.join("kept/same.md"), "same").unwrap();
+        fs::write(dst.join("kept/changed.md"), "old").unwrap();
+        fs::write(dst.join("kept/stale.md"), "stale").unwrap();
+        fs::write(dst.join("stale-dir/gone.md"), "gone").unwrap();
+
+        let untouched = dst.join("kept/same.md");
+        let past = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_000_000);
+        fs::File::options()
+            .write(true)
+            .open(&untouched)
+            .unwrap()
+            .set_modified(past)
+            .unwrap();
+
+        mirror_tree(&src, &dst).unwrap();
+
+        assert_eq!(fs::metadata(&untouched).unwrap().modified().unwrap(), past);
+        assert_eq!(
+            fs::read_to_string(dst.join("kept/changed.md")).unwrap(),
+            "new"
+        );
+        assert_eq!(fs::read_to_string(dst.join("added.md")).unwrap(), "added");
+        assert!(!dst.join("kept/stale.md").exists());
+        assert!(!dst.join("stale-dir").exists());
+        let leftovers: Vec<_> = fs::read_dir(dst.join("kept"))
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name())
+            .collect();
+        assert_eq!(
+            leftovers.len(),
+            2,
+            "temporary files left behind: {leftovers:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_mirror_tree_never_writes_or_prunes_through_destination_symlinks() {
+        let temp = tempfile::tempdir().unwrap();
+        let src = temp.path().join("src");
+        let dst = temp.path().join("dst");
+        let outside = temp.path().join("outside");
+        fs::create_dir_all(src.join("linked-dir")).unwrap();
+        fs::write(src.join("linked-dir/new.md"), "new").unwrap();
+        fs::write(src.join("linked-file.md"), "new").unwrap();
+        fs::create_dir_all(&dst).unwrap();
+        fs::create_dir_all(outside.join("dir")).unwrap();
+        fs::write(outside.join("dir/precious.md"), "precious").unwrap();
+        fs::write(outside.join("file.md"), "precious").unwrap();
+        std::os::unix::fs::symlink(outside.join("dir"), dst.join("linked-dir")).unwrap();
+        std::os::unix::fs::symlink(outside.join("file.md"), dst.join("linked-file.md")).unwrap();
+        std::os::unix::fs::symlink(outside.join("dir"), dst.join("stale-link")).unwrap();
+
+        mirror_tree(&src, &dst).unwrap();
+
+        assert_eq!(
+            fs::read_to_string(outside.join("dir/precious.md")).unwrap(),
+            "precious"
+        );
+        assert!(!outside.join("dir/new.md").exists());
+        assert_eq!(
+            fs::read_to_string(outside.join("file.md")).unwrap(),
+            "precious"
+        );
+        assert!(!dst.join("linked-dir").is_symlink());
+        assert_eq!(
+            fs::read_to_string(dst.join("linked-dir/new.md")).unwrap(),
+            "new"
+        );
+        assert!(!dst.join("linked-file.md").is_symlink());
+        assert!(dst.join("stale-link").symlink_metadata().is_err());
+    }
 
     #[test]
     fn test_stage_files_no_stage() {

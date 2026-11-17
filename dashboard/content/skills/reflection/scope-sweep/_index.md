@@ -1,6 +1,6 @@
 +++
 title = "scope-sweep"
-description = "Run a final breadth check after the core work and review to catch missed requirements, incomplete tasks, edge cases, and operational risks. Use before declaring a scope complete, with evidence for remaining gaps."
+description = "Check finished work for incomplete tasks, missed requirements, unhandled scope, and operational follow-ups. Use before declaring a scope complete, citing evidence for each remaining gap."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,31 +12,24 @@ mermaid = false
 
 # Scope Sweep
 
-Now that we've completed the core work and reviewed it, do a final pass to identify anything we missed or should address before considering this scope "done".
+Run a final completeness pass after the core work and its review, before declaring the scope done. The question is whether everything in scope was delivered, not whether the delivered code is correct.
 
-This is the **breadth pass** - it makes sure nothing was dropped. For a deep dive on a single axis, reach for focused passes instead: edge-case probing for logic and failure-mode analysis of a diff, self-review for simplification and idiomatic cleanup, critical thinking to stress-test your own reasoning.
+## Process
 
-_Note: Prefer your agent's built-in file-search and file-reading tools (instead of ad-hoc bash `find`/`grep`) to quickly sweep the codebase for incomplete items, FIXME comments, or test gaps._
+1. Restate the scope: the user's original request, any agreed plan or spec, and follow-ups added during the session.
+2. Search the changed files and the session for unfinished markers: TODO, FIXME, placeholder values, stubbed functions, skipped tests.
+3. Check each item below against that scope, citing a file, line, command, or message as evidence.
 
-Please check for:
+## Check for
 
-- **Incomplete tasks**: anything you planned to do but didn't get to
-- **Overlooked requirements**: anything implied but not explicitly handled
-- **Missing questions**: what I should have asked but didn't
-- **Hidden assumptions**: any assumptions you made that could be wrong
-- **Edge cases**: scenarios that could break or degrade the solution
-- **Failure modes**: what happens when inputs are malformed, missing, hostile, or extreme
-- **Operational concerns**: deployment, monitoring, logging, maintenance, rollback
-- **Security and abuse risks**: permissions, misuse paths, data exposure
-- **Performance bottlenecks**: scalability issues, worst-case behavior, cost traps
-- **Testing gaps**: what still needs tests or validation
-- **User experience gaps**: confusing flows, unclear outputs, poor defaults
-- **Integration risks**: dependencies, external APIs, versioning, backward compatibility
-- **Future-proofing**: what will become painful in 3-6 months if not handled now
+- **Incomplete tasks**: work you planned or promised but did not finish.
+- **Missed requirements**: anything stated or clearly implied in the request that no change handles.
+- **Unhandled scope**: related files, callers, docs, configuration, or migrations the change should have touched.
+- **Open questions**: decisions you made on the user's behalf that they should confirm.
+- **Testing gaps**: new behavior with no test or verification run.
+- **Operational follow-ups**: deployment, configuration, monitoring, rollback, or documentation steps someone still has to perform.
 
-Finally:
+## Report
 
-- **What is the biggest risk remaining?**
-- **If you were reviewing this as a third party, what would you criticize first?**
-- **What would you improve if you had one more day?**
+List each gap with its evidence and a proposed action, grouped as "finish now" or "hand to the user". Close with the single biggest remaining gap. If the scope is complete, say so and name the evidence.
 

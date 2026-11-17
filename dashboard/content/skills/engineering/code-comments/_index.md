@@ -1,6 +1,6 @@
 +++
 title = "code-comments"
-description = "Write or review code comments for non-obvious intent, constraints, and invariants. Use to trim redundant or stale comments and audit comment quality in a specified scope or diff."
+description = "Audit and rewrite code comments in a specified file, path, or diff so they state non-obvious intent, constraints, and invariants. Use when the user asks for a comment audit or comment cleanup."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,19 +12,11 @@ mermaid = false
 
 # Code Comments
 
-Guidelines and audit workflows for writing concise, high-signal code comments.
-
 Code should speak for itself. High quality code relies on expressive naming, clean modularization, and type signatures to communicate intent. Comments are reserved strictly for non-obvious context that the code cannot express on its own.
 
-## When to Use This Skill
+## Core rules
 
-- Writing new code or editing existing files (automated model behavioral guide).
-- Reviewing diffs or PRs for comment hygiene and verbosity.
-- Explicitly requested via `/code-comments` or `/code-comments <path>` to audit and prune bloated, redundant, or noisy comments.
-
-## Core Rules
-
-### 1. Why, Not What
+### 1. Why, not what
 
 Comments must explain **intent, constraints, invariants, or edge-case rationale** - never restate the syntax or mechanics of what the code is doing.
 
@@ -52,7 +44,7 @@ Comments must explain **intent, constraints, invariants, or edge-case rationale*
   const CHUNK_SIZE_BYTES = 64 * 1024
   ```
 
-### 2. Refactor Over Comment
+### 2. Refactor over comment
 
 If code requires a paragraph to explain its mechanics, refactor the code instead of adding comments:
 
@@ -60,53 +52,50 @@ If code requires a paragraph to explain its mechanics, refactor the code instead
 - Extract complex boolean conditions into well-named helper booleans or functions.
 - Break long, multi-purpose functions into small, single-purpose units.
 
-### 3. Brevity Over Verbosity
+### 3. Brevity over verbosity
 
-- **No essays:** Keep comments strictly to 1 or 2 concise lines. Never write multi-paragraph dissertations for a few lines of implementation.
-- **No decorative banners or headers:** Avoid ASCII art, dividing lines (`// ====================`), and redundant section headers.
-- **No redundant docstrings:** Do not duplicate type signatures in JSDoc or docstrings (e.g. `@param {string} name The name parameter`). Use docstrings only on public APIs where consumer-facing behavior is non-obvious.
+- Keep each comment to one or two lines stating the reason.
+- Let function and module names carry structure; plain code with blank lines separates sections.
+- Write docstrings on public APIs whose consumer-facing behavior is non-obvious, describing behavior and constraints; the type signature already documents parameter types.
 
-### 4. Zero Tolerance for Stale Comments & AI Tells
+### 4. Current comments only
 
-- **No commented-out code:** Delete unused or dead code; version control tracks history.
-- **No changelogs / authorship in code:** Do not add "Modified by AI on date" or inline changelog notes.
-- **Never use em-dashes:** Do not use Unicode U+2014 em-dashes in comments. Use standard hyphens (`-`), colons, commas, or parentheses.
+- Delete commented-out code and dead code; version control keeps the history.
+- Keep authorship and change history in commits, so comments describe the code as it is now.
+- Use hyphens, colons, commas, or parentheses for asides in comments, not em-dashes (U+2014).
 
 ---
 
-## Comment Decision Matrix
+## Comment decision matrix
 
 When writing or reviewing comments, classify each comment into one of four actions:
 
 | Category                 | Indicator                                                                           | Action                                                        |
 | :----------------------- | :---------------------------------------------------------------------------------- | :------------------------------------------------------------ |
-| **Redundant / Obvious**  | Restates function name, variable assignment, loop, or type                          | **Delete immediately**                                        |
+| **Redundant / Obvious**  | Restates function name, variable assignment, loop, or type                          | **Delete**                                                    |
 | **Bloated Essay**        | Multi-sentence explanation of straightforward logic                                 | **Trim to 1 concise line** focusing on the "why"              |
 | **Cryptic Code Smell**   | Long comment explaining convoluted logic                                            | **Refactor code** (rename, extract helper) and remove comment |
 | **Legitimate Invariant** | Explains upstream bugs, mathematical formulas, hardware quirks, or security reasons | **Keep** as a brief, single-line note                         |
 
 ---
 
-## Interactive Audit Workflow (`/code-comments`)
+## Audit workflow
 
-When the user runs `/code-comments` or requests a comment audit:
+When the user requests a comment audit or cleanup:
 
-1. **Target Discovery:**
-   - If a file or path is specified (e.g. `/code-comments src/auth.ts`), scan that file.
+1. Find the target.
+   - If a file or path is specified, scan that scope.
    - If no target is given, inspect the current working changes (`git diff` or modified files).
 
-2. **Audit & Classify:**
-   - Scan all comments in the target scope.
-   - Categorize each comment using the Comment Decision Matrix (Delete / Trim / Refactor / Keep).
+2. Audit and classify.
+   - Scan every comment in the target scope.
+   - Categorize each comment using the comment decision matrix (Delete / Trim / Refactor / Keep).
 
-3. **Present Summary & Plan:**
-   - Show a concise table of findings:
-     - File path and line numbers
-     - Current comment text
-     - Proposed action (Delete, Trim to single line, or Refactor)
-     - Rationale
+3. Present the plan and wait for approval.
+   - Show a concise table of findings: file path and line numbers, current comment text, proposed action, and rationale.
+   - Ask the user to approve, adjust, or drop items. Apply edits directly without this pause only when the user has already asked you to apply the changes in that scope.
 
-4. **Surgical Execution:**
-   - Apply edits cleanly without touching unrelated formatting or logic.
-   - Verify code compiles and passes tests before finishing.
+4. Apply the approved edits.
+   - Change only the approved comments and any approved refactors, leaving unrelated formatting and logic untouched.
+   - Run the project's build and tests; done when they pass and every approved row in the table is applied.
 

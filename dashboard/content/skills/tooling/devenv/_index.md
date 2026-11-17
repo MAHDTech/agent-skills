@@ -10,105 +10,62 @@ mermaid = false
 +++
 
 
-# Devenv Integration
+<!-- cspell:ignore devenv secretspec SECRETSPEC -->
 
-When working in a repository that uses `devenv`, you must strictly adhere to the following rules for environment consistency:
+# Devenv
 
-- **Devenv is Mandatory:** For projects containing a `devenv.nix` and/or `devenv.yaml` file, strict use of `devenv` for dependency and shell environment management is required.
-- **DO NOT Run Bare Commands:** ALL standard CLI operations MUST run via the devenv shell. You must **always** provide a reason for the execution via the `SECRETSPEC_REASON` environment variable to satisfy SecretSpec's audit logging for AI agents. To do this use:
+This skill applies when the project root contains `devenv.nix` or `devenv.yaml`. In such a project the devenv shell owns the toolchain: run the project's build, test, lint, formatter, and language tools through it, and declare any new project tool in `devenv.nix` rather than installing it on the host.
 
-```bash
-SECRETSPEC_REASON="<reason>" devenv --no-tui shell -- <command>
-```
+## Invoking the shell
 
-- **NO TUI is Mandatory (`--no-tui`):** ALWAYS include the `--no-tui` flag when running `devenv` commands (e.g. `devenv --no-tui shell ...`, `devenv --no-tui test`) to disable the interactive terminal interface so AI Agents do not get stuck!
-- **Root Execution Only:** You must ONLY run `devenv shell` commands from the root of the repository where the `devenv.nix` file is located.
-  - Never run it from a sub-directory.
-  - Looking for the `devenv.nix` is how you know you are in the right place.
-  - Correct: `SECRETSPEC_REASON="checking code" devenv --no-tui shell -- cargo check`
-- **Dash-Dash is Mandatory (`--`):** NEVER use `devenv shell -c <command>`. This is an incredibly common mistake. The `-c` argument is used for a "clean" environment and using it gives unexpected results.
-  - Use `SECRETSPEC_REASON="<reason>" devenv --no-tui shell -- <command>` - this is the right way.
-
-## Non-Interactive Agent and CI Invocations
-
-Bare `devenv shell` (or `devenv --no-tui shell` without a non-interactive secrets provider) can **hang or fail on an authorization prompt** in agent sessions, headless CI, and backlog gates. That looks like a red test gate when the suite never started.
-
-For **every** agent-driven or CI-driven `devenv` invocation, use this shape:
+Use one command shape for every non-interactive (agent or CI) invocation:
 
 ```bash
 CI=true \
 SECRETSPEC_PROVIDER=env \
-SECRETSPEC_REASON="<reason>" \
-devenv --no-tui shell --quiet -- \
-  <command>
+SECRETSPEC_REASON="<why this command runs>" \
+devenv --no-tui shell --quiet -- <command> [args...]
 ```
 
-| Variable / flag | Why |
-| --------------- | --- |
-| `CI=true` | Many `devenv.nix` setups change install/auto-deps behaviour under CI; agents should match CI. |
-| `SECRETSPEC_PROVIDER=env` | Resolve secrets from the environment only - **no interactive provider prompt**. |
-| `SECRETSPEC_REASON=…` | Required for SecretSpec agent audit logging. |
-| `--no-tui` | Never open the interactive TUI (hangs agents). |
-| `--quiet` | Prefer under CI/agents to reduce noise; still always use `--no-tui`. |
+| Part                      | Reason                                                                                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--no-tui`                | Keeps the interactive progress interface from holding the terminal. Pass it to every devenv subcommand (`shell`, `test`, `up`, `tasks`).               |
+| `--` before the command   | Separates devenv's flags from the command. `-c` is `--clean` (strip the environment), not "run a command".                                             |
+| `SECRETSPEC_REASON`       | SecretSpec's default `require_reason = "agents"` policy fails secret access from coding agents until a reason is supplied; the reason is audit-logged. |
+| `SECRETSPEC_PROVIDER=env` | Resolves secrets from environment variables so no provider opens an interactive authorization prompt. It overrides every per-secret provider chain.    |
+| `CI=true`                 | Matches CI behaviour in `devenv.nix` setups that branch on it.                                                                                         |
+| `--quiet`                 | Trims progress output.                                                                                                                                 |
 
-**Profile selection** when `secretspec.toml` exists (same rules as hook runs below): set `SECRETSPEC_ENV` to `ci` if `[profiles.ci]` exists, else `default`, else the first defined profile.
+Run the command from the directory that contains `devenv.nix`. When `secretspec.toml` defines several profiles and the task needs a specific one, set `SECRETSPEC_PROFILE=<profile>` (or pass `--secretspec-profile <profile>`); prefer a `ci` profile when it exists, otherwise `default`.
 
-**Never** run bare `devenv shell` without `--no-tui` in an agent context. **Never** dismiss or ignore a secretspec authorization prompt - fix the env (`SECRETSPEC_PROVIDER=env` + required vars) instead.
+If a command still stops on a SecretSpec prompt, fix the environment (export the required secret variables, set the provider and profile) and re-run; never answer the prompt on the user's behalf.
 
-Other skills must **not** restate these flags. If a project has `devenv.nix` or `devenv.yaml`, follow **this** skill when building any command that enters the devenv shell.
+## Testing and hooks
 
-## Pre-commit Hooks and Testing
+`devenv --no-tui test` builds the shell, runs every configured git hook, and runs the project's declared tests. Use it, with the variables above, as the project's verification step:
 
-> [!CAUTION]
-> **PRE-COMMIT VS PREK IN DEVENV.NIX:**
-> - **Terminology:** "pre-commit" refers strictly to the Git lifecycle hook stage (e.g. `.pre-commit-config.yaml`).
-> - **CLI Tool Deprecation:** The standalone `pre-commit` Python CLI tool and package are **DEPRECATED** and replaced by `prek`.
-> - **DO NOT add `pkgs.pre-commit` or `pre-commit` package/input to `devenv.nix`.** If a hook runner package is needed, use `pkgs.prek` or `git-hooks.git-hooks`.
-> - ALWAYS use `prek` to run or manage pre-commit hooks (e.g., `prek run -a`).
+```bash
+CI=true SECRETSPEC_PROVIDER=env SECRETSPEC_REASON="run project tests" \
+  devenv --no-tui test
+```
 
-Devenv runs tests and linters directly. The project-level hooks are run via `prek` (see the prek skill).
-- `SECRETSPEC_REASON="running tests" devenv --no-tui test`: This triggers all pre-commit hooks (managed by `prek`) and other defined tests and is **mandatory** as part of testing. Prefer the non-interactive prefix from **Non-Interactive Agent and CI Invocations** when an agent or gate runs this.
+- Git hooks are declared under `git-hooks.hooks` in `devenv.nix`; `git-hooks.package` defaults to `pkgs.prek`, so keep `prek` as the hook runner and leave the Python `pre-commit` package out of `packages`.
+- Hooks see only files Git tracks, so stage new files before relying on a green run.
+- Report each failing hook or test by name with its error output.
 
-**Verification Hook Run (ALL Repositories):**
-You must verify that all hooks (Prettier, CSpell, etc.) pass successfully. Check if `secretspec.toml` exists in the repository root:
-- **If it exists:**
-  1. If `[profiles.ci]` is defined, set `SECRETSPEC_ENV="ci"`.
-  2. Else if `[profiles.default]` is defined, set `SECRETSPEC_ENV="default"`.
-  3. Else, use the first profile name defined under `[profiles.<profile_name>]`.
-  4. Run the validation command with the non-interactive prefix:
+## Changing the environment
 
-     ```bash
-     CI=true SECRETSPEC_PROVIDER=env SECRETSPEC_ENV="<env>" \
-       SECRETSPEC_REASON="<context-specific-reason>" \
-       devenv --no-tui shell --quiet -- prek run -a
-     ```
-
-- **If it does not exist:**
-  1. Run:
-
-     ```bash
-     CI=true SECRETSPEC_REASON="<context-specific-reason>" \
-       devenv --no-tui shell --quiet -- prek run -a
-     ```
-
-If any hook fails, report the failures back.
-
-## SecretSpec Integration
-
-Devenv integrates with SecretSpec, a tool that manages secret resolution and auditing.
-- **Audit Logging and Agent Accountability:** Coding agents are required by default to provide a human-readable reason whenever accessing secrets. This is enforced by SecretSpec's `require_reason = "agents"` policy.
-- **Always Provide a Reason:** To ensure your commands never fail due to unauthorized secret access, you MUST supply a `SECRETSPEC_REASON` environment variable for **every** `devenv --no-tui shell` invocation.
-- **Non-Interactive Provider:** In agent, CI, and backlog-gate contexts, always set `SECRETSPEC_PROVIDER=env` so SecretSpec does not open an interactive authorization UI. Interactive providers are for humans at a terminal only.
-
-## MCP Servers & Skills
-
-- **Check all available MCP servers** for additional knowledge and skills.
-- Prioritize the use of the Devenv MCP server when it is available:
-  - It can be accessed via `devenv mcp` to run locally.
-  - Or via the remote URL: `https://mcp.devenv.sh` (Note: requires active internet connection).
+- Add packages to `packages`, language toolchains under `languages.<name>`, scripts under `scripts`, and long-running services under `processes` or `services`. Group each option in one attribute set rather than repeating the key with dotted paths.
+- After editing `devenv.nix`, re-enter the shell (`devenv --no-tui shell -- true`) to rebuild; add `--refresh-eval-cache` if a newly declared script is reported missing.
+- Look up option names and packages before writing them: the devenv MCP server (`devenv mcp` locally, or `https://mcp.devenv.sh`) searches options and packages, and the vendored docs cover the rest.
 
 ## References
 
-- Local reference docs in `resources/auto/` (`resources/auto/devenv-llms.txt`, `resources/auto/devenv-llms-full.txt`, and `resources/auto/llms.txt`)
-- [Devenv MCP Server](https://mcp.devenv.sh) (Online-Only)
+- devenv docs: `resources/auto/devenv-llms-full.txt` (single file, includes the CLI reference and every option) or the per-page files indexed by `resources/auto/devenv-llms.txt`.
+- SecretSpec docs: `resources/auto/llms-full.txt` and the per-page files indexed by `resources/auto/llms.txt`.
+
+## Completion criteria
+
+- Every project command in the task ran through `devenv --no-tui shell -- <command>` (or `devenv --no-tui test`) with `SECRETSPEC_REASON` set.
+- `devenv --no-tui test` exits 0, or each failure is reported by hook or test name.
 

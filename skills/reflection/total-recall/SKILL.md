@@ -39,19 +39,19 @@ Start a clean decision log by copying the header from `resources/manual/decision
 
 ## Logging a Row
 
-Write entries in plain, direct language as if briefing a colleague. Avoid AI buzzwords, puffery, and abstract corporate speak (the unslop skill applies to decision logs too).
+Write entries in plain, direct language as if briefing a colleague. Name the concrete change, command, or file instead of abstract summaries.
 
 ### Using the Helper Script
 
-Use the included helper script to guarantee well-formed TSV entries and guard against formula injection:
+Use the helper script at `resources/manual/log.sh`, relative to this skill's directory, to guarantee well-formed TSV entries and guard against formula injection:
 
 ```bash
-skills/reflection/total-recall/resources/manual/log.sh <logfile> <phase> <decision> <why> <evidence> <result>
+<skill-dir>/resources/manual/log.sh <logfile> <phase> <decision> <why> <evidence> <result>
 ```
 
 The script automatically:
 
-1. Stamped ISO8601 UTC timestamps.
+1. Stamps each row with an ISO8601 UTC timestamp.
 2. Initializes headers on first use if the log file does not exist.
 3. Strips internal tab and newline characters.
 4. Prefixes cells starting with `=`, `+`, `-`, or `@` with a single quote (`'`) to prevent spreadsheet formula injection.
@@ -76,7 +76,6 @@ Do not log trivial, self-evident edits (e.g. fixing a typo, running a standard l
 1. **One row, one decision:** Every row must represent a single, focused checkpoint fitting entirely on one line.
 2. **Append-only integrity:** Never edit or delete existing rows. If a prior decision is reversed or found flawed, append a new row recording the pivot and rationale.
 3. **Concrete evidence pointers:** Evidence must point to a reproducible artifact, commit SHA, file line, or test run.
-4. **No em-dashes:** Do not use Unicode U+2014 em-dashes in log messages or documentation. Use standard hyphens, colons, or commas.
 
 ## Transcript Audit
 
@@ -85,7 +84,7 @@ Before finishing a run, verify that the log reflects ground truth by auditing it
 1. **Verify actions:** Confirm every logged decision corresponds to an actual command or file modification.
 2. **Verify evidence:** Check that listed commits, test outputs, or files actually exist and prove the claimed result.
 3. **Check for missing pivots:** If an approach was attempted, failed, and abandoned during the run, ensure that pivot is recorded.
-4. **Prune noise:** Remove trivial or redundant rows that add cognitive load without audit value.
+4. **Flag noise:** For a trivial or redundant row, append a row that marks it as noise and names the row's timestamp. Leave the original row in place.
 
 ## Cross-Model Review
 

@@ -1,50 +1,38 @@
 ---
 name: git-resolve-conflicts
 description: Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.
-context: fork
-agent: general-purpose
 metadata:
   group: github
 ---
 
-<!-- omit in toc -->
+# Resolve Git Conflicts
 
-# Resolve Merge Conflicts
+Resolve the conflicts left by an in-progress merge, rebase, or cherry-pick using a structured, context-aware approach. Resolve what the evidence supports confidently, state the reasoning for non-trivial resolutions, and escalate when the correct behavior is ambiguous.
 
-Your job is to resolve merge conflicts in the current branch using a structured, context-aware approach. You resolve what you can confidently, explain your reasoning for non-trivial resolutions, and escalate when the correct behavior is ambiguous.
+## 1. Verify state
 
-- [1. Verify State](#1-verify-state)
-- [2. Map All Conflicts](#2-map-all-conflicts)
-- [3. Build Context Per Conflict](#3-build-context-per-conflict)
-  - [3a. Read the full file](#3a-read-the-full-file)
-  - [3b. Trace commit history on both sides](#3b-trace-commit-history-on-both-sides)
-  - [3c. Examine surrounding code](#3c-examine-surrounding-code)
-  - [3d. Check cascading implications](#3d-check-cascading-implications)
-  - [3e. Assess business logic impact](#3e-assess-business-logic-impact)
-- [4. Classify Each Conflict (3-Tier System)](#4-classify-each-conflict-3-tier-system)
-- [5. Resolve by Tier](#5-resolve-by-tier)
-  - [Tier 1: Auto-resolve](#tier-1-auto-resolve)
-  - [Tier 2: Resolve with type-specific guidance](#tier-2-resolve-with-type-specific-guidance)
-  - [Tier 3: Escalate](#tier-3-escalate)
-  - [New code escalation](#new-code-escalation)
-- [6. Verify and Stage](#6-verify-and-stage)
-- [7. Reflection and Handoff](#7-reflection-and-handoff)
-
-## 1. Verify State
-
-Assume I already ran `git merge` and there are unresolved conflicts.
-
-- Run `git status` to confirm conflicts exist
-- Identify the merge target via `git rev-parse MERGE_HEAD` (or `REBASE_HEAD` / `CHERRY_PICK_HEAD` as applicable)
-- Run a baseline diff between both sides, excluding lock/generated files:
+Start from an in-progress operation with unresolved conflicts. Run `git status` to confirm conflicts exist, then identify the operation and the incoming commit:
 
 ```bash
-git diff MERGE_HEAD...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"
+for ref in MERGE_HEAD REBASE_HEAD CHERRY_PICK_HEAD; do
+  git rev-parse -q --verify "$ref" >/dev/null && echo "$ref"
+done
 ```
 
-This gives you the big picture before touching individual conflicts.
+Set `OTHER` to the ref that exists. The sides read differently by operation:
 
-## 2. Map All Conflicts
+- **Merge** (`MERGE_HEAD`): "ours" (`HEAD`) is the current branch; "theirs" (`MERGE_HEAD`) is the branch being merged in.
+- **Rebase** (`REBASE_HEAD`): the sides are swapped. "Ours" (`HEAD`) is the upstream plus the commits already replayed; "theirs" (`REBASE_HEAD`) is the branch's own commit being replayed.
+- **Cherry-pick** (`CHERRY_PICK_HEAD`): "ours" (`HEAD`) is the current branch; "theirs" is the commit being picked.
+
+Get the big picture before touching individual conflicts: the change being applied, and what `HEAD` changed since the two sides diverged, excluding lock files:
+
+```bash
+git show --stat "$OTHER"
+git diff "$OTHER"...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"
+```
+
+## 2. Map all conflicts
 
 Inventory every conflict before resolving any of them.
 
@@ -61,7 +49,7 @@ rg "<<<<<<< " --line-number
   - Same subsystem? Paired changes? Generated files?
   - How many conflicts total? Are they concentrated or spread across the codebase?
 
-## 3. Build Context Per Conflict
+## 3. Build context per conflict
 
 For **each** conflict, before classifying or resolving:
 
@@ -72,8 +60,8 @@ Not just the markers. Understand the function/block's role in the file.
 ### 3b. Trace commit history on both sides
 
 ```bash
-git log --oneline MERGE_HEAD -- <file>
-git log --oneline HEAD -- <file>
+git log --oneline HEAD.."$OTHER" -- <file>
+git log --oneline "$OTHER"..HEAD -- <file>
 ```
 
 Read commit messages and diffs to understand **intent** on each side.
@@ -92,7 +80,7 @@ Read 20-40 lines around the conflict. Identify invariants:
 If the conflict is in a signature, type, constant, or export:
 
 ```bash
-rg "<symbol_name>" --type-add 'src:*.{ts,py,go,rs,java}' -t src
+rg -w "<symbol_name>"
 ```
 
 Find all usages to identify downstream impact.
@@ -105,7 +93,7 @@ Answer three questions for each conflict:
 2. **Risk**: If resolved wrong, what breaks? (nothing / tests / production / data integrity)
 3. **Novelty**: Both sides added new behavior? Or one cleanly supersedes the other?
 
-## 4. Classify Each Conflict (3-Tier System)
+## 4. Classify each conflict
 
 | Tier                                   | When                                                                                                                                                    | Action                                                                                                                                     |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -117,9 +105,9 @@ Answer three questions for each conflict:
 
 > Resolved `file:line`. [How]. Rationale: [why]. Flag if wrong.
 
-**Key balance**: Tier 1 keeps you decisive. Tier 3 keeps you consultative when it matters. Tier 2 handles the middle ground -- resolve but make reasoning visible.
+Tier 1 stays decisive, Tier 3 stays consultative when it matters, and Tier 2 covers the middle ground: resolve, but make the reasoning visible.
 
-## 5. Resolve by Tier
+## 5. Resolve by tier
 
 ### Tier 1: Auto-resolve
 
@@ -159,15 +147,15 @@ Apply the right merge strategy based on the construct type:
 
 ### Tier 3: Escalate
 
-- Show me the conflicting chunks with surrounding context
+- Show the user the conflicting chunks with surrounding context
 - Explain what each side intended (based on commit history from step 3b)
 - State the specific ambiguity ("Both sides modify the retry logic but with different strategies")
 - Offer 2-3 resolution options with trade-offs
-- **Wait for my direction before editing**
+- **Wait for the user's direction before editing**
 
 After receiving direction:
 
-- Restate your plan in one sentence before editing
+- Restate the plan in one sentence before editing
 - Re-evaluate remaining Tier 2 conflicts if new context was revealed
 
 ### New code escalation
@@ -177,7 +165,7 @@ When neither side's code is complete and the right answer is a **third implement
 - Flag it explicitly with a 3-5 bullet plan describing the proposed implementation
 - Wait for approval before writing
 
-## 6. Verify and Stage
+## 6. Verify and stage
 
 After all conflicts are resolved:
 
@@ -189,9 +177,9 @@ Confirm zero remaining conflict markers.
 
 - Run lint/type-check if fast (skip slow integration tests)
 - Stage resolved files individually: `git add <specific_files>` -- **not** `git add .`
-- **Do not commit** -- leave that to me
+- Leave the commit (and `git rebase --continue` or `git cherry-pick --continue`) to the user
 
-## 7. Reflection and Handoff
+## 7. Reflect and hand off
 
 Provide a summary table with a **Status** emoji column so risky items are impossible to overlook:
 
@@ -205,15 +193,15 @@ Provide a summary table with a **Status** emoji column so risky items are imposs
 | ----- | ----------------------------- | ------------------------------------------------------------------------------------ |
 | `✅`  | Safe / auto-resolved          | Tier 1 resolutions, trivial merges, no risk                                          |
 | `🟢`  | Resolved with high confidence | Tier 2 where intent was clear from context                                           |
-| `🟡`  | Resolved but needs your eyes  | Tier 2 with lower confidence, subtle behavior changes, or dropped code               |
-| `🔴`  | Escalated / blocked           | Tier 3, waiting for your direction                                                   |
+| `🟡`  | Resolved but needs review     | Tier 2 with lower confidence, subtle behavior changes, or dropped code               |
+| `🔴`  | Escalated / blocked           | Tier 3, waiting for the user's direction                                             |
 | `⚠️`  | Cascading risk                | Auto-merged files or downstream code that may be affected but wasn't in conflict set |
 
 **Rules:**
 
 - Every row MUST have a status emoji -- no blank status cells
 - Any resolution that **drops code** (even dead code) must be `🟡` or higher
-- Any Tier 2 resolution where your confidence is below ~80% must be `🟡`
+- Any Tier 2 resolution with confidence below ~80% must be `🟡`
 - Tier 3 is always `🔴`
 
 ### Flags section
@@ -224,6 +212,6 @@ After the table, list flags grouped by severity. Each flag MUST start with its e
 - `🟡` Tier 2 lower-confidence resolutions (non-blocking but review recommended)
 - `⚠️` Cascading implications found during step 3d
 - `⚠️` Architectural divergence detected between the two sides
-- `⚠️` Files that weren't in the conflict set but may be affected by the merge
+- `⚠️` Files that weren't in the conflict set but may be affected by the operation
 
-Closing question: **Are there areas of the codebase this merge could affect that aren't in the conflict markers?**
+Closing question: **Are there areas of the codebase this operation could affect that aren't in the conflict markers?**

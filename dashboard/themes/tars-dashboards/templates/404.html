@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}404 · {{ config.title }}{% endblock title %}
-
 {% block content %}
-<div class="prose max-w-none text-center py-20">
-  <h1 class="!text-6xl" style="color: var(--color-status-red)">404</h1>
-  <p style="color: var(--color-muted)" class="!text-lg">Signal lost. The requested document was not found in The Archive.</p>
-  <p><a href="{{ get_url(path='/') }}">← Return to The Archive</a></p>
+<div class="max-w-xl mx-auto py-12">
+  <section class="monolith-card p-8 text-center space-y-5">
+    <p class="font-mono text-xs text-accent-amber tracking-wider">404</p>
+    <h1 class="font-semibold text-3xl text-text-primary tracking-tight">Page not found</h1>
+    <p class="text-sm text-text-muted leading-relaxed">
+      That page doesn't exist, or the skill was renamed. Try search, or head back to the catalog.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 pt-2">
+      <a href="/skills/" class="btn btn-primary">Back to the catalog</a>
+      <button type="button" data-search-open class="btn min-h-[40px] px-4 text-sm">Search</button>
+    </div>
+  </section>
 </div>
 {% endblock content %}

@@ -34,6 +34,7 @@ let
     ripgrep
     tailwindcss_4
     trivy
+    watchexec
     zola
   ];
 
@@ -234,10 +235,13 @@ in
         ];
       };
 
+      # `--fix` regenerates dashboard content in place, so it never has to be
+      # rebuilt by hand. Rewritten files are left unstaged: the commit stops
+      # once, then `git add` and commit again.
       dashboard-lint = {
         enable = true;
         name = "Dashboard Lint";
-        entry = "${cargoHook} run -p ask-cli -- dashboard lint";
+        entry = "${cargoHook} run -p ask-cli -- dashboard lint --fix";
         files = "^(skills(-archive)?/.*\\.md$|dashboard/(content|themes|css)/|dashboard/config\\.toml$)";
         excludes = [ ];
         always_run = true;
@@ -245,6 +249,14 @@ in
         require_serial = true;
       };
       deadnix.enable = true;
+      # Tera 2 component arguments take bare braces (`arg={value}`). A quoted
+      # `arg="{value}"` renders the literal text instead of failing the build.
+      tera-templates = {
+        enable = true;
+        name = "Tera Templates";
+        entry = "${pkgs.writeShellScript "tera-templates" config.scripts.tera-templates.exec}";
+        files = "^dashboard/themes/.*/templates/";
+      };
       editorconfig-checker = {
         enable = true;
         excludes = [
@@ -316,19 +328,7 @@ in
         enable = true;
         excludes = [ "^skills/vendor/" ];
       };
-      prettier = {
-        enable = true;
-        excludes = [
-          "^skills/vendor/"
-          "\\.html$"
-          "README\\.md$"
-          "^agents/AGENTS\\.md$"
-          "^skills\\.sh\\.json$"
-          "^dashboard/static/\\.well-known/"
-          "\\.devcontainer\\.json$"
-          "\\.devcontainer/devcontainer\\.json$"
-        ];
-      };
+      prettier.enable = true;
       ripsecrets.enable = true;
       rustfmt = {
         enable = true;
@@ -419,7 +419,7 @@ in
       '';
     };
     dashboard = {
-      description = "Manage the dashboard (usage: dashboard --action <build|serve|css|lint>)";
+      description = "Manage the dashboard (usage: dashboard --action <build|serve|css|lint|index>)";
       exec = ''
         cargo run -p ask-cli -- dashboard "$@"
       '';
@@ -431,6 +431,37 @@ in
         ./scripts/codeql-run.sh "$@"
       '';
     };
+    dashboard-watch = {
+      description = "Refresh dashboard content and search index, then repeat on every skill change";
+      exec = ''
+        set -uo pipefail
+        ask dashboard index
+        exec watchexec --postpone --debounce 1s \
+          --watch skills --watch skills-archive \
+          --watch dashboard/themes --watch dashboard/config.toml \
+          -- cargo run --quiet -p ask-cli -- dashboard index
+      '';
+    };
+    dashboard-test = {
+      description = "Build the dashboard into a scratch directory and verify the output";
+      exec = ''
+        ./scripts/test-dashboard.sh "$@"
+      '';
+    };
+    tera-templates = {
+      description = "Reject quoted Tera component arguments in dashboard templates";
+      exec = ''
+        set -euo pipefail
+        targets=("$@")
+        if [ "''${#targets[@]}" -eq 0 ]; then
+          targets=(dashboard/themes)
+        fi
+        if ${pkgs.gnugrep}/bin/grep -rnE '[a-zA-Z0-9_-]+="[{][^{%#]' "''${targets[@]}"; then
+          echo "error: quoted Tera component argument; write arg={value}, not arg=\"{value}\"" >&2
+          exit 1
+        fi
+      '';
+    };
     crap = {
       description = "Run cargo-crap analysis";
       exec = ''
@@ -439,7 +470,22 @@ in
     };
   };
 
+  # `devenv up`: Zola live reload, Tailwind watch, and a watcher that
+  # regenerates dashboard content and the search index when a skill changes.
+  # Skipped under `devenv test`, which would otherwise start them alongside the tests.
+  processes = lib.mkIf (isNative && !config.devenv.isTesting) {
+    # Downloaded reference docs link to heading anchors that Zola slugs
+    # differently, and their code fences carry info strings Zola's highlighter
+    # does not know (`theme={null}`, `candid`). Both print thousands of warnings
+    # on every rebuild, so they are filtered here to keep real errors visible;
+    # `ask dashboard lint` still shows them.
+    zola.exec = "zola --root dashboard serve --port 3000 2>&1 | grep --line-buffered -v -e 'The anchor in the link' -e 'Language `.*` not found'";
+    tailwind.exec = "tailwindcss -i dashboard/css/input.css -o dashboard/static/build/css/generated.css --watch=always";
+    dashboard-watch.exec = "dashboard-watch";
+  };
+
   enterTest = ''
     ./scripts/run-tests.sh
+    ./scripts/test-dashboard.sh
   '';
 }

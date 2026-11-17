@@ -64,14 +64,14 @@ fn test_environment_resolution_custom_and_workspace() {
     assert_eq!(skills_dir, root.join("my-custom-skills"));
 
     let ws_root = root.join("my-workspace");
-    let antigravity_env = TargetEnvironment::Antigravity {
+    let antigravity_env = TargetEnvironment::Agents {
         workspace_root: Some(ws_root.clone()),
     };
     let ag_dir =
         EnvironmentResolver::resolve_skills_dir_with_root(&antigravity_env, Some(root)).unwrap();
     assert_eq!(ag_dir, ws_root.join(".agents/skills"));
 
-    let claude_env = TargetEnvironment::ClaudeDesktop;
+    let claude_env = TargetEnvironment::ClaudeCode;
     let claude_dir =
         EnvironmentResolver::resolve_skills_dir_with_root(&claude_env, Some(root)).unwrap();
     assert_eq!(claude_dir, root.join(".claude/skills"));
@@ -731,22 +731,23 @@ fn test_installer_error_into_skill_error_all_variants() {
 fn test_target_environment_default_skills_dir() {
     let dummy_home = PathBuf::from("/mock/home");
 
-    // Claude Desktop
-    let claude_dir = TargetEnvironment::ClaudeDesktop.default_skills_dir(Some(&dummy_home));
-    #[cfg(target_os = "macos")]
-    assert_eq!(
-        claude_dir,
-        dummy_home.join("Library/Application Support/Claude/skills")
-    );
-    #[cfg(not(target_os = "macos"))]
+    // Claude Code reads ~/.claude/skills on every platform.
+    let claude_dir = TargetEnvironment::ClaudeCode.default_skills_dir(Some(&dummy_home));
     assert_eq!(claude_dir, dummy_home.join(".claude/skills"));
+
+    // Antigravity CLI
+    let agy_cli_dir = TargetEnvironment::AntigravityCli.default_skills_dir(Some(&dummy_home));
+    assert_eq!(
+        agy_cli_dir,
+        dummy_home.join(".gemini/antigravity-cli/skills")
+    );
 
     // Cursor
     let cursor_dir = TargetEnvironment::Cursor.default_skills_dir(Some(&dummy_home));
     assert_eq!(cursor_dir, dummy_home.join(".cursor/skills"));
 
     // Antigravity without workspace
-    let agy_home_dir = (TargetEnvironment::Antigravity {
+    let agy_home_dir = (TargetEnvironment::Agents {
         workspace_root: None,
     })
     .default_skills_dir(Some(&dummy_home));
@@ -754,7 +755,7 @@ fn test_target_environment_default_skills_dir() {
 
     // Antigravity with workspace
     let ws_root = PathBuf::from("/mock/workspace");
-    let agy_ws_dir = (TargetEnvironment::Antigravity {
+    let agy_ws_dir = (TargetEnvironment::Agents {
         workspace_root: Some(ws_root.clone()),
     })
     .default_skills_dir(Some(&dummy_home));
@@ -1068,4 +1069,60 @@ fn test_install_invalid_source_path_variants() {
     }
 
     assert!(!root.join("installed").exists());
+}
+
+// -----------------------------------------------------------------------------
+// 21. Standard Target Coverage, Detection, and Legacy Identifiers
+// -----------------------------------------------------------------------------
+
+#[test]
+fn test_resolver_and_default_dir_agree_for_every_standard_target() {
+    let home = PathBuf::from("/mock/home");
+    for target in TargetEnvironment::all_standard() {
+        assert_eq!(
+            EnvironmentResolver::resolve_skills_dir_with_root(&target, Some(&home)).unwrap(),
+            target.default_skills_dir(Some(&home)),
+            "{} resolves inconsistently",
+            target.identifier()
+        );
+    }
+}
+
+#[test]
+fn test_detected_standard_skips_tools_that_are_not_installed() {
+    let temp = TempDir::new().unwrap();
+    let home = temp.path();
+    let agents = TargetEnvironment::Agents {
+        workspace_root: None,
+    };
+    assert_eq!(
+        TargetEnvironment::detected_standard(Some(home)),
+        vec![agents.clone()]
+    );
+
+    fs::create_dir_all(home.join(".claude")).unwrap();
+    fs::create_dir_all(home.join(".gemini")).unwrap();
+    assert_eq!(
+        TargetEnvironment::detected_standard(Some(home)),
+        vec![
+            TargetEnvironment::ClaudeCode,
+            agents,
+            TargetEnvironment::AntigravityCli,
+            TargetEnvironment::AntigravityAcp,
+        ]
+    );
+}
+
+#[test]
+fn test_legacy_registry_identifiers_still_deserialize() {
+    assert_eq!(
+        serde_json::from_str::<TargetEnvironment>("\"claude-desktop\"").unwrap(),
+        TargetEnvironment::ClaudeCode
+    );
+    assert_eq!(
+        serde_json::from_str::<TargetEnvironment>("{\"antigravity\":{}}").unwrap(),
+        TargetEnvironment::Agents {
+            workspace_root: None
+        }
+    );
 }

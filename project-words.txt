@@ -64,6 +64,7 @@ databaseId
 dataclass
 dataclasses
 dbos
+deadnix
 dedup
 deepenable
 deltadb
@@ -101,6 +102,7 @@ fsvm
 fsvms
 functools
 gamedev
+getzola
 ghostty
 giphy
 Gitea
@@ -131,6 +133,7 @@ isResolved
 jetbrainsmono
 jina
 jujutsu
+justfile
 Karpathy
 keymap
 keymaps
@@ -198,10 +201,10 @@ outcalls
 pagefind
 pandoc
 pathlib
+pbakaus
 peaceiris
 permessage
 pgrep
-pbakaus
 pkgs
 Pocock
 prefactoring
@@ -250,6 +253,7 @@ scqa
 sculpt
 secops
 secretspec
+seps
 serde
 sess
 Setext
@@ -262,6 +266,8 @@ skimmable
 slugifying
 spacetimedb
 sqfs
+statelessly
+statix
 stfolder
 stignore
 strokecolor
@@ -279,6 +285,7 @@ Syncthing
 t3dotgg
 tailwind
 tailwindcss
+tailwindlabs
 tars
 taskfile
 tauri
@@ -298,12 +305,14 @@ todoread
 todowrite
 toolsdirectory
 toplevel
+tracestate
 tstack
 unitless
 unmirrored
 unreachability
 unrooted
 unslop
+upserts
 usize
 velero
 venv

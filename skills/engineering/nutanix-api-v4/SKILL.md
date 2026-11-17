@@ -10,7 +10,7 @@ metadata:
 Nutanix v4 APIs deliver a modern, standardized, and scalable RESTful interface for automating and operating the Nutanix Cloud Platform. Built on Open API specifications, v4 APIs introduce OData query semantics, language-specific SDKs (Python, Go, Java, JavaScript), granular versioning, and modular namespace architecture spanning AOS 7.0+ and Prism Central pc.2024.3+.
 
 > [!IMPORTANT]
-> **Legacy API Deprecation Notice**: Nutanix legacy API versions (v0.8, v1, v2, v3) are scheduled for deprecation and support termination starting with the AOS/PC release in Q4-CY2026. All new integrations and custom tooling must target v4 APIs.
+> Target v4 APIs for all new integrations and custom tooling. As of the March 2026 v4 API documentation, Nutanix planned to deprecate legacy API versions (v0.8, v1, v2, v3) starting with the AOS and PC release planned for Q4-CY2026; check `resources/manual/overview-and-versioning.md` and current Nutanix release notes for the status.
 
 ---
 
@@ -42,8 +42,7 @@ Authenticate v4 API requests using API keys attached to Service Accounts:
 
 ```bash
 # Include the API key in request headers
-curl -k -H "Authorization: Bearer <api_key>" \
-     -H "x-ntnx-api-key: <api_key>" \
+curl -k -H "x-ntnx-api-key: <api_key>" \
      -H "Content-Type: application/json" \
      https://<prism-central-ip>:9440/api/vmm/v4.0/ahv/config/vms
 ```
@@ -56,7 +55,7 @@ When executing specific API integrations, SDK upgrades, or troubleshooting v4 AP
 
 | Topic / Requirement                | Reference File Pointer                                                                                         | Key Content Covered                                                                                                                                                                                                              |
 | :--------------------------------- | :------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Overview, SDKs & Deprecation**   | [`resources/manual/overview-and-versioning.md`](resources/manual/overview-and-versioning.md)                   | Nutanix v4 API architecture, developer features, legacy API deprecation timeline (v0.8-v3 Q4-CY2026), SDK compatibility, and versioning scheme.                                                                                  |
+| **Overview, SDKs & Deprecation**   | [`resources/manual/overview-and-versioning.md`](resources/manual/overview-and-versioning.md)                   | Nutanix v4 API architecture, developer features, legacy API deprecation timeline (v0.8-v3), SDK compatibility, and versioning scheme.                                                                                            |
 | **Namespaces Reference**           | [`resources/manual/namespaces-reference.md`](resources/manual/namespaces-reference.md)                         | Complete matrix of all 18 v4 namespaces (AIOps, VMM, Flow, IAM, Volumes, Monitoring, Security, Objects, Multi Domain, LCM, Files, etc.), GA status, and version requirements.                                                    |
 | **Release Features & Updates**     | [`resources/manual/release-features.md`](resources/manual/release-features.md)                                 | Release-by-release API updates (pc.7.5.1, pc.7.5, pc.7.3, pc.2024.3.1, pc.2024.3), VM startup policies, custom attributes, ETag removal, Recovery Plans v4 APIs, Cloud KMS, and BMC APIs.                                        |
 | **Troubleshooting & Known Issues** | [`resources/manual/troubleshooting-and-known-issues.md`](resources/manual/troubleshooting-and-known-issues.md) | Resolved issues, mandatory OData parameter workarounds (`$filter`, `$limit`, `$select`, etc.), RBAC owner permission fixes, service account VM creation workaround, category value deletion cleanup, and discontinued endpoints. |

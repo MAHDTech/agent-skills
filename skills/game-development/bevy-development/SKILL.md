@@ -2,39 +2,21 @@
 name: bevy-development
 description: Build or modernize Bevy games and simulations in Rust. Use for ECS design, scheduling, input, assets, messages, performance, or migration between Bevy APIs.
 resources:
-  - https://bevy.org/learn/migration-guides/
+  - https://raw.githubusercontent.com/bevyengine/bevy-website/main/content/learn/migration-guides/0.18-to-0.19.md
+  - https://raw.githubusercontent.com/bevyengine/bevy-website/main/content/learn/migration-guides/0.19-to-0.20.md
 ---
 
-# Bevy Game Engine Expert
+# Bevy game development
 
-Patterns for building high-performance, modular games with Bevy - the data-driven ECS
-game engine built in Rust.
+Patterns for building modular games and simulations with Bevy, the data-driven ECS game engine built in Rust.
 
-**Targets Bevy 0.19** (stable). Bevy moves fast and breaks APIs between releases;
-if a project pins an older version or is upgrading to Bevy 0.20 (available on crates.io),
-verify against official migration guides before applying these snippets.
-The migration cheat sheet below covers the churn since ~0.14.
+These snippets target Bevy 0.20 (the cheat sheet and examples were checked against the 0.20.1 crates). Bevy breaks APIs between releases, so read the project's pinned `bevy` version in `Cargo.toml` first; for any other version, or when upgrading, check the migration guides before applying these snippets: the bundled `resources/auto/` copies cover 0.18 to 0.20, and `https://bevy.org/learn/migration-guides/` has the rest.
 
-## When to Use This Skill
-
-- Developing 2D or 3D games and simulations in Rust with Bevy.
-- Structuring ECS data layouts, writing queries, and designing systems.
-- Ordering, grouping, and scheduling systems (fixed timesteps, state transitions).
-- Handling input, asset loading, and message/event-driven communication.
-- Optimizing Bevy performance (parallel queries, sparse sets, change detection, batching).
-- Modernizing a stale Bevy codebase off deprecated APIs.
-
-## Reference Files
-
-Load these for depth:
-
-- `resources/auto/learn-migration-guides.md` - Bevy migration guides and release notes.
-
-## Migration Cheat Sheet (older Bevy -> 0.19)
+## Migration cheat sheet (older Bevy to 0.20)
 
 Old code you will meet in stale projects, and its current form:
 
-| Old (deprecated / removed)    | Current (0.19)                                  |
+| Old (deprecated / removed)    | Current (0.20)                                  |
 | ----------------------------- | ----------------------------------------------- |
 | `time.delta_seconds()`        | `time.delta_secs()`                             |
 | `time.elapsed_seconds()`      | `time.elapsed_secs()`                           |
@@ -51,7 +33,7 @@ Old code you will meet in stale projects, and its current form:
 | `Trigger<E>` (observers)      | `On<E>`                                         |
 | `Input<T>`                    | `ButtonInput<T>`                                |
 
-## 1. ECS Fundamentals
+## 1. ECS fundamentals
 
 Components are plain data structs; systems are functions; resources are global
 singletons. Use required components for default setups, child-parent relationships
@@ -75,13 +57,13 @@ fn movement_system(
     mut query: Query<(&mut Transform, &Velocity), With<Player>>,
 ) {
     for (mut transform, velocity) in &mut query {
-        // delta_secs() - renamed from delta_seconds() in 0.16.
+        // delta_secs() - renamed from delta_seconds() in 0.15.
         transform.translation += velocity.0.extend(0.0) * time.delta_secs();
     }
 }
 ```
 
-## 2. App & Plugin Structure
+## 2. App and plugin structure
 
 Split game logic into plugins to decouple features and keep incremental compiles fast.
 
@@ -112,7 +94,7 @@ impl Plugin for PlayerPlugin {
 }
 ```
 
-## 3. Scheduling & Ordering
+## 3. Scheduling and ordering
 
 Systems run in parallel unless their accesses conflict. Add ordering only for real data
 dependencies. Use system sets, states, and run conditions to organize and gate
@@ -130,7 +112,7 @@ app.insert_resource(Time::<Fixed>::from_hz(64.0));
 app.add_systems(FixedUpdate, physics_step);
 ```
 
-## 4. Queries & Change Detection
+## 4. Queries and change detection
 
 Filter with `With` / `Without`; react to changes with `Changed<T>` / `Added<T>`. Use
 `ParamSet` to resolve system query conflicts, and `Ref<T>` to inspect component
@@ -165,15 +147,13 @@ fn load_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
 struct Scored(u32);
 ```
 
-## 5. Performance Patterns
+## 5. Performance patterns
 
 - **Parallel iteration:** for large independent workloads, use `par_iter_mut()`.
 - **SparseSet storage:** for frequently added/removed components (buffs, statuses) -
   use `#[component(storage = "SparseSet")]` to optimize storage access patterns.
 - **Batch spawning:** `commands.spawn_batch(..)` beats a loop of individual `spawn`
   calls.
-- **Change filters:** put `Changed<T>` on reactive systems (UI, animation) to skip
-  stable data.
 
 ```rust
 fn parallel_update(mut query: Query<(&mut Transform, &Velocity)>) {
@@ -183,7 +163,7 @@ fn parallel_update(mut query: Query<(&mut Transform, &Velocity)>) {
 }
 ```
 
-## 6. Developer Commands
+## 6. Developer commands
 
 ```bash
 # Fast iterative dev builds via dynamic linking (much faster incremental compiles).
@@ -193,25 +173,12 @@ cargo run --features bevy/dynamic_linking
 cargo run --release
 ```
 
-| Task                                | Command                                                                          |
-| ----------------------------------- | -------------------------------------------------------------------------------- |
-| Check for compile errors            | `cargo check 2>&1 \| head -30`                                                   |
-| List component definitions          | `grep -rn "derive(Component)" src/ --include="*.rs"`                             |
-| Find systems using queries          | `grep -rn "fn.*Query<" src/ --include="*.rs"`                                    |
-| Identify state machine declarations | `grep -rn "derive.*States" src/ --include="*.rs"`                                |
-| Spot system ordering hooks          | `grep -rn "\.add_systems\|\.chain()\|\.after(\|\.before(" src/ --include="*.rs"` |
-| Find deprecated bundle usage        | `grep -rn "Bundle" src/ --include="*.rs"`                                        |
-| Find deprecated Time calls          | `grep -rn "delta_seconds\|elapsed_seconds" src/ --include="*.rs"`                |
+## 7. Practices
 
-## 7. Best Practices
-
-- **Do:** access singletons with `Res<T>` rather than `ResMut<T>` unless you mutate -
+- Access singletons with `Res<T>`, and take `ResMut<T>` only in systems that mutate;
   read-only access lets the scheduler run more systems concurrently.
-- **Do:** use marker components / ZSTs to filter queries cheaply.
-- **Do:** apply `Changed<T>` to reactive systems (UI updates, animation) to skip stable
-  data.
-- **Do:** prefer required components over reintroducing bundle-shaped wrapper structs.
-- **Don't:** run heavy nested loops over >1,000 entities without `par_iter_mut()` or a
-  cached query.
-- **Don't:** poll asset-loaded checks inside gameplay frames - gate them behind a
-  loading state.
+- Use marker components (ZSTs) to filter queries cheaply.
+- Apply `Changed<T>` to reactive systems (UI updates, animation) to skip stable data.
+- Use required components instead of bundle-shaped wrapper structs.
+- Iterate workloads over roughly 1,000 entities with `par_iter_mut()`.
+- Gate asset-loaded checks behind a loading state so gameplay frames never poll them.

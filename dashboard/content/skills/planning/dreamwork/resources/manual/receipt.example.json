@@ -1,0 +1,57 @@
+{
+  "version": 2,
+  "run_id": "<run-id>",
+  "issue_id": "<project-issue-id>",
+  "role": "implementer",
+  "attempt": 0,
+  "repair_round": 0,
+  "status": "blocked",
+  "approval_commit": "<40-hex-approved-proposal-commit>",
+  "base_commit": "<40-hex-base-commit>",
+  "candidate_commit": null,
+  "candidate_tree": null,
+  "changed_paths": [],
+  "artifacts": [
+    {
+      "path": ".agents/dreamwork/<run-id>/<issue-key>/impl-preflight-000.json",
+      "sha256": "<64-hex-sha256>"
+    }
+  ],
+  "preflight": {
+    "path": ".agents/dreamwork/<run-id>/<issue-key>/impl-preflight-000.json",
+    "sha256": "<64-hex-sha256>"
+  },
+  "checks": [
+    {
+      "id": "<approved-gate-id>",
+      "required": true,
+      "command": [
+        "<approved-executable>",
+        "<approved-argument>"
+      ],
+      "cwd": ".",
+      "environment": {},
+      "revision_commit": null,
+      "revision_tree": null,
+      "status": "not_run",
+      "exit_code": null,
+      "exit_status_source": null,
+      "evidence_source": "executed",
+      "evidence_receipt": null,
+      "log_sha256": null,
+      "summary": "Template only; replace with the approved command and actual result using repository-relative paths only."
+    }
+  ],
+  "findings": [],
+  "limitations": [
+    "Template only; no execution or acceptance is established."
+  ],
+  "extensions": {
+    "criterion_map": {},
+    "responses": {},
+    "score": null,
+    "seat": null,
+    "served_by": null,
+    "services_torn_down": null
+  }
+}

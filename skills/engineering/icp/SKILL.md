@@ -1,6 +1,6 @@
 ---
 name: icp
-description: Build, secure, test, and deploy Internet Computer (ICP) canisters and full-stack dapps in Motoko, Rust, and TypeScript. Use for canister architecture, stable memory, ICRC and chain-key tokens (ckBTC, ckETH, ckSOL), Internet Identity, vetKeys, HTTPS outcalls, or icp CLI workflows.
+description: Build, secure, and deploy Internet Computer (ICP) canisters and dapps in Motoko, Rust, or TypeScript. Use for canister state and upgrades, ICRC or chain-key tokens, identity, HTTPS outcalls, or icp CLI work.
 resources:
   - https://skills.internetcomputer.org/.well-known/skills/index.json
   - https://skills.internetcomputer.org/llms.txt
@@ -12,11 +12,11 @@ resources:
 
 The Internet Computer (ICP) executes smart contracts as **canisters**: WebAssembly actor units written in Motoko or Rust that bundle code and state, expose strongly typed Candid interfaces, persist state across upgrades via stable memory, pay for compute and storage under a reverse-gas cycles model, and serve browser or agent clients directly through HTTP gateways.
 
-## Resolve the Right Sub-Skill First
+## Resolve the right sub-skill first
 
-Upstream DFINITY maintains 29 task-specific ICP sub-skills at `https://skills.internetcomputer.org/`. Always load the matching sub-skill and its companion reference files before writing canister, client, or deployment configuration code:
+Upstream DFINITY maintains task-specific ICP sub-skills at `https://skills.internetcomputer.org/`. Load the matching sub-skill and its companion reference files before writing canister, client, or deployment configuration code:
 
-1. **Check the local index first:** Read `resources/auto/llms.txt` to match the user's task to the exact sub-skill name and trigger description.
+1. **Match the task to a sub-skill:** Use the domain list below, then confirm against the `description` in the sub-skill file's frontmatter. `resources/auto/llms.txt` explains the upstream loading modes; the live trigger descriptions are in `https://skills.internetcomputer.org/.well-known/skills/index.json`.
 2. **Read the local sub-skill and its references:** Open the downloaded skill in `resources/auto/well-known-skills-<skill-name>-skill.md` (for example, `resources/auto/well-known-skills-writing-motoko-skill.md` or `resources/auto/well-known-skills-icp-cli-skill.md`) along with any companion `resources/auto/well-known-skills-<skill-name>-references-<topic>.md` files listed in that skill.
 3. **On-demand `curl` fallback (zero Node.js / zero `npx`):** When local `resources/auto/` files are absent or you need to verify the live upstream catalog (`https://skills.internetcomputer.org/.well-known/skills/index.json`), fetch the discovery index and the target sub-skill directly with `curl -fsSL`:
 
@@ -29,74 +29,20 @@ Upstream DFINITY maintains 29 task-specific ICP sub-skills at `https://skills.in
 
 4. **Optional project-local install:** Use `npx skills add dfinity/icskills` only when a user explicitly asks to install pinned ICP skills into their own project repository and has Node.js available.
 
-## Sub-Skill Catalog by Domain
+## Sub-skills by domain
 
-### 1. Motoko Language and State Persistence
+Start from the domain:
 
-| Sub-Skill                           | Local Resource File                                                           | Primary Scope and Companion References                                                                                                                       |
-| ----------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `writing-motoko`                    | `resources/auto/well-known-skills-writing-motoko-skill.md`                    | Modern Motoko syntax, `persistent actor`, `mo:core` standard library, mixins, and compiler error fixes (`well-known-skills-writing-motoko-references-*.md`). |
-| `reviewing-motoko`                  | `resources/auto/well-known-skills-reviewing-motoko-skill.md`                  | Design review for `.mo` backends, type invariants, and stable vs transient state discipline (`state-and-persistence`, `type-encoding`).                      |
-| `mops-cli`                          | `resources/auto/well-known-skills-mops-cli-skill.md`                          | Package management, toolchain pinning (`moc`, `lintoko`), building, and testing via `mops.toml`.                                                             |
-| `migrating-motoko-actors`           | `resources/auto/well-known-skills-migrating-motoko-actors-skill.md`           | Actor state migration and schema evolution with `mops`-managed `migrations/` chains (`well-known-skills-migrating-motoko-actors-references-examples.md`).    |
-| `troubleshooting-motoko-migrations` | `resources/auto/well-known-skills-troubleshooting-motoko-migrations-skill.md` | Diagnostics and repair for broken migration chains and upgrade compatibility errors.                                                                         |
-| `stable-memory`                     | `resources/auto/well-known-skills-stable-memory-skill.md`                     | Upgrade-safe state persistence using `StableBTreeMap` and `MemoryManager` in Rust or persistent actors in Motoko.                                            |
+- Motoko language and state persistence: `writing-motoko`, `reviewing-motoko`, `mops-cli`, `migrating-motoko-actors`, `troubleshooting-motoko-migrations`, `stable-memory`.
+- Security, architecture, and cryptography: `canister-security`, `multi-canister`, `certified-variables`, `vetkeys`, `encrypted-maps`.
+- Tokens, DeFi, and cross-chain: `icrc-ledger`, `ckbtc`, `cketh`, `cksol`, `evm-rpc`.
+- Authentication, wallets, and governance: `internet-identity`, `agent-web-identity`, `wallet-integration`, `sns-launch`.
+- Networking, hosting, and external services: `https-outcalls`, `static-site`, `custom-domains`, `smtp-gateway`, `service-discoverability`, `ic-dashboard`.
+- Tooling, deployment, and cycles: `icp-cli`, `cycles-management`, `buy-cycles`, `cloud-engine-canisters`, `deploy-to-cloud-engine`, `caffeine-app`, `canhelp`, `autosync-ic-skills`, `autoupgrade-icp-cli`.
 
-### 2. Canister Security, Architecture, and Cryptography
+The upstream catalog grows; when `index.json` lists a sub-skill missing from these groups, use it.
 
-| Sub-Skill             | Local Resource File                                             | Primary Scope and Companion References                                                                                                                          |
-| --------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `canister-security`   | `resources/auto/well-known-skills-canister-security-skill.md`   | Access control, anonymous principal rejection, reentrancy guards (`CallerGuard`), async saga safety, callback trap prevention, and cycle drain defenses.        |
-| `multi-canister`      | `resources/auto/well-known-skills-multi-canister-skill.md`      | Inter-canister calls, canister factory patterns, bounded vs unbounded waits, and 2 MiB message payload limits.                                                  |
-| `certified-variables` | `resources/auto/well-known-skills-certified-variables-skill.md` | Cryptographically verified query responses using Merkle trees (`RbTree`/`CertTree`), `ic-http-certification`, and `@dfinity/certificate-verification`.          |
-| `vetkeys`             | `resources/auto/well-known-skills-vetkeys-skill.md`             | Threshold key derivation (`vetKD`), identity-based encryption (IBE), timelock encryption, and BLS threshold signatures via `ic-vetkeys` and `@icp-sdk/vetkeys`. |
-| `encrypted-maps`      | `resources/auto/well-known-skills-encrypted-maps-skill.md`      | End-to-end encrypted, access-controlled key-value maps built on vetKeys `EncryptedMaps`.                                                                        |
-
-### 3. Tokens, DeFi, and Cross-Chain Integration
-
-| Sub-Skill     | Local Resource File                                     | Primary Scope and Companion References                                                                                          |
-| ------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `icrc-ledger` | `resources/auto/well-known-skills-icrc-ledger-skill.md` | Deploying and integrating ICRC-1 and ICRC-2 fungible token ledgers (`icrc1_transfer`, `icrc2_approve`, `icrc2_transfer_from`).  |
-| `ckbtc`       | `resources/auto/well-known-skills-ckbtc-skill.md`       | Chain-key Bitcoin (`ckBTC`) deposit and withdrawal flows via the minter, subaccount derivation, and UTXO management.            |
-| `cketh`       | `resources/auto/well-known-skills-cketh-skill.md`       | Chain-key Ethereum (`ckETH`) and `ckERC20` (`ckUSDC`, `ckUSDT`, `ckEURC`, `ckWBTC`, `ckLINK`) backend and frontend integration. |
-| `cksol`       | `resources/auto/well-known-skills-cksol-skill.md`       | Chain-key Solana (`ckSOL`) deposit address derivation, deposits, and withdrawals.                                               |
-| `evm-rpc`     | `resources/auto/well-known-skills-evm-rpc-skill.md`     | Calling Ethereum and EVM chains (Arbitrum, Base, Optimism) from Rust canisters via `evm_rpc_client`.                            |
-
-### 4. Authentication, Wallets, and Governance
-
-| Sub-Skill            | Local Resource File                                            | Primary Scope and Companion References                                                                                                              |
-| -------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `internet-identity`  | `resources/auto/well-known-skills-internet-identity-skill.md`  | Passkey, OpenID, and enterprise SSO authentication via `@icp-sdk/auth`, identity attributes, shared subdomain sessions, and web push notifications. |
-| `agent-web-identity` | `resources/auto/well-known-skills-agent-web-identity-skill.md` | Linking an AI agent or CLI session to a user's app-specific principal via `icp identity link web`.                                                  |
-| `wallet-integration` | `resources/auto/well-known-skills-wallet-integration-skill.md` | External wallet integration using `@icp-sdk/signer` and ICRC signer standards (`ICRC-25`, `ICRC-29`, `ICRC-49`, `ICRC-94`, `ICRC-167`, OISY).       |
-| `sns-launch`         | `resources/auto/well-known-skills-sns-launch-skill.md`         | Service Nervous System (SNS) DAO configuration, tokenomics, testflight validation, and decentralization swaps.                                      |
-
-### 5. Networking, Web Hosting, and External Services
-
-| Sub-Skill                 | Local Resource File                                                 | Primary Scope and Companion References                                                                                                |
-| ------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `https-outcalls`          | `resources/auto/well-known-skills-https-outcalls-skill.md`          | Canister HTTPS outcalls, deterministic transform functions, flexible outcalls, and `ic0.cost_http_request_v2` cycle budgeting.        |
-| `static-site`             | `resources/auto/well-known-skills-static-site-skill.md`             | Hosting frontends and SPAs via `@dfinity/static-site` (`certified-assets` canister) and migrating from `@dfinity/asset-canister`.     |
-| `custom-domains`          | `resources/auto/well-known-skills-custom-domains-skill.md`          | Registering custom domains with IC HTTP gateways, DNS records (`CNAME`, `TXT`, ACME), and `.well-known/ic-domains`.                   |
-| `smtp-gateway`            | `resources/auto/well-known-skills-smtp-gateway-skill.md`            | Receiving inbound email in canisters via `ic-smtp-gateway-protocol` and chunked delivery.                                             |
-| `service-discoverability` | `resources/auto/well-known-skills-service-discoverability-skill.md` | Publishing `/.well-known/ic-architecture` manifests, `candid:service` metadata, `getApiDoc`, and `/.well-known/ii-derivation-origin`. |
-| `ic-dashboard`            | `resources/auto/well-known-skills-ic-dashboard-skill.md`            | Querying public REST APIs at `dashboard.internetcomputer.org` for canister, ledger, SNS, and subnet telemetry.                        |
-
-### 6. Tooling, Deployment, Cycles, and Cloud Engines
-
-| Sub-Skill                | Local Resource File                                                | Primary Scope and Companion References                                                                                                          |
-| ------------------------ | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `icp-cli`                | `resources/auto/well-known-skills-icp-cli-skill.md`                | Project configuration (`icp.yaml`), local networks (`icp network start`), builds (`icp build`), deployment (`icp deploy`), and `dfx` migration. |
-| `cycles-management`      | `resources/auto/well-known-skills-cycles-management-skill.md`      | Monitoring cycle balances, freezing thresholds, canister top-ups, and converting ICP to cycles via the Cycles Minting Canister (CMC).           |
-| `buy-cycles`             | `resources/auto/well-known-skills-buy-cycles-skill.md`             | Purchasing cycles with a credit card via `icp cycles buy` and CyclePay.                                                                         |
-| `cloud-engine-canisters` | `resources/auto/well-known-skills-cloud-engine-canisters-skill.md` | Authoring cycle-free canisters targeting CloudEngine subnets (OpenCloud).                                                                       |
-| `deploy-to-cloud-engine` | `resources/auto/well-known-skills-deploy-to-cloud-engine-skill.md` | Deploying canisters to a CloudEngine subnet via the `icp` CLI.                                                                                  |
-| `caffeine-app`           | `resources/auto/well-known-skills-caffeine-app-skill.md`           | Scaffolding and building Caffeine (`caffeine.ai`) full-stack Motoko and React/Vite applications.                                                |
-| `canhelp`                | `resources/auto/well-known-skills-canhelp-skill.md`                | Discovering and inspecting mainnet canister Candid interfaces by canister ID or name.                                                           |
-| `autosync-ic-skills`     | `resources/auto/well-known-skills-autosync-ic-skills-skill.md`     | Configuring project session hooks to keep local IC skill copies synchronized.                                                                   |
-| `autoupgrade-icp-cli`    | `resources/auto/well-known-skills-autoupgrade-icp-cli-skill.md`    | Configuring session hooks to check and upgrade `icp` and `ic-wasm` binaries.                                                                    |
-
-## Core Architectural Rules and Guardrails
+## Core architectural rules and guardrails
 
 1. **Prefer `icp` CLI and `mops` over legacy `dfx`:**
    - Default to `icp` (`icp.yaml`, `icp network start`, `icp build`, `icp deploy`) and `mops` (`mops.toml`, `mops test`) for new and modernized projects.
@@ -115,7 +61,7 @@ Upstream DFINITY maintains 29 task-specific ICP sub-skills at `https://skills.in
 6. **Make HTTPS Outcalls Deterministic:**
    - Always supply a transform function that strips non-deterministic headers (timestamps, request IDs, rate-limit counters) so all subnet replicas reach consensus on the response byte payload, and compute cycle attachment with `ic0.cost_http_request_v2`.
 
-## Verification Checklist
+## Verification checklist
 
 Run the applicable checks for the project stack before declaring canister or client changes complete:
 

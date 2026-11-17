@@ -20,27 +20,27 @@ AgentRouter also powers the underlying Agent Gateway and unified endpoint router
 
 ---
 
-## Documentation Lookup Protocol
+## Documentation lookup
 
-Before authoring gateway configurations, routing policies, MCP server definitions, or client integrations, inspect the downloaded upstream documentation in `resources/auto/`:
+Before authoring gateway configurations, routing policies, MCP server definitions, or client integrations, search the vendored documentation bundle `resources/auto/llms-full.txt`. It concatenates every upstream docs page as Markdown, each section starting with a `Source: https://theagentrouter.ai/docs/...` line, so search for the page path to jump to it:
 
-1. Read `resources/auto/llms.txt` first to locate the relevant getting-started, concept, capability, CLI, or API reference guide.
-2. Open the matching reference files in `resources/auto/` to verify exact CRD group versions, field names, CLI flags, and security policies:
-   - Core CRDs and architecture: `resources/auto/docs-concepts-resources.md`, `resources/auto/docs-concepts-architecture-system-architecture.md`, and `resources/auto/docs-api.md`
-   - Provider connections and LLM routing: `resources/auto/docs-capabilities-llm-integrations-connect-providers.md`, `resources/auto/docs-capabilities-llm-integrations-supported-providers.md`, and `resources/auto/docs-capabilities-inference-inferencepool-support.md`
-   - MCP gateway routing: `resources/auto/docs-capabilities-mcp.md`
-   - A2A agent traffic: `resources/auto/docs-capabilities-a2a.md`
-   - Traffic policies, fallback, and token rate limiting: `resources/auto/docs-capabilities-traffic-provider-fallback.md`, `resources/auto/docs-capabilities-traffic-usage-based-ratelimiting.md`, and `resources/auto/docs-capabilities-traffic-quota-policy.md`
-   - Security and observability: `resources/auto/docs-capabilities-security-upstream-auth.md`, `resources/auto/docs-capabilities-observability-metrics.md`, and `resources/auto/docs-capabilities-observability-tracing.md`
-   - Standalone CLI (`aigw`): `resources/auto/docs-cli.md` and `resources/auto/docs-cli-aigwrun.md`
+- Core CRDs and API reference: `docs/concepts/resources` and `docs/api/` (includes the v1alpha1 to v1beta1 migration notes)
+- Provider connections and LLM routing: `docs/getting-started/connect-providers/` and `docs/capabilities/llm-integrations/`
+- MCP gateway routing: `docs/capabilities/mcp/`
+- A2A agent traffic: `docs/capabilities/a2a/`
+- Fallback and token rate limiting: `docs/capabilities/traffic/provider-fallback`, `docs/capabilities/traffic/usage-based-ratelimiting`, and `docs/capabilities/traffic/quota-policy`
+- Security and observability: `docs/capabilities/security/upstream-auth`, `docs/capabilities/observability/metrics`, and `docs/capabilities/observability/tracing`
+- Standalone CLI (`aigw`): `docs/cli/` and `docs/cli/aigwrun`
+
+When the local bundle looks stale, fetch the current index at `https://theagentrouter.ai/llms.txt`.
 
 ---
 
-## Core Workflows
+## Core workflows
 
-### 1. Unified LLM Gateway and OpenAI-Compatible Routing
+### 1. Unified LLM gateway and OpenAI-compatible routing
 
-AgentRouter manages LLM traffic on Kubernetes through three primary custom resources (`aigateway.envoyproxy.io/v1alpha1`):
+AgentRouter manages LLM traffic on Kubernetes through three primary custom resources (`aigateway.envoyproxy.io/v1beta1`; `v1alpha1` is deprecated):
 
 - `AIGatewayRoute`: Defines the unified client-facing API schema, model-matching rules, and backend routing weights or fallback chains.
 - `AIServiceBackend`: Represents an individual upstream AI service backend (such as OpenAI, Anthropic, AWS Bedrock, Azure OpenAI, GCP Vertex AI, or self-hosted vLLM and NVIDIA NIM endpoints) and declares its expected output schema.
@@ -66,7 +66,7 @@ curl -sS -X POST "$AGENT_ROUTER_URL/chat/completions" \
   }'
 ```
 
-### 2. MCP Server Registration and Tool Routing
+### 2. MCP server registration and tool routing
 
 AgentRouter aggregates multiple Model Context Protocol (MCP) servers behind a single unified Streamable HTTP endpoint using the `MCPRoute` custom resource (`aigateway.envoyproxy.io/v1beta1`):
 
@@ -95,29 +95,26 @@ spec:
 
 - Use `toolSelector` in `MCPRoute` backend references to filter exposed tools by exact name or regular expression.
 - Upstream tool names are prefixed with the backend name (for example, `github__issue_read`) so tool invocations route deterministically across multiplexed MCP backends.
-- Consult `resources/auto/docs-capabilities-mcp.md` (via `resources/auto/llms.txt`) for OAuth authorization, JWT scope enforcement, and per-user header forwarding.
+- Search the `docs/capabilities/mcp/` section of `resources/auto/llms-full.txt` for OAuth authorization, JWT scope enforcement, and per-user header forwarding.
 
-### 3. Agent-to-Agent (A2A) Routing and Guardrails
+### 3. Agent-to-Agent (A2A) routing and guardrails
 
 AgentRouter routes Agent2Agent (A2A) traffic using Envoy Gateway `HTTPRoute` resources paired with `EnvoyPatchPolicy` and the `envoy.filters.http.a2a` HTTP filter:
 
 - Expose public agent discovery on `GET /.well-known/agent-card.json` and JSON-RPC task execution on `POST /a2a` with extended streaming timeouts (for example, `30m` for Server-Sent Events).
 - Isolate A2A listeners onto a dedicated `Gateway` resource or per-route filter scope so JSON-RPC envelope validation does not buffer unrelated LLM routes.
 - Attach `SecurityPolicy`, token rate limits (`BackendTrafficPolicy`), and `QuotaPolicy` rules to enforce authentication and usage budgets across agent calls.
-- Consult `resources/auto/docs-capabilities-a2a.md` (via `resources/auto/llms.txt`) for complete listener and route manifests.
+- A2A support is a preview built on Envoy's alpha A2A filter; search the `docs/capabilities/a2a/` section of `resources/auto/llms-full.txt` for complete listener and route manifests.
 
-### 4. Nutanix Enterprise AI (NAI) Gateway Integration
+### 4. Nutanix Enterprise AI (NAI) gateway integration
 
-When working in a Nutanix Enterprise AI environment, choose the skill that matches the operational layer:
-
-- Use `agent-router` (`/agent-router`) when configuring or troubleshooting AgentRouter gateway routing rules (`AIGatewayRoute`, `AIServiceBackend`, `BackendSecurityPolicy`, `MCPRoute`), unified LLM provider fallback, token rate limiting, MCP tool multiplexing, or A2A agent routing.
-- Use [nutanix-enterprise-ai](@/skills/engineering/nutanix-enterprise-ai/_index.md) (`/nutanix-enterprise-ai`) when deploying NAI Helm charts (`nai-operators`, `nai-core`), sizing Kubernetes GPU/CPU nodes, managing NAI RBAC and platform API keys, or operating vLLM and NVIDIA NIM inference endpoints on Nutanix Kubernetes Platform (NKP).
+In a Nutanix Enterprise AI environment, this skill covers the AgentRouter routing layer: `AIGatewayRoute`, `AIServiceBackend`, `BackendSecurityPolicy`, `MCPRoute`, provider fallback, token rate limiting, MCP tool multiplexing, and A2A routing. For deploying NAI Helm charts (`nai-operators`, `nai-core`), sizing GPU/CPU nodes, NAI RBAC and platform API keys, or operating vLLM and NVIDIA NIM inference endpoints, use [nutanix-enterprise-ai](@/skills/engineering/nutanix-enterprise-ai/_index.md).
 
 ---
 
-## Completion Criteria
+## Completion criteria
 
-- Gateway routes, provider credentials, and MCP/A2A schemas are verified against `resources/auto/llms.txt` and the corresponding `resources/auto/*.md` reference guides.
+- Gateway routes, provider credentials, and MCP/A2A schemas are checked against the matching section of `resources/auto/llms-full.txt`.
 - Kubernetes manifests (`AIGatewayRoute`, `AIServiceBackend`, `BackendSecurityPolicy`, `MCPRoute`, `HTTPRoute`) and client requests specify explicit API versions, authentication headers, timeouts, and model or tool selectors.
-- All configuration changes and documentation updates pass repository skill and catalog validation (`ask skills lint`).
+- Every applied resource reports `Accepted` in its status (`kubectl get <kind> <name> -o jsonpath='{.status.conditions}'`), and a test request through the gateway succeeds: a `curl` to `$GATEWAY_URL/v1/chat/completions` for LLM routes, or an MCP client connection to the `MCPRoute` path for MCP routes.
 

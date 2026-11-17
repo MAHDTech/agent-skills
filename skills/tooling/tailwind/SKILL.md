@@ -2,43 +2,53 @@
 name: tailwind
 description: Style components or build CSS with Tailwind CSS v4. Use for utility classes, CSS-first theme variables, imports, and CLI stylesheet compilation.
 resources:
-  - https://tailwindcss.com/docs
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/styling-with-utility-classes.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/hover-focus-and-other-states.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/responsive-design.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/dark-mode.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/theme.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/adding-custom-styles.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/detecting-classes-in-source-files.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/functions-and-directives.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/preflight.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/compatibility.mdx
+  - https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/upgrade-guide.mdx
 ---
 
 # Tailwind CSS v4
 
-Guidelines for compiling stylesheet bundles and styling components using Tailwind CSS (utility-first styling framework). Consult the local Tailwind CSS v4 docs in `resources/auto/` (such as `resources/auto/docs.md`) for full reference.
+The vendored docs in `resources/auto/` are the Markdown (MDX) sources of the official Tailwind CSS docs, one file per page (for example `resources/auto/tailwindlabs-tailwindcss.com-main-src-docs-theme.mdx.md`). Search them for directives, theme variable namespaces, and variants before writing CSS. For a single utility's class list, fetch its page source from `https://raw.githubusercontent.com/tailwindlabs/tailwindcss.com/main/src/docs/<utility>.mdx` (for example `padding.mdx`).
 
-## Tailwind CSS v4 Key Rules
+## v4 rules
 
-Tailwind CSS v4 introduces a completely redesigned compilation engine and configuration syntax:
-
-1. **CSS-First Configuration:** Tailwind v4 abandons `tailwind.config.js` in favor of standard CSS syntax. Configure custom theme variables (colors, fonts, screens) inside `@theme` directive blocks directly in your CSS:
+1. Configure in CSS. Import Tailwind and declare design tokens as theme variables in `@theme`; each variable creates matching utilities (`--color-primary` gives `bg-primary`, `text-primary`, and so on):
 
    ```css
    @import "tailwindcss";
 
    @theme {
      --color-primary: #1e3a8a;
-     --color-surface: #f3f4f6;
      --font-sans: "Inter", sans-serif;
    }
    ```
 
-2. **Standard Imports:** Use `@import "tailwindcss";` at the top of your stylesheet instead of old directives like `@tailwind base; @tailwind components; @tailwind utilities;`.
+2. Use `@import "tailwindcss";` in place of the v3 `@tailwind base; @tailwind components; @tailwind utilities;` directives.
+3. A legacy JavaScript config still works when loaded explicitly with `@config "./tailwind.config.js";`; v4 does not detect it automatically. Prefer `@theme` for new tokens.
+4. Content detection is automatic and treats source files as plain text, skipping `.gitignore`d files. Write complete class names (map a prop to `"bg-red-600"`, never build `bg-${color}-600`), and register extra paths with `@source "../path";`.
 
-## Build & Compilation Commands
+## Build commands
 
-Use the Tailwind v4 CLI to compile utility classes:
+The v4 CLI ships in the `@tailwindcss/cli` package:
 
-- **Build once:** `tailwindcss -i <input.css> -o <output.css>`
-- **Watch mode:** `tailwindcss -i <input.css> -o <output.css> --watch`
-- **Minify output:** `tailwindcss -i <input.css> -o <output.css> --minify`
+```bash
+npx @tailwindcss/cli -i ./src/input.css -o ./dist/output.css            # build once
+npx @tailwindcss/cli -i ./src/input.css -o ./dist/output.css --watch    # rebuild on change
+npx @tailwindcss/cli -i ./src/input.css -o ./dist/output.css --minify   # minified output
+```
 
-## Completion Criteria
+Use the project's existing entry point instead (a `tailwindcss` binary on `PATH`, a package script, or a Vite or PostCSS plugin) when it has one.
 
-The styling task is complete when:
+## Completion criteria
 
-1. The output CSS stylesheet compiles successfully without CLI error logs.
-2. Custom theme variables are correctly defined under `@theme` and reflect properly on elements.
-3. Utility styles are purged correctly and yield a responsive, optimized output bundle.
+- The build command exits 0 and writes the output file.
+- Each class used by the change appears in the compiled CSS (search the output for it), including classes generated from new `@theme` variables.

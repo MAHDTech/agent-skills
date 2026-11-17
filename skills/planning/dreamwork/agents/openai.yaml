@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dreamwork"
+  short_description: "Plan issues, deliver them in T3 Code, finish with human UAT"
+  default_prompt: "Use $dreamwork to plan issues with me, then implement, review and council-check them autonomously in T3 Code and bring me back only for UAT."
+
+policy:
+  allow_implicit_invocation: false

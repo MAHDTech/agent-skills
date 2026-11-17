@@ -8,7 +8,7 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 ## Structure
 
-- **Self-Contained Skill & Cross-Reference Policy:** Skills must stand alone without implicit dependencies. Cross-references (via `/skill-name` command invocations or relative Markdown links) are strictly forbidden across skills unless both skills explicitly declare membership in the same cohesive group via `metadata.group`. The six standard groups are: `authoring`, `github`, `planning-pipeline`, `review`, `opencode`, and `guards`. As exceptions, the universal router (`skill-router`) and all archived skills in `skills-archive/` are exempt as cross-reference sources. Live skills must never cross-reference archived skills.
+- **Self-Contained Skill & Cross-Reference Policy:** Skills must stand alone without implicit dependencies. Cross-references (via `/skill-name` command invocations or relative Markdown links) are strictly forbidden across skills unless both skills explicitly declare membership in the same cohesive group via `metadata.group`. The six standard groups are: `authoring`, `github`, `planning-pipeline`, `review`, `guards`, and `nutanix`. As exceptions, the universal router (`skill-router`) and all archived skills in `skills-archive/` are exempt as cross-reference sources. Live skills must never cross-reference archived skills.
 - Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, game-development, planning, review, github, reflection, writing, authoring, tooling, guards), with an `in-progress/` lifecycle bucket for drafts. Retired skills move to the top-level `skills-archive/<category>/<name>/` tree (same layout, original category kept): they stay on the dashboard for reference, but the installer and `npx skills add` never install them, and `ask skills sync` removes any local links to them. Archived skills carry `metadata.archived` (date) and optionally `metadata.replaced-by` (the successor's name) in their frontmatter; see the `skill-archive` skill.
 - Names are prefix-free kebab-case; each folder name matches the skill `name` in its frontmatter.
 - Every promoted custom skill must declare `policy.allow_implicit_invocation` explicitly in `agents/openai.yaml`, matching the inverse of `disable-model-invocation` in `SKILL.md` (omitted means `false`). Use concise discovery descriptions and follow the invocation criteria in the `skill-creator` skill. Vendor snapshots and archived skills are excluded from this policy.
@@ -34,12 +34,52 @@ See the [README.md](./README.md) for an overview of the project and available sk
 - Runtime: Rust toolchain via devenv. The native `ask` CLI binary in `crates/ask-cli` manages skills and the dashboard.
 - CLI Tool: `ask` (or `cargo run -p ask-cli --`). Subcommands include `ask skills` for catalog management and `ask dashboard` for site operations. An interactive TUI is available via `ask tui` or bare `ask`.
 
+## devenv
+
+Everything runs inside the `devenv` environment defined in `devenv.nix`.
+
+| Command                                     | Use it to                                                                                |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `devenv --no-tui shell -- <command>`        | Run one command inside the environment.                                                  |
+| `devenv --no-tui test`                      | Run every hook, the Rust tests, and the dashboard site test. This is what CI runs.       |
+| `devenv up`                                 | Start the dashboard dev loop (see [Dashboard](#dashboard)). Long-running; stop it after. |
+| `devenv --no-tui --refresh-eval-cache test` | Re-evaluate `devenv.nix` first. Use after editing it if a new script is "not found".     |
+
+- Scripts declared under `scripts` in `devenv.nix` (`ask`, `skills`, `dashboard`, `dashboard-test`, `dashboard-watch`, `tera-templates`, `crap`, `codeql-run`) are on `PATH` inside the shell. Give every script a `description`; the shell banner lists them.
+- Run `git commit` inside the environment (`devenv --no-tui shell -- git commit ...`) so the hooks find their tools.
+- Stage new files before `devenv --no-tui test`: the hooks only check files Git tracks.
+
+### devenv.nix style
+
+- **Define each top-level option once.** Group related settings in a single attribute set instead of repeating the key with dotted paths. Repeated keys trigger the statix `W20` warning.
+
+  ```nix
+  # Wrong: `scripts` is assigned three times.
+  scripts.css.exec = "...";
+  scripts.build.exec = "...";
+  scripts.check.exec = "...";
+
+  # Right: one `scripts` block.
+  scripts = {
+    css.exec = "...";
+    build.exec = "...";
+    check.exec = "...";
+  };
+  ```
+
+- The same rule applies to `processes`, `packages`, `env`, `languages`, `git-hooks.hooks`, and every other option.
+- Dotted paths are fine inside a block for a single leaf, such as `css.exec = "...";`.
+- Format with `nixfmt` and keep `statix check devenv.nix` and `deadnix devenv.nix` clean. `nixfmt` and `deadnix` run as hooks.
+
 ## Dashboard
 
 - To build: `ask dashboard build` - syncs content, builds CSS, renders the site, and indexes it (all-in-one).
-- To serve: `ask dashboard serve` - builds once, then serves with live reload using Zola and Tailwind.
+- To serve: `devenv up` - Zola live reload, Tailwind watch, and a watcher that regenerates content and the search index when a skill changes. `ask dashboard serve` does the same without devenv processes.
+- Search index only: `ask dashboard index` (regenerates content and the development Pagefind index from a scratch build).
 - CSS only: `ask dashboard css` (escape hatch; `build` already does this).
-- Lint only: `ask dashboard lint` (verifies committed dashboard content matches generated artifacts).
+- Lint only: `ask dashboard lint` (verifies committed dashboard content matches generated artifacts; read-only). `ask dashboard lint --fix` regenerates the content in place first; the Dashboard Lint commit hook runs it that way, so a commit that changes a skill stops once for `git add`.
+- Site test: `dashboard-test` (builds into a scratch directory and checks the rendered output; part of `devenv --no-tui test`).
+- The dashboard shares its design system with mahdtech.com. Keep token, class, and component names aligned with that site, and add repeated markup as a `ui.*` component in `templates/macros/ui.html`. See [docs/dashboard.md](./docs/dashboard.md).
 
 ## Behaviour
 

@@ -24,7 +24,7 @@ Nutanix Enterprise AI combines:
 
 ### 1. Deploying NAI via Helm on Kubernetes
 
-Nutanix Enterprise AI is deployed into the `nai-system` namespace using the `nai-operators` and `nai-core` Helm charts:
+Nutanix Enterprise AI is deployed into the `nai-system` namespace using the `nai-operators` and `nai-core` Helm charts. Replace `<version>` with the NAI release you are installing, and take the chart parameters and storage class names for your platform from `resources/manual/deployment-and-installation.md`:
 
 ```bash
 # Add Nutanix Helm repository
@@ -32,13 +32,13 @@ helm repo add ntnx-charts https://nutanix.github.io/helm-releases
 helm repo update ntnx-charts
 
 # Deploy NAI Operators
-helm upgrade --install nai-operators ntnx-charts/nai-operators --version 2.8.0 \
+helm upgrade --install nai-operators ntnx-charts/nai-operators --version <version> \
   -n nai-system --create-namespace --wait --timeout 15m \
   --set "global.storage.storageClassName=nutanix-volume" \
   --set "global.imagePullSecrets[0].name=nai-registry-secret"
 
 # Deploy NAI Core with NFS storage class for model cache
-helm upgrade --install nai-core ntnx-charts/nai-core --version 2.8.0 \
+helm upgrade --install nai-core ntnx-charts/nai-core --version <version> \
   -n nai-system --create-namespace --wait --timeout 15m \
   --set "global.storage.storageClassNameRWX=nai-nfs-storage" \
   --set "global.storage.storageClassName=nutanix-volume" \
@@ -75,16 +75,11 @@ Route inference traffic between on-prem models and cloud APIs:
 
 - **Local Endpoints**: Route between multiple local deployments for load balancing and high availability.
 - **Third-Party Providers**: Aggregate AWS Bedrock, Azure OpenAI, Google Gemini, Anthropic, or OpenAI behind a unified gateway endpoint with rate limits and unified API keys.
-- **AgentRouter Gateway**: NAI's Agent Gateway and unified routing layer are powered by AgentRouter; see [agent-router](../agent-router/SKILL.md) (`/agent-router`) for AgentRouter gateway configuration, unified LLM routing, and MCP or A2A server routing.
+- **AgentRouter Gateway**: NAI's Agent Gateway and unified routing layer are powered by AgentRouter; see [agent-router](../agent-router/SKILL.md) for AgentRouter gateway configuration, unified LLM routing, and MCP or A2A server routing.
 
 ### 4. Model Context Protocol (MCP) Integration
 
-Connect agentic workflows to internal databases, tools, and search APIs:
-
-```bash
-# Verify deployed MCP pods in the cluster
-kubectl get pods -n nai-system -l app.kubernetes.io/component=mcp-server
-```
+Connect agentic workflows to internal databases, tools, and search APIs through remote MCP servers or local containerized MCP deployments. Follow `resources/manual/mcp-servers.md` for registration, connectors, client keys, and verification; `kubectl get pods -n nai-system` shows the platform pods.
 
 ---
 

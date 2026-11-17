@@ -10,27 +10,20 @@ mermaid = false
 +++
 
 
-# Google Antigravity Documentation
+# Google Antigravity documentation
 
-Local reference documentation for official Google Antigravity developer guides. Always read these files directly to obtain accurate specifications, rules, and commands instead of relying on model pretraining memory.
+Answer Antigravity questions from the vendored official docs in `resources/auto/` rather than from memory. Each file is the Markdown version of one page under `https://antigravity.google/docs/`, named after its path (for example `resources/auto/docs-hooks.md`, `resources/auto/docs-cli-reference.md`, `resources/auto/docs-sdk-subagents.md`).
 
-## Role & Purpose
+Use this skill to research or verify Antigravity CLI flags, slash commands, settings, rules, skills, subagents, permissions, sandboxing, hooks, MCP, plugins, or the SDK, or to configure Antigravity workspace or user settings.
 
-Use this skill when:
+## Steps
 
-- Researching or verifying Google Antigravity specifications, command-line flags, rules, subagents, permissions, or hooks.
-- Working on `plugin-agy-guards` features or configuring workspace settings.
+1. Find the page: list or search `resources/auto/` by topic keyword (file names mirror the docs URL paths).
+2. Read the matching file and answer from its text.
+3. When no local file covers the topic, fetch `https://antigravity.google/llms.txt` for the current page index and read the page's `.md` URL (append `.md` to the docs path).
 
-## Execution Rules
+## Completion criteria
 
-1. **Locate the target topic**: Read the entry documentation index at `resources/auto/llms.txt` to find the exact filename in `resources/auto/` covering your query.
-2. **Read target document**: Open the corresponding markdown file in `resources/auto/` to retrieve the primary source material.
-
-## Completion Criteria
-
-The research task is complete when:
-
-1. The target documentation file identified from `resources/auto/llms.txt` has been read directly from `resources/auto/` to answer the query.
-2. Verified facts, CLI commands, parameters, or schemas match the official text exactly.
-3. Every cited fact is linked back to the user with a clickable link pointing to the specific documentation file.
+- Every fact, command, parameter, or schema in the answer matches the docs text.
+- Each cited fact names its source page as a `https://antigravity.google/docs/...` URL.
 

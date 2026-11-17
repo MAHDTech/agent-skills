@@ -1,34 +1,47 @@
-<header class="border-b" style="border-color: var(--color-border); background: var(--color-surface)">
-  <div class="w-full px-4 md:px-8 h-14 flex items-center justify-between">
-    {# Logo / title #}
-    <div class="flex items-center gap-3">
-      <button
-        id="mobile-menu-trigger"
-        type="button"
-        aria-expanded="false"
-        aria-controls="sidebar-drawer"
-        aria-label="Toggle navigation menu"
-        class="md:hidden text-sm flex items-center justify-center px-2.5 py-1 rounded cursor-pointer border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-[var(--shadow-glow-cyan)] transition-all bg-transparent font-mono"
-        style="color: var(--color-muted);"
-      >
-        ☰
-      </button>
-      <a href="{{ get_url(path='/') }}" class="text-lg font-bold no-underline flex items-center gap-2" style="color: var(--color-primary)">
-        <span style="color: var(--color-muted)">▸</span> {{ config.title }}
+  {% set active_path = current_path | default(value="/") %}
+  <header class="site-header sticky top-0 z-30 monolith-glass">
+    <div class="max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="/" class="group flex items-center gap-3 rounded-[6px] min-w-0">
+        <img src="{{ config.extra.logo_path }}" alt="" width="34" height="34" class="w-8.5 h-8.5 shrink-0 transition-transform duration-200 group-hover:scale-105">
+        <span class="flex flex-col leading-none">
+          <span class="font-mono font-bold text-base tracking-tight text-text-primary group-hover:text-accent-cyan transition-colors">{{ config.title }}</span>
+          <span class="text-[11px] text-text-muted hidden sm:inline mt-1">{{ config.extra.author }}</span>
+        </span>
       </a>
-    </div>
 
-    {# Navigation #}
-    <nav class="flex items-center gap-6">
-      {% if config.extra.nav_links is defined %}
-        {% for link in config.extra.nav_links %}
-          <a href="{{ link.url }}" class="text-sm no-underline hover:underline" style="color: var(--color-muted)">{{ link.name }}</a>
+      <nav class="hidden md:flex items-center gap-7" aria-label="Primary">
+        {% for item in config.extra.menu_items %}
+          {{ <ui.nav_link item={item} active_path={active_path} /> }}
         {% endfor %}
-      {% endif %}
+      </nav>
 
-      <button id="search-trigger" class="text-sm flex items-center gap-1.5 px-3 py-1 rounded cursor-pointer border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-[var(--shadow-glow-cyan)] transition-all bg-transparent font-mono" style="color: var(--color-muted);">
-        ⌛ Search <kbd class="text-xs px-1 rounded border border-[var(--color-border)] opacity-60 ml-0.5 font-mono">⌘K</kbd>
-      </button>
-    </nav>
-  </div>
-</header>
+      <div class="flex items-center gap-2">
+        <button type="button" data-search-open aria-haspopup="dialog" class="btn text-text-muted">
+          <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <span class="hidden sm:inline">Search</span>
+          <kbd class="hidden sm:inline font-mono text-[10px] px-1.5 py-0.5 rounded border border-border bg-well" data-search-shortcut>Ctrl K</kbd>
+          <span class="visually-hidden sm:hidden">Search</span>
+        </button>
+
+        <button type="button" data-theme-toggle class="btn">
+          <span class="visually-hidden">Switch colour theme. Current: </span>
+          <svg data-theme-icon="sun" aria-hidden="true" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
+          </svg>
+          <svg data-theme-icon="moon" aria-hidden="true" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg data-theme-icon="auto" aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+            <path d="M8 21h8m-4-4v4"></path>
+          </svg>
+          <span data-theme-label class="sr-only sm:not-sr-only">Auto</span>
+        </button>
+
+        <button id="mobile-menu-btn" type="button" aria-expanded="false" aria-controls="sidebar-drawer" class="btn md:hidden">
+          <span id="mobile-menu-label">Menu</span>
+        </button>
+      </div>
+    </div>
+  </header>

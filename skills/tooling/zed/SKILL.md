@@ -2,56 +2,45 @@
 name: zed
 description: Configure or troubleshoot Zed editor settings, keybindings, and language servers. Use to verify Zed option names and update user or project settings in the correct scope.
 resources:
-  - https://zed.dev/llms.txt
+  - https://zed.dev/docs/reference/all-settings.md
+  - https://zed.dev/docs/key-bindings.md
+  - https://zed.dev/docs/configuring-languages.md
+  - https://zed.dev/docs/languages.md
+  - https://zed.dev/docs/vim.md
+  - https://zed.dev/docs/tasks.md
+  - https://zed.dev/docs/toolchains.md
+  - https://zed.dev/docs/environment.md
+  - https://zed.dev/docs/themes.md
+  - https://zed.dev/docs/ai/agent-settings.md
+  - https://zed.dev/docs/ai/llm-providers.md
+  - https://zed.dev/docs/ai/mcp.md
 ---
 
-# Zed Editor Configuration
+# Zed editor configuration
 
-Guidelines for discovering, configuring, and validating options for the Zed code editor.
+Zed's settings change between releases, so take every key, default, and schema from the vendored docs in `resources/auto/`, not from memory. The complete settings reference is `resources/auto/docs-reference-all-settings.md`.
 
-Because Zed evolves rapidly, avoid assuming hardcoded key paths or deprecated schema keys. Instead, use the vendored documentation in `resources/auto/` as the single source of truth for available settings, default values, and schema structures.
+## Configuration files
 
-## Configuration File Locations
+- User settings: `~/.config/zed/settings.json` (Linux and macOS), `%APPDATA%\Zed\settings.json` (Windows).
+- Project settings: `.zed/settings.json` in the project root.
+- Keymaps: `~/.config/zed/keymap.json` (Linux and macOS), `%APPDATA%\Zed\keymap.json` (Windows).
 
-Zed supports both global user settings and workspace-specific project settings:
+## Steps
 
-- **Global User Settings:**
-  - Linux/macOS: `~/.config/zed/settings.json`
-  - Windows: `%APPDATA%\Zed\settings.json`
-- **Project Local Settings:**
-  - Workspace root: `.zed/settings.json`
-- **Global Keymaps:**
-  - Linux/macOS: `~/.config/zed/keymap.json`
-  - Windows: `%APPDATA%\Zed\keymap.json`
+1. Search `resources/auto/` for the exact key and an example, such as `lsp` (language server overrides), `buffer_font_size`, `vim_mode`, `agent` (AI agent and providers), `format_on_save`, or `file_types`.
+2. If the local docs lack a recently added key, read the current page from `https://zed.dev/docs/llms.txt`, which indexes a Markdown copy of every docs page.
+3. Read the target settings file and keep its existing keys and comments.
+4. Choose the scope: user settings for personal preferences (theme, fonts, keybindings); `.zed/settings.json` for repository rules (formatter, per-language tab size, project language servers).
+5. Write the change as JSONC (JSON with comments).
 
-## Documentation & Option Lookup Protocol
+## Language-specific settings
 
-When configuring Zed settings for a task, follow this search and lookup protocol:
+- `file_types` maps a language name to extensions, file names, or globs. Path globs follow the default entries' form with a leading `**/` (for example `"**/templates/**/*.html"`); bare entries such as `"c"` match an extension or name.
+- Override formatting per language under `languages`, for example `"languages": { "HTML": { "format_on_save": "off" } }`, when a formatter breaks template syntax such as Tera or Jinja inside `.html` files.
 
-1. **Query Vendored Documentation:**
-   Search the `resources/auto/` directory within this skill using pattern or string search tools to locate exact setting keys, section titles, and examples.
-   - Example search targets: language server overrides (`lsp`), font settings (`buffer_font_size`), Vim mode (`vim_mode`), assistant/AI providers (`assistant`), or file formatting (`format_on_save`).
-2. **Inspect Existing Settings:**
-   Before introducing new keys, check the target `settings.json` or `.zed/settings.json` to preserve existing user choices and structure.
-3. **Verify Settings Scope:**
-   - Use global `settings.json` for user-wide preferences (e.g. theme, font, default keybindings).
-   - Use `.zed/settings.json` for repository-specific rules (e.g. workspace formatter, language-specific tab size, project-specific LSPs).
-4. **Update Offline Resources when Outdated:**
-   If a newly released Zed feature or configuration key is not present in local resources, trigger a resource sync:
+## Completion criteria
 
-   ```bash
-   skills --action download-resources --skill zed
-   ```
-
-## Syntax & Formatting Rules
-
-1. **JSON / JSONC:** Zed settings files use JSONC (JSON with comments). Ensure syntax remains valid JSON or JSONC when editing.
-2. **Clean Edits:** When editing settings via automated tools, avoid deleting unrelated top-level keys or inline documentation comments.
-
-## Completion Criteria
-
-A Zed configuration task is complete when:
-
-1. The target setting key and value have been confirmed against the vendored docs in `resources/auto/`.
-2. The modified configuration file (`settings.json`, `.zed/settings.json`, or `keymap.json`) contains valid JSON without syntax or schema errors.
-3. Settings are saved in the correct scope (user-wide vs project-local).
+- The key and value match `resources/auto/` or the live docs page.
+- The edited `settings.json`, `.zed/settings.json`, or `keymap.json` parses as JSONC.
+- The setting sits in the scope the user asked for (user-wide or project).

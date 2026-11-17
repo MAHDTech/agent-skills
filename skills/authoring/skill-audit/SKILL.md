@@ -18,10 +18,13 @@ The tree is the **single source of truth**; the generated README, `agents/AGENTS
 
 ## Before you start
 
-Two mechanical gates come first - they are cheap and catch drift a read-through would miss:
+Three mechanical gates come first. They write nothing, so the audit stays read-only, and they catch drift a read-through would miss:
 
-1. `devenv --no-tui shell -- ask skills lint` - frontmatter, naming, placement. Record every error; these are findings.
-2. `devenv --no-tui shell -- ask skills sync`, then check `git status`. A diff means the generated artifacts had drifted from the tree - the drift is itself a finding.
+1. `devenv --no-tui shell -- ask skills lint` - frontmatter, naming, placement, links. Record every error; these are findings.
+2. `devenv --no-tui shell -- ask skills sync --dry-run` - lists installs that would be updated or deleted. Any `[Update]` or `[Delete]` line means local installs drifted from the tree; record it.
+3. `devenv --no-tui shell -- ask dashboard lint` - renders dashboard content into a scratch directory and compares it with the committed copy. A failure means the generated artifacts drifted; record the listed paths.
+
+Fixing drift (a real `ask skills sync`) is a follow-up you recommend, not part of the audit.
 
 ## The audit
 
@@ -29,7 +32,7 @@ Walk the whole collection. Each pass carries an exhaustive bound - every skill, 
 
 1. **Inventory.** List every promoted custom skill - one per `skills/<category>/<name>/`, excluding `vendor/` and the `in-progress/` **lifecycle bucket** (archived skills live outside `skills/`, under `skills-archive/`, and are out of scope) - grouped by category. This inventory is what the rest of the audit checks against.
 2. **Per-skill review.** Apply the checklist below to _every_ skill in the inventory.
-3. **Cross-reference integrity.** Collect every `/skill-name` mentioned in any `SKILL.md` and confirm each resolves to a promoted skill of that name. A reference to an archived or nonexistent skill is a **dangling reference** - record it. Then confirm the `/skill-router` index names every promoted skill exactly once, and names nothing archived or gone.
+3. **Cross-reference integrity.** Collect every skill reference - `/skill-name` mentions, relative links, and prose that names another skill ("use the X skill") - across every `SKILL.md` and every file under `resources/manual/`, and confirm each resolves to a promoted skill in the same `metadata.group`. A reference to an archived or nonexistent skill is a **dangling reference**; one that crosses groups breaks the self-contained rule. Record both. Then confirm the `/skill-router` index gives every promoted skill exactly one entry (prose mentions elsewhere in the router are fine) and names nothing archived or gone.
 
    ```bash
    # Promoted custom skill entry points (the inventory).
@@ -37,6 +40,8 @@ Walk the whole collection. Each pass carries an exhaustive bound - every skill, 
    # Slash references are candidates: distinguish commands from paths before reconciling.
    rg -o --no-filename '/[a-z][a-z0-9]+(-[a-z0-9]+)*' skills \
      -g SKILL.md -g '!skills/vendor/**' -g '!skills/in-progress/**' | sort -u
+   # Relative links from SKILL.md and resources/manual/ that do not resolve.
+   rg -n -o '\]\(\.[^)#]+' skills -g '*.md' -g '!skills/vendor/**' -g '!**/resources/auto/**'
    ```
 
 4. **Collection-level review.** Across the whole set, look for:
@@ -56,6 +61,8 @@ For each skill in the inventory:
 - **Policies agree** - every promoted custom skill has an explicit boolean `policy.allow_implicit_invocation` in `agents/openai.yaml`, equal to the inverse of `disable-model-invocation` (default `false`). Explicit-only bodies state their user-request boundary for hosts without a verified policy control. Use `/skill-creator`'s compatibility reference when evaluating host-specific behavior.
 - **Body is lean** - no **sediment** (stale lines), no **sprawl** (simply too long), no **duplication** (one meaning, one place), no **no-op** (default behaviour restated), no **negation** (steer by the positive target).
 - **References resolve** - its `/skill-name` mentions and sibling-file pointers all hit live targets.
+- **Works standalone** - installed alone, the skill still works: no reliance on this repository's tooling (`ask`, `skills --action`, repo paths, a hard-coded `devenv`) unless it exists for that tool, and no reliance on skills outside its group.
+- **Facts are current** - commands, flags, API names, and version claims match the skill's own `resources/auto/` or `resources/manual/` docs; every `resources/auto/` file is real documentation, not an HTML shell, redirect stub, or marketing page.
 
 ## Done when
 

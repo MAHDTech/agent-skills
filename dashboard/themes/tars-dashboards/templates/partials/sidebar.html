@@ -1,24 +1,24 @@
-<nav class="sticky top-8 overflow-y-auto max-h-[calc(100vh-4rem)] pr-2 pb-8 custom-scrollbar">
-  {% set root = get_section(path="_index.md") %}
+      {% set active_path = current_path | default(value="/") %}
+      {% set catalog = get_section(path="skills/_index.md") %}
+      {% set _categories = [get_section(path=subpath) for subpath in catalog.subsections] %}
 
-  {% set _root_subs = [get_section(path=subpath) for subpath in root.subsections] %}
-  {% set sorted_root_subs = _root_subs | sort(attribute="title") %}
+      {# Header links are hidden below md, so repeat them at the top of the drawer. #}
+      <nav aria-label="Mobile" class="md:hidden space-y-2 pb-5 mb-5 border-b border-border">
+        {% for item in config.extra.menu_items %}
+          {{ <ui.nav_link item={item} active_path={active_path} mobile={true} /> }}
+        {% endfor %}
+      </nav>
 
-  <div class="space-y-4 text-sm">
-    {% for sub in sorted_root_subs %}
-      {{ <render_section section_path={sub.relative_path} current_path={current_path | default(value="")} /> }}
-    {% endfor %}
-  </div>
-</nav>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Wait for a tiny bit to ensure fonts and layout have calculated
-    setTimeout(() => {
-      const activeItem = document.getElementById("sidebar-active-item");
-      if (activeItem) {
-        activeItem.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }, 50);
-  });
-</script>
+      <nav aria-label="Skills" class="md:sticky md:top-24 md:max-h-[calc(100vh-7rem)] md:overflow-y-auto md:py-8 md:pr-2 text-sm">
+        <p class="font-mono text-xs uppercase tracking-wider text-accent-cyan mb-3 px-2">Catalog</p>
+        <div class="space-y-1">
+          {# Live categories by title, then the archive of retired skills. #}
+          {% set _sorted = _categories | sort(attribute="title") %}
+          {% for category in _sorted %}
+            {% if category.path != "/skills/archive/" %}{{ <ui.sidebar_section section_path={category.relative_path} current_path={active_path} /> }}{% endif %}
+          {% endfor %}
+          {% for category in _sorted %}
+            {% if category.path == "/skills/archive/" %}{{ <ui.sidebar_section section_path={category.relative_path} current_path={active_path} /> }}{% endif %}
+          {% endfor %}
+        </div>
+      </nav>

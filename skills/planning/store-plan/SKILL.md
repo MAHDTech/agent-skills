@@ -5,18 +5,9 @@ metadata:
   group: planning-pipeline
 ---
 
-<!-- omit in toc -->
-
 # Store Plan
 
 Capture the current conversation into a structured, reviewable plan file.
-
-- [Instructions](#instructions)
-  - [1. Gather context](#1-gather-context)
-  - [2. Generate the plan document](#2-generate-the-plan-document)
-  - [3. Write and confirm](#3-write-and-confirm)
-- [Output Path](#output-path)
-- [Plan Format and Example](#plan-format-and-example)
 
 ## Instructions
 
@@ -34,25 +25,13 @@ If the user passed a description as an argument (e.g., `/store-plan auth refacto
 
 ### 2. Generate the plan document
 
-Build the document using the format defined in [Plan Format and Example](#plan-format-and-example). Not every section is required - **omit sections that have no content** rather than leaving them empty. The goal is a document that someone (including future-you) can pick up cold and understand what was decided, what's next, and why.
+Build the document using the format defined in [Plan format and example](#plan-format-and-example). Not every section is required - **omit sections that have no content** rather than leaving them empty. The goal is a document that someone (including future-you) can pick up cold and understand what was decided, what's next, and why.
 
-Present the draft to the user before writing.
+### 3. Confirm and write
 
-### 3. Write and confirm
+Present the draft and its target path to the user, and ask if they want to adjust anything. Once they approve, write the file to the path defined in [Output path](#output-path), creating `docs/plans/` if needed, and report the path.
 
-**Step 3a - Write the file:**
-
-```bash
-mkdir -p docs/plans/
-```
-
-Write to the path defined in [Output Path](#output-path).
-
-**Step 3b - Confirm with the user:**
-
-Present the file path and a brief summary to the user. Ask if they want to adjust anything before finalizing.
-
-## Output Path
+## Output path
 
 ```text
 docs/plans/{YYYY}_{MM}_{DD}_{description}.md
@@ -64,7 +43,7 @@ Examples:
 - `docs/plans/2026_04_02_frontend_split.md`
 - `docs/plans/2026_04_02_migration_engine_redesign.md`
 
-## Plan Format and Example
+## Plan format and example
 
 The full document structure (section by section), the formatting rules (status circles, no tables, headings, code references), and a complete worked example live in [resources/manual/plan-format.md](resources/manual/plan-format.md).
 

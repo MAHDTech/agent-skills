@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $code-review to review code diffs for standards and specs."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

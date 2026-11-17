@@ -1,0 +1,13 @@
+{
+    "file_types": {
+        "Tera (HTML)": ["**/dashboard/themes/**/templates/**/*.html"]
+    },
+    "languages": {
+        "HTML": {
+            "format_on_save": "off"
+        },
+        "Tera (HTML)": {
+            "format_on_save": "off"
+        }
+    }
+}

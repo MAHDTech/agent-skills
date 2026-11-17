@@ -27,19 +27,10 @@ The entry point and local references are modified guidance, not an upstream snap
 
 The skill does not bundle or require Impeccable's binary launcher, CLI, hooks, browser integration, or project sidecars. Consult the [Impeccable documentation index](https://impeccable.style/llms.txt) when investigating upstream changes; it is a navigation index, not the skill's knowledge base or an automatically mirrored resource tree.
 
-## Ownership and catalog boundaries
-
-The approved approach is a custom design skill with curated local knowledge and official external references. Keep guidance useful offline and retrieve current platform details when a decision depends on them. No vendor import or CLI modification is required for this approach. The existing vendor importer can target upstream's flat `plugin/skills` collection if a separate upstream integration is wanted later.
-
-The catalog review found implementation specialists for egui, Bevy/egui, and Tailwind, and a vendor web performance skill. Retain them: they cover framework APIs, integration, compilation, or measurement that a general design workflow does not replace. No existing general UI/UX design skill was identified for retirement. This skill stays self-contained and adds no cross-skill invocation dependency.
-
 ## Updating the references
 
 1. Compare the recorded upstream commit with the proposed revision; inspect the listed source files and any changed license or attribution notices.
 2. Adopt a change only when it improves this skill's design decisions or verification across its supported surfaces. Keep upstream runtime instructions outside this skill.
 3. Preserve attribution, mark adaptations, and update the version, commit, and review date when refreshing derived guidance.
 4. Check the official links in the surface references. Verify changing numeric requirements and API behavior against the target platform and installed version.
-5. Keep hand-authored content under `resources/manual/`; use a declared `resources:` download only if intentionally adding downloader-owned material under `resources/auto/`.
-
-Validate frontmatter, invocation policy, relative links, router reachability, and generated catalog/dashboard artifacts through the repository's devenv checks after changes. Include manual reference files when running markdown checks, since general hook exclusions skip resource directories.
 
