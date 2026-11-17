@@ -1,6 +1,6 @@
 +++
 title = "guards-goal"
-description = "Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /guards-goal or explicitly requests a persistent goal."
+description = "Set or resume a persistent goal and pursue it until every requirement is verified or blocked. Use only when the user explicitly asks for a goal that persists across turns."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -101,9 +101,9 @@ Treat completion as unproven until current evidence establishes it:
 
 ### Blocked audit
 
-Verify the blocker against current state and exhaust meaningful independent work. Mark the goal blocked only when progress requires user input or an external-state change. Record the condition, evidence, attempted alternatives, and exact unblock action. Difficulty, slowness, uncertainty, or incomplete work alone does not qualify.
+Verify the blocker against current state and finish all meaningful independent work first. Mark the goal blocked only when progress requires user input or an external-state change; difficulty, slowness, or uncertainty are reasons to keep working. Record the condition, evidence, attempted alternatives, and exact unblock action.
 
-Respect stricter native lifecycle rules. If they require repeated blocked turns, track the same underlying condition across actual goal turns and leave the goal active until the threshold is satisfied. Equivalent wording does not reset the count. Do not manufacture turns or repeated checks to satisfy it. On resuming a blocked goal, revalidate the condition and start a fresh blocked audit, including any native repetition threshold.
+Follow any stricter native lifecycle rules. If they require repeated blocked turns, count real goal turns that hit the same underlying condition, however it is worded, and keep the goal active until the threshold is met. On resuming a blocked goal, revalidate the condition and start a fresh blocked audit, including any native repetition threshold.
 
 Once the applicable blocked criteria are met, update the status and confirm the update succeeded. Preserve the full objective and checkpoint for resumption; report the blocker and the action needed to proceed.
 

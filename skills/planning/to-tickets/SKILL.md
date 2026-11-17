@@ -1,6 +1,6 @@
 ---
 name: to-tickets
-description: Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use for buildable slices, excluding .guards/issues automation.
+description: Split a plan or spec into approved vertical implementation tickets with blocking dependencies, then publish to local files or an issue tracker. Use when the user asks to turn a plan into buildable slices.
 disable-model-invocation: true
 metadata:
   group: planning-pipeline
@@ -14,7 +14,7 @@ metadata:
 
 Break a plan, spec, or conversation into a set of **tickets** - tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-These are **buildable implementation tickets** - distinct from `/wayfinder`'s investigation tickets (which resolve open _decisions_, not ship features) and from the `.guards/issues/` backlog files that automated factory ticket pipelines generate and consume (a separate ticket-automation pipeline this skill does not write to).
+These are **buildable implementation tickets** - distinct from `/wayfinder`'s investigation tickets, which resolve open _decisions_ rather than ship features.
 
 Work from your project's conventions: its issue tracker (GitHub via `gh`, Linear, or local files), triage label vocabulary, domain glossary, and any ADRs in the area you are touching. If those conventions have not been established, ask the user before publishing.
 
@@ -65,12 +65,12 @@ Iterate until the user approves the breakdown.
 
 Publish the approved tickets. **How** depends on the tracker your project uses - the tickets are the same either way; only the shape of the blocking edges changes:
 
-- **Local files** → write one file per ticket under `scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below - one ticket per file, never a single combined file.
+- **Local files** → write one file per ticket under the project's existing ticket directory if it has one, otherwise `docs/plans/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below - one ticket per file, never a single combined file.
 - **A real issue tracker (GitHub, Linear, …)** → publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Use the platform's native blocking / sub-issue relationship where it has one; otherwise set each ticket's "Blocked by" to the blocking issues. Apply your project's ready-for-agent triage label (or its equivalent) unless instructed otherwise - the tickets are agent-grabbable by construction.
 
 Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
 
-Do NOT close or modify any parent issue.
+Leave any parent issue open and unchanged.
 
 ## Local ticket template
 
@@ -113,7 +113,5 @@ not layer-by-layer implementation.
 ```
 
 In either form, avoid specific file paths or code snippets - they go stale fast. Exception: if exploratory prototyping produced a snippet that encodes a decision more precisely than prose can (a state machine, reducer, schema, or type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts - not a working demo, just the important bits.
-
-Work the frontier one ticket at a time, implementing one ticket at a time and clearing context between tickets.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

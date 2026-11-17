@@ -8,7 +8,7 @@ use skills_core::models::{
 };
 use std::fs::{self, File};
 use tempfile::tempdir;
-use wiremock::matchers::{method, path};
+use wiremock::matchers::{header, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 #[test]
@@ -784,9 +784,9 @@ async fn test_download_and_clean_skip_archived_skills() {
 
     let batch = downloader
         .download_all_resources(std::slice::from_ref(&archived_skill))
-        .await
-        .unwrap();
-    assert!(batch.is_empty());
+        .await;
+    assert!(batch.files.is_empty());
+    assert!(batch.failed.is_empty());
 
     let cleaned = downloader
         .clean_all_resources(std::slice::from_ref(&archived_skill))
@@ -872,4 +872,142 @@ async fn test_llms_full_not_crawled_and_fragment_links_deduplicated() {
     let downloader = SkillDownloader::builder().max_retries(0).build();
     let files = downloader.download_skill_resources(&skill).await.unwrap();
     assert_eq!(files.len(), 3);
+}
+
+#[tokio::test]
+async fn test_llms_child_md_page_retries_without_markdown_accept_on_404() {
+    // Mirrors docs.x.ai: `<page>.md` with a Markdown Accept header is a 404,
+    // the same URL with `Accept: */*` serves Markdown.
+    let mock_server = MockServer::start().await;
+    let base_uri = mock_server.uri();
+
+    let llms_body =
+        format!("- [Quirky]({base_uri}/docs/quirky.md)\n- [Plain]({base_uri}/docs/plain.md)\n");
+    Mock::given(method("GET"))
+        .and(path("/llms.txt"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(llms_body))
+        .mount(&mock_server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/docs/quirky.md"))
+        .and(header("accept", "*/*"))
+        .respond_with(ResponseTemplate::new(200).set_body_string("# Quirky Page"))
+        .with_priority(1)
+        .mount(&mock_server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/docs/quirky.md"))
+        .respond_with(ResponseTemplate::new(404))
+        .with_priority(2)
+        .mount(&mock_server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/docs/plain.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_string("# Plain Page"))
+        .mount(&mock_server)
+        .await;
+
+    let dir = tempdir().unwrap();
+    let skill_dir = dir.path().join("skills/engineering/quirky-skill");
+    let auto_dir = skill_dir.join("resources/auto");
+    let fm = SkillFrontmatter::builder()
+        .name("quirky-skill")
+        .description("Test .md 404 fallback")
+        .resources(vec![format!("{base_uri}/llms.txt")])
+        .build();
+    let skill = Skill::builder()
+        .path(skill_dir.join("SKILL.md"))
+        .dir_name("quirky-skill".to_string())
+        .category(SkillCategory::Engineering)
+        .promoted(true)
+        .frontmatter(fm)
+        .content("# Content".to_string())
+        .raw("---\nname: quirky-skill\n---".to_string())
+        .resources(Vec::new())
+        .build();
+
+    let downloader = SkillDownloader::builder().max_retries(0).build();
+    let files = downloader.download_skill_resources(&skill).await.unwrap();
+
+    assert_eq!(files.len(), 3);
+    assert!(
+        fs::read_to_string(auto_dir.join("docs-quirky.md"))
+            .unwrap()
+            .contains("Quirky Page")
+    );
+    assert!(
+        fs::read_to_string(auto_dir.join("docs-plain.md"))
+            .unwrap()
+            .contains("Plain Page")
+    );
+}
+
+#[tokio::test]
+async fn test_fetch_url_does_not_retry_non_md_404() {
+    let mock_server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/docs/page"))
+        .respond_with(ResponseTemplate::new(404))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    let downloader = SkillDownloader::builder().max_retries(0).build();
+    let result = downloader
+        .fetch_url(&format!("{}/docs/page", mock_server.uri()))
+        .await;
+    assert!(result.is_err());
+}
+
+#[tokio::test]
+async fn test_download_all_resources_keeps_going_when_one_skill_fails() {
+    let mock_server = MockServer::start().await;
+    let base_uri = mock_server.uri();
+    Mock::given(method("GET"))
+        .and(path("/ok/guide.md"))
+        .respond_with(ResponseTemplate::new(200).set_body_string("# Fresh Guide"))
+        .mount(&mock_server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/gone/guide"))
+        .respond_with(ResponseTemplate::new(500))
+        .mount(&mock_server)
+        .await;
+
+    let dir = tempdir().unwrap();
+    let make_skill = |name: &str, url: String| {
+        let skill_dir = dir.path().join("skills/engineering").join(name);
+        fs::create_dir_all(skill_dir.join("resources/auto")).unwrap();
+        Skill::builder()
+            .path(skill_dir.join("SKILL.md"))
+            .dir_name(name.to_string())
+            .category(SkillCategory::Engineering)
+            .promoted(true)
+            .frontmatter(
+                SkillFrontmatter::builder()
+                    .name(name)
+                    .description("Test batch download")
+                    .resources(vec![url])
+                    .build(),
+            )
+            .content("# Content".to_string())
+            .raw(format!("---\nname: {name}\n---"))
+            .resources(Vec::new())
+            .build()
+    };
+    let failing = make_skill("failing-skill", format!("{base_uri}/gone/guide"));
+    let healthy = make_skill("healthy-skill", format!("{base_uri}/ok/guide.md"));
+    let previous = dir
+        .path()
+        .join("skills/engineering/failing-skill/resources/auto/gone-guide.md");
+    fs::write(&previous, "# Last good copy").unwrap();
+
+    let downloader = SkillDownloader::builder().max_retries(0).build();
+    let report = downloader.download_all_resources(&[failing, healthy]).await;
+
+    assert_eq!(report.failed.len(), 1);
+    assert_eq!(report.failed[0].0, "failing-skill");
+    assert_eq!(report.file_count(), 1);
+    assert!(report.files.contains_key("healthy-skill"));
+    assert_eq!(fs::read_to_string(&previous).unwrap(), "# Last good copy");
 }

@@ -12,7 +12,7 @@ TDD is the red to green loop. This skill is the reference that makes that loop p
 
 When exploring the codebase, read any project context docs (a `CONTEXT.md`, architecture notes, or ADRs in the area you are touching) if they exist, so test names and interface vocabulary match the project's domain language and conventions.
 
-For the deep-module vocabulary that governs where seams go, apply modular design.
+Place seams at the boundaries of **deep modules**: a small interface hiding substantial behaviour is the right place to test, because the interface stays stable while the internals change.
 
 ## What a good test is
 
@@ -24,9 +24,7 @@ See [tests.md](resources/manual/tests.md) for examples and [mocking.md](resource
 
 A **seam** is the public boundary you test at: the interface where you observe behaviour without reaching inside. Tests live at seams, never against internals.
 
-**Test only at pre-agreed seams.** Before writing any test, write down the seams under test and confirm them with the user. No test is written at an unconfirmed seam. You cannot test everything - agreeing the seams up front is how testing effort lands on the critical paths and complex logic instead of every edge case.
-
-Ask: "What's the public interface, and which seams should we test?"
+**Test only at agreed seams.** Before writing any test, write down the seams under test. If a plan, spec, or ticket already names them, use those; otherwise confirm them with the user by asking: "What's the public interface, and which seams should we test?" Every test sits at an agreed seam. You cannot test everything - agreeing the seams up front is how testing effort lands on the critical paths and complex logic instead of every edge case.
 
 ## Anti-patterns
 
@@ -38,7 +36,7 @@ Ask: "What's the public interface, and which seams should we test?"
 
 - **Red before green.** Write the failing test first, then only enough code to pass it. Do not anticipate future tests or add speculative features.
 - **One slice at a time.** One seam, one test, one minimal implementation per cycle.
-- **Run tests through the project's toolchain.** In this repo that means the pinned environment - for example `devenv --no-tui test` or `devenv --no-tui shell -- cargo test`. Confirm the runner before you start looping so red and green are reliable signals.
-- **Refactoring is not part of the loop.** It belongs to the review stage (run code review), not the red to green implementation cycle.
+- **Run tests through the project's toolchain.** Use the project's pinned toolchain or wrapper (for example a devenv or nix shell) if it has one. Confirm the runner before you start looping so red and green are reliable signals.
+- **Refactoring happens after the loop.** Keep each cycle to red then green; restructure in a separate review pass once the slice is green.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

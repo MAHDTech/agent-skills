@@ -5,27 +5,35 @@ resources:
   - https://pagefind.app/llms.txt
 ---
 
-# Pagefind Search Indexer
+# Pagefind search indexer
 
-Guidelines for indexing static websites and configuring search capabilities using Pagefind. Always consult `resources/auto/llms.txt` and search `resources/auto/` (such as `resources/auto/docs-index.md` and `resources/auto/docs-config-options-index.md`) for full options reference.
+Pagefind indexes a built static site and writes a search bundle beside it. Take options and attributes from the vendored docs: start at `resources/auto/llms.txt`, then read the matching page such as `resources/auto/docs-config-options-index.md`, `resources/auto/docs-config-sources-index.md`, `resources/auto/docs-indexing-index.md`, or `resources/auto/docs-weighting-index.md`. Pagefind 1.5 replaced the Default UI with the Component UI, documented in `resources/auto/llms-component-ui.txt`.
 
-## CLI & Core Indexing Commands
+## Indexing
 
-Run Pagefind post-build to index the output HTML content:
+Run Pagefind after the site generator has written its HTML:
 
-- **Default Indexing:** `npx pagefind --site <build_output_dir>` (indexes all HTML pages in the output directory, e.g., `dashboard/public`).
-- **Config file:** Pagefind can load parameters from a `pagefind.yml` or `pagefind.json` file placed in the project root.
+```bash
+npx pagefind --site <build-output-dir>
+```
 
-## Client Integration Rules
+Use the project's existing invocation (a pinned binary, `python3 -m pagefind`, or a package script) when it has one.
 
-1. **JS/CSS Assets:** Pagefind generates static search assets (compiled index and search UI scripts) under the `pagefind` directory in the site root (e.g. `pagefind/pagefind.js`, `pagefind/pagefind.css`).
-2. **Excluding Elements:** To keep irrelevant layout elements (such as footers, navbars, sidebars) from polluting search index scores, add `data-pagefind-ignore` attribute to their HTML elements.
-3. **Weighting Content:** To highlight specific regions (e.g., titles, primary paragraphs), use `data-pagefind-weight="<value>"` (value from 1 to 10) on elements.
+- Options can come from CLI flags, `PAGEFIND_*` environment variables, or a `pagefind.toml`, `pagefind.yml`, `pagefind.yaml`, or `pagefind.json` file in the directory where the command runs. Flags override environment variables, which override the file.
+- The bundle is written to `<site>/pagefind/` by default (`output_subdir` changes it).
 
-## Completion Criteria
+## Controlling the index
 
-The indexing task is complete when:
+- Mark the main content with `data-pagefind-body`. Once any page has it, pages without it are not indexed, so add it to every page layout that should be searchable.
+- Exclude navigation, footers, and sidebars inside indexed content with `data-pagefind-ignore`.
+- Weight a region with `data-pagefind-weight="<n>"`, any number from 0.0 to 10.0 (default 1.0). The scale is quadratic: 2.0 counts about four times as much as normal text.
 
-1. `pagefind` completes building the search database successfully without throwing errors.
-2. The index folder `pagefind/` exists in the public output directory containing the generated search chunks and compiled index configs.
-3. Relevant search query tests return expected matches.
+## Client integration
+
+The Component UI loads `/pagefind/pagefind-component-ui.js` and `/pagefind/pagefind-component-ui.css`; the JavaScript API imports `/pagefind/pagefind.js`. Check `resources/auto/llms-component-ui.txt` for the component markup.
+
+## Completion criteria
+
+- The Pagefind command exits 0 and reports a non-zero number of indexed pages.
+- `<site>/pagefind/` exists in the build output.
+- A search for a term known to be on an indexed page returns that page, and a term that appears only in an ignored region does not.

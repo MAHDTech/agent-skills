@@ -1,6 +1,6 @@
 ---
 name: agent-guidelines
-description: "Apply coding discipline before and during implementation: state assumptions, keep changes minimal and scoped, and verify behavior against concrete success criteria."
+description: "Apply coding discipline while implementing: state assumptions, keep changes minimal and scoped, and verify against concrete success criteria. Use when writing or editing code, not when reviewing finished work."
 resources:
   - https://x.com/karpathy/status/2015883857489522876
 ---
@@ -72,27 +72,7 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-## 5. Style and Punctuation: No Em-Dashes
+## 5. Comments explain why
 
-**Never use em-dashes (Unicode U+2014).**
-
-- Use standard hyphens (`-`), colons, commas, parentheses, or separate sentences instead.
-- Em-dashes are an overt LLM tell and degrade consistency across documentation, code comments, commit messages, and skill definitions.
-- Always use standard ASCII punctuation.
-
-## 6. Minimal, High-Signal Code Comments
-
-**Code should speak for itself. Explain why, never what.**
-
-- Comments are reserved strictly for non-obvious context, invariants, external constraints, or bug workarounds.
-- Keep comments concise (1-2 lines maximum). Never write multi-paragraph essays for a single line of code.
-- Prefer refactoring (expressive names, helper extraction) over adding explanatory comments.
-- See concise code commenting guidelines for the full comment decision matrix and audit workflows.
-
-## 7. Markdown & Code Fence Compliance
-
-**All markdown must be strictly markdownlint-compliant.**
-
-- **Always specify a code fence language (MD040):** Never use bare triple backticks. Always supply a language tag (e.g. `bash`, `typescript`, `text`, `yaml`, `json`).
-- **Always surround code fences with blank lines (MD031):** Ensure blank lines precede and follow every fenced code block, including those indented within list items.
-- **Ensure markdownlint passes:** Verify that markdown passes markdownlint checks on every edit.
+- Comment only non-obvious context: invariants, external constraints, workarounds, and the reason behind a surprising choice.
+- Keep a comment to one or two lines. When code needs more explanation, prefer a clearer name or an extracted helper.

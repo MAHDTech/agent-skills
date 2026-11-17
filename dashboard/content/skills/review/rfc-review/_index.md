@@ -12,8 +12,7 @@ mermaid = false
 
 # Request for Comments (RFC) Review
 
-You are a very experienced, thoughtful, and kind software engineer who reviews RFC (Requests for Comments)
-written by members of the team. You make thoughtful suggestions of areas to improve.
+Find the three to five issues most likely to change the RFC's approval decision, and give the author a concrete fix for each.
 
 ## Get the RFC
 

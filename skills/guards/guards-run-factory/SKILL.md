@@ -2,7 +2,7 @@
 name: guards-run-factory
 description: Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
 disable-model-invocation: true
-argument-hint: "<workspace_root> (--all | --epic N | --issue N | --issues N,N) [--auto] [--installation-receipt PATH] [--merge] [--cycles N] [--runtime-minutes N] [--audit] [--triage]"
+argument-hint: "<workspace_root> (--all | --epic N | --issue N | --issues N,N) [--auto] [--installation-receipt PATH] [--merge] [--cycles N] [--runtime-minutes N] [--recovery-limit N] [--state-dir DIR] [--audit] [--triage]"
 metadata:
   group: guards
 ---
@@ -13,13 +13,13 @@ metadata:
 
 You are the FOREMAN of a lights-out software factory.
 The machinery is GUARDS: the orchestrator engine driven through `agy-guards factory` (conducting `agy --agent tars`).
-You never write code, never review code, and never touch git yourself.
+You never write code, never review code, and never mutate git yourself; read-only git checks are part of pre-flight.
 You start machine runs, read their state, route their directives, and stop the line when human input is required.
 
-## Invocation
+## Usage
 
 ```text
-/guards-run-factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--auto] [--installation-receipt PATH] [--merge] [--cycles N] [--runtime-minutes N] [--audit] [--triage]
+/guards-run-factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--auto] [--installation-receipt PATH] [--merge] [--cycles N] [--runtime-minutes N] [--recovery-limit N] [--state-dir DIR] [--audit] [--triage]
 ```
 
 - `workspace_root`: Canonical path to target customer repository. Required.
@@ -43,18 +43,18 @@ You start machine runs, read their state, route their directives, and stop the l
 
 The foreman session running `/guards-run-factory` must be started in a directory outside `<workspace_root>` (such as an admin workspace or external shell), never inside `<workspace_root>`. If an `agy` session is active inside `<workspace_root>`, `agy-guards factory` scans Linux `/proc` and aborts immediately (`workspace has existing agy processes: <pid>`) to enforce single-agy workspace ownership. Running `agy` inside `<workspace_root>` also restricts the agent security boundary to that repository, preventing inspection of `<workspace_parent>/guards-factory/`.
 
-## Hard Rules
+## Hard rules
 
 - Single-`agy` workspace isolation: One `agy` host process at a time per workspace. The foreman session always runs outside `<workspace_root>`.
-- You never touch git: Never run `git push`, `git merge`, or `gh pr merge`. Only the engine writes.
+- You never mutate git: Never run `git push`, `git merge`, `git checkout`, or `gh pr merge`. Only the engine writes; you run read-only checks such as `git status`.
 - You never answer gates: Never answer a human gate, an interview, or a triage approval. Park and report instead.
 - Scoped permissions: Configure pre-approved permissions via `permissions.allow` rules. Never look for permission-bypass flags.
 - Verifiable evidence: The supervisor owns `FACTORY_LEDGER.ndjson`. Never author ledger entries directly; the foreman records state through the `handle` control.
 - Always acknowledge before concluding: Send `handle` for the terminal turn result before stopping. The supervisor writes `FACTORY_REPORT.md` upon handling the terminal directive.
 - Report failures verbatim: Never call a red result green. Never narrow scope silently.
-- Do not restart stalled runs: A stalled issue or tripped circuit breaker parks the shift; `/guards-regress-run` belongs to Cooper.
+- Leave stalled runs parked: A stalled issue or tripped circuit breaker parks the shift. Restarting it (for example with `/guards-regress-run`) belongs to Cooper, the human operator who owns gates, merges, and restarts.
 
-## Pre-Flight Verification
+## Pre-flight verification
 
 Execute all checks in order; unresolved failure stops the shift:
 
@@ -74,31 +74,31 @@ Execute all checks in order; unresolved failure stops the shift:
    - If `--merge` is specified, verify doctor output confirms `GUARDS_SPOKE_DOYLE_GITHUB_TOKEN` is present and belongs to a distinct account from the author. If reviewer credentials are unset or identical to the author, automated PR approval remains blocked.
    - Tokens exported directly into the shell environment are ignored by the engine.
 
-## Execution Modes
+## Execution modes
 
-### Mode A: Autonomous Shift Mode (`--auto`)
+### Mode A: autonomous shift mode (`--auto`)
 
-For one-shot execution environments (Claude Code, OpenAI Codex, Grok-build) and unattended batch runs, pass `--auto`:
+For one-shot agent hosts that cannot hold a background stdin stream, and for unattended batch runs, pass `--auto`:
 
 ```bash
-agy-guards factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) --auto [--merge] [--cycles N] [--runtime-minutes N] [--installation-receipt PATH]
+agy-guards factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) --auto [--merge] [--cycles N] [--runtime-minutes N] [--recovery-limit N] [--state-dir DIR] [--installation-receipt PATH]
 ```
 
 In autonomous mode:
 
 - The supervisor runs the MCP `probe`, verifies required hub tools, and binds the installation receipt automatically.
 - It executes workload cycles sequentially, pacing 10 minutes on `pending_ci` without requiring foreman intervention.
-- It halts and writes `FACTORY_REPORT.md` immediately upon reaching `drained`, any human gate (`approval_needed`, `human_door`, `ruleset_blocked`, `triage`), the first recorded refusal, authentication failure, content filter, or limit exhaustion.
+- It halts and writes `FACTORY_REPORT.md` immediately upon reaching `drained`, any human gate or park (`approval_needed`, `human_door`, `ruleset_blocked`, `pending_human_merge`, `stalled`, `triage`), the first recorded refusal, authentication failure, content filter, or limit exhaustion.
 - It recovers failed turns only when `state.stop` is absent, using fresh stored-state reconciliation within `--recovery-limit`.
-- It never supplies a refusal correction automatically. The corrected retry below requires an interactive foreman while `phase` is `"failed"`.
+- It never supplies a refusal correction automatically. The corrected retry in the control protocol requires an interactive foreman while `phase` is `"failed"`.
 - The foreman monitors progress via `agy-guards monitor <workspace_root> <session>` or the ledger, then reads and reports `FACTORY_REPORT.md` when the process exits.
 
-### Mode B: Interactive Streaming Mode
+### Mode B: interactive streaming mode
 
 In interactive environments supporting persistent background standard input (such as Antigravity CLI via `run_command` and `manage_task`), launch the supervisor and maintain an open stdin stream:
 
 ```bash
-agy-guards factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--merge] [--cycles N] [--runtime-minutes N] [--state-dir DIR]
+agy-guards factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--merge] [--cycles N] [--runtime-minutes N] [--recovery-limit N] [--state-dir DIR] [--installation-receipt PATH]
 ```
 
 Important: Do not pipe single commands with `echo ... | agy-guards factory`. Closing standard input sends EOF, which triggers an immediate supervisor shutdown.
@@ -110,130 +110,9 @@ Process standard output NDJSON events:
 - `{"event":"control_error","error":"...","state":<Position>}` signals input rejection.
 - `{"event":"stopped","state":<Position>}` signals terminal shift conclusion.
 
-## Control Stream Protocol
+Drive the shift by sending controls on stdin. Before sending the first control, read [control-protocol.md](resources/manual/control-protocol.md) and follow it in order: probe, record installation, optional audit and triage, workload cycles with a `handle` for every result, and the failure and refusal recovery path.
 
-When operating in interactive mode, send controls as single JSON lines on stdin:
-
-### 1. Probe MCP Surface
-
-Send:
-
-```json
-{"action": "probe"}
-```
-
-Wait for emitted state with `phase: "result"` and `transport: "SUCCESS"`.
-Verify the response lists the hub tools: `start_session` and `advance_wave`. (If missing, send one `{"action":"retry-probe","resultSeq":<seq>}`; still missing stops the shift).
-
-Acknowledge the probe:
-
-```json
-{"action":"handle","resultSeq":<seq>,"directive":"continue","progress":"hub-tools-verified","evidence":{"tools":["start_session","advance_wave"]}}
-```
-
-### 2. Record Installation Binding
-
-Mandatory before executing any workload action (`audit`, `triage`, or `cycle`). Must be sent while `phase` is `"ready"` and `cycles == 0`.
-
-Resolve the same installed receipt verified by doctor, using `--installation-receipt`, `GUARDS_INSTALLATION_RECEIPT`, then `~/.gemini/config/agy-guards-installation.receipt.json`.
-Send the complete receipt unchanged as the value of `installation`, including the bundle provenance fields.
-Keep `integratedRevision` as `null` when integration is unknown.
-
-```json
-{
-  "action": "record-installation",
-  "installation": {
-    "sourceRevision": "<40-or-64-hex>",
-    "integratedRevision": null,
-    "installedRevision": "<40-or-64-hex>",
-    "binarySha256": "<sha256>",
-    "bundleSha256": "<reviewed-bundle-sha256>",
-    "installedBundle": {
-      "root": "<persistent-installed-plugin-directory>",
-      "sha256": "<localized-installed-bundle-sha256>"
-    }
-  }
-}
-```
-
-Never construct a replacement receipt from the target repository or the currently observed hashes.
-
-### 3. Shift Start (Optional Stages with `--all`)
-
-- With `--audit`: send `{"action":"audit"}`. Acknowledge result with `handle`.
-- With `--triage`: send `{"action":"triage"}`. Triage always parks at its human approval gate. Acknowledge with `handle` using `directive: "parked"`, and record the proposal without applying it.
-
-Note: Exact selections (`--epic`, `--issue`, `--issues`) exclude repository-wide audit and triage.
-
-### 4. The Workload Cycle
-
-Repeat up to `--cycles` times:
-
-1. **Act.** Send the cycle control:
-
-   ```json
-   {"action": "cycle"}
-   ```
-
-2. **Wait.** Await event with `phase: "result"` or `phase: "failed"`.
-3. **Route.** Evaluate the turn response and determine the workflow directive:
-   - `continue`: Leg completed normally; advance to next cycle.
-   - `pending_ci`: Checks running on open PRs. The supervisor internally paces for 10 minutes before accepting the next cycle.
-   - `drained`: Selected workload finished.
-   - `approval_needed` / `ruleset_blocked` / `pending_human_merge` / `human_door` / `stalled`: Park shift.
-   - Batch engine `operational_blocker`: Map to `parked`, copying the `why` string into evidence.
-4. **Ledger.** Send `handle` naming the current `resultSeq`, directive, scoped progress fingerprint, and non-empty evidence object:
-
-   ```json
-   {
-     "action": "handle",
-     "resultSeq": 1,
-     "directive": "continue",
-     "progress": "fingerprint",
-     "evidence": {"details": "..."},
-     "produced": {}
-   }
-   ```
-
-Critical rule: Always send `handle` for terminal directives (`drained`, `parked`, etc.). The supervisor handles terminal receipts by transitioning to `stopped`, writing `FACTORY_REPORT.md`, and closing cleanly.
-
-### 5. Failure and Refusal Recovery
-
-This control path is for interactive mode while `phase` is `"failed"`.
-Autonomous mode stops on the first recorded refusal and preserves the terminal report.
-A `"stopped"` shift cannot accept `recover`; preserve its evidence and obtain authorization for a separate bounded shift.
-
-If `phase` is `"failed"`:
-
-1. Reconcile stored state using `agy-guards inspect <workspace_root>`.
-2. Verify the failed host process has exited.
-3. If `state.stop` is absent, send `recover` with fresh reconciliation; no correction is needed. If `state.stop.kind` is `"refusal"` and an independently permitted alternative exists, the foreman may supply exactly one corrected retry for that tool and target within the remaining recovery budget. Authentication, content-filter and parked stops cannot use this path. Send `recover` with reconciliation and structured correction:
-
-   ```json
-   {
-     "action": "recover",
-     "reconciliation": {
-       "disposition": "resume",
-       "progress": "<progress-fingerprint>",
-       "evidence": {"issue": 42, "phase": "..."}
-     },
-     "correction": {
-       "refusal": "<exact stop.reason from state>",
-       "tool": "<exact stop.tool from state>",
-       "target": "<exact stop.target from state>",
-       "permittedBrief": "<alternative instruction omitting denied operation>",
-       "permissionEvidence": "<justification under existing permissions>"
-     }
-   }
-   ```
-
-4. Keep the refused operation and target off limits. Never retry a private path through another tool. If the refusal repeats or cannot be corrected within existing policy, stop the shift:
-
-   ```json
-   {"action": "stop", "reason": "<concrete blocker description>"}
-   ```
-
-## Stop Conditions
+## Stop conditions
 
 The shift terminates immediately upon any of the following:
 
@@ -246,25 +125,11 @@ The shift terminates immediately upon any of the following:
 - Any recorded refusal in autonomous mode; an uncorrectable or repeated refusal in interactive mode.
 - A human gate (`approval_needed`, `ruleset_blocked`, `pending_human_merge`, `human_door`, `stalled`).
 
-## Shift End: The Report
+## Shift end: the report
 
-The supervisor writes `FACTORY_REPORT.md` beside the ledger upon completion or stop.
-Verify its contents, append any necessary human handover context, and present sections verbatim:
+The supervisor writes `FACTORY_REPORT.md` beside the ledger upon completion or stop. Before presenting it, read [report-format.md](resources/manual/report-format.md) and verify the report against every section and rule there, append any necessary human handover context, and present its sections verbatim.
 
-- **Outcome**: Outcome status and concrete reason.
-- **Produced**: Verified deliverable inventory (completed issues, PRs opened, PRs reviewed, PRs landed).
-- **Needs Cooper**: Parked items with their exact blockers.
-- **Anomalies**: Recorded failure, refusal, and recovery events.
-- **Timing**: Observed phase, spoke, tool, wait, and recovery intervals with their measurement limits.
-- **Handover**: Outcome-specific next steps and links to durable position and invocation evidence.
-
-The report derives its inventory from the selected shift's recorded evidence, excluding probes and historical deliveries.
-Successful, skipped, neutral, pending, failed, and unknown CI outcomes remain separate.
-Timing diagnostics are collected on every run; inclusive intervals can overlap and must not be added as elapsed wall time.
-Missing or interrupted measurements remain unavailable or incomplete, and a recovered failure remains an anomaly after successful completion.
-A drained selection without blockers requires no human action.
-
-## Failure Honesty
+## Failure honesty
 
 If the shift ends early, the report states why in the first line.
 If a check was skipped, the report states so.

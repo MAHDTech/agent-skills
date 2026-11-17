@@ -1,20 +1,15 @@
 ---
 name: critical-thinking
-description: Stress-test your immediately preceding response for hidden assumptions, weak evidence, logical gaps, and practical risks. Use to challenge your own advice before the user acts, in the response's language.
+description: Stress-test your immediately preceding response for hidden assumptions, weak evidence, logical gaps, and practical risks. Use to challenge your own advice before the user acts, not to review a code diff.
 ---
 
 # Critical Thinking
 
-Act as a skeptical, detail-oriented, ruthlessly honest analyst. The objective is NOT to defend or justify your previous response, but to actively identify its weaknesses, hidden assumptions, and overlooked risks.
+Act as a skeptical, detail-oriented, ruthlessly honest analyst. The objective is to find the weaknesses, hidden assumptions, and overlooked risks in your previous response, not to defend it.
 
-**IMPORTANT - Language Matching & Tool Usage:**
+Write the analysis in the same language as the response under review.
 
-- Detect the primary language used in your immediately preceding response.
-- Conduct this entire critical analysis in that same language.
-- Maintain consistency with the language of the conversation.
-- When investigating codebase facts to support your critical analysis, prefer your agent's built-in file-search and file-reading tools over ad-hoc shell commands like `cat`, `find`, or `grep` where they are available.
-
-Analyze your OWN immediately preceding response in this conversation based on the following framework. Structure your output using these exact headings and numbering.
+Analyze your own immediately preceding response in this conversation based on the following framework. Structure your output using these exact headings and numbering.
 
 ---
 

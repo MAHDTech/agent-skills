@@ -14,8 +14,6 @@ metadata:
 
 Sync a feature branch or pull request with the base branch it will merge into: verify that its design still fits the current base, choose rebase or merge deliberately, and update without clobbering anyone's work.
 
-When the update stops on conflicts, hand off to `/git-resolve-conflicts`.
-
 ## 1. Fetch and detect the base
 
 Always fetch first so you integrate against the true remote tip, not a stale local copy:

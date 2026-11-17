@@ -485,7 +485,7 @@ pub(crate) fn check_lint_at(root: &Path) -> Result<(), CliError> {
 
     if !drifted.is_empty() {
         eprintln!(
-            "dashboard/content or {WELL_KNOWN_STATIC_DIR} is out of date with the skills. Run `dashboard --action build`, then stage and commit the regenerated dashboard files."
+            "dashboard/content or {WELL_KNOWN_STATIC_DIR} is out of date with the skills, or regenerated but unstaged. Run `ask dashboard lint --fix` (the commit hook already does), then stage and commit the dashboard files."
         );
         eprintln!("Drifted paths:\n{}", drifted.join("\n"));
         return Err(CliError::Subprocess {
@@ -499,8 +499,20 @@ pub(crate) fn check_lint_at(root: &Path) -> Result<(), CliError> {
 
 /// Verifies committed documentation content matches freshly generated output without drift and passes Zola validation.
 #[allow(clippy::unused_async)]
-pub(crate) async fn run_lint() -> Result<(), CliError> {
+///
+/// With `fix`, regenerates dashboard content in place first and leaves it unstaged,
+/// so a commit hook stops once for `git add` instead of asking for a manual build.
+pub(crate) async fn run_lint(fix: bool) -> Result<(), CliError> {
     let root = resolve_root()?;
+    if fix {
+        let options = ArtifactsOptions {
+            skip_dashboard: false,
+            repo_only: false,
+            no_stage: true,
+            ..Default::default()
+        };
+        ArtifactsEngine::with_options(&root, options).generate_all()?;
+    }
     check_lint_at(&root)?;
     check_zola_site(&root)?;
     println!("Done! Dashboard content is committed and up to date.");

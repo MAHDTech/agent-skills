@@ -76,7 +76,6 @@ Do not log trivial, self-evident edits (e.g. fixing a typo, running a standard l
 1. **One row, one decision:** Every row must represent a single, focused checkpoint fitting entirely on one line.
 2. **Append-only integrity:** Never edit or delete existing rows. If a prior decision is reversed or found flawed, append a new row recording the pivot and rationale.
 3. **Concrete evidence pointers:** Evidence must point to a reproducible artifact, commit SHA, file line, or test run.
-4. **No em-dashes:** Do not use Unicode U+2014 em-dashes in log messages or documentation. Use standard hyphens, colons, or commas.
 
 ## Transcript Audit
 

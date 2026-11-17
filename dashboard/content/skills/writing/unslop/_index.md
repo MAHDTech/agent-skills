@@ -1,6 +1,6 @@
 +++
 title = "unslop"
-description = "Edit writing to remove AI cliches, filler, robotic phrasing, and decorative formatting while preserving meaning and facts. Use when text needs a natural human voice, varied rhythm, and plain language."
+description = "Edit writing to remove AI cliches, filler, and robotic phrasing, then fix spelling, grammar, and links. Use when a post, README, or doc needs plain language before publication."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,18 +12,19 @@ mermaid = false
 
 # Unslop
 
-Edit text to remove AI patterns and add human voice.
+Edit text to remove AI patterns, restore the author's voice where it belongs, and leave it free of mechanical errors.
 
 ## Process
 
 1. **Scan for patterns.** Audit the input against the detection list below.
 2. **Rewrite cleanly.** Preserve original meaning and facts while matching the intended tone.
-3. **Add soul.** Inject opinion, varied cadence, and authentic voice.
-4. **Self-audit.** Check: "What still makes this obviously AI-generated?" Fix remaining tells before finishing.
+3. **Add soul where voice is wanted.** For posts, READMEs, and other prose that carries the author's voice, apply the section below. For specs, reference docs, and code comments, remove the tells only and keep facts and wording neutral.
+4. **Self-audit.** Check: "What still makes this obviously AI-generated?" Fix remaining tells.
+5. **Proofread.** Make a final pass, described below, before finishing.
 
 ## Adding soul
 
-Removing patterns is half the job. Sterile, voiceless writing is just as obvious.
+Applies only to prose where the author's voice is wanted. Removing patterns is half the job there; sterile, voiceless writing is just as obvious.
 
 - **Have opinions.** React to facts instead of neutrally listing pros and cons.
 - **Vary rhythm.** Short sentences. Then longer ones that take their time. Mix it up.
@@ -54,7 +55,7 @@ Removing patterns is half the job. Sterile, voiceless writing is just as obvious
 
 ### Style
 
-1. **Em dash overuse.** Avoid em dashes entirely. Use periods or commas only (no parentheses, no en dashes, no hyphen-as-dash substitutes). Em dashes are an AI tell, and reaching for parentheses instead just trades one tell for another. If a thought needs separation, end the sentence or use a comma.
+1. **Em dashes.** Replace each em dash with a period, comma, colon, or parentheses, whichever fits the sentence. Use a spaced hyphen only as a hyphen, never as a dash substitute.
 2. **Colon overuse.** Colons are fine before a list or example. Not as mid-sentence connectors. "If you're coming from traditional automation: instead of registering event handlers, you describe conditions" adds nothing with the colon. Rewrite to let the point stand on its own without comparison framing. "Describing when the scheduler should fire works best as plain English." Same meaning, no crutch punctuation.
 3. **Boldface overuse.** Don't bold every proper noun or acronym.
 4. **Inline-header lists.** The tell is a bold label and colon that restates the line: "**Performance:** Performance improved...". Convert those to prose. A bold lead-in that ends in a period, names the item, and is followed by genuinely new detail ("**Schema in TypeScript.** Tables live in one file.") is fine, not a tell.
@@ -85,4 +86,15 @@ Removing patterns is half the job. Sterile, voiceless writing is just as obvious
 3. **Active voice.** Prefer it. Catch "is/are/was/were + past participle" and name the actor: "queries are validated" becomes "the compiler validates queries", "the file is parsed by the loader" becomes "the loader parses the file". Passive is fine only when the actor is unknown or genuinely doesn't matter.
 4. **Cut adverbs, or use a stronger verb.** "runs quickly" becomes "is fast" or the number. "significantly improves" becomes the measured delta. An adverb propping up a weak verb means the verb is wrong.
 5. **Prefer the plain word.** "utilize" becomes "use", "leverage" becomes "use", "facilitate" becomes "help", "numerous" becomes "many", "in the event that" becomes "if". The fancier synonym is rarely clearer.
+
+## Final proofreading pass
+
+After the rewrite, read the whole text once more for mechanical errors and fix them in place:
+
+- Spelling, typos, and wrong-word usage ("their" for "there").
+- Grammar: subject-verb agreement, tense consistency, punctuation.
+- Repeated words and phrases within a sentence or paragraph.
+- Links: empty, placeholder, or incomplete URLs. Fix them when the target is clear; otherwise flag them.
+
+Report logic errors, contradictions, and unsupported claims to the user instead of rewriting them. If the text is clean, say so.
 

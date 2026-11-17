@@ -14,7 +14,7 @@ mermaid = false
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Take the current conversation context and codebase understanding and produce a spec (you may know this document as a PRD). Do NOT interview the user - just synthesize what you already know.
+Take the current conversation context and codebase understanding and produce a spec (you may know this document as a PRD). Synthesize what you already know rather than running a new interview; the only question to put to the user is the seam check in step 2.
 
 Work from your project's conventions: its issue tracker (GitHub via `gh`, Linear, or local files), triage label vocabulary, domain glossary, and any ADRs in the area you are touching. If those conventions have not been established, ask the user before publishing.
 
@@ -24,7 +24,7 @@ Work from your project's conventions: its issue tracker (GitHub via `gh`, Linear
 
 2. Sketch out the seams at which you will test the feature. Prefer existing seams to new ones, and use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
-   Check with the user that these seams match their expectations.
+   Confirm the seams with the user in a single message, then continue.
 
 3. Write the spec using the template below, then publish it to your project's issue tracker. Apply the project's ready-for-agent triage label (or its equivalent) - no need for additional triage.
 

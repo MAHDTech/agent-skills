@@ -25,6 +25,23 @@ struct ExpandedResourceTarget {
     is_top_level: bool,
 }
 
+/// Outcome of downloading documentation resources across many skills.
+#[derive(Debug, Clone, Default)]
+pub struct ResourceDownloadReport {
+    /// Files saved per skill name.
+    pub files: HashMap<String, Vec<ResourceFile>>,
+    /// Skills whose download failed, with the error; their previous files are kept.
+    pub failed: Vec<(String, String)>,
+}
+
+impl ResourceDownloadReport {
+    /// Total number of files saved across all skills.
+    #[must_use]
+    pub fn file_count(&self) -> usize {
+        self.files.values().map(Vec::len).sum()
+    }
+}
+
 /// Default request timeout for downloads in seconds.
 pub const DEFAULT_TIMEOUT_SECS: u64 = 60;
 /// Default maximum retry attempts for transient HTTP errors.
@@ -83,14 +100,42 @@ impl SkillDownloader {
     }
 
     /// Fetches the raw string content of a URL with exponential backoff retries.
-    #[allow(tail_expr_drop_order)]
+    ///
+    /// A `.md` URL that returns 404 is retried once with `Accept: */*`. Some
+    /// documentation hosts (docs.x.ai) serve `<page>.md` only without a Markdown
+    /// `Accept` header, and 404 when both ask for Markdown.
     pub async fn fetch_url(&self, url: &str) -> Result<String> {
+        match self.fetch_url_with_accept(url, None).await {
+            Err(SkillError::Network { message, .. })
+                if message == Self::not_found_message() && Self::is_markdown_path(url) =>
+            {
+                self.fetch_url_with_accept(url, Some("*/*")).await
+            }
+            other => other,
+        }
+    }
+
+    fn not_found_message() -> String {
+        format!("HTTP error: status {}", StatusCode::NOT_FOUND)
+    }
+
+    fn is_markdown_path(url: &str) -> bool {
+        let path = url.split(['?', '#']).next().unwrap_or(url);
+        path.to_ascii_lowercase().ends_with(".md")
+    }
+
+    #[allow(tail_expr_drop_order)]
+    async fn fetch_url_with_accept(&self, url: &str, accept: Option<&str>) -> Result<String> {
         let mut attempts = 0;
         let mut delay = Duration::from_millis(500);
 
         loop {
             attempts += 1;
-            match self.client.get(url).send().await {
+            let mut request = self.client.get(url);
+            if let Some(accept) = accept {
+                request = request.header(ACCEPT, accept);
+            }
+            match request.send().await {
                 Ok(response) => {
                     let status = response.status();
                     if status.is_success() {
@@ -172,7 +217,10 @@ impl SkillDownloader {
         for target in &all_targets {
             let content = match self.fetch_url(&target.url).await {
                 Ok(c) => c,
-                Err(_) if all_targets.len() > 1 && !target.is_top_level => continue,
+                Err(err) if all_targets.len() > 1 && !target.is_top_level => {
+                    eprintln!("Warning: skipped linked page {}: {err}", target.url);
+                    continue;
+                }
                 Err(err) => return Err(err),
             };
             if let Some(ref expected_digest) = target.expected_digest
@@ -449,19 +497,26 @@ impl SkillDownloader {
     }
 
     /// Downloads resources across a collection of skills.
-    pub async fn download_all_resources(
-        &self,
-        skills: &[Skill],
-    ) -> Result<HashMap<String, Vec<ResourceFile>>> {
-        let mut results = HashMap::new();
+    ///
+    /// A skill whose download fails keeps its existing `resources/auto/` files
+    /// and is recorded in [`ResourceDownloadReport::failed`]; the other skills
+    /// still download, so one unreachable site does not block a refresh.
+    pub async fn download_all_resources(&self, skills: &[Skill]) -> ResourceDownloadReport {
+        let mut report = ResourceDownloadReport::default();
         for skill in skills {
             if !Self::is_managed_resource_skill(skill) {
                 continue;
             }
-            let files = self.download_skill_resources(skill).await?;
-            results.insert(skill.name().to_string(), files);
+            match self.download_skill_resources(skill).await {
+                Ok(files) => {
+                    report.files.insert(skill.name().to_string(), files);
+                }
+                Err(err) => report
+                    .failed
+                    .push((skill.name().to_string(), err.to_string())),
+            }
         }
-        Ok(results)
+        report
     }
 
     /// Cleans `<skill_dir>/resources/auto/` directory.

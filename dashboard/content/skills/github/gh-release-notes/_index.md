@@ -14,7 +14,7 @@ mermaid = false
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Turn the history merged since the last release into notes a human actually wants to read, then publish them as a GitHub release. The pairing skill for shipping is `/gh-create-pr` - this picks up after those PRs have merged.
+Turn the history merged since the last release into notes a human actually wants to read, then publish them as a GitHub release.
 
 ## 1. Establish the range
 

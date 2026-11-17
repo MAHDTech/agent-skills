@@ -12,7 +12,7 @@ mermaid = false
 
 # PR Edge Case Review
 
-Review branch changes for logic correctness. This skill finds what breaks, not what looks bad - use refactoring or sculpting code for code quality.
+Review branch changes for logic correctness: find what breaks. Readability and style findings are out of scope.
 
 ## Instructions
 
@@ -35,10 +35,10 @@ Review branch changes for logic correctness. This skill finds what breaks, not w
 
 ### 2. Logic Errors
 
-Flag logic that produces _wrong behavior_, not merely code that could read more cleanly (that is refactoring or sculpting code's job).
+Flag logic that produces _wrong behavior_.
 
 - Conditional branches that are unintentionally mutually exclusive or unreachable, so a case that should run never does
-- Inverted or off-by-one comparisons (`<` vs `<=`, `&&` vs `||`, negation errors) that select the wrong branch
+- Inverted or off-by-one comparisons (`<` vs `<=`, `&&` vs `||`, negation errors) that select the wrong branch, including loop bounds, pagination, and slicing
 - Complex boolean expressions whose operator precedence or short-circuiting yields the wrong result
 - Switch/match statements missing a case, so valid inputs fall through to a wrong default
 - Validation applied in one path but skipped in another that reaches the same sink
@@ -51,7 +51,6 @@ Flag logic that produces _wrong behavior_, not merely code that could read more 
 - Resource exhaustion: unbounded loops, unlimited retries, growing memory
 - Time-dependent behavior: timezone issues, DST, clock skew, expiry edge cases
 - Integer overflow, floating-point precision, string encoding issues
-- Off-by-one errors in loops, pagination, slicing
 
 ### 4. Integration Risks
 

@@ -42,16 +42,16 @@ Vendor snapshots are generated output. Successful refreshes overwrite local edit
 
 Ordinary installation, `ask skills sync`, lint, builds, and tests use the checked-in snapshots. Git restores the complete catalog for any repository commit. `ask skills clean-resources` and documentation downloads leave vendor-owned files untouched.
 
-## Daily update PR
+## Weekly update PR
 
-The scheduled workflow runs daily and can also be started manually. It maintains one combined PR on `automation/vendor-skills`. An unmerged PR is refreshed in place on subsequent runs. Unchanged content produces no additional commits or PRs.
+The scheduled workflow (`.github/workflows/vendor-skills-update.yaml`) runs every Monday at 02:00 UTC and can also be started manually. It refreshes vendor snapshots and every custom skill's `resources/auto/` documentation, and maintains one combined PR on `automation/vendor-skills`. An unmerged PR is refreshed in place on subsequent runs. Unchanged content produces no additional commits or PRs.
 
 The updater can retain successful snapshots already pending in that PR when a later download fails:
 
 ```bash
-ask skills download-resources --vendors-only --pending-ref origin/automation/vendor-skills
+ask skills download-resources --pending-ref origin/automation/vendor-skills
 ```
 
 The pending ref must already be available in the local checkout. A changed source declaration or newer base-branch edits take precedence over pending snapshots. No additional state file is needed.
 
-The workflow uses the repository's GitHub App credentials (`APP_CLIENT_ID` and `APP_PRIVATE_KEY`). Git access to vendor repositories uses existing Git authentication. Download failures appear in the run summary; validation still prevents publishing a conflicting catalog.
+The workflow uses the repository's GitHub App credentials (`APP_CLIENT_ID` and `APP_PRIVATE_KEY`). Git access to vendor repositories uses existing Git authentication. Download failures appear in the run summary and PR body. A skill whose documentation fails to download keeps its previous files, and the other skills still update. Validation (every hook plus the tests) still runs before the PR is opened, so a refreshed document that breaks the dashboard fails the PR's checks instead of reaching the default branch.

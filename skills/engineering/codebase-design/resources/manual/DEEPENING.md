@@ -1,6 +1,6 @@
 # Deepening
 
-How to deepen a cluster of shallow modules safely, given its dependencies. Assumes the vocabulary in [SKILL.md](../SKILL.md) - **module**, **interface**, **seam**, **adapter**.
+How to deepen a cluster of shallow modules safely, given its dependencies. Assumes the vocabulary in [SKILL.md](../../SKILL.md) - **module**, **interface**, **seam**, **adapter**.
 
 ## Dependency categories
 
@@ -36,4 +36,4 @@ Third-party services (payment, messaging, etc.) you do not control. The deepened
 - Tests assert on observable outcomes through the interface, not internal state.
 - Tests should survive internal refactors - they describe behaviour, not implementation. If a test has to change when the implementation changes, it is testing past the interface.
 
-For the loop that writes those interface-level tests, run `/tdd`.
+Write those interface-level tests one at a time, red before green.

@@ -7,7 +7,7 @@ metadata:
 
 # Nutanix Files
 
-Nutanix Files (v5.0) is an enterprise-grade, software-defined, scale-out file storage solution built natively on the Nutanix Cloud Infrastructure (NCI) and Acropolis Distributed Storage Fabric (DSF). It provides high-performance, resilient, and multi-tenant file services supporting SMB (Server Message Block) and NFS (Network File System) protocols for enterprise workloads such as user profile disks (VDI), enterprise application data, home directories, healthcare PACS imaging, and big data analytics.
+Nutanix Files is an enterprise-grade, software-defined, scale-out file storage solution built natively on the Nutanix Cloud Infrastructure (NCI) and Acropolis Distributed Storage Fabric (DSF). It provides high-performance, resilient, and multi-tenant file services supporting SMB (Server Message Block) and NFS (Network File System) protocols for enterprise workloads such as user profile disks (VDI), enterprise application data, home directories, healthcare PACS imaging, and big data analytics.
 
 Nutanix Files combines:
 
@@ -61,7 +61,7 @@ Automate tiering of cold files to Nutanix Objects or external S3 stores:
 Deploy Nutanix File Analytics to track file access operations and enforce security policies:
 
 - **Audit Logging**: Logs all create, read, write, delete, and permission change events.
-- **Ransomware Prevention**: Monitors mass file modification/deletion patterns and automatically isolates infected shares.
+- **Ransomware detection**: Detects abnormal deletion spikes, mass renames, and known ransomware extension patterns, then raises real-time alerts and, where anomaly rules are configured to act, blocks the offending activity. Confirm the available actions for your File Analytics version in `resources/manual/file-analytics-and-monitoring.md`.
 
 ---
 

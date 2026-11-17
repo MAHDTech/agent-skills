@@ -10,41 +10,35 @@ mermaid = false
 +++
 
 
-# Prek (Pre-commit)
+# Prek
 
-`prek` is a fast Git hook manager written in Rust, designed as a drop-in replacement for the deprecated `pre-commit` CLI tool.
+`prek` is a Git hook manager written in Rust and a drop-in replacement for the Python `pre-commit` CLI. It reads the same `.pre-commit-config.yaml` (or its own `prek.toml`).
 
-> [!IMPORTANT]
-> **Command Line & Package Discrepancy:** The CLI binary is `prek`, NOT `pre-commit`. The `pre-commit` CLI tool is deprecated and MUST NOT be used.
+Two meanings of "pre-commit" appear in hook work:
 
-## Key Differences
+- The Git hook stage that runs before a commit is created, and the `.pre-commit-config.yaml` file that configures hooks.
+- The Python `pre-commit` CLI tool.
 
-- **Git concept / stage:** "pre-commit" refers strictly to the Git lifecycle hook stage (e.g. `.pre-commit-config.yaml`).
-- **Legacy CLI Tool (DEPRECATED):** The Python-based `pre-commit` CLI tool is deprecated. **NEVER** add `pkgs.pre-commit` or `pre-commit` package/input to `devenv.nix` or package managers.
-- **Active Hook Runner:** `prek` is the CLI binary used to run and configure pre-commit hooks.
+This skill's policy: run and manage hooks with `prek`, and add `prek` (not the Python `pre-commit` package) wherever a hook runner is installed.
 
-## Running Hooks
+## Running hooks
 
-When working inside a `devenv` shell, run:
+In a devenv project, run prek through the project's devenv shell so hooks find the project's tools. Elsewhere, run it directly:
 
 ```bash
-SECRETSPEC_REASON="running pre-commit hooks" devenv --no-tui shell -- prek run -a
+prek run           # hooks against staged files
+prek run -a        # hooks against every tracked file (--all-files)
 ```
-
-If not using `devenv`, run:
-
-```bash
-prek run -a
-```
-
-Use `-a` or `--all-files` to run hooks against all files in the repository.
 
 ## Commands
 
-- `prek run`: Run hooks against modified files.
-- `prek run -a`: Run hooks against all files.
-- `prek install`: Install prek Git shims into Git's hooks directory.
-- `prek uninstall`: Uninstall prek Git shims.
-- `prek validate-config`: Validate configuration files (`prek.toml` or `.pre-commit-config.yaml`).
-- `prek cache`: Manage the prek cache (e.g., `prek cache clean`).
+- `prek install` / `prek uninstall`: add or remove the Git hook shims.
+- `prek validate-config`: check `prek.toml` or `.pre-commit-config.yaml`.
+- `prek cache clean`: clear cached hook environments.
+
+Run `prek --help` or `prek <command> --help` for the flags of the installed version.
+
+## Completion criteria
+
+- `prek run -a` exits 0, or every failing hook is reported by its id with the error output.
 

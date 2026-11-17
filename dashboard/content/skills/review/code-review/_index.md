@@ -1,6 +1,6 @@
 +++
 title = "code-review"
-description = "Review a diff against a fixed commit, branch, tag, or merge-base for repository standards and spec compliance. Use for branch or PR review with two parallel agents, reporting the axes separately."
+description = "Review a diff against a fixed commit, branch, or tag for repository standards and spec compliance. Use only when the user explicitly requests a branch or PR review, not to hunt edge cases or draft test plans."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -13,6 +13,8 @@ mermaid = false
 <!-- cspell:ignore mattpocock Fowler PRD rerank reranking -->
 
 # Code Review
+
+**Invocation:** Start only when the user explicitly requests this workflow.
 
 Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
@@ -41,17 +43,14 @@ Look for the originating spec, in this order:
 
 1. Issue or ticket references in the commit messages - conventional-commit footers such as `Closes #45`, or a `#123` in the body. Fetch the referenced issue with `gh issue view <number>`, or the pull-request description with `gh pr view`.
 2. A path the user passed as an argument.
-3. A PRD or spec file under `docs/`, `specs/`, `plans/`, or a scratch directory, matching the branch name or feature. In this repo, specs and tickets are typically produced by specification and ticket breakdown, so that is the artefact the Spec axis checks against.
+3. A PRD or spec file under `docs/`, `specs/`, `plans/`, or a scratch directory, matching the branch name or feature.
 4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent skips and reports "no spec available".
 
 ### 3. Identify the standards sources
 
 Anything in the repo that documents how code should be written - a `CONTRIBUTING.md`, an `AGENTS.md` or `CLAUDE.md`, a coding-standards doc, or the conventions the repo's tooling already encodes.
 
-On top of whatever the repo documents, the Standards axis always carries a **smell baseline** - a fixed set of common code smells that applies even when a repo documents nothing. It lives in [code-smells.md](@/skills/review/code-review/resources/manual/code-smells.md). Two rules bind it:
-
-- **The repo overrides.** A documented repo convention always wins; where it endorses something the baseline would flag, suppress the smell.
-- **Always a judgement call.** Each smell is a labelled heuristic ("possible Feature Envy"), never a hard violation - and, like any standard here, skip anything the repo's tooling already enforces.
+On top of whatever the repo documents, the Standards axis always carries a **smell baseline** - a fixed set of common code smells that applies even when a repo documents nothing. It lives in [code-smells.md](@/skills/review/code-review/resources/manual/code-smells.md), together with the two rules that bind it: the repo's documented conventions override the baseline, and every smell is a judgement call.
 
 ### 4. Spawn both sub-agents in parallel
 
@@ -92,7 +91,6 @@ Reporting them separately stops one axis from masking the other.
 
 - `/pr-build-context` - gather high-signal context on a pull request before the review.
 - `/pr-create-test-plan`, `/pr-edge-cases` - draft a manual test plan, or probe edge cases and failure modes on a branch.
-- bug diagnosis - when the Spec axis surfaces a real defect, hand it off to run the defect down.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
 

@@ -13,7 +13,6 @@
         "code-comments",
         "codebase-design",
         "diagnosing-bugs",
-        "domain-modeling",
         "icp",
         "interface-design",
         "model-context-protocol",
@@ -47,7 +46,6 @@
         "grilling",
         "handoff",
         "prioritize-backlog",
-        "software-factory",
         "store-plan",
         "to-spec",
         "to-tickets",
@@ -97,7 +95,6 @@
       "title": "Writing",
       "description": "Proofreading and documentation polish.",
       "skills": [
-        "proofread",
         "simplify-docs",
         "unslop"
       ]

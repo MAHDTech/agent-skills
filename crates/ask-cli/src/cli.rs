@@ -318,8 +318,8 @@ pub enum SkillsCommands {
         /// Refresh vendor snapshots and catalog artifacts without documentation downloads.
         #[arg(long)]
         vendors_only: bool,
-        /// Retain pending snapshots from an existing update branch if a source fails.
-        #[arg(long, requires = "vendors_only")]
+        /// Retain pending vendor snapshots from an existing update branch if a source fails.
+        #[arg(long)]
         pending_ref: Option<String>,
     },
 
@@ -374,7 +374,14 @@ pub enum DashboardCommands {
 
     /// Verify generated documentation markup and anchor link integrity.
     #[command(about = "Verify generated documentation markup and anchor link integrity")]
-    Lint,
+    Lint {
+        /// Regenerate dashboard content in place (unstaged) before checking.
+        #[arg(
+            long,
+            help = "Regenerate dashboard content in place (unstaged) before checking"
+        )]
+        fix: bool,
+    },
 
     /// Regenerate dashboard content and the development search index.
     #[command(about = "Regenerate dashboard content and the development search index")]

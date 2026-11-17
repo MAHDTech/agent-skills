@@ -1,9 +1,10 @@
 ---
-name: Vendor Skills Update
+name: Skills Update
 
 on:
   schedule:
-    - cron: "0 2 * * *"
+    # Weekly, Monday 02:00 UTC.
+    - cron: "0 2 * * 1"
   workflow_dispatch: {}
 
 permissions:
@@ -32,11 +33,11 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
 
-      - name: Refresh Vendor Snapshots
+      - name: Refresh Vendor Snapshots and Documentation
         uses: tars-cloud/actions/composite/run-devenv@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
         with:
           run: |
-            ask skills download-resources --vendors-only \
+            ask skills download-resources \
               --pending-ref refs/remotes/origin/automation/vendor-skills \
               > "$RUNNER_TEMP/vendor-update.md"
             cat "$RUNNER_TEMP/vendor-update.md" >> "$GITHUB_STEP_SUMMARY"
@@ -55,11 +56,12 @@ jobs:
           token: ${{ steps.token.outputs.token }}
           branch: automation/vendor-skills
           base: ${{ github.event.repository.default_branch }}
-          title: "chore(skills): Update vendor skills"
-          commit-message: "chore(skills): refresh vendor snapshots"
+          title: "chore(skills): Update vendor skills and documentation"
+          commit-message: "chore(skills): refresh vendor snapshots and documentation"
           body-path: ${{ runner.temp }}/vendor-update.md
           add-paths: |
             skills/vendor/
+            skills/*/resources/auto/
             README.md
             agents/AGENTS.md
             skills.sh.json

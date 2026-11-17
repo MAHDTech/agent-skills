@@ -10,7 +10,7 @@ use comfy_table::{Attribute, Cell, Table};
 use crate::cli::{OutputFormat, SkillsArgs, SkillsCommands, SyncConflictStrategy, SyncInstallMode};
 use crate::commands::{CliError, resolve_root};
 use skills_core::artifacts::{ArtifactsEngine, ArtifactsOptions};
-use skills_core::downloader::SkillDownloader;
+use skills_core::downloader::{ResourceDownloadReport, SkillDownloader};
 use skills_core::error::SkillError;
 use skills_core::installer::{
     InstallMode, InstallOptions, Installer, TargetEnvironment, UninstallOptions,
@@ -729,12 +729,9 @@ async fn run_download_resources(
     .map_err(|e| SkillError::validation(&root, e.to_string()))??;
     let skills = SkillParser::discover_skills(&root)?;
     let resources = if vendors_only {
-        Ok(0)
+        ResourceDownloadReport::default()
     } else {
-        SkillDownloader::new()
-            .download_all_resources(&skills)
-            .await
-            .map(|results| results.values().map(Vec::len).sum::<usize>())
+        SkillDownloader::new().download_all_resources(&skills).await
     };
     ArtifactsEngine::with_options(
         &root,
@@ -770,13 +767,20 @@ async fn run_download_resources(
             println!("- Preserved **{id}** from the existing update PR.");
         }
         if !vendors_only {
+            println!("\n## Documentation resources\n");
             println!(
-                "\nDownloaded {} documentation resource files.",
-                resources.as_ref().copied().unwrap_or_default()
+                "Downloaded {} files across {} skills.",
+                resources.file_count(),
+                resources.files.len()
             );
+            for (skill, error) in &resources.failed {
+                println!(
+                    "- Kept the previous files for **{skill}**: {}",
+                    error.replace(['\n', '\r'], " ")
+                );
+            }
         }
     }
-    resources?;
     Ok(())
 }
 

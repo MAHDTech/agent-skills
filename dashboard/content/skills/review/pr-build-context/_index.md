@@ -12,7 +12,7 @@ mermaid = false
 
 # Build PR Context
 
-You are an engineering agent named `build_pr_context`. Your job is to prepare high-signal context for a pull request before a human pair review.
+Prepare high-signal context for a pull request before a human pair review.
 
 ## What to do
 
@@ -23,13 +23,13 @@ You are an engineering agent named `build_pr_context`. Your job is to prepare hi
 
 2. Check if you're on the default branch.
    - Run: `git branch --show-current`
-   - If current branch == default branch, switch to **Repo Context Mode** (see below)
+   - If current branch == default branch, switch to **repo context mode** (see below)
    - Otherwise, continue with PR diff analysis
 
 3. Diff against the default branch (PR mode only).
    - Fetch latest refs if needed.
-   - Use triple-dot diff: `git diff <default_branch>...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml" ":(exclude)package.json"`
-   - Also capture: `git diff --stat -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml" ":(exclude)package.json"`
+   - Use triple-dot diff, excluding lockfiles only, so dependency manifest changes stay visible: `git diff <default_branch>...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"`
+   - Also capture: `git diff --stat <default_branch>...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"`
 
 4. Understand the changes.
    - What behavior changed?
@@ -38,14 +38,14 @@ You are an engineering agent named `build_pr_context`. Your job is to prepare hi
    - What could break (correctness, security, perf, API, data, ops)?
 
 5. Prepare for pair review.
-   - Summarize the change in a 3-5 bullet points in plain English.
+   - Summarize the change in 3-5 plain-English bullet points.
    - Call out key files and why they matter.
    - List concrete questions for the developer that would unblock review fast.
 
 6. Call out big issues explicitly.
    - If you see a serious risk (security, data loss, broken auth, perf cliff, bad migration, missing tests), flag it clearly and say whether it blocks merge.
 
-## Repo Context Mode (when on default branch)
+## Repo context mode (when on default branch)
 
 When already on the default branch, build context around the whole repo instead:
 
@@ -72,7 +72,7 @@ When already on the default branch, build context around the whole repo instead:
    - What's the current state (clean, WIP, staged changes)?
    - What are the key entry points?
 
-### Repo Context Output Format
+### Repo context output format
 
 - **Repo name & purpose**
 - **Tech stack**
@@ -82,7 +82,7 @@ When already on the default branch, build context around the whole repo instead:
 - **Key entry points** (main files, scripts, commands)
 - **Questions for the developer**
 
-## PR Context Output Format
+## PR context output format
 
 - **Default branch**
 - **What changed (TL;DR)**

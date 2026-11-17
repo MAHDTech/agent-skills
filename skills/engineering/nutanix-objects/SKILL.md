@@ -38,7 +38,7 @@ aws --endpoint-url $ENDPOINT_URL s3 ls
 # Create a new bucket
 aws --endpoint-url $ENDPOINT_URL s3 mb s3://my-app-bucket
 
-# Upload object with server-side encryption or tags
+# Upload an object
 aws --endpoint-url $ENDPOINT_URL s3 cp dataset.csv s3://my-app-bucket/data/dataset.csv
 ```
 
@@ -57,14 +57,9 @@ Ensure data immutability with WORM policies:
 - **Retention Locking**: After the grace period, objects cannot be deleted or modified until the retention period expires.
 - **Versioning**: Bucket versioning must be enabled to update objects in a WORM bucket.
 
-### 4. Telemetry & Prometheus Monitoring
+### 4. Telemetry and Prometheus monitoring
 
-Expose object store metrics directly to Prometheus:
-
-```bash
-# Scrape Nutanix Objects Prometheus Exporter endpoint
-curl -k https://<objects-exporter-ip>:9443/metrics
-```
+The Nutanix Objects Prometheus Exporter runs on Prism Central. Point an external Prometheus server at the exporter service to collect object store stats (including CPU and memory for Atlas, Object Controller, and Metadata Server) and visualize them in Grafana. See `resources/manual/apis-and-integrations.md` for the exported stats; the manual does not document the scrape endpoint, so confirm it with current Nutanix documentation or your Nutanix account team.
 
 ---
 

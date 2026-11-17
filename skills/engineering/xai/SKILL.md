@@ -5,13 +5,11 @@ resources:
   - https://docs.x.ai/llms.txt
 ---
 
-# xAI & Grok API Integration
+# xAI and Grok API integration
 
-Guidelines for discovering, configuring, and building software with xAI and Grok APIs, SDKs, and endpoints.
+xAI models and SDK capabilities change often, so verify endpoints, model identifiers, parameters, and feature support against current documentation before writing code. The local `resources/auto/` directory holds the documentation index (`resources/auto/llms.txt`), one file per page it lists (named after the page path, such as `resources/auto/developers-models.md` for the API guides, `build-*` for Grok Build, and `cookbook-*` for the cookbook), and the REST API schema (`resources/auto/openapi.json.md`).
 
-Because xAI models and SDK capabilities evolve rapidly, treat the vendored documentation in `resources/auto/` as the single source of truth for available endpoints, model identifiers, API parameters, and feature support.
-
-## OpenAI Compatibility & Client Setup
+## OpenAI compatibility and client setup
 
 xAI APIs provide OpenAI SDK compatibility. Most integration tasks use official OpenAI client libraries configured with xAI endpoints:
 
@@ -31,6 +29,8 @@ xAI APIs provide OpenAI SDK compatibility. Most integration tasks use official O
 - **SDK Setup Example (Python):**
 
   ```python
+  import os
+
   from openai import OpenAI
 
   client = OpenAI(
@@ -39,36 +39,28 @@ xAI APIs provide OpenAI SDK compatibility. Most integration tasks use official O
   )
   ```
 
-## Documentation & API Option Lookup Protocol
+## Documentation lookup
 
-When configuring xAI API integration for a task, follow this lookup protocol:
+When configuring an xAI API integration, follow this lookup order:
 
-1. **Query Vendored Documentation:**
-   Search the `resources/auto/` directory within this skill using pattern or string search tools to verify exact model names, endpoint paths, parameter schemas, and request payloads.
-   - Example search targets: model aliases (`grok-3`, `grok-2-vision`), function calling schema (`tools`), search/web tools (`grok-search`), structured outputs (`response_format`), or vision capabilities.
-2. **Confirm Model & Endpoint Capabilities:**
-   Before making API requests, verify that the selected Grok model supports the intended feature (e.g., multimodal vision inputs vs text-only, web search integration, function calling).
-3. **Handle API Credentials Safely:**
-   Ensure `XAI_API_KEY` is loaded from environment variables or secure secret managers. Never hardcode credentials into source files.
-4. **Update Offline Resources when Outdated:**
-   If a newly announced Grok feature or model identifier is missing from local resources, trigger a resource download:
+1. Read the guide page in `resources/auto/` (for example `developers-models.md`, `developers-tools-function-calling.md`, `developers-tools-web-search.md`, `developers-model-capabilities-text-structured-outputs.md`, or `developers-model-capabilities-images-understanding.md`).
+2. Verify exact endpoint paths, parameter schemas, and request payloads in `resources/auto/openapi.json.md`.
+3. Take model identifiers from the current models page (`resources/auto/developers-models.md`, or `https://docs.x.ai/developers/models` when it may be stale), not from memory or examples, and confirm the selected model supports the intended feature (vision input, server-side search tools, function calling, reasoning).
+4. Load `XAI_API_KEY` from environment variables or a secret manager.
+5. When a page is missing locally or a newly announced feature is absent, check the upstream index at `https://docs.x.ai/llms.txt`. To fetch a page online, request its `.md` URL without an `Accept: text/markdown` header; that combination returns 404.
 
-   ```bash
-   skills --action download-resources --skill xai
-   ```
+## Core integration patterns
 
-## Core Integration Patterns
-
-1. **Model Selection:** Verify current active model strings and pricing/rate-limit tiers in `resources/auto/`.
+1. **Model selection:** Verify current model strings and pricing and rate-limit tiers on the models, pricing, and rate-limits pages listed in the index.
 2. **Streaming & Tool Calling:** Use standard OpenAI-style `stream: true` or `tools` arrays for function calling.
 3. **Structured Outputs:** Use JSON mode or JSON schema response formats when precise downstream parsing is required.
 4. **Vision & Multimodal:** Pass image URLs or base64 data to vision-supported Grok models following standard message content block arrays.
 
-## Completion Criteria
+## Completion criteria
 
 An xAI API integration task is complete when:
 
-1. Target model identifiers, endpoints, and parameters have been validated against vendored docs in `resources/auto/`.
+1. Target model identifiers, endpoints, and parameters have been validated against the current docs pages and `resources/auto/openapi.json.md`.
 2. Client initializations correctly target `https://api.x.ai/v1` and rely on environment-provided `XAI_API_KEY`.
 3. Error handling covers common API response codes (e.g. rate limits, token limit exceeded, invalid key).
 4. Code implementations have been verified against integration tests or mock executions.

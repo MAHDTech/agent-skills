@@ -1,6 +1,6 @@
 +++
 title = "dreamwork"
-description = "Plan issues with the human, then autonomously research, implement, review and council-check them in isolated T3 Code worktrees, returning to the human only for final UAT before landing. Use only when the user explicitly requests Dreamwork."
+description = "Plan issues with the human, then implement and review them autonomously in T3 Code worktrees until final UAT. Use only when the user explicitly requests Dreamwork in T3 Code."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,7 +12,10 @@ mermaid = false
 
 # Dreamwork
 
-Use this skill only when the user explicitly requests its workflow.
+**Invocation:** Start only when the user explicitly requests this workflow.
+
+Dreamwork requires the T3 Code host and its thread, worktree and orchestration tools.
+If they are unavailable, say so and stop.
 
 Dreamwork is a T3 Code procedure built from skill instructions, Markdown and JSON.
 There are no scripts, daemons, schedulers or extra MCP servers. Discussing,

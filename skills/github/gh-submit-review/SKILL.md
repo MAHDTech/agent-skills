@@ -43,24 +43,30 @@ Etiquette: one blocking finding is enough to request changes - do not soften it 
 
 ## 3. Draft the body and inline comments
 
-Apply `/gh-pr-comments` formatting and preflight checks across the review summary and every inline comment:
+Before posting, apply these rules to the review summary and every inline comment. Follow `/gh-pr-comments` for the full checklist when it is installed.
 
-- **Account-aware attribution:** Check `gh api user -q '.login, .type'`. When posting from a human user's login (`type == "User"` and not a dedicated automation account), prefix the summary body and each inline comment with the `[!NOTE]` `🤖 **<model> responding on behalf of <user>**` callout (skipping `responding on behalf of <user>` when authenticated as a dedicated bot or automation account).
+- **Attribution:** When `gh api user -q '.login, .type'` shows a human account, start the summary body and each inline comment with the `> [!NOTE]` callout `> 🤖 **<model> on behalf of <user>**`; skip it on bot or automation accounts.
+- **Preflight scan:** Scan the full outgoing payload, including quoted code and command output, for secrets and private details before posting.
 - **Summary body:** Lead with the verdict and its reason. For request-changes, list the blocking items up front with concrete `file:line`, behavior, or check citations so the author sees them without scrolling.
 - **Inline comments:** Anchor each specific finding to its file and line rather than describing locations in prose. Use `RIGHT` for the new version of the diff, `LEFT` for the old. The line must appear in the PR diff or the API rejects the comment.
-- **Secret and privacy preflight scan:** Before submitting, scan the summary body, every inline comment, and all quoted code or command output for secrets, tokens, internal hostnames or paths, and private details.
 
 ## 4. Submit
 
-**Summary only** (no inline comments) - use `gh pr review` directly and capture the printed review URL:
+Write scratch files to a temp directory outside the working tree so they never land in a commit:
 
 ```bash
-gh pr review <pr> --request-changes --body-file review-body.md
+scratch="$(mktemp -d)"
+```
+
+**Summary only** (no inline comments) - write the body to `"$scratch/review-body.md"`, then use `gh pr review` directly and capture the printed review URL:
+
+```bash
+gh pr review <pr> --request-changes --body-file "$scratch/review-body.md"
 ```
 
 Swap in `--approve` or `--comment` as chosen.
 
-**With inline comments** - build a single JSON payload and post it to the reviews endpoint so the event, body, and all inline comments land as one review, extracting `html_url` to confirm publication:
+**With inline comments** - build a single JSON payload in `"$scratch/review.json"` and post it to the reviews endpoint so the event, body, and all inline comments land as one review, extracting `html_url` to confirm publication:
 
 ```json
 {
@@ -85,13 +91,13 @@ Swap in `--approve` or `--comment` as chosen.
 ```
 
 ```bash
-gh api "repos/{owner}/{repo}/pulls/<pr>/reviews" --input review.json --jq '.html_url'
+gh api "repos/{owner}/{repo}/pulls/<pr>/reviews" --input "$scratch/review.json" --jq '.html_url'
 ```
 
 `event` must be `APPROVE`, `REQUEST_CHANGES`, or `COMMENT`. Omit `event` to leave the review `PENDING` (a draft only you can see) when you want to eyeball it on GitHub before publishing. Use `start_line` with `line` for a multi-line comment.
 
 ## 5. Confirm
 
-Verify that GitHub returned the published review URL (`html_url` from the REST response or the URL printed by `gh pr review`). Report the submitted event, the verified review URL, the summary, the count of inline comments, and the PR URL. Done when the published review URL is confirmed and every intended inline comment is attached.
+Verify that GitHub returned the published review URL (`html_url` from the REST response or the URL printed by `gh pr review`). Remove the scratch directory with `rm -rf "$scratch"`. Report the submitted event, the verified review URL, the summary, the count of inline comments, and the PR URL. Done when the published review URL is confirmed and every intended inline comment is attached.
 
 > Adapted from [t3dotgg/tstack](https://github.com/t3dotgg/tstack) (MIT).

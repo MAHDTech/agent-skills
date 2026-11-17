@@ -20,7 +20,7 @@ Create a well-structured GitHub issue using `gh` CLI, populated with context fro
 
 ## Instructions
 
-1. **Determine the repo** -- confirm you're inside a git repo with a GitHub remote:
+1. **Determine the repo** -- confirm the working directory is a git repo with a GitHub remote:
 
    ```bash
    gh repo view --json nameWithOwner -q '.nameWithOwner'
@@ -30,16 +30,18 @@ Create a well-structured GitHub issue using `gh` CLI, populated with context fro
 
 2. **Synthesize the conversation** into a GitHub issue body following the structure below.
 
-3. **Create the issue** using `gh`:
+3. **Scan before posting.** Scan the full outgoing payload (title, body, quoted code, logs, and links) for secrets and private details, and redact or ask the user before continuing. Follow `/gh-pr-comments` for the full checklist when it is installed.
+
+4. **Create the issue** from a body file outside the working tree, then remove it:
 
    ```bash
-   gh issue create --title "<concise title>" --body "$(cat <<'ISSUE_EOF'
-   <issue body here>
-   ISSUE_EOF
-   )"
+   body="$(mktemp)"
+   # write the issue body to "$body"
+   gh issue create --title "<concise title>" --body-file "$body"
+   rm -f "$body"
    ```
 
-4. **Report back** with the issue URL.
+5. **Report back** with the issue URL.
 
 ## Issue Body Structure
 
@@ -56,12 +58,12 @@ This section should stand alone -- a reader who stops here should understand the
 
 ### Section 2: Context & Discussion
 
-This is the bulk of the issue. Capture everything relevant from our conversation:
+This is the bulk of the issue. Capture everything relevant from the conversation:
 
 - **Background** -- what led to this discussion
 - **Current behavior** -- how things work today (or don't)
 - **Desired behavior** -- what success looks like
-- **Constraints & decisions** -- trade-offs we discussed, options we rejected and why
+- **Constraints & decisions** -- trade-offs discussed, options rejected and why
 - **Technical details** -- relevant code paths, configs, schemas, API shapes, error messages
 - **Related work** -- links to PRs, issues, docs, or external references mentioned
 
@@ -73,17 +75,17 @@ This is the bulk of the issue. Capture everything relevant from our conversation
 - Embed images/screenshots if any were shared (use `![alt](url)` syntax)
 - Wrap code snippets, commands, file paths, and config in fenced code blocks with language tags
 - Use `<details><summary>...</summary>...</details>` to collapse verbose content (logs, full configs, large code blocks) so the issue stays scannable
-- Do NOT strip context -- preserve the substance of our discussion, but reorganize it logically
+- Preserve the substance of the discussion, reorganized by topic
 
 ### Section 3: Implementation Plan
 
-End with the plan we've aligned on (even if rough). Frame it for a future agent or developer picking this up cold:
+End with the agreed plan (even if rough). Frame it for a future agent or developer picking this up cold:
 
 - Number the steps
 - Call out key files to create or modify
 - Note any open questions or decisions still TBD (prefix with `[ ]`)
 - If there are dependencies between steps, make the order explicit
-- If we haven't aligned on a plan yet, write `## Implementation Plan\n\n_TBD -- no plan agreed on yet._`
+- If no plan was agreed, write `## Implementation Plan\n\n_TBD -- no plan agreed on yet._`
 
 ## Labels & Assignment (optional)
 

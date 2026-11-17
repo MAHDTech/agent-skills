@@ -235,10 +235,13 @@ in
         ];
       };
 
+      # `--fix` regenerates dashboard content in place, so it never has to be
+      # rebuilt by hand. Rewritten files are left unstaged: the commit stops
+      # once, then `git add` and commit again.
       dashboard-lint = {
         enable = true;
         name = "Dashboard Lint";
-        entry = "${cargoHook} run -p ask-cli -- dashboard lint";
+        entry = "${cargoHook} run -p ask-cli -- dashboard lint --fix";
         files = "^(skills(-archive)?/.*\\.md$|dashboard/(content|themes|css)/|dashboard/config\\.toml$)";
         excludes = [ ];
         always_run = true;
@@ -472,9 +475,11 @@ in
   # Skipped under `devenv test`, which would otherwise start them alongside the tests.
   processes = lib.mkIf (isNative && !config.devenv.isTesting) {
     # Downloaded reference docs link to heading anchors that Zola slugs
-    # differently, which prints thousands of warnings on every rebuild. They are
-    # filtered here so real errors stay visible; `ask dashboard lint` still shows them.
-    zola.exec = "zola --root dashboard serve --port 3000 2>&1 | grep --line-buffered -v 'The anchor in the link'";
+    # differently, and their code fences carry info strings Zola's highlighter
+    # does not know (`theme={null}`, `candid`). Both print thousands of warnings
+    # on every rebuild, so they are filtered here to keep real errors visible;
+    # `ask dashboard lint` still shows them.
+    zola.exec = "zola --root dashboard serve --port 3000 2>&1 | grep --line-buffered -v -e 'The anchor in the link' -e 'Language `.*` not found'";
     tailwind.exec = "tailwindcss -i dashboard/css/input.css -o dashboard/static/build/css/generated.css --watch=always";
     dashboard-watch.exec = "dashboard-watch";
   };
