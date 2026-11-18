@@ -1,7 +1,10 @@
 # lychee configuration file - link checker
 
 # Accept status codes from hosts that block/deny automated checkers.
-accept = ["200..=299", "403", "406", "429"]
+# 503: github.com answers anonymous /blob/ page requests with random 503s, even
+# with a token, per-host throttling, or retries. lychee cannot scope `accept`
+# to one host, and a 503 never means a link is dead (404/410 still fail).
+accept = ["200..=299", "403", "406", "429", "503"]
 
 # Retry transient network/server errors before marking a link broken.
 max_retries = 2
