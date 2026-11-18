@@ -23,7 +23,6 @@ let
     cargo-watch
     clang
     codeql
-    convco
     figlet
     git
     hello
@@ -212,8 +211,9 @@ in
         files = rustInputs;
       };
       commitizen.enable = true;
+      # HACK: TODO: convco is broken upstream
       convco = {
-        enable = true;
+        enable = false;
         settings = {
           configPath = ".versionrc";
         };
