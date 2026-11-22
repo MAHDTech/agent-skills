@@ -1,0 +1,7 @@
+interface:
+  display_name: "Reverse Engineer Binary"
+  short_description: "Reverse engineer binaries and packages with tiered CLI triage"
+  default_prompt: "Use $reverse-engineer-binary to analyze a compiled binary or packaged app."
+
+policy:
+  allow_implicit_invocation: false
