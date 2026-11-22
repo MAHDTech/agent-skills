@@ -25,8 +25,10 @@ description: Single source of truth for agent instructions
 - **optimize-performance**: Improve an existing hot path using benchmarks and profiling. Use for latency, throughput, or memory targets; route newly introduced slowdowns to regression diagnosis.
 - **productionize-app**: Prepare an entire application for production when explicitly requested. Audit and fix configuration, reliability, security, observability, packaging, and deployment readiness.
 - **research**: Research a technical question against primary sources and save the cited findings as a Markdown note in the repo. Use when the user wants a saved, cited research note, not a quick doc lookup.
+- **reverse-engineer-binary**: Reverse engineer compiled binaries, packaged apps, Electron bundles, or APKs via tiered CLI triage and evidence-backed critique when explicitly requested. Skip for ordinary source repositories.
 - **sculpt-code**: Refactor a scoped diff or selected files for clearer naming, control flow, structure, and less duplication or dead code. Use for cleanup that preserves behavior.
 - **tdd**: Build features or fixes test-first using a red-to-green loop. Use for behavior-focused integration tests, choosing public test seams, and avoiding tests coupled to internals.
+- **understand-codebase**: Analyze a source codebase into an evidence-backed architecture teardown, critique, and transferable learnings report when explicitly requested. Skip for shallow PR briefings or compiled binaries.
 - **upgrade-dependencies**: Upgrade packages, frameworks, or language/runtime versions using release notes and a green test baseline. Use for version bumps, breaking migrations, and lockfile changes.
 - **xai**: Integrate or debug xAI/Grok APIs and SDKs. Use for client configuration, model capabilities, streaming, tool calling, structured output, vision, or search integration.
 

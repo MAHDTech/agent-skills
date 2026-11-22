@@ -24,8 +24,10 @@
         "optimize-performance",
         "productionize-app",
         "research",
+        "reverse-engineer-binary",
         "sculpt-code",
         "tdd",
+        "understand-codebase",
         "upgrade-dependencies",
         "xai"
       ]

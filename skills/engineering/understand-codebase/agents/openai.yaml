@@ -1,0 +1,7 @@
+interface:
+  display_name: "Understand Codebase"
+  short_description: "Analyze and critique a source codebase with evidence"
+  default_prompt: "Use $understand-codebase to analyze a source repository and extract learnings."
+
+policy:
+  allow_implicit_invocation: false

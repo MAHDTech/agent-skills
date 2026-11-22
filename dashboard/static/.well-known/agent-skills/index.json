@@ -380,6 +380,13 @@
       "digest": "sha256:fe5dce0767bd5bb8c58c93d60ff763a535711ac07cf6baeb47b10615d03eb258"
     },
     {
+      "name": "reverse-engineer-binary",
+      "type": "skill-md",
+      "description": "Reverse engineer compiled binaries, packaged apps, Electron bundles, or APKs via tiered CLI triage and evidence-backed critique when explicitly requested. Skip for ordinary source repositories.",
+      "url": "/.well-known/agent-skills/reverse-engineer-binary/SKILL.md",
+      "digest": "sha256:8e299215c4c023b4f366ff438fe6fbe33a7e34f4cab32bec6586aca91c48e395"
+    },
+    {
       "name": "rfc-review",
       "type": "skill-md",
       "description": "Review an RFC or design document before approval for problem clarity, relevant compliance concerns, security, and performance. Use to return only the three to five most consequential issues with concrete suggestions.",
@@ -447,7 +454,7 @@
       "type": "skill-md",
       "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:d3a12951f5c671f4c5dccd2483547e456e007278f36df5901272277d2f0f7bf4"
+      "digest": "sha256:6d800fae48fadebb7616abe1f9fa46c7b1565356a0477dde50c147a5b3ddb89c"
     },
     {
       "name": "store-plan",
@@ -490,6 +497,13 @@
       "description": "Maintain an append-only TSV decision trail and audit its evidence against the transcript. Use when explicitly requesting a persistent audit trail for autonomous work, multi-phase migrations, or risky refactors.",
       "url": "/.well-known/agent-skills/total-recall/SKILL.md",
       "digest": "sha256:e11a5433199cb7f1801d3a63c88ad0e42de8b7b11175799b7cfbf71c70d692fc"
+    },
+    {
+      "name": "understand-codebase",
+      "type": "skill-md",
+      "description": "Analyze a source codebase into an evidence-backed architecture teardown, critique, and transferable learnings report when explicitly requested. Skip for shallow PR briefings or compiled binaries.",
+      "url": "/.well-known/agent-skills/understand-codebase/SKILL.md",
+      "digest": "sha256:61c831d96fbb07da6386851ae47509ca63deca8a8ed1c542e3d1711887830f71"
     },
     {
       "name": "unslop",
