@@ -1,9 +1,43 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.58](https://github.com/MAHDTech/agent-skills/compare/v0.1.57...7f4282fa5c69f305fd690dbeeda4bc3821f09e85) (2026-11-09)
+### [v0.1.59](https://github.com/MAHDTech/agent-skills/compare/v0.1.58...ac46f4638ab34ff29a10e8e739b358c078bc49c3) (2026-11-23)
 
-### Features
+#### Features
+
+* **skills:** add understand-codebase and reverse-engineer-binary skills
+(#343)
+([c2346aa](https://github.com/MAHDTech/agent-skills/commit/c2346aa5cf653218bb2d34b7cb5d20b16463ade5)),
+closes [#343](https://github.com/MAHDTech/agent-skills/issues/343)
+* fix skill sync targets and align the dashboard with mahdtech.com (#332)
+([edee4df](https://github.com/MAHDTech/agent-skills/commit/edee4df19f077269461f077ffe518ead3dce83a2)),
+closes [#332](https://github.com/MAHDTech/agent-skills/issues/332)
+* **skills:** add DBOS vendor skills from dbos-inc/agent-skills (#326)
+([c3b759c](https://github.com/MAHDTech/agent-skills/commit/c3b759ceff18c8e8c204b930dc14529c3e04cc44)),
+closes [#326](https://github.com/MAHDTech/agent-skills/issues/326)
+
+#### Fixes
+
+* need convco (#340)
+([61d7b2c](https://github.com/MAHDTech/agent-skills/commit/61d7b2c0f9101553d8577ff2efa584741c8d236e)),
+closes [#340](https://github.com/MAHDTech/agent-skills/issues/340)
+* convco (#339)
+([96339a6](https://github.com/MAHDTech/agent-skills/commit/96339a6f5a5dd2af2c1d060528ed2b2a23425163)),
+closes [#339](https://github.com/MAHDTech/agent-skills/issues/339)
+* **ci:** accept 503 in lychee for throttled GitHub blob links (#338)
+([0661f4b](https://github.com/MAHDTech/agent-skills/commit/0661f4b3508a25f954579b51c75200496b052bbb)),
+closes [#338](https://github.com/MAHDTech/agent-skills/issues/338)
+* **ci:** harden lychee exclusions and ignore flaky ICP gateway (#328)
+([a83324b](https://github.com/MAHDTech/agent-skills/commit/a83324bf0b0fce1b7b2989e34be9d618bfd863b2)),
+closes [#328](https://github.com/MAHDTech/agent-skills/issues/328)
+* **skills:** decouple skills from auto resource links and harden git hooks
+(#321)
+([9a59538](https://github.com/MAHDTech/agent-skills/commit/9a5953803f671634ccb743ba75a088374176c298)),
+closes [#321](https://github.com/MAHDTech/agent-skills/issues/321)
+
+### [v0.1.58](https://github.com/MAHDTech/agent-skills/compare/v0.1.57...v0.1.58) (2026-11-10)
+
+#### Features
 
 * **skills:** add cross-platform interface design guidance (#318)
 ([1d2b8a4](https://github.com/MAHDTech/agent-skills/commit/1d2b8a4cec38e1f485231a7d57b2b01cd5a1974b)),
