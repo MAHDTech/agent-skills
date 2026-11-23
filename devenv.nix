@@ -211,9 +211,8 @@ in
         files = rustInputs;
       };
       commitizen.enable = true;
-      # HACK: TODO: convco is broken upstream
       convco = {
-        enable = false;
+        enable = true;
         settings = {
           configPath = ".versionrc";
         };
