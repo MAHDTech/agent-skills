@@ -379,6 +379,13 @@
       ]
     },
     {
+      "name": "reverse-engineer-binary",
+      "description": "Reverse engineer compiled binaries, packaged apps, Electron bundles, or APKs via tiered CLI triage and evidence-backed critique when explicitly requested. Skip for ordinary source repositories.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "name": "rfc-review",
       "description": "Review an RFC or design document before approval for problem clarity, relevant compliance concerns, security, and performance. Use to return only the three to five most consequential issues with concrete suggestions.",
       "files": [
@@ -486,6 +493,13 @@
     {
       "name": "total-recall",
       "description": "Maintain an append-only TSV decision trail and audit its evidence against the transcript. Use when explicitly requesting a persistent audit trail for autonomous work, multi-phase migrations, or risky refactors.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "understand-codebase",
+      "description": "Analyze a source codebase into an evidence-backed architecture teardown, critique, and transferable learnings report when explicitly requested. Skip for shallow PR briefings or compiled binaries.",
       "files": [
         "SKILL.md"
       ]

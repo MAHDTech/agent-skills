@@ -52,6 +52,8 @@ A starting situation that generates work, then merges onto the main flow:
 - `/wayfinder` - reach for this when the work is too big for one session and the way to the destination isn't visible yet.
 - `/dreamwork` - reach for this only in T3 Code, when a set of issues should be planned with you, then implemented, reviewed, and council-checked autonomously in isolated worktrees, returning to you for UAT before landing.
 - `/research` - reach for this when you want a question answered from primary sources and saved as a cited note in the repo.
+- `/understand-codebase` - reach for this when you want an evidence-backed teardown of a source repository: what it does, how it's architected, strengths, weaknesses, and transferable learnings.
+- `/reverse-engineer-binary` - reach for this when source code is absent and you need tiered CLI triage and critique of a compiled binary, Electron/ASAR bundle, APK, or packaged app.
 
 ## Shaping the backlog
 
