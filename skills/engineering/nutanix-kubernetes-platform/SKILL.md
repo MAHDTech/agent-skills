@@ -92,3 +92,11 @@ When executing specific NKP lifecycle tasks, refer to the dedicated manual refer
 | **AI Navigator & MCP Integration**   | [`resources/manual/ai-navigator.md`](resources/manual/ai-navigator.md)                                               | AI Navigator setup, Azure OpenAI integration, NKP MCP server capabilities.                                   |
 | **NKP Insights & Telemetry**         | [`resources/manual/nkp-insights-guide.md`](resources/manual/nkp-insights-guide.md)                                   | NKP Insights configuration, alert rules, Bring Your Own Storage (BYOS) metrics.                              |
 | **Master Documentation Index**       | [`resources/manual/master-index.md`](resources/manual/master-index.md)                                               | Master overview of all 13 documentation modules.                                                             |
+
+---
+
+## Completion criteria
+
+- Verify cluster, node, and workspace health with `kubectl get nodes`, `kubectl get clusters -A`, and `nkp get workspaces`, and capture `nkp diagnose` when troubleshooting failures.
+- Confirm upgrades follow the documented sequence (Kommander, workspace apps, management cluster, then workload clusters, one minor version at a time) with target VM images already present in Prism Central.
+- When advising without live cluster access, cite the matching `resources/manual/` module and the documented NKP version snapshot (v2.18).

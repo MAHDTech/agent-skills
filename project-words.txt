@@ -1,4 +1,3 @@
-afsi
 agentclientprotocol
 agentic
 allssh
@@ -88,6 +87,7 @@ driveupload
 edgecase
 eframe
 egui
+elif
 endcomponent
 endmacro
 endraw
@@ -97,6 +97,7 @@ evans
 evictable
 evolog
 fastcdc
+feff
 fileset
 filesets
 fips
@@ -109,6 +110,7 @@ fsvm
 fsvms
 functools
 gamedev
+getenv
 getzola
 ghidra
 ghostty
@@ -126,6 +128,7 @@ hardlinked
 headlessly
 headRefName
 headRefOid
+healthz
 herdr
 hexdump
 hitl
@@ -244,6 +247,7 @@ radare
 ratatui
 readelf
 readlink
+readyz
 realpath
 refspec
 reinstall
@@ -330,6 +334,7 @@ toolsdirectory
 toplevel
 tracestate
 tstack
+typechecks
 unitless
 unmirrored
 unreachability

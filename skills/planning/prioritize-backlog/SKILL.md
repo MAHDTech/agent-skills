@@ -38,6 +38,12 @@ The highest-leverage move in grooming is subtraction. For each low-scoring item 
 
 Cap the groomed, ordered zone - only the next chunk needs to be sharp. Everything past the line stays coarse: a rough parking lot you re-groom, not a queue you maintain. Re-groom on a cadence (each iteration, each intake) rather than letting the pile drift.
 
+## Done when
+
+- Every candidate item is scored through one consistent lens (Value vs effort, RICE, or WSJF).
+- Every cut item lists a brief rationale (no owner or impact, duplicate, superseded, or cost exceeds value).
+- The capped top zone is clustered and ordered with zero dependency inversions (no item sits above a blocker it depends on), and remaining items stay in a coarse parking lot.
+
 ## Handoffs
 
 - Once the top items are ordered and sharp, split them into buildable slices with `/to-tickets`.

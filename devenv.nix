@@ -38,19 +38,20 @@ let
   ];
 
   hookBinPath = lib.makeBinPath (
+    with pkgs;
     [
       config.languages.rust.toolchainPackage
-      pkgs.clang
-      pkgs.stdenv.cc
-      pkgs.pkg-config
-      pkgs.cmake
-      pkgs.git
-      pkgs.zola
-      pkgs.tailwindcss_4
-      pkgs.pagefind
-      pkgs.coreutils
+      clang
+      stdenv.cc
+      pkg-config
+      cmake
+      git
+      zola
+      tailwindcss_4
+      pagefind
+      coreutils
     ]
-    ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.mold ]
+    ++ lib.optionals stdenv.isLinux [ mold ]
   );
 
   rustHookEnv = lib.concatStringsSep "\n" (
@@ -137,16 +138,24 @@ in
   '';
 
   languages = {
-    nix.enable = isNative;
-    javascript.enable = false;
-    typescript.enable = false;
+    nix = {
+      enable = isNative;
+    };
+    javascript = {
+      enable = false;
+    };
+    typescript = {
+      enable = false;
+    };
     shell = {
       enable = isNative;
     };
     rust = {
       enable = isNative;
       toolchainFile = ./rust-toolchain.toml;
-      mold.enable = pkgs.stdenv.isLinux;
+      mold = {
+        enable = pkgs.stdenv.isLinux;
+      };
     };
   };
 
@@ -200,7 +209,9 @@ in
           "\\.rs$"
         ];
       };
-      check-symlinks.enable = true;
+      check-symlinks = {
+        enable = true;
+      };
       check-yaml = {
         enable = true;
         excludes = [ "^skills/vendor/" ];
@@ -210,7 +221,9 @@ in
         entry = lib.mkForce "${cargoHook} clippy --workspace --all-targets --locked";
         files = rustInputs;
       };
-      commitizen.enable = true;
+      commitizen = {
+        enable = true;
+      };
       convco = {
         enable = true;
         settings = {
@@ -247,7 +260,9 @@ in
         pass_filenames = false;
         require_serial = true;
       };
-      deadnix.enable = true;
+      deadnix = {
+        enable = true;
+      };
       # Tera 2 component arguments take bare braces (`arg={value}`). A quoted
       # `arg="{value}"` renders the literal text instead of failing the build.
       tera-templates = {
@@ -327,8 +342,12 @@ in
         enable = true;
         excludes = [ "^skills/vendor/" ];
       };
-      prettier.enable = true;
-      ripsecrets.enable = true;
+      prettier = {
+        enable = true;
+      };
+      ripsecrets = {
+        enable = true;
+      };
       rustfmt = {
         enable = true;
         excludes = [ "^skills/vendor/" ];
@@ -384,7 +403,9 @@ in
 
   starship = {
     enable = isNative;
-    config.enable = false;
+    config = {
+      enable = false;
+    };
   };
 
   devcontainer = {
@@ -478,9 +499,15 @@ in
     # does not know (`theme={null}`, `candid`). Both print thousands of warnings
     # on every rebuild, so they are filtered here to keep real errors visible;
     # `ask dashboard lint` still shows them.
-    zola.exec = "zola --root dashboard serve --port 3000 2>&1 | grep --line-buffered -v -e 'The anchor in the link' -e 'Language `.*` not found'";
-    tailwind.exec = "tailwindcss -i dashboard/css/input.css -o dashboard/static/build/css/generated.css --watch=always";
-    dashboard-watch.exec = "dashboard-watch";
+    zola = {
+      exec = "zola --root dashboard serve --port 3000 2>&1 | grep --line-buffered -v -e 'The anchor in the link' -e 'Language `.*` not found'";
+    };
+    tailwind = {
+      exec = "tailwindcss -i dashboard/css/input.css -o dashboard/static/build/css/generated.css --watch=always";
+    };
+    dashboard-watch = {
+      exec = "dashboard-watch";
+    };
   };
 
   enterTest = ''

@@ -83,88 +83,18 @@ The vendored spec and docs in `resources/auto/` are the source of truth. Files p
 - Validate `Origin` (`403` when invalid), bind to `127.0.0.1` when local, and send `X-Accel-Buffering: no` on SSE responses.
 - Follow the authorization spec for remote servers; stdio servers read credentials from the environment instead.
 
-## Deprecations
+## Deprecations and legacy compatibility
 
-Deprecated features still work during the deprecation window, but new servers adopt the replacement.
-
-| Deprecated                                               | Replacement                                                                           |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Roots                                                    | Pass directories or files via tool parameters, resource URIs, or server configuration |
-| Sampling                                                 | Call LLM provider APIs directly                                                       |
-| Logging (`notifications/message`)                        | `stderr` for stdio; OpenTelemetry for observability                                   |
-| Sampling `includeContext: "thisServer"` / `"allServers"` | Omit the field or use `"none"`                                                        |
-| HTTP+SSE transport (`GET /sse` plus `POST /messages`)    | Streamable HTTP                                                                       |
-| OAuth Dynamic Client Registration                        | Client ID Metadata Documents                                                          |
-
-Removed outright in `2026-07-28`: `initialize` / `notifications/initialized`, `ping`, `logging/setLevel` (log level is now per request via `io.modelcontextprotocol/logLevel`), `resources/subscribe` / `resources/unsubscribe` (now `subscriptions/listen`), `notifications/roots/list_changed`, `notifications/elicitation/complete`, the `Mcp-Session-Id` header, the HTTP GET stream, and core-protocol tasks (now the `io.modelcontextprotocol/tasks` extension).
+Check `resources/auto/specification-2026-07-28-deprecated.md` and `resources/auto/specification-2026-07-28-changelog.md` for the complete tables of deprecated features (Roots, Sampling, `notifications/message` logging, HTTP+SSE, OAuth DCR) and outright removals (`initialize`/`notifications/initialized`, `ping`, `logging/setLevel`, `resources/subscribe`, `Mcp-Session-Id`, HTTP GET streams, and core-protocol tasks, now the `io.modelcontextprotocol/tasks` extension).
 
 **Legacy compatibility.** A server that must also serve `2025-11-25` or earlier clients can be dual-era: answer `initialize` with legacy semantics scoped to that process or session, and serve requests carrying modern `_meta` statelessly. A modern-only server names its supported versions in the error it returns to `initialize`. See the compatibility matrix in `resources/auto/specification-2026-07-28-basic-versioning.md`.
 
-## Minimal servers
+## Minimal servers and SDK gotchas
 
-Both examples follow `resources/auto/docs-2026-07-28-develop-build-server.md`. Check the SDK's own documentation for resource and prompt registration and for HTTP hosting, which that guide does not cover.
+Read `resources/auto/docs-2026-07-28-develop-build-server.md` for full TypeScript, Python, Java, Kotlin, and C# starter servers (and each SDK's own docs for resource/prompt registration and HTTP hosting). Watch these two high-signal SDK pitfalls:
 
-TypeScript (`npm install @modelcontextprotocol/server zod`, `"type": "module"`):
-
-```typescript
-import {McpServer} from "@modelcontextprotocol/server"
-import {serveStdio} from "@modelcontextprotocol/server/stdio"
-import {z} from "zod"
-
-// serveStdio calls this for each instance it needs, so return a fresh server.
-function createServer() {
-  const server = new McpServer({name: "weather", version: "1.0.0"})
-
-  server.registerTool(
-    "get_alerts",
-    {
-      description: "Get weather alerts for a US state",
-      inputSchema: z.object({
-        state: z.string().length(2).describe("Two-letter state code, e.g. CA")
-      })
-    },
-    async ({state}) => ({
-      content: [{type: "text", text: `No active alerts for ${state}`}]
-    })
-  )
-
-  return server
-}
-
-serveStdio(createServer, {
-  onerror: (error) => console.error("Server error:", error)
-})
-```
-
-`serveStdio` answers both `2026-07-28` clients and legacy `initialize` clients. Wiring `server.connect(new StdioServerTransport())` by hand serves only legacy clients.
-
-Python (MCP SDK 2.0.0 or newer, `uv add "mcp[cli]"`):
-
-```python
-import logging
-
-from mcp.server import MCPServer
-
-logger = logging.getLogger(__name__)
-mcp = MCPServer("weather")
-
-
-@mcp.tool()
-async def get_alerts(state: str) -> str:
-    """Get weather alerts for a US state.
-
-    Args:
-        state: Two-letter US state code (e.g. CA, NY)
-    """
-    logger.info("get_alerts %s", state)  # stderr, never print()
-    return f"No active alerts for {state}"
-
-
-if __name__ == "__main__":
-    mcp.run(transport="stdio")
-```
-
-`MCPServer` builds the tool schema from type hints and the docstring. It replaces the 1.x `FastMCP` import.
+- **TypeScript (`@modelcontextprotocol/server`, ESM `"type": "module"`):** Pass a factory function to `serveStdio(createServer, ...)` so each instance gets a fresh `McpServer` and serves both `2026-07-28` and legacy `initialize` clients. Wiring `server.connect(new StdioServerTransport())` by hand serves only legacy clients.
+- **Python (MCP SDK 2.0.0+, `uv add "mcp[cli]"`):** Import `MCPServer` from `mcp.server` (it replaces the 1.x `FastMCP` import and builds tool schemas from type hints and docstrings). Log through `logging` to `stderr`, never `print()`.
 
 ## Testing with MCP Inspector
 
@@ -197,5 +127,5 @@ The server work is done when all of these hold:
 - Cross-call state flows through explicit handles, and user input or LLM calls flow through MRTR `InputRequiredResult`.
 - List and read results carry `ttlMs` and `cacheScope`, and results carry `resultType` and `serverInfo` (verify in the Inspector's raw JSON-RPC view if the SDK sets them for you).
 - A dual-era server also passes `tools/list` with `--protocol-era legacy`.
-- Every spec claim made to the user cites the `resources/auto/specification-2026-07-28-*` page it came from.
+- Every spec claim made to the user cites the `resources/auto/specification-2026-07-28-*` page it came from (or, when local `resources/auto/` is absent, the corresponding page fetched from `https://modelcontextprotocol.io/llms.txt`).
 

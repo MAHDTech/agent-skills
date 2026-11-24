@@ -13,26 +13,34 @@ Generate a manual test plan for the changes in the current branch. The plan cove
 
 ### Step 1: Detect base branch
 
-Try these methods in order:
+Try these methods in order without clobbering an earlier success:
 
 ```bash
 BASE_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null)
+[ -n "$BASE_BRANCH" ] || BASE_BRANCH=$(git remote show origin 2>/dev/null | grep "HEAD branch" | cut -d: -f2 | xargs)
+[ -n "$BASE_BRANCH" ] || BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
 ```
+
+If all fail, ask the user. Fetch and resolve `BASE_REF`, preferring `origin/$BASE_BRANCH`, and ask the user if neither ref exists:
 
 ```bash
-BASE_BRANCH=$(git remote show origin 2>/dev/null | grep "HEAD branch" | cut -d: -f2 | xargs)
+git fetch origin "$BASE_BRANCH" 2>/dev/null || true
+BASE_REF=""
+if git rev-parse --verify "origin/$BASE_BRANCH" >/dev/null 2>&1; then
+  BASE_REF="origin/$BASE_BRANCH"
+elif git rev-parse --verify "$BASE_BRANCH" >/dev/null 2>&1; then
+  BASE_REF="$BASE_BRANCH"
+fi
 ```
-
-If both fail, ask the user.
 
 ### Step 2: Gather change context
 
-Run all of these and capture the results:
+Run all of these and capture the results (excluding lockfiles from `--stat` so generated churn does not drown the real changes):
 
 ```bash
-git diff $BASE_BRANCH...HEAD --name-only
-git diff $BASE_BRANCH...HEAD --stat
-git log $BASE_BRANCH..HEAD --oneline
+git diff "$BASE_REF"...HEAD --name-only
+git diff "$BASE_REF"...HEAD --stat -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"
+git log "$BASE_REF"..HEAD --oneline
 ```
 
 ### Step 3: Detect project tooling

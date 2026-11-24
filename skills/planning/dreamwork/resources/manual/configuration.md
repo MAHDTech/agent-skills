@@ -9,8 +9,10 @@ the [project contract](project-contract.md).
 1. A config path named in the request.
 2. Otherwise the project file `.agents/dreamwork.json` in the initiating repository,
    layered over the user file `~/.agents/dreamwork.json`. Either may be absent.
-3. If neither exists, propose a user file from [the example](config.example.json)
-   and stop before dispatch.
+3. If neither exists, propose a user file shaped like
+   [the example](config.example.json), populating `providerInstanceId`, `model`,
+   and `options` from `orchestrator_capabilities` rather than copying placeholder
+   names from the example, and stop before dispatch.
 
 Layering replaces whole entries: a project file that defines `roles.implementer`
 replaces the user's `roles.implementer`; one that defines `council` replaces the

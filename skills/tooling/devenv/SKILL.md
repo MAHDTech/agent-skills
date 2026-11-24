@@ -1,6 +1,6 @@
 ---
 name: devenv
-description: Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands. Follow its shell, dependency, SecretSpec, hook, and test-runner conventions.
+description: Manage shells, dependencies, SecretSpec, hooks, and tests in devenv projects. Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands.
 resources:
   - https://secretspec.dev/llms.txt
   - https://devenv.sh/llms.txt
@@ -45,14 +45,45 @@ CI=true SECRETSPEC_PROVIDER=env SECRETSPEC_REASON="run project tests" \
   devenv --no-tui test
 ```
 
-- Git hooks are declared under `git-hooks.hooks` in `devenv.nix`; `git-hooks.package` defaults to `pkgs.prek`, so keep `prek` as the hook runner and leave the Python `pre-commit` package out of `packages`.
+- Git hooks live under `git-hooks` (`hooks`) in `devenv.nix`; `git-hooks` uses `pkgs.prek` as its default package, so keep `prek` as the hook runner and leave the Python `pre-commit` package out of `packages`.
 - Hooks see only files Git tracks, so stage new files before relying on a green run.
 - Report each failing hook or test by name with its error output.
 
 ## Changing the environment
 
-- Add packages to `packages`, language toolchains under `languages.<name>`, scripts under `scripts`, and long-running services under `processes` or `services`. Group each option in one attribute set rather than repeating the key with dotted paths.
-- After editing `devenv.nix`, re-enter the shell (`devenv --no-tui shell -- true`) to rebuild; add `--refresh-eval-cache` if a newly declared script is reported missing.
+- Add packages to `packages`, language toolchains under `languages`, scripts under `scripts`, and long-running services under `processes` or `services`.
+- Write package lists with `with pkgs;` instead of repeating the `pkgs.` prefix on each item.
+- Define each top-level attribute set (`scripts`, `processes`, `languages`, `git-hooks`, `services`, `env`) **once** and write every nested option in long form instead of dotted paths, even for a single leaf. Repeating a dotted prefix such as `scripts.foo.exec = ...; scripts.bar.exec = ...;` triggers `statix` warning `W20` (`The key 'scripts' is first assigned here ... repeated here ...`) and fails linting, and nested blocks keep future expansion trivial:
+
+```nix
+{ pkgs, ... }:
+{
+  packages = with pkgs; [
+    git
+    jq
+    ripgrep
+  ];
+
+  scripts = {
+    build = {
+      exec = "cargo build";
+    };
+    check = {
+      exec = "cargo check";
+    };
+  };
+
+  git-hooks = {
+    hooks = {
+      nixfmt = {
+        enable = true;
+      };
+    };
+  };
+}
+```
+
+- After editing `devenv.nix`, re-enter the shell (`devenv --no-tui shell -- true`, with the `SECRETSPEC_*` variables above if SecretSpec is configured) to rebuild; add `--refresh-eval-cache` if a newly declared script is reported missing.
 - Look up option names and packages before writing them: the devenv MCP server (`devenv mcp` locally, or `https://mcp.devenv.sh`) searches options and packages, and the vendored docs cover the rest.
 
 ## References
@@ -62,5 +93,6 @@ CI=true SECRETSPEC_PROVIDER=env SECRETSPEC_REASON="run project tests" \
 
 ## Completion criteria
 
-- Every project command in the task ran through `devenv --no-tui shell -- <command>` (or `devenv --no-tui test`) with `SECRETSPEC_REASON` set.
+- Every project command in the task ran through `devenv --no-tui shell -- <command>` (or `devenv --no-tui test`), with `SECRETSPEC_REASON` set whenever SecretSpec is configured.
+- Any `devenv.nix` edits use `with pkgs;` for package lists and long-form nested attribute sets instead of dotted paths.
 - `devenv --no-tui test` exits 0, or each failure is reported by hook or test name.

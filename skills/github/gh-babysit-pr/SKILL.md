@@ -60,13 +60,13 @@ gh api "repos/$OWNER/$REPO/commits/$SHA/check-runs"
   - Prefer fixes that delete or narrow code over adding new helpers, configuration flags, caches, locks, or speculative wrappers.
   - Fix genuine bugs within the user's intended scope.
   - Decline false positives, speculative edge-case guards, unneeded extra compatibility layers, or out-of-scope nits with a concise `file:line`, test, or behavior explanation, and record valid out-of-scope ideas as follow-ups rather than expanding the PR.
-- **Attributed replies before resolution:** On a human account, start every comment posted on the user's behalf with the `> [!NOTE]` callout `> 🤖 **<model> on behalf of <user>**`, and scan the full outgoing payload for secrets and private details before posting. Follow `/gh-pr-comments` for the full checklist when it is installed. When multiple open threads need structured triage, use `/gh-resolve-pr-comments`. Resolve a review thread only after GitHub returns the confirmed URL for your reply.
+- **Attributed replies before resolution:** On a human account, start every comment posted on the user's behalf with the `> [!NOTE]` callout `> 🤖 **<model> on behalf of <user>**`, and scan the full outgoing payload for secrets and private details before posting. Follow `/gh-pr-comments` for the full checklist when it is installed. When multiple open threads need structured triage, use `/gh-resolve-pr-comments` when installed and authorized; otherwise present a brief fix/decline/discuss plan for user approval, push verified fixes, and reply to each thread's root comment ID citing the pushed SHA. Resolve a review thread only after GitHub returns the confirmed URL for your reply.
 
 ## 4. Reconcile base-branch movement and readiness
 
 `resources/manual/pr-wait` emits events when new base-branch commits touch files modified by this PR and when `mergeStateStatus` becomes `BEHIND` or `DIRTY`:
 
-1. When the branch is `BEHIND`, `DIRTY`, or overlaps newly landed base commits, run `/git-update-branch` to evaluate conceptual conflicts against the updated base and rebase or merge cleanly.
+1. When the branch is `BEHIND`, `DIRTY`, or overlaps newly landed base commits, run `/git-update-branch` when installed and authorized; otherwise fetch `origin`, review base-branch commits since divergence for conceptual conflicts or superseded work, rebase or merge cleanly, resolve conflicts, and confirm with the user before force-pushing a rewritten branch.
 2. If an overlapping commit or PR on the base branch makes this PR obsolete, stop monitoring, report the concrete base-branch evidence to the user, and ask before closing the PR unless closure was explicitly authorized.
 3. Stop watching once `resources/manual/pr-wait` exits `0` on the latest head. Report readiness to the user unless merging was explicitly requested.
 4. Immediately before any user-authorized merge, run `git fetch origin` and re-verify PR status and checks. Never merge while `mergeStateStatus` is `BEHIND` or `DIRTY`, or when base commits landed after the last green run on files this PR touches; update the branch, push, and wait for green checks again first.

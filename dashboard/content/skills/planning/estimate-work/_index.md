@@ -43,6 +43,12 @@ Every estimate stands on **assumptions** - the API behaves, the data's clean, th
 
 When the uncertainty is too large to estimate - you can't even bound the range - **spike** instead: a timeboxed investigation whose deliverable is _knowledge_, not the feature. Timebox it so one open question can't swallow the schedule, and estimate the real work only once the spike closes and its output is a better estimate.
 
+## Done when
+
+- Every estimable item carries a range (best, likely, worst) in one consistent unit (relative size or absolute time), with reference-class calibration noted.
+- Each estimate lists its named assumptions and explicit risks (size and likelihood) beside the range rather than hiding them in padding.
+- Any item too uncertain to bound is marked as a timeboxed spike with a concrete knowledge deliverable instead of a guessed number.
+
 ## Handoffs
 
 - Estimating a plan or ticket set? Size each slice as you cut it with `/to-tickets` - buildable slices are the natural estimation unit.

@@ -6,7 +6,7 @@ metadata:
   license: MIT
 ---
 
-# Codebase Design
+# Codebase design
 
 Design **deep modules**: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface. Use this language and these principles wherever code is being designed or restructured. The aim is leverage for callers, locality for maintainers, and testability for everyone.
 
@@ -99,12 +99,17 @@ Good interfaces make testing natural.
 
 ## Rejected framings
 
-- **Depth as ratio of implementation-lines to interface-lines** (Ousterhout): rewards padding the implementation. We use depth-as-leverage instead.
-- **"Interface" as the TypeScript `interface` keyword or a class's public methods**: too narrow - interface here includes every fact a caller must know.
+- **Depth as ratio of implementation-lines to interface-lines** (Ousterhout): rewards padding the implementation. Use depth-as-leverage instead.
 
 ## Going deeper
 
 - **Deepening a cluster given its dependencies** - see [DEEPENING.md](resources/manual/DEEPENING.md): dependency categories, seam discipline, and replace-don't-layer testing.
 - **Exploring alternative interfaces** - see [DESIGN-IT-TWICE.md](resources/manual/DESIGN-IT-TWICE.md): spin up parallel sub-agents to design the interface several radically different ways, then compare on depth, locality, and seam placement.
+
+## Completion criteria
+
+- Each proposed or refactored module passes the deletion test (removing it would duplicate real complexity across callers rather than just deleting a pass-through).
+- Every seam introduced is justified by at least two adapters (for example production + test), and internal seams stay private to the implementation.
+- Caller-facing behavior is tested through the module's interface rather than its internals, and existing tests or newly written interface tests pass.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

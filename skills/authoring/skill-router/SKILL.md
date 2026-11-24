@@ -1,6 +1,6 @@
 ---
 name: skill-router
-description: Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.
+description: Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic. Use only when the user explicitly requests routing or browsing the catalog.
 disable-model-invocation: true
 metadata:
   group: authoring
@@ -138,7 +138,7 @@ Beyond `/code-review` on the main flow:
 
 ## Tooling
 
-- `/agent-guidelines` - reach for this when you want work checked against the behavioural guidelines for agents.
+- `/agent-guidelines` - reach for this while writing or editing code to apply coding discipline (state assumptions, keep changes minimal and scoped, and verify against concrete criteria), not when reviewing finished work.
 - `/antigravity` - reach for this when you need to research or verify Google Antigravity specifications, command-line flags, rules, subagents, or hooks.
 - `/devenv` - reach for this when a repo uses devenv for its shell and dependencies; every project command then runs through it.
 - `/nix-shell` - reach for this on NixOS in a project without devenv, to run ad-hoc CLI utilities in ephemeral Nix shells.

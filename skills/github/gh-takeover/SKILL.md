@@ -43,22 +43,22 @@ Preserve human contributor credit at every step:
 
 ## 3. Modernize and rework within scope
 
-1. Run `/git-update-branch` to check whether base-branch changes since divergence solved, superseded, or shifted the design, and integrate the latest base branch cleanly.
+1. Fetch the base branch and inspect commits landed since divergence for conceptual conflicts, superseded fixes, or design shifts before rebasing or merging cleanly; run `/git-update-branch` for the full workflow when installed and authorized.
 2. Rework whatever mechanics are broken or overcomplicated to deliver the original goal, keeping unrelated features out of scope.
 3. Simplify the implementation where possible without dropping intended behavior, edge-case contracts, or public surfaces.
 4. Recheck the source PR before shipping in case new commits or review context landed while you worked.
 
 ## 4. Verify realistic workflows
 
-- Reproduce the original bug or exercise realistic user-facing workflows end-to-end through the repository's documented environment wrapper (for example `devenv --no-tui shell -- <command>`).
+- Reproduce the original bug or exercise realistic user-facing workflows end-to-end through the repository's documented environment wrapper or test runner from `README.md`, `CONTRIBUTING.md`, or CI config.
 - Treat green mocked unit tests as insufficient on their own to prove the feature works in practice.
 - Record concrete command results, and state plainly anything you could not verify locally.
 
 ## 5. Ship, monitor, and report
 
-- When finishing includes opening or updating a pull request, run `/gh-create-pr` to draft and publish it behind its approval gate.
-- When asked to see the PR through CI and review rather than stopping at filing, continue with `/gh-babysit-pr`.
-- Format any PR comments or review replies posted on the user's behalf with `/gh-pr-comments`.
+- When finishing includes opening or updating a pull request, show the drafted title and description and get explicit user approval before publishing; run `/gh-create-pr` when installed and authorized.
+- When asked to see the PR through CI and review rather than stopping at filing, continue with `/gh-babysit-pr` when installed and authorized (otherwise report the PR URL and current check status).
+- Before posting any PR comment or review reply on the user's behalf, scan the full outgoing payload for secrets and private details, and on a human GitHub account (`gh api user -q '.type'` returns `User`) prefix it with the `> [!NOTE]` callout `> 🤖 **<model> on behalf of <user>**`; follow `/gh-pr-comments` for the full checklist when installed.
 - Close out with a concise report covering:
   - What you inherited (`HEAD` SHA, source PR or branch, and open issues found)
   - What you changed and why

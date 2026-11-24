@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-One collection, many runtimes. A `skills/<name>/SKILL.md` collection is Anthropic-style, so the same source installs into Claude Code, OpenCode, Goose, and Antigravity CLI. Install and manage it with the [skills.sh](https://skills.sh) CLI.
+One collection, many runtimes. A `skills/<name>/SKILL.md` collection is Anthropic-style, so the same source installs into Claude Code, OpenAI Codex, Cursor, OpenCode, Goose, and Antigravity CLI. Install and manage it with the [skills.sh](https://skills.sh) CLI.
 
 ## Install a collection
 
@@ -16,13 +16,13 @@ Point the CLI at a GitHub `<owner>/<repo>`:
 
 ```bash
 # NPM
-npx skills add MAHDTech/agent-skills
+npx skills add <owner>/<repo>
 
 # Bun
-bunx skills add MAHDTech/agent-skills
+bunx skills add <owner>/<repo>
 ```
 
-The installer auto-detects which agents you have (Claude Code, OpenCode, Goose, Antigravity), then lets you pick the skills and the agents to wire. Skills install by **symlink**, so later updates to the source flow through without a reinstall.
+The installer auto-detects which agents you have (Claude Code, OpenAI Codex, Cursor, OpenCode, Goose, Antigravity), then lets you pick the skills and the agents to wire. Skills install by **symlink**, so later updates to the source flow through without a reinstall.
 
 ## Manage installed skills
 
@@ -40,8 +40,9 @@ Run `npx skills --help` for the full verb set (listing what is installed and rem
 After install, a skill lives at its runtime's skills location and the agent picks it up from there:
 
 - **Claude Code** - `~/.claude/skills/`
-- **OpenCode & Goose** - `~/.agents/skills/`
-- **Antigravity CLI** - registered in `~/.gemini/config/skills.json`
+- **OpenAI Codex, OpenCode & Goose** - `~/.agents/skills/`
+- **Cursor** - `~/.cursor/skills/`
+- **Antigravity CLI & IDE** - `~/.gemini/config/skills/<skill>/`, `<workspace>/.agents/skills/<skill>/`, `~/.gemini/antigravity-cli/skills/<skill>/`, or `~/.gemini/skills/<skill>/`
 
 Exact paths can shift per version; treat these as where to look, and confirm against the runtime's own docs if one differs.
 

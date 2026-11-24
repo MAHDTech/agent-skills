@@ -85,10 +85,10 @@ description: Single source of truth for agent instructions
 
 ## Authoring
 
-- **skill-archive**: Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog.
-- **skill-audit**: Audit the custom skill catalog for invocation policies, descriptions, frontmatter, references, duplicates, and lifecycle drift.
+- **skill-archive**: Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog. Use only when the user explicitly requests archiving a skill.
+- **skill-audit**: Audit the custom skill catalog for invocation policies, descriptions, frontmatter, references, duplicates, and lifecycle drift. Use only when the user explicitly requests a catalog audit.
 - **skill-creator**: Create or update custom agent skills with concise discovery descriptions, matching invocation policies, supporting resources, and catalog checks.
-- **skill-router**: Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.
+- **skill-router**: Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic. Use only when the user explicitly requests routing or browsing the catalog.
 
 ## Tooling
 
@@ -96,8 +96,8 @@ description: Single source of truth for agent instructions
 - **antigravity**: Look up Google Antigravity/AGY CLI, IDE, and SDK behavior. Use for its settings, commands, keybindings, agent permissions, hooks, or plugin integration.
 - **cargo-crap**: Measure Rust change risk with cargo-crap and coverage data. Use for CRAP scores, cargo-llvm-cov integration, complexity regression gates, CI reports, or badges.
 - **cargo-doc**: Verify Rust crate APIs with local cargo doc output or docs.rs. Use to inspect exact signatures, methods, traits, and feature-gated items for the project version.
-- **devenv**: Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands. Follow its shell, dependency, SecretSpec, hook, and test-runner conventions.
-- **herdr**: Operate Herdr panes, workspaces, or agent sessions when HERDR_ENV=1. Also use for Herdr setup, configuration, keybindings, and troubleshooting questions.
+- **devenv**: Manage shells, dependencies, SecretSpec, hooks, and tests in devenv projects. Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands.
+- **herdr**: Operate Herdr panes, workspaces, or agent sessions (requires HERDR_ENV=1) only when the user explicitly asks to use Herdr. Also use for Herdr setup, config, keybindings, and troubleshooting questions.
 - **install-skills**: Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.
 - **jj**: Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.
 - **nix-shell**: Run missing ad-hoc CLI utilities in ephemeral nix shell environments when Nix is installed and the project has no devenv or Nix dev shell. Use for one-off diagnostics or conversions.

@@ -2,8 +2,6 @@
 name: gh-create-issue
 description: Create a structured GitHub issue from the current conversation with gh CLI. Use when asked to file an issue that preserves the problem, discussion, constraints, and agreed implementation plan.
 disable-model-invocation: true
-resources:
-  - https://cli.github.com/manual/gh_issue
 metadata:
   group: github
 ---
@@ -12,7 +10,7 @@ metadata:
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Consult the `gh issue` manual in `resources/auto/manual-gh_issue.md` for more details.
+Run `gh issue --help` on demand if you need flag details.
 
 Create a well-structured GitHub issue using `gh` CLI, populated with context from the current conversation.
 

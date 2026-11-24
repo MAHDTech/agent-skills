@@ -6,14 +6,14 @@
       "type": "skill-md",
       "description": "Build, integrate, or debug Agent Client Protocol agents and clients with official SDKs. Use for ACP sessions, tool calls, schemas, transports, or protocol migrations.",
       "url": "/.well-known/agent-skills/acp/SKILL.md",
-      "digest": "sha256:3e78305a9208a3724b32bfb898428d3166e5eb8e217edce50af919e61f027873"
+      "digest": "sha256:2e557e5acfd3159b31147d9010c2637921a0a66d9cea97b859826080cc6d78b8"
     },
     {
       "name": "agent-guidelines",
       "type": "skill-md",
       "description": "Apply coding discipline while implementing: state assumptions, keep changes minimal and scoped, and verify against concrete success criteria. Use when writing or editing code, not when reviewing finished work.",
       "url": "/.well-known/agent-skills/agent-guidelines/SKILL.md",
-      "digest": "sha256:f0dc318311390950c1cf31aed4a5895f772dc5bc63b6e13779f00257e405de26"
+      "digest": "sha256:4c15d8ecfa9213eb57180abdf2abc31a8dd578319751180c273347ffe62f251a"
     },
     {
       "name": "agent-router",
@@ -48,14 +48,14 @@
       "type": "skill-md",
       "description": "Verify Rust crate APIs with local cargo doc output or docs.rs. Use to inspect exact signatures, methods, traits, and feature-gated items for the project version.",
       "url": "/.well-known/agent-skills/cargo-doc/SKILL.md",
-      "digest": "sha256:e5fecc00b2f2e0dc963a8a7c90b7bd30968e36824992590fe2d73d2a19670fb8"
+      "digest": "sha256:ee92bf67d3f9a5ed4763ae1819df9ee333d1de5638b17ffe4819705fdc71592b"
     },
     {
       "name": "casita",
       "type": "skill-md",
       "description": "Store, sync, and verify immutable content-addressed object graphs with the Casita CLI or Rust API. Use for imports, named roots and retention, sync, Casitar archives, integrity checks, or garbage collection.",
       "url": "/.well-known/agent-skills/casita/SKILL.md",
-      "digest": "sha256:3676842f89d63772c3c798791d3377a3c51e94ddf5fa9cea5c32e474274f2643"
+      "digest": "sha256:e81ba62fbf3290e2e9264ae91e880ffe8cc412165ef57c5302f9e6d888d1984a"
     },
     {
       "name": "characterization-tests",
@@ -83,7 +83,7 @@
       "type": "skill-md",
       "description": "Design or improve module interfaces and test seams. Use when simplifying caller requirements, reducing shallow abstractions, or making modules easier to test and maintain.",
       "url": "/.well-known/agent-skills/codebase-design/SKILL.md",
-      "digest": "sha256:1b8b6305b4db6f0d9b218068493ecedda8a4b6a106b56f8319632ba5e51e814f"
+      "digest": "sha256:fdd3ad4c9449cec28abe82595bca3bd809cdb929e46eff7cd0cef6a99d6ca063"
     },
     {
       "name": "critical-thinking",
@@ -95,9 +95,9 @@
     {
       "name": "devenv",
       "type": "skill-md",
-      "description": "Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands. Follow its shell, dependency, SecretSpec, hook, and test-runner conventions.",
+      "description": "Manage shells, dependencies, SecretSpec, hooks, and tests in devenv projects. Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands.",
       "url": "/.well-known/agent-skills/devenv/SKILL.md",
-      "digest": "sha256:b6445d48a99f70d6a55249c876f8b5a53d48a2c2b39579f7f7347577a1bbf0d3"
+      "digest": "sha256:d6cfecee35ba7ace54b5a7083dec5c2580a7b2ff276a6c604c2db924cea4e40f"
     },
     {
       "name": "diagnosing-bugs",
@@ -118,28 +118,28 @@
       "type": "skill-md",
       "description": "Estimate a plan or ticket set using relative sizes or time ranges, reference history, named assumptions, and risk. Use when sizing work, forecasting delivery, or deciding whether uncertainty needs a spike.",
       "url": "/.well-known/agent-skills/estimate-work/SKILL.md",
-      "digest": "sha256:af735ba874c15a482709f8b0306a588bd79caabd620b5a9db577d463402e8fc6"
+      "digest": "sha256:f05c76dcd1a8afa51ff9cb2b983f4646410392b499848bc74a1f7d400b0a56dd"
     },
     {
       "name": "gh-babysit-pr",
       "type": "skill-md",
       "description": "Monitor an open pull request through CI checks, review bots, and base-branch updates with pr-wait. Use only when the user explicitly asks to watch, monitor, or babysit a PR.",
       "url": "/.well-known/agent-skills/gh-babysit-pr/SKILL.md",
-      "digest": "sha256:d5707349707581a331acf2f2ee4e7d7b0dcaf32ab0759a053868eff9ee531554"
+      "digest": "sha256:fc5d988e2643a508192474e2e73f5e32d612095cb3cb2a77d82e5b7c4f836c40"
     },
     {
       "name": "gh-create-issue",
       "type": "skill-md",
       "description": "Create a structured GitHub issue from the current conversation with gh CLI. Use when asked to file an issue that preserves the problem, discussion, constraints, and agreed implementation plan.",
       "url": "/.well-known/agent-skills/gh-create-issue/SKILL.md",
-      "digest": "sha256:db39cef8217dcbdee299b24f3ec3119e779980e7587808c34ebc6c87fb61fec4"
+      "digest": "sha256:8daa88fc85c21ccb7e1e4b3b128b5301c422d8ec648196c082f2ee2ef9084a78"
     },
     {
       "name": "gh-create-pr",
       "type": "skill-md",
       "description": "Draft a problem-first Conventional Commit PR title and description, then create or update the PR once the user approves the draft. Use when asked to open or update a pull request.",
       "url": "/.well-known/agent-skills/gh-create-pr/SKILL.md",
-      "digest": "sha256:ffd9e15933440b715d2684c90895a2bf8f35cecc403134a7f88d51b2c3c3ed82"
+      "digest": "sha256:e72287136526a934c5d1303aa9f8559a83cfdf82cd3c54ed93df306a2b9170cc"
     },
     {
       "name": "gh-pr-comments",
@@ -153,42 +153,42 @@
       "type": "skill-md",
       "description": "Curate release notes from commits and merged PRs since the last tag, then create a GitHub release. Use when asked to cut or publish a versioned release, with draft and prerelease options.",
       "url": "/.well-known/agent-skills/gh-release-notes/SKILL.md",
-      "digest": "sha256:504e6f1a774ff2dfcbbedfeadffc3f7938f71d71ae0daee55b829fcf848abb60"
+      "digest": "sha256:76bfb75ce13da435ea5a6074e97ded9c9c73931145641df6b7b0f5e3c6477d6e"
     },
     {
       "name": "gh-resolve-pr-comments",
       "type": "skill-md",
       "description": "Triage and address human and AI bot PR review comments, push back on false positives, and reply before resolving threads. Use when asked to handle PR feedback.",
       "url": "/.well-known/agent-skills/gh-resolve-pr-comments/SKILL.md",
-      "digest": "sha256:5b08bfc6034cd14187af5f0315ec8f2a139ba7320834a2ccc3131ab62049f91c"
+      "digest": "sha256:312d3142ee4a993e9a4d59b47e8acf62b7c718f3f3d18ab1430a2ff9c7f17f69"
     },
     {
       "name": "gh-submit-review",
       "type": "skill-md",
       "description": "Publish a GitHub PR review with verdict, inline findings, secret scanning, and human-account attribution. Use when asked to submit a completed PR review.",
       "url": "/.well-known/agent-skills/gh-submit-review/SKILL.md",
-      "digest": "sha256:108a0968edfabb7f33a8ab08c614c63b21888e90d4b0a3f20f1c040f2d765c1e"
+      "digest": "sha256:38d9a92ace477a7abee5de9ed63f1f8b74c31ba8bf349afa0f0a51df23e5a898"
     },
     {
       "name": "gh-takeover",
       "type": "skill-md",
       "description": "Adopt and finish an inherited pull request, branch, or agent handoff while preserving contributor credit. Use only when the user explicitly asks to take over existing work.",
       "url": "/.well-known/agent-skills/gh-takeover/SKILL.md",
-      "digest": "sha256:e900dc7c2f220b0e12394c8533a9caf03f3bd37f08b9e9dcedce7011741f909b"
+      "digest": "sha256:003ac18fc519f4fd5eb4b31f97184d7b768d9aa65b5f28098bc4d2b85f4778e7"
     },
     {
       "name": "gh-triage",
       "type": "skill-md",
       "description": "Triage GitHub issues and external PRs: categorize, verify claims, interview as needed, and post agent-ready briefs. Use when asked to run a maintainer triage session or change issue and PR triage labels or states.",
       "url": "/.well-known/agent-skills/gh-triage/SKILL.md",
-      "digest": "sha256:c7c4cd9bdb3c82984e6de59a94b1d7219159e734a2b62c54337a63af17644e46"
+      "digest": "sha256:7858ccdcfea62dbe444f049361e91e4bd08a986df7d556ef6b247c470de446b3"
     },
     {
       "name": "git-resolve-conflicts",
       "type": "skill-md",
       "description": "Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.",
       "url": "/.well-known/agent-skills/git-resolve-conflicts/SKILL.md",
-      "digest": "sha256:54e22017edfb79f944a406e52649267e4227826497594e02245a307a6203b988"
+      "digest": "sha256:bbcb67fa0df130cded94cd55d3c8c2ae3fa6188ba6f24599ce19ad2689594393"
     },
     {
       "name": "git-update-branch",
@@ -230,28 +230,28 @@
       "type": "skill-md",
       "description": "Summarize the current conversation into a temporary handoff for another agent or session. Use when transferring unfinished work; reference durable artifacts, suggest relevant skills, and redact secrets.",
       "url": "/.well-known/agent-skills/handoff/SKILL.md",
-      "digest": "sha256:9aa59bce3b7caa37a6e72e309becd38699f6100cecf197e299a0aee3a35836b3"
+      "digest": "sha256:28d5e83037032413842d90bfdd5fab3b2e099311650538d724b744376f7721ac"
     },
     {
       "name": "herdr",
       "type": "skill-md",
-      "description": "Operate Herdr panes, workspaces, or agent sessions when HERDR_ENV=1. Also use for Herdr setup, configuration, keybindings, and troubleshooting questions.",
+      "description": "Operate Herdr panes, workspaces, or agent sessions (requires HERDR_ENV=1) only when the user explicitly asks to use Herdr. Also use for Herdr setup, config, keybindings, and troubleshooting questions.",
       "url": "/.well-known/agent-skills/herdr/SKILL.md",
-      "digest": "sha256:a97f8e46bd24acf3d0220bb3a92d20ea57fa0b23349778d9b7db064479aa4daf"
+      "digest": "sha256:03704ea2c516a0da169c9a63750eb01bf95903408e16afd65f580ae359087fb5"
     },
     {
       "name": "icp",
       "type": "skill-md",
       "description": "Build, secure, and deploy Internet Computer (ICP) canisters and dapps in Motoko, Rust, or TypeScript. Use for canister state and upgrades, ICRC or chain-key tokens, identity, HTTPS outcalls, or icp CLI work.",
       "url": "/.well-known/agent-skills/icp/SKILL.md",
-      "digest": "sha256:26d7858c3b6dcd19af083eb7912592715cb45a75327acf13af885c3b7198159e"
+      "digest": "sha256:8a003004e7bbe283e37717f7e3e48d9c500700578c107f2730fbff6f98fae8f2"
     },
     {
       "name": "install-skills",
       "type": "skill-md",
       "description": "Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.",
       "url": "/.well-known/agent-skills/install-skills/SKILL.md",
-      "digest": "sha256:be3dbf85a7ed023eda2b3e421424d505eb265e46502f9d7f9b17420fe8c34164"
+      "digest": "sha256:b32ac1046e6870c80c7c2bcaf309a450cf28cf1e6c7a84d635090cf78f314456"
     },
     {
       "name": "interface-design",
@@ -265,56 +265,56 @@
       "type": "skill-md",
       "description": "Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.",
       "url": "/.well-known/agent-skills/jj/SKILL.md",
-      "digest": "sha256:3087bbb0566869eb70319b437082f501a815d778a9ebb1ca83b3924a59d14111"
+      "digest": "sha256:ad91a5c3f479112e3f9b43116186ef478727f3f6ca53a6f48b8eacb5e9de7d6e"
     },
     {
       "name": "model-context-protocol",
       "type": "skill-md",
       "description": "Build or debug MCP servers with official SDKs against the stateless 2026-07-28 spec. Use for tool schemas, resources, prompts, server/discover, stdio or Streamable HTTP transports, and MCP Inspector testing.",
       "url": "/.well-known/agent-skills/model-context-protocol/SKILL.md",
-      "digest": "sha256:9a053da061d415e6d0782da12d84c96f533d13f7b69a6c1adf851f6bc94ffc22"
+      "digest": "sha256:be67d1936227b8052be72da90a55959f0ee442870a1cbc78e90ee47bf154b478"
     },
     {
       "name": "nix-shell",
       "type": "skill-md",
       "description": "Run missing ad-hoc CLI utilities in ephemeral nix shell environments when Nix is installed and the project has no devenv or Nix dev shell. Use for one-off diagnostics or conversions.",
       "url": "/.well-known/agent-skills/nix-shell/SKILL.md",
-      "digest": "sha256:7107814c7cedbf617e69005ba0d5c2f2950cff37e998af9c3edfffd647491a30"
+      "digest": "sha256:a43158910f48cdb56b0138dd4b6c35be7f3c5e5abab5dd61c6cacff9ee860606"
     },
     {
       "name": "nutanix-api-v4",
       "type": "skill-md",
       "description": "Integrate or debug Nutanix v4 REST APIs and official SDKs. Use for OData queries, namespaces, version compatibility, or migrating legacy Nutanix API integrations.",
       "url": "/.well-known/agent-skills/nutanix-api-v4/SKILL.md",
-      "digest": "sha256:83a05b9a25bdcbc68f3169cebc3bd52b0ac3d923d58c1d09f5eb2ca4fa01ebcb"
+      "digest": "sha256:b2b02c6ea892be81a3df93fb24eee43f1af0d2d7beea6449cfc89c3bfbea915b"
     },
     {
       "name": "nutanix-enterprise-ai",
       "type": "skill-md",
       "description": "Configure or troubleshoot Nutanix Enterprise AI (NAI/GPT-in-a-Box). Use for platform deployment, model serving, inference gateways, RBAC, or NAI MCP connectors.",
       "url": "/.well-known/agent-skills/nutanix-enterprise-ai/SKILL.md",
-      "digest": "sha256:310a233c627135bee521e5b2ba16cd65a258b427054d618ff5e6bc9e5c8a5e1c"
+      "digest": "sha256:1a01ed26ff3992c26797839a1fe65cec5cf3498a4b469f57fc59fefe4563ce8f"
     },
     {
       "name": "nutanix-files",
       "type": "skill-md",
       "description": "Configure or troubleshoot Nutanix Files servers and SMB/NFS shares. Use for directory integration, Smart Tiering, recovery, analytics, performance, or Files APIs.",
       "url": "/.well-known/agent-skills/nutanix-files/SKILL.md",
-      "digest": "sha256:9d21b7d19a53a65b8c97d169491cc984bb11567ba8a6fb373399a4b60716e895"
+      "digest": "sha256:bf26c42f382fa9f3c18b456b42539eb77cce160c76bfb2f10546679a2a8dd7a2"
     },
     {
       "name": "nutanix-kubernetes-platform",
       "type": "skill-md",
       "description": "Configure, operate, or troubleshoot Nutanix Kubernetes Platform (NKP), Konvoy, or Kommander. Use for NKP cluster lifecycle, image builds, air-gapped installs, or Insights.",
       "url": "/.well-known/agent-skills/nutanix-kubernetes-platform/SKILL.md",
-      "digest": "sha256:62a065b61b13b16dd9a41faf80c3e351cb7e857db82c708a023155e60feebe3e"
+      "digest": "sha256:5c4a99105067515055ee43fc1d5f0879e2deb02502fbe43bee7cf7eb562539c9"
     },
     {
       "name": "nutanix-objects",
       "type": "skill-md",
       "description": "Configure or troubleshoot Nutanix Objects storage. Use for its S3 APIs, buckets, IAM, WORM policies, replication, cloud tiering, monitoring, or Objects Browser.",
       "url": "/.well-known/agent-skills/nutanix-objects/SKILL.md",
-      "digest": "sha256:3fa7aa50877409cb84f45a7cf240cc778be4a9e5d9cf4a8416f16d681e790b08"
+      "digest": "sha256:a65be01133df33840f33caced5700f4680aefe7d16896703fa6dbad449dbe518"
     },
     {
       "name": "optimize-performance",
@@ -335,14 +335,14 @@
       "type": "skill-md",
       "description": "Prepare a briefing before reviewing a pull request: explain the diff, key files, risks, and questions for the author. Use for PR context, or a whole-repository overview when on its default branch.",
       "url": "/.well-known/agent-skills/pr-build-context/SKILL.md",
-      "digest": "sha256:dabedfc4ed6630b2166b27d8eade3279496ee90b9fad577946dc7976bc8b075b"
+      "digest": "sha256:025460c01fcd9d6581cacc92765b0ac236c75eb8630530941a325357eb040d3c"
     },
     {
       "name": "pr-create-test-plan",
       "type": "skill-md",
       "description": "Draft TEST_PLAN.md for a branch's real user flows and integration changes using the project's commands. Use when a reviewer needs manual verification steps and a quick smoke test before merging.",
       "url": "/.well-known/agent-skills/pr-create-test-plan/SKILL.md",
-      "digest": "sha256:30da17c23d08ab1898a6911a738fd77e5ed035868bc643f93ec2beb2e8dcf98a"
+      "digest": "sha256:da3fda21f8eb2974c1a4457865ce912c9740ce752c01debde6981a9a3a9606fb"
     },
     {
       "name": "pr-edge-cases",
@@ -363,14 +363,14 @@
       "type": "skill-md",
       "description": "Rank, cut, cluster, and sequence ideas or tickets by value, effort, risk, and dependencies. Use when grooming a backlog with value-effort, RICE, or WSJF scoring, whatever tracker it lives in.",
       "url": "/.well-known/agent-skills/prioritize-backlog/SKILL.md",
-      "digest": "sha256:841d99c2e71121dbfdf440610a1f11201023febd5723d483c3678112f2c51dbf"
+      "digest": "sha256:3463b7e50bcb29b37142c0d60a9e4e17824f4fc331f8ad3db4fa0580cf744bbe"
     },
     {
       "name": "productionize-app",
       "type": "skill-md",
       "description": "Prepare an entire application for production when explicitly requested. Audit and fix configuration, reliability, security, observability, packaging, and deployment readiness.",
       "url": "/.well-known/agent-skills/productionize-app/SKILL.md",
-      "digest": "sha256:e8b3130386b571550c66d63d6fc946614f72d75b48926732436b315c779beafe"
+      "digest": "sha256:7634fea8054b42e7f98c983f4abe050f481ab0e1bad671d5f76e5b9ba4e64f6b"
     },
     {
       "name": "research",
@@ -412,7 +412,7 @@
       "type": "skill-md",
       "description": "Refactor a scoped diff or selected files for clearer naming, control flow, structure, and less duplication or dead code. Use for cleanup that preserves behavior.",
       "url": "/.well-known/agent-skills/sculpt-code/SKILL.md",
-      "digest": "sha256:90ff38fd89ad332236a0720d770682bb226bc60bebcd476123bb0a48928ac255"
+      "digest": "sha256:9ebbbcc83ca9de5fa57040476b7f335ca113350600bea7b1bbb1ce80a01e7e03"
     },
     {
       "name": "self-review",
@@ -431,16 +431,16 @@
     {
       "name": "skill-archive",
       "type": "skill-md",
-      "description": "Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog.",
+      "description": "Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog. Use only when the user explicitly requests archiving a skill.",
       "url": "/.well-known/agent-skills/skill-archive/SKILL.md",
-      "digest": "sha256:263c34edd005658d2edfe9e5e112650a6e557ce6dc1b9dbc998b612d40cedc09"
+      "digest": "sha256:f54488228f81b2b7f241959a634be289fbc2066055db2de83515719275ff58e1"
     },
     {
       "name": "skill-audit",
       "type": "skill-md",
-      "description": "Audit the custom skill catalog for invocation policies, descriptions, frontmatter, references, duplicates, and lifecycle drift.",
+      "description": "Audit the custom skill catalog for invocation policies, descriptions, frontmatter, references, duplicates, and lifecycle drift. Use only when the user explicitly requests a catalog audit.",
       "url": "/.well-known/agent-skills/skill-audit/SKILL.md",
-      "digest": "sha256:47342d32585829100a6a0ff04ec2ea0b11ea07e8788fbd1f2fdad32a1ce5e0d1"
+      "digest": "sha256:0253c2b01a106e9a0643f6fcd39aec09ed15a0a2c7ca81da355e6259fe35cf07"
     },
     {
       "name": "skill-creator",
@@ -452,16 +452,16 @@
     {
       "name": "skill-router",
       "type": "skill-md",
-      "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
+      "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic. Use only when the user explicitly requests routing or browsing the catalog.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:6d800fae48fadebb7616abe1f9fa46c7b1565356a0477dde50c147a5b3ddb89c"
+      "digest": "sha256:dbbe370c31c9094776ee7e4e6678e218d6bc455ff021a87b0da56bca265abddf"
     },
     {
       "name": "store-plan",
       "type": "skill-md",
       "description": "Save an agreed conversation plan, decisions, action items, and open questions to a reviewable Markdown file in docs/plans/. Use when a durable repository plan is needed rather than a temporary handoff.",
       "url": "/.well-known/agent-skills/store-plan/SKILL.md",
-      "digest": "sha256:c98ab16fc236c04dd34e3d1cfd39bd0b3087ae21e23c3eeff1c68fe6154af774"
+      "digest": "sha256:37e0cb36c9075921bc29a234ca605501f0ea7fed013edd8dcaf564d42acdfacc"
     },
     {
       "name": "tailwind",
@@ -482,7 +482,7 @@
       "type": "skill-md",
       "description": "Synthesize the current conversation into a product spec or PRD and publish it to the project's issue tracker. Use when asked to formalize discussed requirements and testing decisions without a new interview.",
       "url": "/.well-known/agent-skills/to-spec/SKILL.md",
-      "digest": "sha256:a7311a0a5e6b61c831ea9d14861038cf09290f7283d85a7a71da0dce3909cdeb"
+      "digest": "sha256:3fa1eed0826d153fa87885a063f185dc0f3b5f01f2fd710d42c269aba49e6db9"
     },
     {
       "name": "to-tickets",
@@ -524,7 +524,7 @@
       "type": "skill-md",
       "description": "Chart a large, ambiguous effort as an issue-tracker map of investigation tickets. Use when asked to map unknown decisions or work one frontier ticket per session, rather than slice known implementation work.",
       "url": "/.well-known/agent-skills/wayfinder/SKILL.md",
-      "digest": "sha256:2f4820c339790e3cf5f5c1227e4b20e401f73b8f1a5176765dfb7d13744b5ec2"
+      "digest": "sha256:2b05267b1c2243bba4e57b95b966cb30aebf386ab1828cc3e3ec2acb17ceb6be"
     },
     {
       "name": "wtf",
@@ -538,7 +538,7 @@
       "type": "skill-md",
       "description": "Integrate or debug xAI/Grok APIs and SDKs. Use for client configuration, model capabilities, streaming, tool calling, structured output, vision, or search integration.",
       "url": "/.well-known/agent-skills/xai/SKILL.md",
-      "digest": "sha256:76d7f3bc45c737acbe01b8122aa2c1903011bf34c7058b7491629d434870ba26"
+      "digest": "sha256:e4d82b0667f8519be76e520f8a930cc7a2e2faa33fb2e9ffb1a90cdb715d81d5"
     },
     {
       "name": "zed",
@@ -552,7 +552,7 @@
       "type": "skill-md",
       "description": "Build, serve, or customize an existing Zola site. Use for Tera templates and components, taxonomies, zola.toml options, theme changes, or Zola build and link checks.",
       "url": "/.well-known/agent-skills/zola/SKILL.md",
-      "digest": "sha256:a3f2e65bc284b0e029a1066c403f51c8535c85b4b60b00ae48149ffb427c8044"
+      "digest": "sha256:079dfb65dbebca6cbda9aab33bc5d85e912748eb5ffa20b40a5a9a4e4b970e50"
     }
   ]
 }

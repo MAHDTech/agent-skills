@@ -10,115 +10,113 @@ mermaid = false
 +++
 
 
-# Sculpt Code
+# Sculpt code
 
-Reshape code quality across eight dimensions. Scope to branch changes by default (`git diff <base-branch>...HEAD`), or accept explicit file/directory targets.
-
-**Philosophy:** Write code for the next reader (human or agent). Minimize cognitive load. Prefer boring, obvious code over clever code. Every change must preserve business logic unless explicitly told otherwise.
+Reshape code quality across eight dimensions while preserving existing behavior unless explicitly told otherwise. Scope to branch changes by default (`git diff <base-branch>...HEAD`), or accept explicit file/directory targets.
 
 ## Instructions
 
-1. **Determine scope** - ask if unclear:
+1. **Determine scope** (ask if unclear):
    - Branch diff: `git diff <base-branch>...HEAD --name-only`
    - Staged changes: `git diff --cached --name-only`
    - Explicit files: user-provided list
-2. **Read all changed files in full** before reviewing - understand existing patterns, not just the diff.
-3. **Review each dimension** below. For each finding, cite `file_path:line_number`.
-4. **Apply fixes directly** - this is a sculpting tool, not a report generator. Make the changes, show what you did.
+2. **Verify a green baseline** before editing by running the repository's tests, typecheck, and linter for the scoped area (or note if no suite exists and pin critical behavior first).
+3. **Read all scoped files in full** before refactoring so changes match existing module patterns rather than just the diff.
+4. **Review each dimension** below, citing `file_path:line_number` for each change.
+5. **Apply fixes directly** and report the changes made.
+6. **Re-run tests, typecheck, and linter** after refactoring to confirm behavior is preserved and all checks pass.
 
 ## Dimensions
 
-### 1. Dead Code & Surface Area
+### 1. Dead code and surface area
 
-- Remove genuinely unused imports, functions, classes, and exception types
-- **Verify before delete**: grep the entire codebase before removing anything
-- Remove commented-out code; git history keeps it
-- Remove premature abstractions: factories with 1 implementation, pass-through wrappers, single-use utility classes
+- Remove genuinely unused imports, functions, classes, and exception types.
+- **Verify before delete**: grep the entire codebase before removing any symbol.
+- Remove commented-out code (Git history preserves it).
+- Remove pass-through wrappers, single-use utility classes, and single-implementation factories that add indirection without hiding complexity or defining an active boundary; keep an abstraction when it enforces a real contract or test seam, hides non-trivial invariant logic, or has a documented second implementation in progress.
 
-### 2. Naming & Clarity
+### 2. Naming and clarity
 
-- Names must reveal intent - no `data`, `temp`, `result`, `x`, `val`, `info` without context
-- Follow the codebase's existing conventions (don't mix `repo`/`repository`, `config`/`configuration`)
-- Function names describe what they do, not how
-- Prefer the language's idiomatic emptiness and truthiness checks (for example `if not items:` in Python) when they read as clearly as the explicit form
-- Boolean variables/functions read as questions: `is_valid`, `has_permission`, `should_retry`
+- Choose intent-revealing names; replace vague identifiers (`data`, `temp`, `result`, `x`, `val`, `info`) with domain terms.
+- Keep terminology consistent across the codebase (use one term consistently, such as `repo` or `repository`, `config` or `configuration`).
+- Name functions after their observable outcome or action.
+- Prefer the language's idiomatic emptiness and truthiness checks (for example `if not items:` in Python) when they read as clearly as the explicit form.
+- Name boolean variables and predicates as questions (`is_valid`, `has_permission`, `should_retry`).
 
-### 3. File & Function Size
+### 3. File and function size
 
-- Functions over ~50 lines → candidate for extraction
-- Files over ~400 lines → candidate for splitting
-- Each function should have a single clear responsibility
-- If you need a comment to separate "sections" within a function, those sections are probably separate functions
-- Group related functions in the same file; don't scatter them
+- Treat functions over ~50 lines as extraction candidates.
+- Treat files over ~400 lines as splitting candidates.
+- When a function relies on heading comments to separate internal "sections", extract those sections into named helper functions.
+- Co-locate related helpers in the same module.
 
-### 4. Nesting & Control Flow
+### 4. Nesting and control flow
 
-- Max 3 levels of nesting - flatten with early returns and guard clauses
-- Prefer early returns over deeply nested if/else chains
-- Extract complex conditions into named booleans or predicate functions
-- Replace nested loops with comprehensions or helper functions where it improves readability (not where it obscures it)
+- Cap nesting at 3 levels by flattening with guard clauses and early returns.
+- Replace deeply nested `if`/`else` chains with early returns.
+- Extract complex boolean conditions into named variables or predicate functions.
+- Replace nested loops with comprehensions or helper functions when doing so improves clarity.
 
-### 5. Idiomatic Patterns
+### 5. Idiomatic patterns
 
-- Use language-native constructs (e.g., list comprehensions in Python, `map`/`filter` in JS where idiomatic)
-- Follow the repo's established patterns - don't introduce new paradigms for one function
-- Prefer standard library over hand-rolled equivalents
-- Match error handling style to the rest of the codebase
+- Use language-native constructs (for example list comprehensions in Python, `map`/`filter` in JS where idiomatic) and standard-library functions over hand-rolled equivalents.
+- Match the repository's established architecture, idioms, and error-handling conventions.
 
-### 6. Reuse Opportunities
+### 6. Reuse opportunities
 
-- Check if an existing helper already does what new code is doing - grep before writing
-- Duplication thresholds: extract a magic value into a named constant at 2+ uses; extract repeated logic into a helper at 3+ occurrences (two copies of logic can stay inline)
-- Flag cases where a library function was reimplemented
+- Grep the codebase before adding a helper to reuse existing utilities.
+- Duplication thresholds: extract a magic value into a named constant at 2+ uses; extract repeated logic into a helper at 3+ occurrences (two copies can stay inline).
+- Replace hand-rolled reimplementations of installed library functions with the library call.
 
-### 7. TODO Hygiene
+### 7. TODO hygiene
 
-Match the project's existing TODO convention. If it already uses a TODO-prefix taxonomy, follow that taxonomy; otherwise stick to a plain `TODO:` (plus the widely understood `FIXME:` / `HACK:`) rather than imposing a scheme the codebase hasn't adopted.
+Match the project's existing TODO convention (use its prefix taxonomy if adopted; otherwise stick to plain `TODO:`, `FIXME:`, or `HACK:`).
 
-Each TODO must include:
+- Remove stale or resolved TODOs.
+- Complete existing in-scope TODOs when trivial and safe.
+- Keep remaining valid TODOs focused by ensuring each states **what** is deferred and **why**; avoid adding speculative TODOs for hypothetical future cleanups.
 
-- **What**: clear description
-- **Why**: context on why it's deferred
+### 8. Readability and cognitive load
 
-Add missing TODOs for: known shortcuts, deferred work, temporary workarounds, and obvious improvement opportunities spotted during review. Remove stale or resolved TODOs.
+- Keep comments focused on **why** (invariants, workarounds, external constraints) and delete comments that restate the code.
+- Trim verbose rationale comments to one or two direct lines.
+- Use blank lines between logical blocks.
+- Preserve `IMPORTANT`, `NOTE`, `CRITICAL`, and `DEV_NOTE` markers (tighten the wording while keeping the tag).
+- Keep links, issue references, and external citations intact.
 
-### 8. Readability & Cognitive Load
-
-- Comments explain **why**, not **what** (delete `# increment counter` above `counter += 1`)
-- Trim noisy, bloated comments to one or two lines of rationale
-- When a block of code needs a heading comment to explain what it does, extract it into a named function instead (see dimension 3)
-- Strategic whitespace: blank lines between logical sections
-- Preserve all `IMPORTANT`, `NOTE`, `CRITICAL`, `DEV_NOTE` markers - clean up the text, not the tag
-- Keep links, issue references, and external references intact
-
-## Output Format
+## Output format
 
 For each file changed, show:
 
 ```text
 ### file_path
 
-**Changes made:**
+Changes made:
 - [dimension] description of change (line X)
 - [dimension] description of change (line Y)
 ```
 
-End with a summary: files touched, lines removed, TODOs added/removed, helpers extracted.
+End with a summary: files touched, lines removed, TODOs resolved/removed, helpers extracted, and verification commands run.
 
 ## Leave unchanged
 
-- Working abstractions (even if currently simple)
-- Type annotations and signatures (they document contracts)
-- Test code (unless explicitly asked)
-- Forward-looking base classes if second implementation is likely soon
-- Domain-specific patterns the team uses intentionally
+- Abstractions that hide real complexity, define an active contract or test seam, or support a documented second implementation in progress.
+- Public type annotations and signatures that define external contracts.
+- Test code (unless explicitly requested).
+- Intentional domain-specific patterns established by the team.
 
 ## Larger refactors
 
-For a bigger cleanup - removing accumulated engineering debt, untangling oversized modules, or collapsing duplicated logic across many files - work in small, reviewable passes rather than one sweeping diff:
+For a bigger cleanup (removing accumulated debt, untangling oversized modules, or collapsing duplicated logic across many files), work in small, reviewable passes rather than one sweeping diff:
 
-1. **Map before editing.** Survey the messy area first: noisy modules, duplicated logic, dead code, public contracts, and the tests around them. Know what you're touching before you touch it.
-2. **One theme per pass.** Pick a single cleanup theme at a time - delete dead code, simplify control flow, extract a helper, or modernise one stale pattern - not all at once.
-3. **State the behaviour and the check.** Before each pass, name the current behaviour, the structural improvement, and the smallest check that proves behaviour stayed stable. Run that check after every pass.
-4. **Keep migrations separate.** Framework migrations, dependency upgrades, and architecture moves are their own task, outside a refactor pass. Lean on a green test suite, or characterization tests that pin current behaviour when there isn't one, as the safety net.
+1. **Map before editing.** Survey the target area first: noisy modules, duplicated logic, dead code, public contracts, and existing tests.
+2. **One theme per pass.** Pick a single cleanup theme per pass (dead code, control flow, helper extraction, or one stale pattern).
+3. **State the behavior and the check.** Before each pass, name the preserved behavior, the structural change, and the smallest check that verifies it; run that check after every pass.
+4. **Keep migrations separate.** Treat framework migrations, dependency upgrades, and architecture moves as separate tasks outside a refactor pass, backed by tests or characterization tests.
+
+## Completion criteria
+
+- A green baseline check (tests, typecheck, and lint applicable to the repo) ran before editing, or the absence of automated checks was explicitly noted.
+- Every refactor preserves existing behavior, respects the `## Leave unchanged` boundaries, and cites `file_path:line_number` in the summary.
+- All applicable tests, typechecks, and linters pass after the final edit with zero new warnings or unrelated changes.
 

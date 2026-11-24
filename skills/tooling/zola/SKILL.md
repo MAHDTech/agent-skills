@@ -34,7 +34,7 @@ Run `zola --version` first. Zola 0.23 moved to Tera 2 and removed shortcodes: co
 
 ## Commands
 
-Run from the site root, or pass `--root <path>`:
+Run from the site root, or pass `--root <path>` before the subcommand (for example, `zola --root <path> build`):
 
 - `zola build` renders the site to `public/`.
 - `zola serve` serves with live reload on port 1111.

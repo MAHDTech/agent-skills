@@ -1,6 +1,6 @@
 +++
 title = "skill-audit"
-description = "Audit the custom skill catalog for invocation policies, descriptions, frontmatter, references, duplicates, and lifecycle drift."
+description = "Audit the custom skill catalog for invocation policies, descriptions, frontmatter, references, duplicates, and lifecycle drift. Use only when the user explicitly requests a catalog audit."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -43,7 +43,7 @@ Walk the whole collection. Each pass carries an exhaustive bound - every skill, 
    rg --files skills -g SKILL.md -g '!skills/vendor/**' -g '!skills/in-progress/**'
    # Slash references are candidates: distinguish commands from paths before reconciling.
    rg -o --no-filename '/[a-z][a-z0-9]+(-[a-z0-9]+)*' skills \
-     -g SKILL.md -g '!skills/vendor/**' -g '!skills/in-progress/**' | sort -u
+     -g '*.md' -g '!skills/vendor/**' -g '!skills/in-progress/**' -g '!**/resources/auto/**' | sort -u
    # Relative links from SKILL.md and resources/manual/ that do not resolve.
    rg -n -o '\]\(\.[^)#]+' skills -g '*.md' -g '!skills/vendor/**' -g '!**/resources/auto/**'
    ```

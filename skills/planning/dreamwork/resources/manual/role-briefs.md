@@ -84,9 +84,14 @@ required gates passed; otherwise changes_requested or blocked.
 Run-branch head: <full commit and tree>. Final gates: <gate IDs>.
 
 Reset your fresh checkout to the run-branch head, run preflight, then run the final
-gates only. Do not review code. Return completed with gate results, or blocked.
-Leave the checkout clean and services stopped: it becomes the UAT checkout.
+gates only. Do not review code. Write "role": "verifier" in your receipt and
+return completed with gate results, or blocked. Leave the checkout clean and
+services stopped: it becomes the UAT checkout.
 ```
+
+Dispatch with the Reviewer target and T3 `role: "test"`, passing `<role>` as
+`verifier` in the brief header so the returned receipt carries `"role": "verifier"`
+for Architect validation.
 
 ## Council member
 

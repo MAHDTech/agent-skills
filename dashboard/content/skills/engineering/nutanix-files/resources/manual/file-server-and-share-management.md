@@ -39,8 +39,12 @@ Nutanix Files supports SMB 2.1 and SMB 3.0 (including SMB 3.02 / 3.1.1).
 - **Durable Handles**: Re-establishes broken TCP sessions transparently after short network interruptions.
 
 ```bash
-# Example CLI view of SMB shares via ncli
-ncli file-server list-shares name=<file-server-name>
+# On a CVM: list shares for a file server by UUID, or list all shares across file servers
+ncli fs list-shares uuid=<file-server-uuid>
+ncli file-server list-all-fs-shares
+
+# On an FSVM: list shares hosted by the file server
+afs share.list
 ```
 
 ---

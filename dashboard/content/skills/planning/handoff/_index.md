@@ -12,17 +12,32 @@ mermaid = false
 
 # Handoff
 
-Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save it to the operating system's temporary directory - **not** the current workspace - so it isn't committed by accident.
+Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save it to the operating system's temporary directory - **not** the current workspace - so it isn't committed by accident, and return the exact saved file path to the user.
 
 This handoff is deliberately **throwaway** - a temporary baton for the next agent. For a durable plan that lives in the repo and gets committed, use `/store-plan` instead.
 
-Include a **"Suggested skills"** section in the document, listing the skills the next agent should invoke (for example `/prioritize-backlog`, `/wayfinder`, or whichever fit the work ahead) and why each is relevant.
+If the user passed arguments, treat them as a description of what the next session will focus on and tailor the document accordingly.
 
-Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead - the handoff points at the source of truth, it doesn't copy it.
+## Required sections
 
-Redact any sensitive information, such as API keys, passwords, tokens, or personally identifiable information. If a secret is load-bearing for the next session, reference where it lives (e.g. an env var name or secrets manager path) rather than the value itself.
+Include these sections in the handoff document (keep each concise and omit filler):
 
-If the user passed arguments, treat them as a description of what the next session will focus on and tailor the doc accordingly.
+- **Goal**: What the effort is trying to achieve and what the next session should focus on.
+- **Completed work**: Decisions reached and changes already landed or verified.
+- **Remaining work and next steps**: Concrete ordered actions for the next agent to take first.
+- **Open questions**: Unresolved blockers, trade-offs, or decisions still waiting on input.
+- **Artifact pointers**: Paths or URLs to existing specs, plans, ADRs, issues, commits, or diffs. Reference the source of truth rather than duplicating its content.
+- **Suggested skills**: Skills the next agent should invoke (for example `/prioritize-backlog`, `/wayfinder`, or whichever fit the work ahead) and why each is relevant.
+
+## Redaction
+
+Redact any sensitive information, such as API keys, passwords, tokens, or personally identifiable information. If a secret is load-bearing for the next session, reference where it lives (e.g., an env var name or secrets manager path) rather than the value itself.
+
+## Done when
+
+- The handoff file is saved in the OS temporary directory outside the current workspace.
+- Every required section is present, with durable artifacts referenced by path or URL rather than copied.
+- All secrets and PII are verified redacted, and the exact saved file path is reported to the user.
 
 ---
 

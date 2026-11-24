@@ -13,9 +13,11 @@ skill_name = "dreamwork"
 
 When every issue is staged or parked:
 
-1. Dispatch the Reviewer target in a fresh worktree (role `test`) to reset its
-   checkout to the run-branch head, run preflight, and run the plan's final gates.
-   It does not review code. Its receipt is the run-level gate evidence.
+1. Dispatch the Reviewer target in a fresh worktree with T3 `role: "test"` to
+   reset its checkout to the run-branch head, run preflight, and run the plan's
+   final gates. The brief must instruct the child to write `"role": "verifier"`
+   in its returned receipt (required for Architect receipt validation). It does
+   not review code. Its receipt is the run-level gate evidence.
 2. If a final gate fails, find the responsible issue from the evidence and send it
    back through repair, Reviewer verification and restaging. If the cause is unclear
    or spans issues, park the run's remaining work as not converged and report it.

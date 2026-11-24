@@ -4,10 +4,10 @@
     "researcher": {
       "targets": [
         {
-          "providerInstanceId": "codex",
-          "model": "gpt-6.1-sol",
+          "providerInstanceId": "<provider-instance-id>",
+          "model": "<model-id>",
           "options": {
-            "reasoningEffort": "high"
+            "<option-key>": "<option-value>"
           }
         }
       ]
@@ -15,15 +15,15 @@
     "implementer": {
       "targets": [
         {
-          "providerInstanceId": "opencode",
-          "model": "opencode/inkling-2-small-free",
+          "providerInstanceId": "<primary-provider-instance-id>",
+          "model": "<model-id>",
           "options": {}
         },
         {
-          "providerInstanceId": "codex",
-          "model": "gpt-6.1-sol",
+          "providerInstanceId": "<fallback-provider-instance-id>",
+          "model": "<fallback-model-id>",
           "options": {
-            "reasoningEffort": "medium"
+            "<option-key>": "<option-value>"
           }
         }
       ]
@@ -31,10 +31,10 @@
     "reviewer": {
       "targets": [
         {
-          "providerInstanceId": "antigravity",
-          "model": "gemini-4-argon",
+          "providerInstanceId": "<provider-instance-id>",
+          "model": "<model-id>",
           "options": {
-            "thinking_level": "medium"
+            "<option-key>": "<option-value>"
           }
         }
       ]
@@ -44,47 +44,47 @@
     "min_seats": 2,
     "seats": [
       {
-        "name": "Claude Opus",
+        "name": "<anthropic-seat-name>",
         "family": "anthropic",
         "targets": [
           {
-            "providerInstanceId": "claudeAgent",
-            "model": "claude-opus-5-5",
+            "providerInstanceId": "<primary-provider-instance-id>",
+            "model": "<anthropic-model-id>",
             "options": {
-              "effort": "high"
+              "<option-key>": "<option-value>"
             }
           },
           {
-            "providerInstanceId": "antigravity",
-            "model": "claude-opus-5-5",
+            "providerInstanceId": "<fallback-provider-instance-id>",
+            "model": "<anthropic-model-id>",
             "options": {
-              "thinking_level": "high"
+              "<option-key>": "<option-value>"
             }
           }
         ]
       },
       {
-        "name": "GPT Sol",
+        "name": "<openai-seat-name>",
         "family": "openai",
         "targets": [
           {
-            "providerInstanceId": "codex",
-            "model": "gpt-6.1-sol",
+            "providerInstanceId": "<provider-instance-id>",
+            "model": "<openai-model-id>",
             "options": {
-              "reasoningEffort": "high"
+              "<option-key>": "<option-value>"
             }
           }
         ]
       },
       {
-        "name": "Gemini Carbon",
+        "name": "<google-seat-name>",
         "family": "google",
         "targets": [
           {
-            "providerInstanceId": "antigravity",
-            "model": "gemini-4-carbon",
+            "providerInstanceId": "<provider-instance-id>",
+            "model": "<google-model-id>",
             "options": {
-              "thinking_level": "high"
+              "<option-key>": "<option-value>"
             }
           }
         ]

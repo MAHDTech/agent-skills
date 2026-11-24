@@ -14,7 +14,7 @@ mermaid = false
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Consult the `gh pr` manual in `resources/auto/manual-gh_pr.md` for more details.
+Run `gh pr --help` on demand if you need flag details.
 
 Draft a concise PR title and description from the diff against a base branch, get the user's approval, then create or update the PR.
 
@@ -28,10 +28,16 @@ BASE_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2
 [ -n "$BASE_BRANCH" ] || BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
 ```
 
-If every method fails, ask the user which branch to use; never fall back to a guessed `main` or `master`. Verify the branch exists before proceeding, and stop to ask the user if it does not:
+If every method fails, ask the user which branch to use; never fall back to a guessed `main` or `master`. Fetch and capture the verified ref as `BASE_REF` (preferring `origin/$BASE_BRANCH`), and stop to ask the user if neither ref exists:
 
 ```bash
-git rev-parse --verify "$BASE_BRANCH" 2>/dev/null || git rev-parse --verify "origin/$BASE_BRANCH" 2>/dev/null
+git fetch origin "$BASE_BRANCH" 2>/dev/null || true
+BASE_REF=""
+if git rev-parse --verify "origin/$BASE_BRANCH" >/dev/null 2>&1; then
+  BASE_REF="origin/$BASE_BRANCH"
+elif git rev-parse --verify "$BASE_BRANCH" >/dev/null 2>&1; then
+  BASE_REF="$BASE_BRANCH"
+fi
 ```
 
 ## 2. Analyze the changes
@@ -39,8 +45,8 @@ git rev-parse --verify "$BASE_BRANCH" 2>/dev/null || git rev-parse --verify "ori
 Exclude lockfiles from the stat so generated churn does not drown the real changes; dependency manifests such as `package.json` stay in:
 
 ```bash
-git diff "$BASE_BRANCH" --stat -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"
-git log "$BASE_BRANCH"..HEAD --oneline
+git diff "$BASE_REF"...HEAD --stat -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"
+git log "$BASE_REF"..HEAD --oneline
 ```
 
 ## 3. Draft the title and description
@@ -56,7 +62,7 @@ PR_BODY="$(mktemp -d)/PR_DESCRIPTION.md"
 Before displaying the draft:
 
 - Scan the title, body, quoted snippets, command output, and any attachment links for secrets and private details. Follow `/gh-pr-comments` for the full checklist when it is installed.
-- Keep the description free of comment attribution callouts and `Created with <model> in <harness>` footers; those belong to comments, not PR descriptions.
+- Keep the description free of comment attribution callouts (those belong only on comments) and omit `Created with <model> in <harness>` footers from both PR descriptions and comments.
 
 Display the title and description to the user.
 
@@ -94,7 +100,7 @@ Re-run the secret and private-detail scan if the user edited the draft, then:
    gh pr create --base "$BASE_BRANCH" --title "<generated title>" --body-file "$PR_BODY"
    ```
 
-   If `gh pr create` or `gh pr edit` fails because the GraphQL rate limit is exhausted, use the REST API instead (`/gh-babysit-pr` covers checking the GraphQL budget):
+   If `gh pr create` or `gh pr edit` fails because the GraphQL rate limit is exhausted, use the REST API instead (check `gh api rate_limit --jq '.resources.graphql'`, or use `/gh-babysit-pr` when installed and authorized):
 
    ```bash
    gh api "repos/{owner}/{repo}/pulls" -f title="<generated title>" -f head="$(git branch --show-current)" \
@@ -106,7 +112,7 @@ Re-run the secret and private-detail scan if the user edited the draft, then:
 
 Done when the PR URL is confirmed and reported to the user.
 
-If the user also asked to monitor the PR through CI and reviews, continue with `/gh-babysit-pr`. Post a follow-up PR comment only when the user's request calls for one, following `/gh-pr-comments`.
+If the user also asked to monitor the PR through CI and reviews, continue with `/gh-babysit-pr` when installed and authorized (otherwise report the PR URL and current check status). Post a follow-up PR comment only when the user's request calls for one, following `/gh-pr-comments`.
 
 > Adapted from [t3dotgg/tstack](https://github.com/t3dotgg/tstack) (MIT).
 

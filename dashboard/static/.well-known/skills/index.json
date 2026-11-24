@@ -93,7 +93,7 @@
     },
     {
       "name": "devenv",
-      "description": "Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands. Follow its shell, dependency, SecretSpec, hook, and test-runner conventions.",
+      "description": "Manage shells, dependencies, SecretSpec, hooks, and tests in devenv projects. Use when a repository has devenv.nix or devenv.yaml, or when running devenv commands.",
       "files": [
         "SKILL.md"
       ]
@@ -233,7 +233,7 @@
     },
     {
       "name": "herdr",
-      "description": "Operate Herdr panes, workspaces, or agent sessions when HERDR_ENV=1. Also use for Herdr setup, configuration, keybindings, and troubleshooting questions.",
+      "description": "Operate Herdr panes, workspaces, or agent sessions (requires HERDR_ENV=1) only when the user explicitly asks to use Herdr. Also use for Herdr setup, config, keybindings, and troubleshooting questions.",
       "files": [
         "SKILL.md"
       ]
@@ -429,14 +429,14 @@
     },
     {
       "name": "skill-archive",
-      "description": "Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog.",
+      "description": "Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog. Use only when the user explicitly requests archiving a skill.",
       "files": [
         "SKILL.md"
       ]
     },
     {
       "name": "skill-audit",
-      "description": "Audit the custom skill catalog for invocation policies, descriptions, frontmatter, references, duplicates, and lifecycle drift.",
+      "description": "Audit the custom skill catalog for invocation policies, descriptions, frontmatter, references, duplicates, and lifecycle drift. Use only when the user explicitly requests a catalog audit.",
       "files": [
         "SKILL.md"
       ]
@@ -450,7 +450,7 @@
     },
     {
       "name": "skill-router",
-      "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic.",
+      "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic. Use only when the user explicitly requests routing or browsing the catalog.",
       "files": [
         "SKILL.md"
       ]
