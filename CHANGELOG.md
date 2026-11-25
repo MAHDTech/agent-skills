@@ -1,7 +1,22 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-### [v0.1.59](https://github.com/MAHDTech/agent-skills/compare/v0.1.58...ac46f4638ab34ff29a10e8e739b358c078bc49c3) (2026-11-23)
+### [v0.1.60](https://github.com/MAHDTech/agent-skills/compare/v0.1.59...b6fe24a9fc9f4243f8670a7d3d9435231065ff18) (2026-11-25)
+
+#### Fixes
+
+* **rust:** resolve clippy warnings and update dependencies (#349)
+([b6fe24a](https://github.com/MAHDTech/agent-skills/commit/b6fe24a9fc9f4243f8670a7d3d9435231065ff18)),
+closes [#349](https://github.com/MAHDTech/agent-skills/issues/349)
+* **skills:** remediate skill audit findings and enforce devenv.nix style
+(#348)
+([386b871](https://github.com/MAHDTech/agent-skills/commit/386b8710c67df3f761196c9da16b847d19bda25f)),
+closes [#348](https://github.com/MAHDTech/agent-skills/issues/348)
+* use main as workaround (#345)
+([75d6aab](https://github.com/MAHDTech/agent-skills/commit/75d6aab074e7d7b78b7beb63f90599f9d1bbd75f)),
+closes [#345](https://github.com/MAHDTech/agent-skills/issues/345)
+
+### [v0.1.59](https://github.com/MAHDTech/agent-skills/compare/v0.1.58...v0.1.59) (2026-11-24)
 
 #### Features
 
