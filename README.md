@@ -234,7 +234,7 @@ Autonomous GUARDS software factory, debugging, and persistent goal workflows.
 
 - **[guards-debug](skills/guards/guards-debug/SKILL.md)** - Diagnose and recover stuck or failing agy-guards sessions, hooks, spokes, or factory shifts from outside an active run. Use only when the user explicitly requests GUARDS debugging.
 - **[guards-goal](skills/guards/guards-goal/SKILL.md)** - Set or resume a persistent goal and pursue it until every requirement is verified or blocked. Use only when the user explicitly asks for a goal that persists across turns.
-- **[guards-run-factory](skills/guards/guards-run-factory/SKILL.md)** - Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
+- **[guards-run-factory](skills/guards/guards-run-factory/SKILL.md)** - Run the GUARDS factory unattended over a single repository backlog, single-repo chores, or a parallel multi-repo chores fleet through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift or fleet chores run.
 
 ### Vendor Skills
 

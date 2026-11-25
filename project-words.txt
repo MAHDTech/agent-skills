@@ -227,6 +227,7 @@ pkgs
 plistlib
 plutil
 Pocock
+precheck
 prefactoring
 preheader
 prek

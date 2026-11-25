@@ -51,7 +51,7 @@ Never construct a replacement receipt from the target repository or the currentl
 - With `--audit`: send `{"action":"audit"}`. Acknowledge result with `handle`.
 - With `--triage`: send `{"action":"triage"}`. Triage always parks at its human approval gate. Acknowledge with `handle` using `directive: "parked"`, and record the proposal without applying it.
 
-Note: Exact selections (`--epic`, `--issue`, `--issues`) exclude repository-wide audit and triage.
+Note: Exact selections (`--epic`, `--issue`, `--issues`) and chores-only shifts (`--chores`) exclude repository-wide audit and triage.
 
 ## 4. Workload cycle
 
@@ -68,6 +68,7 @@ Repeat up to `--cycles` times:
    - `continue`: Leg completed normally; advance to next cycle.
    - `pending_ci`: Checks running on open PRs. The supervisor internally paces for 10 minutes before accepting the next cycle.
    - `drained`: Selected workload finished.
+   - `bootstrap`: A `--chores` repository without chores configuration opened a researched `guards/bootstrap-chores` PR for Cooper's review; park shift cleanly.
    - `approval_needed` / `ruleset_blocked` / `pending_human_merge` / `human_door` / `stalled`: Park shift.
    - Batch engine `operational_blocker`: Map to `parked`, copying the `why` string into evidence.
 4. **Ledger.** Send `handle` naming the current `resultSeq`, directive, scoped progress fingerprint, and non-empty evidence object:

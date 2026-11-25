@@ -219,7 +219,7 @@
     },
     {
       "name": "guards-run-factory",
-      "description": "Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.",
+      "description": "Run the GUARDS factory unattended over a single repository backlog, single-repo chores, or a parallel multi-repo chores fleet through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift or fleet chores run.",
       "files": [
         "SKILL.md"
       ]

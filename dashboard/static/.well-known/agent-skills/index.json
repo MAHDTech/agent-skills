@@ -221,9 +221,9 @@
     {
       "name": "guards-run-factory",
       "type": "skill-md",
-      "description": "Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.",
+      "description": "Run the GUARDS factory unattended over a single repository backlog, single-repo chores, or a parallel multi-repo chores fleet through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift or fleet chores run.",
       "url": "/.well-known/agent-skills/guards-run-factory/SKILL.md",
-      "digest": "sha256:bdaada3d8ccff160bb839415201661d5b2662f5e3b3feb8f112c24b9974ddd91"
+      "digest": "sha256:189de89cff1c801cd46784c96418584fdf984d717fa1e3f515e60050196d4e4f"
     },
     {
       "name": "handoff",
