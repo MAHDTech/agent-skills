@@ -11,16 +11,14 @@ on:
 permissions:
   contents: read
   actions: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy Dashboard
+  build:
+    name: Build Dashboard
     runs-on: ubuntu-24.04
     steps:
       - id: setup_project
@@ -47,6 +45,17 @@ jobs:
           path: ./dashboard/public
           include-hidden-files: true
 
+  deploy:
+    name: Deploy Dashboard
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy_to_gh_pages.outputs.page_url }}
+    steps:
       - id: deploy_to_gh_pages
         name: Deploy to GH Pages
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
@@ -58,5 +67,5 @@ jobs:
         with:
           title: Deployment Results
           results: |
-            build-dashboard=${{ steps.build_dashboard.outcome }}
+            build-dashboard=${{ needs.build.result }}
             deploy-pages=${{ steps.deploy_to_gh_pages.outcome }}
