@@ -373,7 +373,14 @@ impl SkillLinter {
                         let clean_target = link_target.split('#').next().unwrap_or(link_target);
                         if !clean_target.is_empty() {
                             let target_path = base_dir.join(clean_target);
-                            if !target_path.exists() {
+                            if target_path.exists() {
+                                Self::check_auto_resource_link(
+                                    clean_target,
+                                    line_num,
+                                    skill,
+                                    report,
+                                );
+                            } else {
                                 report.add(
                                     LintIssue::builder()
                                         .file(skill.path.clone())
@@ -384,13 +391,6 @@ impl SkillLinter {
                                         ))
                                         .severity(LintSeverity::Error)
                                         .build(),
-                                );
-                            } else {
-                                Self::check_auto_resource_link(
-                                    clean_target,
-                                    line_num,
-                                    skill,
-                                    report,
                                 );
                             }
                         }
@@ -977,11 +977,6 @@ impl SkillLinter {
     }
 
     fn check_frontmatter_slop(skill: &Skill, report: &mut LintReport) {
-        let desc = skill.frontmatter.description.trim();
-        if desc.is_empty() {
-            return;
-        }
-
         const FORBIDDEN_PREFIXES: &[&str] = &[
             "this skill provides",
             "expert guidance",
@@ -989,6 +984,20 @@ impl SkillLinter {
             "comprehensive guide",
             "a comprehensive",
         ];
+        const FORBIDDEN_WORDS: &[&str] = &[
+            "comprehensive",
+            "delve",
+            "seamlessly",
+            "furthermore",
+            "utilize",
+            "utilizes",
+            "utilized",
+        ];
+
+        let desc = skill.frontmatter.description.trim();
+        if desc.is_empty() {
+            return;
+        }
 
         for &prefix in FORBIDDEN_PREFIXES {
             if Self::starts_with_case_insensitive(desc, prefix) {
@@ -1005,16 +1014,6 @@ impl SkillLinter {
                 return;
             }
         }
-
-        const FORBIDDEN_WORDS: &[&str] = &[
-            "comprehensive",
-            "delve",
-            "seamlessly",
-            "furthermore",
-            "utilize",
-            "utilizes",
-            "utilized",
-        ];
 
         for &word in FORBIDDEN_WORDS {
             if Self::contains_word(desc, word) {
@@ -1033,13 +1032,6 @@ impl SkillLinter {
     }
 
     fn check_content_slop(skill: &Skill, report: &mut LintReport) {
-        if skill.tree != SkillTree::Live
-            || skill.name() == "unslop"
-            || skill.name() == "skill-creator"
-        {
-            return;
-        }
-
         const FORBIDDEN_WORDS: &[&str] = &[
             "seamlessly",
             "furthermore",
@@ -1050,9 +1042,15 @@ impl SkillLinter {
             "delves",
             "delving",
         ];
-
         const FORBIDDEN_PHRASES: &[&str] =
             &["testament to", "pivotal moment", "evolving landscape"];
+
+        if skill.tree != SkillTree::Live
+            || skill.name() == "unslop"
+            || skill.name() == "skill-creator"
+        {
+            return;
+        }
 
         let mut in_frontmatter = false;
         let stripped = Self::strip_code_blocks(&skill.raw);
@@ -1123,13 +1121,13 @@ impl SkillLinter {
             let before_ok = lower_text[..abs_pos]
                 .chars()
                 .next_back()
-                .map_or(true, |c| !c.is_ascii_alphanumeric() && c != '_' && c != '-');
+                .is_none_or(|c| !c.is_ascii_alphanumeric() && c != '_' && c != '-');
 
             let after_pos = abs_pos + word_len;
             let after_ok = lower_text[after_pos..]
                 .chars()
                 .next()
-                .map_or(true, |c| !c.is_ascii_alphanumeric() && c != '_' && c != '-');
+                .is_none_or(|c| !c.is_ascii_alphanumeric() && c != '_' && c != '-');
 
             if before_ok && after_ok {
                 return true;

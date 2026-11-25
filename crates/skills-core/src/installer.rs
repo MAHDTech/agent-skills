@@ -427,13 +427,11 @@ impl InstalledSkillsRegistry {
                         let source_path = v
                             .get("source_path")
                             .and_then(serde_json::Value::as_str)
-                            .map(PathBuf::from)
-                            .unwrap_or_default();
+                            .map_or_default(PathBuf::from);
                         let target_path = v
                             .get("target_path")
                             .and_then(serde_json::Value::as_str)
-                            .map(PathBuf::from)
-                            .unwrap_or_default();
+                            .map_or_default(PathBuf::from);
                         let mode = v
                             .get("mode")
                             .and_then(|m| serde_json::from_value::<InstallMode>(m.clone()).ok())

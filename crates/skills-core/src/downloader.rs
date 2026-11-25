@@ -438,9 +438,7 @@ impl SkillDownloader {
         }
         let final_filename = if saved_filenames.contains(&raw_slug) {
             let domain_candidate = format!("{}-{raw_slug}", Self::get_domain_prefix(url));
-            if !saved_filenames.contains(&domain_candidate) {
-                domain_candidate
-            } else {
+            if saved_filenames.contains(&domain_candidate) {
                 let (stem, ext) = domain_candidate
                     .rsplit_once('.')
                     .map_or((domain_candidate.as_str(), ""), |(s, e)| (s, e));
@@ -456,6 +454,8 @@ impl SkillDownloader {
                     }
                     counter += 1;
                 }
+            } else {
+                domain_candidate
             }
         } else {
             raw_slug

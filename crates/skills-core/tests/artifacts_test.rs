@@ -1358,6 +1358,53 @@ fn test_skills_sh_json_empty_catalog_keeps_groupings_key() {
     );
 }
 
+fn assert_staged_output_root(
+    staging_root: &std::path::Path,
+    live_dir: &std::path::Path,
+    agents_frontmatter: &str,
+) {
+    let staged_agents = fs::read_to_string(staging_root.join("agents/AGENTS.md")).unwrap();
+    assert!(staged_agents.starts_with(agents_frontmatter));
+    assert!(staged_agents.contains("- **alpha-skill**: Alpha skill description"));
+
+    let staged_readme = fs::read_to_string(staging_root.join("README.md")).unwrap();
+    assert!(staged_readme.contains("- [guide](docs/guide.md)"));
+    assert!(staged_readme.contains("**[alpha-skill](skills/engineering/alpha-skill/SKILL.md)**"));
+
+    let staged_skills_sh = fs::read_to_string(staging_root.join("skills.sh.json")).unwrap();
+    assert!(staged_skills_sh.contains("\"alpha-skill\""));
+
+    let staged_v020 = staging_root
+        .join("dashboard/static")
+        .join(WELL_KNOWN_AGENT_SKILLS_DIR)
+        .join("index.json");
+    let v020_json: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(staged_v020).unwrap()).unwrap();
+    let expected_sha =
+        SkillDownloader::compute_sha256(&fs::read(live_dir.join("SKILL.md")).unwrap());
+    assert_eq!(
+        v020_json["skills"][0]["digest"].as_str(),
+        Some(format!("sha256:{expected_sha}").as_str())
+    );
+
+    let staged_alpha_index = fs::read_to_string(
+        staging_root.join("dashboard/content/skills/engineering/alpha-skill/_index.md"),
+    )
+    .unwrap();
+    assert!(staged_alpha_index.contains("@/skills/engineering/beta-skill/_index.md"));
+    assert!(staged_alpha_index.contains("@/skills-archive/planning/old-plan/_index.md"));
+    assert!(
+        staging_root
+            .join("dashboard/content/skills/engineering/alpha-skill/REFERENCE.md")
+            .is_file()
+    );
+    assert!(
+        staging_root
+            .join("dashboard/content/skills/engineering/alpha-skill/resources/manual/note.md")
+            .is_file()
+    );
+}
+
 #[test]
 fn test_output_root_stages_artifacts_without_mutating_workspace_root() {
     let harness = ArtifactsTestHarness::new();
@@ -1462,44 +1509,5 @@ fn test_output_root_stages_artifacts_without_mutating_workspace_root() {
     assert!(!harness.workspace_root.join(WELL_KNOWN_STATIC_DIR).exists());
 
     // Staged output root must contain all generated artifacts resolved from workspace_root.
-    let staged_agents = fs::read_to_string(staging_root.join("agents/AGENTS.md")).unwrap();
-    assert!(staged_agents.starts_with(agents_frontmatter));
-    assert!(staged_agents.contains("- **alpha-skill**: Alpha skill description"));
-
-    let staged_readme = fs::read_to_string(staging_root.join("README.md")).unwrap();
-    assert!(staged_readme.contains("- [guide](docs/guide.md)"));
-    assert!(staged_readme.contains("**[alpha-skill](skills/engineering/alpha-skill/SKILL.md)**"));
-
-    let staged_skills_sh = fs::read_to_string(staging_root.join("skills.sh.json")).unwrap();
-    assert!(staged_skills_sh.contains("\"alpha-skill\""));
-
-    let staged_v020 = staging_root
-        .join("dashboard/static")
-        .join(WELL_KNOWN_AGENT_SKILLS_DIR)
-        .join("index.json");
-    let v020_json: serde_json::Value =
-        serde_json::from_str(&fs::read_to_string(staged_v020).unwrap()).unwrap();
-    let expected_sha =
-        SkillDownloader::compute_sha256(&fs::read(live_dir.join("SKILL.md")).unwrap());
-    assert_eq!(
-        v020_json["skills"][0]["digest"].as_str(),
-        Some(format!("sha256:{expected_sha}").as_str())
-    );
-
-    let staged_alpha_index = fs::read_to_string(
-        staging_root.join("dashboard/content/skills/engineering/alpha-skill/_index.md"),
-    )
-    .unwrap();
-    assert!(staged_alpha_index.contains("@/skills/engineering/beta-skill/_index.md"));
-    assert!(staged_alpha_index.contains("@/skills-archive/planning/old-plan/_index.md"));
-    assert!(
-        staging_root
-            .join("dashboard/content/skills/engineering/alpha-skill/REFERENCE.md")
-            .is_file()
-    );
-    assert!(
-        staging_root
-            .join("dashboard/content/skills/engineering/alpha-skill/resources/manual/note.md")
-            .is_file()
-    );
+    assert_staged_output_root(&staging_root, &live_dir, agents_frontmatter);
 }

@@ -13,7 +13,6 @@ edition = "2024"
 authors = ["MAHDTech"]
 license = "MIT"
 repository = "https://github.com/MAHDTech/agent-skills"
-homepage = "https://github.com/MAHDTech/agent-skills"
 readme = "README.md"
 
 [workspace.dependencies]
@@ -46,7 +45,6 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
 
 # Error Handling
 thiserror = "2.0.21"
-anyhow = "1.0.104"
 
 # Filesystem and System Utilities
 walkdir = "2.5.0"

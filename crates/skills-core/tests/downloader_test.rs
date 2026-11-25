@@ -500,9 +500,7 @@ fn test_verify_sha256_with_prefix() {
     assert!(!SkillDownloader::verify_sha256(payload, "sha256:deadbeef"));
 }
 
-#[tokio::test]
-async fn test_download_skill_resources_well_known_v010_and_v020_via_llms_txt() {
-    let mock_server = MockServer::start().await;
+async fn mount_well_known_discovery_mocks(mock_server: &MockServer) {
     let base_uri = mock_server.uri();
 
     let cli_skill_raw = "# CLI Skill\n\nGeneric type Vec<T> outside code fence.\n";
@@ -562,47 +560,42 @@ async fn test_download_skill_resources_well_known_v010_and_v020_via_llms_txt() {
          Agent skills discovery: {base_uri}/.well-known/agent-skills/index.json\n"
     );
 
-    Mock::given(method("GET"))
-        .and(path("/llms.txt"))
-        .respond_with(ResponseTemplate::new(200).set_body_string(llms_body))
-        .mount(&mock_server)
-        .await;
+    let routes = [
+        ("/llms.txt", llms_body),
+        (
+            "/.well-known/agent-skills/index.json",
+            v020_index.to_string(),
+        ),
+        (
+            "/.well-known/agent-skills/cli/SKILL.md",
+            cli_skill_raw.to_string(),
+        ),
+        ("/shared/SKILL.md", sdk_skill_raw.to_string()),
+        ("/.well-known/skills/index.json", v010_index.to_string()),
+        (
+            "/.well-known/skills/canister-dev/SKILL.md",
+            "# Canister Dev Skill".to_string(),
+        ),
+        (
+            "/.well-known/skills/canister-dev/references/guide.md",
+            "# Canister Reference Guide".to_string(),
+        ),
+    ];
 
-    Mock::given(method("GET"))
-        .and(path("/.well-known/agent-skills/index.json"))
-        .respond_with(ResponseTemplate::new(200).set_body_string(v020_index.to_string()))
-        .mount(&mock_server)
-        .await;
+    for (route, body) in routes {
+        Mock::given(method("GET"))
+            .and(path(route))
+            .respond_with(ResponseTemplate::new(200).set_body_string(body))
+            .mount(mock_server)
+            .await;
+    }
+}
 
-    Mock::given(method("GET"))
-        .and(path("/.well-known/agent-skills/cli/SKILL.md"))
-        .respond_with(ResponseTemplate::new(200).set_body_string(cli_skill_raw))
-        .mount(&mock_server)
-        .await;
-
-    Mock::given(method("GET"))
-        .and(path("/shared/SKILL.md"))
-        .respond_with(ResponseTemplate::new(200).set_body_string(sdk_skill_raw))
-        .mount(&mock_server)
-        .await;
-
-    Mock::given(method("GET"))
-        .and(path("/.well-known/skills/index.json"))
-        .respond_with(ResponseTemplate::new(200).set_body_string(v010_index.to_string()))
-        .mount(&mock_server)
-        .await;
-
-    Mock::given(method("GET"))
-        .and(path("/.well-known/skills/canister-dev/SKILL.md"))
-        .respond_with(ResponseTemplate::new(200).set_body_string("# Canister Dev Skill"))
-        .mount(&mock_server)
-        .await;
-
-    Mock::given(method("GET"))
-        .and(path("/.well-known/skills/canister-dev/references/guide.md"))
-        .respond_with(ResponseTemplate::new(200).set_body_string("# Canister Reference Guide"))
-        .mount(&mock_server)
-        .await;
+#[tokio::test]
+async fn test_download_skill_resources_well_known_v010_and_v020_via_llms_txt() {
+    let mock_server = MockServer::start().await;
+    mount_well_known_discovery_mocks(&mock_server).await;
+    let base_uri = mock_server.uri();
 
     let dir = tempdir().unwrap();
     let skill_dir = dir.path().join("skills/engineering/discovery-skill");

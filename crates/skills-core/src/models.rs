@@ -287,9 +287,9 @@ fn yaml_value_to_metadata_string(value: serde_yaml::Value) -> String {
         serde_yaml::Value::Null => String::new(),
         serde_yaml::Value::Sequence(_)
         | serde_yaml::Value::Mapping(_)
-        | serde_yaml::Value::Tagged(_) => serde_yaml::to_string(&value)
-            .map(|s| s.trim().to_string())
-            .unwrap_or_default(),
+        | serde_yaml::Value::Tagged(_) => {
+            serde_yaml::to_string(&value).map_or_default(|s| s.trim().to_string())
+        }
     }
 }
 

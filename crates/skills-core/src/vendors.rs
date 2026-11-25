@@ -1,6 +1,7 @@
 //! Declarative vendor skill snapshots acquired through Git.
 
 use std::collections::{BTreeMap, HashSet};
+use std::fmt::Write;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Output};
@@ -106,8 +107,7 @@ pub fn update_vendors(root: &Path, pending_ref: Option<&str>) -> Result<VendorRe
                         Ok(None) => {}
                         Err(error) => {
                             if let Some(message) = report.skipped.get_mut(&source.id) {
-                                message
-                                    .push_str(&format!("; pending snapshot unavailable: {error}"));
+                                let _ = write!(message, "; pending snapshot unavailable: {error}");
                             }
                         }
                     }
@@ -389,7 +389,9 @@ fn prepare_source(source: &Source, staging: &Path) -> Result<(PathBuf, String)> 
     let checkout_str = checkout.to_string_lossy();
     args.push(&checkout_str);
     git(staging, &args)?;
-    if source.path != Path::new(".") {
+    if source.path == Path::new(".") {
+        git(&checkout, &["sparse-checkout", "disable"])?;
+    } else {
         git(
             &checkout,
             &[
@@ -399,8 +401,6 @@ fn prepare_source(source: &Source, staging: &Path) -> Result<(PathBuf, String)> 
                 &source.path.to_string_lossy(),
             ],
         )?;
-    } else {
-        git(&checkout, &["sparse-checkout", "disable"])?;
     }
     let collection = checkout.join(&source.path);
     let canonical = collection.canonicalize()?;

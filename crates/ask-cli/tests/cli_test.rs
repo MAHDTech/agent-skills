@@ -1048,15 +1048,20 @@ fn test_action_bulk_install_uninstall_isolated() {
 }
 
 #[cfg(unix)]
-#[test]
-fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
+fn setup_sync_rename_fixture(
+    root: &std::path::Path,
+) -> (
+    std::path::PathBuf,
+    std::path::PathBuf,
+    std::path::PathBuf,
+    [std::path::PathBuf; 5],
+) {
     use skills_core::{InstallMode, InstallOptions, Installer, TargetEnvironment};
 
-    let temp = tempfile::tempdir().unwrap();
-    let repo = temp.path().join("repo");
+    let repo = root.join("repo");
     let old = repo.join("skills/engineering/spacetimedb");
     let current = repo.join("skills/engineering/spacetime");
-    let external = temp.path().join("other-catalog/external");
+    let external = root.join("other-catalog/external");
     let archived = repo.join("skills-archive/engineering/retired-link");
     for (path, name) in [
         (&old, "spacetimedb"),
@@ -1074,8 +1079,7 @@ fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
         )
         .unwrap();
     }
-    let task_home = temp.path().join("home");
-    let task_config = task_home.join(".config");
+    let task_home = root.join("home");
     let targets = [
         task_home.join(".agents/skills"),
         task_home.join(".gemini/config/skills"),
@@ -1111,6 +1115,19 @@ fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
         "---\nname: spacetime\ndescription: Renamed skill\n---\n",
     )
     .unwrap();
+
+    (repo, current, task_home, targets)
+}
+
+#[cfg(unix)]
+#[test]
+fn test_skills_sync_cleans_renames_and_preserves_manual_skills() {
+    use skills_core::{Installer, TargetEnvironment};
+
+    let temp = tempfile::tempdir().unwrap();
+    let (repo, current, task_home, targets) = setup_sync_rename_fixture(temp.path());
+    let task_config = task_home.join(".config");
+    let installer = Installer::new();
 
     let run_sync = |args: &[&str]| {
         let mut command = Command::cargo_bin("ask").unwrap();
