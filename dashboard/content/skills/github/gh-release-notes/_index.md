@@ -33,17 +33,26 @@ VERSION=v1.4.0
 
 ## 2. Gather the changes
 
-Collect from both the commit log and the merged PRs - PR titles and labels are usually more human than raw commit subjects:
+Collect from both the commit log and the merged PRs - PR titles and labels are usually more human than raw commit subjects. Guard both commands when `$PREV_TAG` is empty (first release):
 
 ```bash
-git log "$PREV_TAG..HEAD" --no-merges --pretty='%s (%h) @%an'
+if [ -n "$PREV_TAG" ]; then
+  git log "$PREV_TAG..HEAD" --no-merges --pretty='%s (%h) @%an'
+else
+  git log HEAD --no-merges --pretty='%s (%h) @%an'
+fi
 ```
 
 ```bash
 BASE=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name')   # default branch; do not assume main
-git log -1 --format=%as "$PREV_TAG"   # date of the previous tag
-gh pr list --state merged --base "$BASE" --search "merged:>=<that-date>" \
-  --json number,title,labels,author,mergedAt
+if [ -n "$PREV_TAG" ]; then
+  PREV_DATE=$(git log -1 --format=%as "$PREV_TAG")
+  gh pr list --state merged --base "$BASE" --limit 200 --search "merged:>=$PREV_DATE" \
+    --json number,title,labels,author,mergedAt
+else
+  gh pr list --state merged --base "$BASE" --limit 200 \
+    --json number,title,labels,author,mergedAt
+fi
 ```
 
 ## 3. Group by type
@@ -72,19 +81,30 @@ Rewrite each entry as a user-facing line, not a commit dump:
 Write the result to a temporary file outside the working tree, so it is never swept into a commit:
 
 ```bash
-NOTES_FILE=$(mktemp --suffix=.md)
+NOTES_FILE="$(mktemp -d)/RELEASE_NOTES.md"
 ```
 
 To start from GitHub's own summary, fetch its generated notes without creating a release, then edit them into the grouped form above:
 
 ```bash
-gh api "repos/{owner}/{repo}/releases/generate-notes" \
-  -f tag_name="$VERSION" -f previous_tag_name="$PREV_TAG" --jq .body > "$NOTES_FILE"
+if [ -n "$PREV_TAG" ]; then
+  gh api "repos/{owner}/{repo}/releases/generate-notes" \
+    -f tag_name="$VERSION" -f previous_tag_name="$PREV_TAG" --jq .body > "$NOTES_FILE"
+else
+  gh api "repos/{owner}/{repo}/releases/generate-notes" \
+    -f tag_name="$VERSION" --jq .body > "$NOTES_FILE"
+fi
 ```
 
-Omit `-f previous_tag_name` for the first release.
+## 5. Preview, scan, and approve
 
-## 5. Publish the release
+Before creating any tag or release:
+
+1. Scan the release title, tag, and full notes body for secrets, credentials, internal hostnames, private URLs, or machine-local paths, and redact or ask the user if any appear.
+2. Display the target commit SHA (`git rev-parse --short HEAD` or `--target`), version tag, draft/prerelease flags, and the full drafted release notes to the user.
+3. Ask the user to approve as-is, request edits (then re-scan and preview), or cancel. Proceed to step 6 only after explicit approval.
+
+## 6. Publish the release
 
 Create the release once, using `$VERSION` from step 1:
 
@@ -92,7 +112,7 @@ Create the release once, using `$VERSION` from step 1:
 gh release create "$VERSION" --title "$VERSION" --notes-file "$NOTES_FILE"
 ```
 
-`gh release create` creates the tag on the current commit (or pass `--target <sha>`). Add `--draft` to review on GitHub before it goes live, or `--prerelease` for an RC. To publish a draft later, run `gh release edit "$VERSION" --draft=false`. Confirm the release URL it prints, and that the tag points at the intended commit, then delete `$NOTES_FILE`.
+`gh release create` creates the tag on the current commit (or pass `--target <sha>`). Add `--draft` to review on GitHub before it goes live, or `--prerelease` for an RC. To publish a draft later, run `gh release edit "$VERSION" --draft=false`. Confirm the release URL it prints, and that the tag points at the intended commit, then remove the temp directory with `rm -rf "$(dirname "$NOTES_FILE")"`.
 
-Done when the release is published (or drafted, if requested) with grouped, human-readable notes and the correct tag.
+Done when the user approved the scanned draft, the release URL and tag target commit are confirmed, and the temporary directory is removed.
 

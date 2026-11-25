@@ -1,6 +1,6 @@
 +++
 title = "herdr"
-description = "Operate Herdr panes, workspaces, or agent sessions when HERDR_ENV=1. Also use for Herdr setup, configuration, keybindings, and troubleshooting questions."
+description = "Operate Herdr panes, workspaces, or agent sessions (requires HERDR_ENV=1) only when the user explicitly asks to use Herdr. Also use for Herdr setup, config, keybindings, and troubleshooting questions."
 sort_by = "title"
 template = "skill.html"
 [extra]

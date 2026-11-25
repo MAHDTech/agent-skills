@@ -25,7 +25,7 @@ Casita separates byte storage from graph semantics through two distinct identity
 ```mermaid
 graph TD
     Root[Named Root: e.g. projects/demo] -->|Retains Closure| ObjDir[Directory ObjectRecord: casita.directory.v1]
-    ObjDir -->|Links to child| ObjFile[File ObjectRecord: casita.file.v1]
+    ObjDir -->|Links to child| ObjFile[File Blob ObjectRecord: casita.blob.v1]
     ObjDir -->|Payload BLAKE3 Digest| BlobDir[Directory Blob: Canonical Entries]
     ObjFile -->|Payload BLAKE3 Digest| BlobFile[File Blob: Plaintext Bytes]
     BlobFile -->|FastCDC Chunking| Chunk1[Chunk A]
@@ -113,7 +113,7 @@ For custom storage tiers, backends, or publication loops, enable the `experiment
 - **Use evictable roots for rebuildable build caches**: Keep intermediate compilation caches (e.g. Cargo `target/`) under `--retention evictable` so disk-pressure GC can reclaim space automatically.
 - **Use `--no-root` on temporary checkouts**: By default, `casita checkout` registers an `auto/checkout/...` root to prevent GC. Pass `--no-root` when checking out ephemeral build trees.
 - **Use Bao verified reads when authentication is required upfront**: Standard sequential reads verify the complete BLAKE3 hash at EOF. If an operation seeks or aborts early, use `open_verified`.
-- **Use `collect_logical()` when sharing payload backends**: When several repositories share one blob store (e.g. multi-tenant S3), use logical collection so one repository does not delete blobs still needed by another.
+- **Use `collect_logical()` (via the `experimental` feature) when sharing payload backends**: When several repositories share one blob store (e.g. multi-tenant S3), use logical collection so one repository does not delete blobs still needed by another.
 - **Change repository state only through the `casita` CLI or Rust API**: `casita.sqlite` and its WAL files are owned by Casita's locks and revision checks.
 - **Map destination roots explicitly in Casitar imports**: Casitar archives never guess destination root names, so pass `--casitar-root` or `--casitar-root-prefix`.
 
@@ -130,4 +130,12 @@ Search `resources/auto/llms-full.txt` for the complete docs, or open the topic f
 - Sync and archives: `resources/auto/guides-sync-index.md` and `resources/auto/guides-casitar-index.md`
 - Operations and integrations: `resources/auto/guides-operations-index.md`, `resources/auto/integrations-cargo-index.md`, and `resources/auto/integrations-ipc-index.md`
 - Error categories, retry guidance, and verification: `resources/auto/reference-errors-index.md`, `resources/auto/concepts-verification-index.md`, and `resources/auto/reference-object-formats-index.md`
+
+---
+
+## Completion criteria
+
+- Verify exact CLI flags, object format namespaces, and Rust API signatures against the relevant `resources/auto/` reference pages before finalizing commands or code.
+- In Rust code, confirm all open payload readers are dropped and `repo.flush().await?` is called before runtime shutdown.
+- Run the applicable verification checks (`casita fsck`, `casita gc --dry-run`, or `cargo test`) and confirm clean results.
 

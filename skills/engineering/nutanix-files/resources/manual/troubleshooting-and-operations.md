@@ -2,19 +2,25 @@
 
 ## Essential CLI Tools for Nutanix Files
 
-Administrative operations and troubleshooting can be performed from the Nutanix CVM or FSVM command line:
+Administrative operations and troubleshooting use `ncli` and `ncc` on a Nutanix CVM, and `afs`, `allssh`, and `smbstatus` on an FSVM:
 
 ```bash
-# Connect to Minerva service shell from CVM
+# On a CVM: list file servers, list shares, and run Files NCC health checks
 ncli file-server list
+ncli fs list-shares uuid=<file-server-uuid>
+ncli file-server list-all-fs-shares
+ncc health_checks fileserver_checks run_all
 
-# Check FSVM cluster health and status
-afsi file-server show-health
+# On an FSVM: inspect file server info, shares, SMB health, and HA state
+afs fs.info
+afs share.list
+afs smb.health_check
+afs ha.minerva_check_ha_state
 
-# Execute command across all FSVM nodes
+# On an FSVM: execute a command across all FSVM nodes
 allssh "uptime"
 
-# Check SMB session status on FSVM
+# On an FSVM: check active SMB sessions
 smbstatus
 ```
 

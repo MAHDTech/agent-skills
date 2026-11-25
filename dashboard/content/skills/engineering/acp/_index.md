@@ -186,3 +186,9 @@ Search `resources/auto/` before answering a protocol question:
 - SDKs: `libraries-*.md`.
 - Full index: `llms.txt`.
 
+## Completion criteria
+
+- Verify all JSON-RPC method names, field names, `sessionUpdate` variants, and capability flags against `resources/auto/protocol-v1-schema.md` (or `resources/auto/protocol-v2-*.md` for v2 draft work).
+- For stdio transports, confirm `stdout` emits only newline-delimited JSON-RPC messages (no embedded newlines or diagnostic output) and all logging goes to `stderr`.
+- Run the project's SDK test suite or `acp-tck` when applicable to confirm handshake, session lifecycle, and cancellation behavior.
+

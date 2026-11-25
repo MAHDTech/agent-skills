@@ -1,78 +1,70 @@
 ---
 name: agent-guidelines
 description: "Apply coding discipline while implementing: state assumptions, keep changes minimal and scoped, and verify against concrete success criteria. Use when writing or editing code, not when reviewing finished work."
-resources:
-  - https://x.com/karpathy/status/2015883857489522876
 ---
 
-# Guidelines
+# Agent Guidelines
 
-Behavioral guidelines to reduce common LLM coding mistakes, derived from Andrej Karpathy's observations on LLM coding pitfalls (cached in `resources/auto/karpathy-status-2015883857489522876.md`).
+Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations on LLM coding pitfalls](https://x.com/karpathy/status/2015883857489522876).
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
-## 1. Think Before Coding
+## 1. Think before coding
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+State assumptions explicitly, surface confusion early, and name tradeoffs before writing code:
 
-Before implementing:
+- State your assumptions up front; ask when uncertain rather than guessing.
+- Present multiple valid interpretations to the user instead of picking silently.
+- Propose a simpler alternative and push back when warranted.
+- Stop when something is unclear, name the ambiguity, and ask before editing.
 
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+## 2. Simplicity first
 
-## 2. Simplicity First
+Write the minimum code that solves the requested problem and leave out speculative work:
 
-**Minimum code that solves the problem. Nothing speculative.**
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
+- Implement only the requested behavior; keep unrequested features, abstractions, and configuration options out of the diff.
+- Write straightforward code for single-use paths rather than wrapping them in premature helpers.
+- Handle realistic failure modes at system boundaries instead of adding defensive branches for impossible states.
+- Rewrite an overly long solution when a shorter, clearer version achieves the same behavior.
 
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
-## 3. Surgical Changes
+## 3. Surgical changes
 
-**Touch only what you must. Clean up only your own mess.**
+Touch only what the task requires and clean up only what your own edits made unused:
 
-When editing existing code:
+- Keep adjacent code, comments, and formatting untouched; leave working unrelated code as-is.
+- Match the surrounding codebase style, even when you would choose a different convention.
+- Report unrelated dead code you notice in your summary rather than deleting it unasked.
+- Remove imports, variables, and functions that your own changes left unused, while leaving pre-existing dead code alone unless asked.
 
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
+The test: every changed line traces directly to the user's request.
 
-When your changes create orphans:
+## 4. Goal-driven execution
 
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
+Turn each task into a verifiable goal and loop until the check passes:
 
-The test: Every changed line should trace directly to the user's request.
+- "Add validation" -> "Write tests for invalid inputs, then make them pass."
+- "Fix the bug" -> "Write a test that reproduces it, then make it pass."
+- "Refactor X" -> "Confirm tests pass before and after the refactor."
 
-## 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-Transform tasks into verifiable goals:
-
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-
-For multi-step tasks, state a brief plan:
+For multi-step tasks, state a brief plan with a concrete check per step:
 
 ```text
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
+1. [Step] -> verify: [check]
+2. [Step] -> verify: [check]
+3. [Step] -> verify: [check]
 ```
 
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+Strong checks let you verify independently; vague goals ("make it work") force repeated clarification.
 
 ## 5. Comments explain why
 
 - Comment only non-obvious context: invariants, external constraints, workarounds, and the reason behind a surprising choice.
-- Keep a comment to one or two lines. When code needs more explanation, prefer a clearer name or an extracted helper.
+- Keep comments to one or two lines; when code needs more explanation, use a clearer name or extract a small helper.
+
+## Completion criteria
+
+- Every assumption or ambiguity that could change behavior was stated or resolved before implementing.
+- Every changed line in the diff traces directly to the request, with no speculative abstractions or unrelated reformatting.
+- Every new or changed behavior is verified against a concrete command, test, or check before reporting done.

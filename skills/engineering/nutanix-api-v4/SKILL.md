@@ -60,3 +60,11 @@ When executing specific API integrations, SDK upgrades, or troubleshooting v4 AP
 | **Release Features & Updates**     | [`resources/manual/release-features.md`](resources/manual/release-features.md)                                 | Release-by-release API updates (pc.7.5.1, pc.7.5, pc.7.3, pc.2024.3.1, pc.2024.3), VM startup policies, custom attributes, ETag removal, Recovery Plans v4 APIs, Cloud KMS, and BMC APIs.                                        |
 | **Troubleshooting & Known Issues** | [`resources/manual/troubleshooting-and-known-issues.md`](resources/manual/troubleshooting-and-known-issues.md) | Resolved issues, mandatory OData parameter workarounds (`$filter`, `$limit`, `$select`, etc.), RBAC owner permission fixes, service account VM creation workaround, category value deletion cleanup, and discontinued endpoints. |
 | **Master Documentation Index**     | [`resources/manual/master-index.md`](resources/manual/master-index.md)                                         | Master overview map of all v4 API reference documentation modules.                                                                                                                                                               |
+
+---
+
+## Completion criteria
+
+- Verify v4 API requests target Prism Central port `9440`, authenticate with `x-ntnx-api-key` (or Basic Auth) loaded from environment/secrets, and use valid GA namespace paths and OData parameters.
+- Confirm mutating calls handle ETags where still enforced, asynchronous task polling, and documented version-specific workarounds (see [troubleshooting-and-known-issues.md](resources/manual/troubleshooting-and-known-issues.md)).
+- Validate live responses or SDK tests against the target Prism Central/AOS release, or cite the matching `resources/manual/` module and release snapshot (March 2026 / pc.7.5.1) when advising offline.

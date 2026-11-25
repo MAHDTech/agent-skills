@@ -1,6 +1,7 @@
 ---
 name: store-plan
 description: Save an agreed conversation plan, decisions, action items, and open questions to a reviewable Markdown file in docs/plans/. Use when a durable repository plan is needed rather than a temporary handoff.
+argument-hint: "[description]"
 metadata:
   group: planning-pipeline
 ---
@@ -21,7 +22,7 @@ Scan the full conversation for:
 - **Risks and open questions** - unresolved items
 - **Phases or ordering** - any sequencing that was discussed
 
-If the user passed a description as an argument (e.g., `/store-plan auth refactor`), use it as `DESCRIPTION`. Otherwise, infer a 2-4 word slug from the conversation topic.
+If the user passed a description as an argument (e.g., `/store-plan auth refactor`), normalize it to lowercase `snake_case` as `{description}`. Otherwise, infer a 2-4 word lowercase `snake_case` slug from the conversation topic.
 
 ### 2. Generate the plan document
 
@@ -36,6 +37,8 @@ Present the draft and its target path to the user, and ask if they want to adjus
 ```text
 docs/plans/{YYYY}_{MM}_{DD}_{description}.md
 ```
+
+Format `{description}` in lowercase `snake_case` (words separated by underscores, no spaces or punctuation).
 
 Examples:
 

@@ -1,130 +1,71 @@
 ---
 name: cargo-doc
 description: Verify Rust crate APIs with local cargo doc output or docs.rs. Use to inspect exact signatures, methods, traits, and feature-gated items for the project version.
-resources:
-  - https://raw.githubusercontent.com/rust-lang/cargo/master/doc/man/cargo-doc.md
-  - https://raw.githubusercontent.com/rust-lang/cargo/master/doc/man/cargo-rustdoc.md
 ---
 
-# Cargo Doc and Rustdoc Navigation
+# Cargo doc and rustdoc navigation
 
-Workflow for generating, querying, and verifying Rust crate documentation locally and remotely with zero hallucination.
+Generate, query, and verify Rust crate documentation locally in `target/doc/` or remotely on `docs.rs` so every type, trait, and signature matches the project's `Cargo.lock`.
 
-**The code is the contract:** Rather than guessing API signatures from model pretraining memory, use `cargo doc` to inspect exact types and methods matching your project's `Cargo.lock`.
+For extra CLI recipes and the `cargo doc` / `cargo rustdoc` flag reference, read [resources/manual/cargo-doc-recipes.md](resources/manual/cargo-doc-recipes.md).
 
----
+## 1. Build targeted local docs
 
-## When to Use This Skill
-
-- Researching unfamiliar, newly added, or rapidly evolving Rust crates.
-- Verifying exact method names, arguments, and return types before writing implementation code.
-- Checking feature-gated APIs or conditionally compiled modules (`--all-features`).
-- Investigating compiler errors when an API appears changed or missing.
-- Inspecting documentation offline when crates lack an `llms.txt` file or when internet access is limited.
-- Querying `docs.rs` for third-party libraries using deterministic URL patterns.
-
----
-
-## Reference Files
-
-For practical CLI query recipes:
-
-- [resources/manual/cargo-doc-recipes.md](resources/manual/cargo-doc-recipes.md) - extra recipes: item link lists, module URLs, and where the cargo doc flag reference lives.
-
----
-
-## 1. Targeted Documentation Builds
-
-Bare `cargo doc` documents every dependency, which is slow in large workspaces. Scope builds to the crates you need with `-p` and `--no-deps`, and add `--all-features` when the item may be feature-gated:
+Bare `cargo doc` documents every dependency. Scope builds to the packages you need with `-p` and `--no-deps`, and add `--all-features` when an API may be feature-gated:
 
 ```bash
-# Build docs for a specific third-party crate:
-cargo doc -p egui --no-deps
+# Build docs for a specific dependency:
+cargo doc -p tower-http --no-deps
 
-# Build docs for multiple target dependencies:
+# Build docs for multiple dependencies:
 cargo doc -p egui -p bevy_egui --no-deps
 
-# Include all optional features to reveal conditionally compiled APIs:
+# Include optional features to reveal conditionally compiled APIs:
 cargo doc -p serde --all-features --no-deps
 
 # Build only workspace crates:
 cargo doc --workspace --no-deps
 ```
 
-Compiled documentation is written to `target/doc/`.
+Cargo writes HTML to `target/doc/<lib_name>/`, where `<lib_name>` replaces hyphens in the Cargo `<package>` name with underscores (for example, package `tower-http` writes to `target/doc/tower_http/`).
 
----
+## 2. Query local documentation
 
-## 2. Querying Local Documentation via File Tools
+Navigate `target/doc/<lib_name>/` directly with search tools:
 
-Once generated, navigate `target/doc/` directly without opening a browser.
-
-### Step 1: Locate the Master Item Index
-
-Every crate contains an `all.html` file listing every public type, trait, function, and macro. Search it first to confirm the exact spelling and module path:
-
-```bash
-# Verify if a type exists in the local documentation:
-grep -i "CentralPanel" target/doc/egui/all.html
-```
-
-### Step 2: Inspect Specific Structs and Traits
-
-Rustdoc outputs dedicated HTML files for every symbol:
-
-- `target/doc/<crate>/struct.<Name>.html`
-- `target/doc/<crate>/trait.<Name>.html`
-- `target/doc/<crate>/enum.<Name>.html`
-
-Query methods and function signatures directly using text search:
-
-```bash
-# List all public methods on a struct:
-grep -in "pub fn " target/doc/egui/struct.Ui.html | head -n 30
-
-# View detailed signatures with surrounding lines:
-grep -A 2 -in "pub fn add" target/doc/egui/struct.Ui.html
-```
-
----
-
-## 3. Remote Docs.rs Querying (Pre-Installation)
-
-When exploring a crate before adding it to `Cargo.toml`, query `docs.rs` using deterministic URL conventions:
-
-1. **Master Item Index**:
-   `https://docs.rs/<crate>/latest/<crate>/all.html`
-   Curl or fetch this page to verify symbols across the whole crate:
+1. **Search the crate item index** (`all.html`) first to confirm exact item names and module paths:
 
    ```bash
-   curl -sL "https://docs.rs/bevy_egui/latest/bevy_egui/all.html" | grep -i "EguiContext"
+   grep -i "TraceLayer" target/doc/tower_http/all.html
    ```
 
-2. **Deterministic Item URLs**:
-   - Struct: `https://docs.rs/<crate>/latest/<crate>/struct.<StructName>.html`
-   - Enum: `https://docs.rs/<crate>/latest/<crate>/enum.<EnumName>.html`
-   - Trait: `https://docs.rs/<crate>/latest/<crate>/trait.<TraitName>.html`
-   - Function: `https://docs.rs/<crate>/latest/<crate>/fn.<FunctionName>.html`
+2. **Inspect item HTML files** (`struct.<Name>.html`, `trait.<Name>.html`, `enum.<Name>.html`, `fn.<Name>.html`). Rustdoc wraps keywords and identifiers in `<span>` elements, so match method anchors (`id="method.`), function links (`class="fn"`), or strip HTML tags when reading signatures:
 
-3. **Version Pinned URLs**:
-   Replace `latest` with an exact semver tag to view historic or pinned docs:
-   `https://docs.rs/egui/0.36.0/egui/struct.Ui.html`
+   ```bash
+   # List method anchors on a struct or trait:
+   grep -o -E 'id="method\.[^"]+"' target/doc/egui/struct.Ui.html | sort -u | head -n 30
 
----
+   # Search stripped HTML text for a method signature:
+   sed -E 's/<[^>]+>//g' target/doc/egui/struct.Ui.html | grep -n -A 2 "pub fn add"
+   ```
 
-## 4. Compiler Diagnostic Loop (`cargo check`)
+## 3. Query docs.rs before adding a crate
 
-When uncertain between two similar methods or signatures:
+When checking a crate before adding it to `Cargo.toml`, distinguish the hyphenated Cargo `<package>` in the URL prefix from the underscored `<lib_name>` in the module path:
 
-1. Write the tentative implementation.
-2. Run `cargo check 2>&1 | head -n 35`.
-3. Review the compiler feedback:
-   - Method renames: `help: there is a method with a similar name: '...'`
-   - Missing traits: `help: the following trait must be implemented: '...'`
-   - Missing imports: `help: consider importing this item: 'use ...'`
-4. Adjust code based on the compiler's diagnostic output.
+- **Item index**: `https://docs.rs/<package>/latest/<lib_name>/all.html`
+- **Item pages**: `https://docs.rs/<package>/latest/<lib_name>/{struct,enum,trait,fn}.<Name>.html`
+- **Pinned version**: replace `latest` with an exact version (`https://docs.rs/<package>/<version>/<lib_name>/all.html`)
+
+```bash
+curl -sL "https://docs.rs/tower-http/latest/tower_http/all.html" | grep -i "TraceLayer"
+```
+
+## 4. Verify with the compiler
+
+When choosing between similar methods or trait bounds, write the call and run `cargo check 2>&1 | head -n 35`. Use rustc's suggestions for renamed methods, missing trait imports, and type mismatches to confirm the exact signature.
 
 ## Completion criteria
 
-- Every external API used in the change was confirmed in `target/doc/` or on docs.rs for the version in `Cargo.lock`.
+- Every external API used in the change is confirmed in `target/doc/<lib_name>/` or on `docs.rs` for the version in `Cargo.lock`.
 - `cargo check` exits 0.

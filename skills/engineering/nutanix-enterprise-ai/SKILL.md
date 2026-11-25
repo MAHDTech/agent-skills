@@ -105,3 +105,11 @@ When performing specific administration, deployment, sizing, or operational task
 | **Observability & OpenTelemetry**      | [`resources/manual/observability-and-opentelemetry.md`](resources/manual/observability-and-opentelemetry.md)   | OpenTelemetry collector configuration, ClickHouse server/keeper architecture, and exporting metrics to Prometheus, Grafana, or external security monitoring systems.              |
 | **NAI Labs & Support Tools**           | [`resources/manual/nai-labs-and-support.md`](resources/manual/nai-labs-and-support.md)                         | NAI Labs applications (Chat, Talk to My Data, Agent), vector database integration, support bundle generation (NKP and non-NKP), and glossary.                                     |
 | **Master Documentation Index**         | [`resources/manual/master-index.md`](resources/manual/master-index.md)                                         | Master overview map linking all 15 documentation modules.                                                                                                                         |
+
+---
+
+## Completion criteria
+
+- Confirm NAI platform pods (`kubectl get pods -n nai-system`) are Ready and verify inference, unified gateway, or MCP endpoint responses with a live smoke request.
+- When advising without cluster access, cite the matching `resources/manual/` module and note version-specific Helm chart parameters or supported GPU/Kubernetes prerequisites.
+- Verify API client keys, registry pull secrets, and Hugging Face/NGC tokens are injected from Kubernetes Secrets or environment variables rather than hardcoded.

@@ -51,24 +51,52 @@ Everything runs inside the `devenv` environment defined in `devenv.nix`.
 
 ### devenv.nix style
 
-- **Define each top-level option once.** Group related settings in a single attribute set instead of repeating the key with dotted paths. Repeated keys trigger the statix `W20` warning.
+- **Use `with pkgs;` for package lists.** Avoid repeating `pkgs.` on every element.
 
   ```nix
-  # Wrong: `scripts` is assigned three times.
-  scripts.css.exec = "...";
-  scripts.build.exec = "...";
-  scripts.check.exec = "...";
+  # Bad
+  packages = [
+    pkgs.git
+    pkgs.jq
+    pkgs.ripgrep
+  ];
 
-  # Right: one `scripts` block.
+  # Good
+  packages = with pkgs; [
+    git
+    jq
+    ripgrep
+  ];
+  ```
+
+- **Define each top-level attribute set once and always use long-form nested attribute sets instead of dotted paths**, even for a single leaf option. Repeating a dotted prefix (`scripts.foo.exec = ...; scripts.bar.exec = ...;`) triggers `statix` warning `W20` (`The key 'scripts' is first assigned here ... repeated here ...`) and fails linting, and long-form blocks stay trivial to expand later.
+
+  ```nix
+  # Bad: triggers statix W20 ("The key `scripts` is first assigned here ... repeated here")
+  scripts.build.exec = "cargo build";
+  scripts.check.exec = "cargo check";
+  git-hooks.hooks.thing.enable = true;
+
+  # Good
   scripts = {
-    css.exec = "...";
-    build.exec = "...";
-    check.exec = "...";
+    build = {
+      exec = "cargo build";
+    };
+    check = {
+      exec = "cargo check";
+    };
+  };
+
+  git-hooks = {
+    hooks = {
+      thing = {
+        enable = true;
+      };
+    };
   };
   ```
 
-- The same rule applies to `processes`, `packages`, `env`, `languages`, `git-hooks.hooks`, and every other option.
-- Dotted paths are fine inside a block for a single leaf, such as `css.exec = "...";`.
+- Apply the same nested long-form rule to `scripts`, `processes`, `env`, `languages`, `git-hooks`, and every other attribute set.
 - Format with `nixfmt` and keep `statix check devenv.nix` and `deadnix devenv.nix` clean. `nixfmt` and `deadnix` run as hooks.
 
 ## Dashboard

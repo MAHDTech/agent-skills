@@ -18,7 +18,7 @@ Where a skill lives, and how it is named and framed in this repo.
 
 ### Category
 
-The topic bucket a skill lives in - one of `authoring`, `engineering`, `game-development`, `github`, `planning`, `reflection`, `review`, `tooling`, `writing`. Set by the directory (`skills/<category>/<name>/`), never by a frontmatter key. A skill's category decides its section in the generated index.
+The topic bucket a skill lives in - one of `authoring`, `engineering`, `game-development`, `github`, `guards`, `planning`, `reflection`, `review`, `tooling`, `writing`. Set by the directory (`skills/<category>/<name>/`), never by a frontmatter key. A skill's category decides its section in the generated index.
 
 _Avoid:_ tag, type, kind, group
 
@@ -30,7 +30,7 @@ _Avoid:_ folder, stage, status
 
 ### Promotion
 
-The state of a skill appearing in the generated README, dashboard, and index, earned by living under one of the nine **category** buckets. Skills in a **lifecycle bucket** (`in-progress/`) or in the top-level archive (`skills-archive/`) are excluded from active installation. Move a skill into a category to promote it; move it to `skills-archive/` via `/skill-archive` to retire it.
+The state of a skill appearing in the generated README, dashboard, and index, earned by living under one of the ten **category** buckets. Skills in a **lifecycle bucket** (`in-progress/`) or in the top-level archive (`skills-archive/`) are excluded from active installation. Move a skill into a category to promote it; move it to `skills-archive/` via `/skill-archive` to retire it.
 
 _Avoid:_ publishing, listing, inclusion
 

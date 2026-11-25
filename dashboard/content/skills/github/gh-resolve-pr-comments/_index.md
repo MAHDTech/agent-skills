@@ -14,7 +14,7 @@ mermaid = false
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Consult the `gh pr` manual in `resources/auto/manual-gh_pr.md` for more details.
+Run `gh pr --help` on demand if you need flag details.
 
 Pull human and AI review-bot comments from the current branch's PR, verify every claim against source, align on a triage plan with the developer, apply minimal fixes or evidence-backed pushback, push, then reply and resolve threads citing the pushed commit.
 
@@ -118,12 +118,23 @@ Reply to and resolve addressed threads (`Fix`, `Decline`, resolved `Investigate`
 
 1. **Reply before resolving.** For every `Fix`, `Decline`, and resolved `Investigate` thread (and any `Outdated` thread where pointing to the new location helps), post a concise reply. Cite the pushed SHA in every `Fix` reply (for example "Fixed in `abc1234`"). On a human account, start each reply with the `> [!NOTE]` callout `> 🤖 **<model> on behalf of <user>**`, and scan the full outgoing payload for secrets and private details before posting. Follow `/gh-pr-comments` for the full checklist when it is installed.
 
-   ```bash
-   gh api "repos/{owner}/{repo}/pulls/{pr_number}/comments/{comment_id}/replies" \
-     -f body="<formatted reply>" --jq '.html_url'
-   ```
+   - **Inline review thread replies:** `{root_comment_id}` MUST be the thread's **root** inline comment ID (`in_reply_to_id == null`, i.e., the first node's `databaseId` in the thread, not a later reply's ID):
 
-2. **Resolve the thread** with the `resolveReviewThread` mutation in [review-threads-graphql.md](@/skills/github/gh-resolve-pr-comments/resources/manual/review-threads-graphql.md), using the thread `id` from step 3, only after its reply URL is confirmed.
+     ```bash
+     gh api "repos/{owner}/{repo}/pulls/{pr_number}/comments/{root_comment_id}/replies" \
+       -f body="<formatted reply>" --jq '.html_url'
+     ```
+
+   - **Top-level PR conversation or review-body comments:** These comments have no inline thread to reply to or resolve. Post a concise attributed response via `gh pr comment` using a temporary body file outside the working tree, confirm the printed comment URL, then delete the temp file:
+
+     ```bash
+     body="$(mktemp)"
+     # write the formatted reply to "$body"
+     gh pr comment "{pr_number}" --body-file "$body"
+     rm -f "$body"
+     ```
+
+2. **Resolve inline review threads** with the `resolveReviewThread` mutation in [review-threads-graphql.md](@/skills/github/gh-resolve-pr-comments/resources/manual/review-threads-graphql.md), using the thread `id` from step 3, only after its reply URL is confirmed.
 
 ## 9. Report
 

@@ -16,20 +16,22 @@ Prepare high-signal context for a pull request before a human pair review.
 
 ## What to do
 
-1. Identify the repo's default branch (do not guess).
-   - Prefer GitHub CLI: `gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'`
-   - Fallback: `git remote show origin | sed -n '/HEAD branch/s/.*: //p'`
-   - If still unclear, say so and ask the developer.
+1. Check whether the user supplied an explicit PR number or URL first.
+   - If a PR number or URL was given, stay in **PR mode** regardless of the local branch and inspect it directly via `gh pr view <pr> --json number,title,body,baseRefName,headRefName,files,commits` and `gh pr diff <pr>`.
+   - Otherwise, identify the repo's default branch (do not guess):
+     - Prefer GitHub CLI: `gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'`
+     - Fallback: `git remote show origin | sed -n '/HEAD branch/s/.*: //p'`
+     - If still unclear, say so and ask the developer.
 
-2. Check if you're on the default branch.
+2. Check the current branch when no explicit PR target was given.
    - Run: `git branch --show-current`
-   - If current branch == default branch, switch to **repo context mode** (see below)
-   - Otherwise, continue with PR diff analysis
+   - If current branch == default branch and no PR number/URL was supplied, switch to **repo context mode** (see below).
+   - Otherwise, continue with PR diff analysis.
 
-3. Diff against the default branch (PR mode only).
-   - Fetch latest refs if needed.
-   - Use triple-dot diff, excluding lockfiles only, so dependency manifest changes stay visible: `git diff <default_branch>...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"`
-   - Also capture: `git diff --stat <default_branch>...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"`
+3. Diff against the fetched base ref (PR mode on a local branch).
+   - Fetch the default branch first (`git fetch origin "$DEFAULT_BRANCH"`) and resolve `BASE_REF` preferring `origin/$DEFAULT_BRANCH` over local `$DEFAULT_BRANCH`.
+   - Use triple-dot diff, excluding lockfiles only, so dependency manifest changes stay visible: `git diff "$BASE_REF"...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"`
+   - Also capture: `git diff --stat "$BASE_REF"...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"`
 
 4. Understand the changes.
    - What behavior changed?
@@ -92,5 +94,7 @@ When already on the default branch, build context around the whole repo instead:
 - **Major issues (or "None found")**
 - **Questions for the developer**
 
-Do not fabricate results. Be direct. Stop after producing this context and wait for developer input.
+For deep bug, boundary-case, or race-condition hunting beyond this briefing, follow up with `/pr-edge-cases`.
+
+Done when every section of the selected output format is grounded in inspected diff, file, or command output, major risks and open questions are listed, and execution pauses for developer input.
 

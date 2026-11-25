@@ -109,9 +109,9 @@ Children write receipts using [receipt.example.json](receipt.example.json); the
 consuming:
 
 - known `version`, all template keys, a `role` of `researcher`, `implementer`,
-  `reviewer`, `verifier` (run verification), `council` (seat under
-  `extensions.seat`) or `architect` (evidence the Architect collected during
-  recovery), and the role's allowed statuses:
+  `reviewer`, `verifier` (run verification; dispatched via T3 `role: "test"`),
+  `council` (seat under `extensions.seat`) or `architect` (evidence the Architect
+  collected during recovery), and the role's allowed statuses:
   Implementer `ready_for_review`; Reviewer and council `accepted` or
   `changes_requested`; Researcher and run verification `completed`; any role may
   report `command_pending` or `blocked`;

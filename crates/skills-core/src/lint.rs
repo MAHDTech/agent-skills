@@ -63,7 +63,7 @@ impl SkillLinter {
         if self.check_resources
             && let Some(parent) = skill.path.parent()
         {
-            self.check_resources_layout(parent, &skill.path, &mut report);
+            self.check_resources_layout(parent, &skill.path, skill.tree, &mut report);
         }
 
         report
@@ -455,7 +455,13 @@ impl SkillLinter {
         }
     }
 
-    fn check_resources_layout(&self, skill_dir: &Path, skill_path: &Path, report: &mut LintReport) {
+    fn check_resources_layout(
+        &self,
+        skill_dir: &Path,
+        skill_path: &Path,
+        tree: SkillTree,
+        report: &mut LintReport,
+    ) {
         let full_skill_dir = if let Some(ref base) = self.base_path {
             base.join(skill_dir)
         } else {
@@ -529,7 +535,7 @@ impl SkillLinter {
                     );
                 }
 
-                // Check manual resources for em-dashes
+                // Check manual resources for em-dashes and live auto Markdown resources for broken downloads
                 let rel_path = entry
                     .path()
                     .strip_prefix(&full_skill_dir)
@@ -537,11 +543,88 @@ impl SkillLinter {
                 let is_manual = rel_path
                     .parent()
                     .is_some_and(|p| p.components().any(|c| c.as_os_str() == "manual"));
+                let is_auto = rel_path
+                    .parent()
+                    .is_some_and(|p| p.components().any(|c| c.as_os_str() == "auto"));
                 if is_manual && let Ok(content) = fs::read_to_string(entry.path()) {
                     Self::check_em_dashes(&content, entry.path(), report);
+                } else if is_auto
+                    && tree == SkillTree::Live
+                    && entry
+                        .path()
+                        .extension()
+                        .is_some_and(|ext| ext.eq_ignore_ascii_case("md"))
+                    && let Ok(content) = fs::read_to_string(entry.path())
+                {
+                    Self::check_auto_resource_quality(&content, entry.path(), report);
                 }
             }
         }
+    }
+
+    fn check_auto_resource_quality(content: &str, file_path: &Path, report: &mut LintReport) {
+        let trimmed = content.trim_start_matches('\u{feff}').trim_start();
+        let prefix: String = trimmed
+            .chars()
+            .take(32)
+            .map(|c| c.to_ascii_lowercase())
+            .collect();
+        if prefix.starts_with("<!doctype html") || prefix.starts_with("<html") {
+            report.add(
+                LintIssue::builder()
+                    .file(file_path.to_path_buf())
+                    .line(1)
+                    .rule("auto-resource-quality")
+                    .message(
+                        "Auto-downloaded Markdown resource is a raw HTML shell rather than documentation; replace or remove the source URL in frontmatter 'resources:'."
+                            .to_string(),
+                    )
+                    .severity(LintSeverity::Error)
+                    .build(),
+            );
+            return;
+        }
+
+        let mut fence_tracker = CodeFenceTracker::new();
+        for (idx, line) in content.lines().enumerate() {
+            if fence_tracker.observe_line(line) != FenceTransition::Outside {
+                continue;
+            }
+            if line.contains("{{#options}}") || Self::contains_handlebars_partial(line) {
+                report.add(
+                    LintIssue::builder()
+                        .file(file_path.to_path_buf())
+                        .line(idx + 1)
+                        .rule("auto-resource-quality")
+                        .message(
+                            "Auto-downloaded Markdown resource contains unrendered Handlebars template syntax; replace the template URL with rendered documentation or a manual reference."
+                                .to_string(),
+                        )
+                        .severity(LintSeverity::Error)
+                        .build(),
+                );
+                return;
+            }
+        }
+    }
+
+    fn contains_handlebars_partial(line: &str) -> bool {
+        let mut rest = line;
+        while let Some(start) = rest.find("{{>") {
+            let after = &rest[start + 3..];
+            if let Some(end) = after.find("}}") {
+                let inner = after[..end].trim();
+                if !inner.is_empty()
+                    && inner
+                        .chars()
+                        .all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '/' | '.'))
+                {
+                    return true;
+                }
+            }
+            rest = after;
+        }
+        false
     }
 
     fn check_duplicate_names(skills: &[Skill], report: &mut LintReport) {
@@ -1246,6 +1329,113 @@ let a = 1;
         assert!(
             report.issues.is_empty(),
             "Expected mismatched fence char and closing info string not to close block, got: {:?}",
+            report.issues
+        );
+    }
+
+    #[test]
+    fn test_auto_resource_quality_flags_html_shell_and_handlebars() {
+        let dir = tempfile::tempdir().unwrap();
+        let skill_dir = dir.path().join("skills/tooling/sample-tool");
+        let auto_dir = skill_dir.join("resources/auto");
+        fs::create_dir_all(&auto_dir).unwrap();
+        fs::write(
+            auto_dir.join("raw-page.md"),
+            "<!doctype html>\n<html lang=\"en\"><head></head><body>SPA</body></html>\n",
+        )
+        .unwrap();
+        fs::write(
+            auto_dir.join("cargo-man.md"),
+            "# cargo-doc(1)\n\n{{#options}}\n{{> section-features }}\n",
+        )
+        .unwrap();
+        fs::write(
+            auto_dir.join("good-doc.md"),
+            "# Good Doc\n\n```html\n<!doctype html>\n<html></html>\n```\n\n```handlebars\n{{> partial-example }}\n```\n",
+        )
+        .unwrap();
+
+        let skill = Skill::builder()
+            .path(PathBuf::from("skills/tooling/sample-tool/SKILL.md"))
+            .dir_name("sample-tool")
+            .category(SkillCategory::Tooling)
+            .promoted(true)
+            .tree(SkillTree::Live)
+            .frontmatter(
+                SkillFrontmatter::builder()
+                    .name("sample-tool")
+                    .description("Run sample tool commands.")
+                    .build(),
+            )
+            .content("# Sample Tool\n\nBody.\n".to_string())
+            .raw("---\nname: sample-tool\ndescription: Run sample tool commands.\n---\n# Sample Tool\n\nBody.\n".to_string())
+            .build();
+
+        let linter = SkillLinter::with_base_path(dir.path());
+        let report = linter.lint_skill(&skill);
+        let quality_issues: Vec<_> = report
+            .issues
+            .iter()
+            .filter(|i| i.rule == "auto-resource-quality")
+            .collect();
+        assert_eq!(
+            quality_issues.len(),
+            2,
+            "Expected exactly 2 auto-resource-quality errors, got: {quality_issues:?}"
+        );
+        assert!(
+            quality_issues
+                .iter()
+                .any(|i| i.file.ends_with("raw-page.md") && i.message.contains("raw HTML shell"))
+        );
+        assert!(
+            quality_issues
+                .iter()
+                .any(|i| i.file.ends_with("cargo-man.md") && i.message.contains("Handlebars"))
+        );
+    }
+
+    #[test]
+    fn test_auto_resource_quality_skips_archived_skills() {
+        let dir = tempfile::tempdir().unwrap();
+        let auto_dir = dir
+            .path()
+            .join("skills-archive/tooling/old-tool/resources/auto");
+        fs::create_dir_all(&auto_dir).unwrap();
+        fs::write(
+            auto_dir.join("raw-page.md"),
+            "<!DOCTYPE html><html></html>\n",
+        )
+        .unwrap();
+
+        let skill = Skill::builder()
+            .path(PathBuf::from("skills-archive/tooling/old-tool/SKILL.md"))
+            .dir_name("old-tool")
+            .category(SkillCategory::Tooling)
+            .promoted(false)
+            .tree(SkillTree::Archive)
+            .frontmatter(
+                SkillFrontmatter::builder()
+                    .name("old-tool")
+                    .description("Legacy tool reference.")
+                    .metadata(HashMap::from([(
+                        "archived".to_string(),
+                        "2026-01-01".to_string(),
+                    )]))
+                    .build(),
+            )
+            .content("# Old Tool\n".to_string())
+            .raw("---\nname: old-tool\ndescription: Legacy tool reference.\nmetadata:\n  archived: \"2026-01-01\"\n---\n# Old Tool\n".to_string())
+            .build();
+
+        let linter = SkillLinter::with_base_path(dir.path());
+        let report = linter.lint_skill(&skill);
+        assert!(
+            report
+                .issues
+                .iter()
+                .all(|i| i.rule != "auto-resource-quality"),
+            "Archived skills should not fail auto-resource-quality: {:?}",
             report.issues
         );
     }

@@ -1,6 +1,6 @@
 ---
 name: skill-archive
-description: Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog.
+description: Retire a custom skill by archiving its files, preserving history, updating inbound references, and regenerating the catalog. Use only when the user explicitly requests archiving a skill.
 disable-model-invocation: true
 metadata:
   group: authoring
@@ -23,7 +23,7 @@ If a replacement is taking over, create it first with `/skill-creator`; archive 
 
 ## Pick the disposition first
 
-Three ways a skill leaves the live set:
+Four ways a skill leaves the live set:
 
 - **Archive** - retire but keep it readable (it shipped, it had users, or its history is worth preserving). `git mv` into `skills-archive/`. The default: shipped skills are never deleted.
 - **Delete** - remove it entirely (a never-promoted `in-progress/` draft, a mistake, nothing worth keeping). `git rm` the directory. Not for anything that ever shipped.
@@ -56,7 +56,7 @@ Three ways a skill leaves the live set:
 3. **Purge or redirect inbound references.** Sweep for the old name in skills and in repository docs, then fix each hit - repoint to the replacement, or remove the mention:
 
    ```bash
-   rg -n -w '<name>' skills --glob 'SKILL.md' --glob '!skills/vendor/**'
+   rg -n -w '<name>' skills --glob '*.md' --glob '!skills/vendor/**' --glob '!**/resources/auto/**'
    rg -n 'skills/<category>/<name>/' docs README.md CONTRIBUTING.md AGENTS.md
    ```
 

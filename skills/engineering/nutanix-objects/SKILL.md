@@ -81,3 +81,11 @@ When performing specific administration, deployment, or troubleshooting tasks fo
 | **APIs, Prometheus & Integrations** | [`resources/manual/apis-and-integrations.md`](resources/manual/apis-and-integrations.md)                             | Prometheus exporter, S3 API operations matrix, S3 Select SQL functions, SSE-C encryption, Kafka schemas, and backup integrations.             |
 | **Troubleshooting & Operations**    | [`resources/manual/troubleshooting-and-operations.md`](resources/manual/troubleshooting-and-operations.md)           | VM shutdown/startup procedures, slow connection detection, UI/subnet discovery fixes, and manual DNS server updates.                          |
 | **Master Documentation Index**      | [`resources/manual/master-index.md`](resources/manual/master-index.md)                                               | Master overview map of all 11 documentation modules.                                                                                          |
+
+---
+
+## Completion criteria
+
+- Verify bucket, policy, replication, or WORM configuration via S3 CLI/API calls or Prism Central object store status, confirming expected access and immutability behavior.
+- When advising without live object store access, cite the matching `resources/manual/` module and note any version-dependent or undocumented endpoints (such as Prometheus scrape endpoints).
+- Confirm S3 access keys, secret keys, and SSE-C encryption keys are loaded from environment variables or secret stores and never committed to source control.

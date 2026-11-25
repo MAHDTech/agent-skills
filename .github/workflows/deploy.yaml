@@ -23,15 +23,20 @@ jobs:
     name: Build and Deploy Dashboard
     runs-on: ubuntu-24.04
     steps:
-      - id: setup_consumer
-        name: Set Up Consumer
-        uses: tars-cloud/actions/composite/setup-consumer@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+      - id: setup_project
+        name: Set Up Project
+        uses: tars-cloud/actions/composite/setup-project@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
         with:
           fetch-depth: 0
+          s3-endpoint: ${{ vars.TARS_CLOUD_S3_ENDPOINT }}
+          s3-bucket: ${{ vars.TARS_CLOUD_S3_BUCKET }}
+          s3-region: ${{ vars.TARS_CLOUD_S3_REGION }}
+          s3-access-key: ${{ secrets.TARS_CLOUD_S3_ACCESS_KEY }}
+          s3-secret-key: ${{ secrets.TARS_CLOUD_S3_SECRET_ACCESS_KEY }}
 
       - id: build_dashboard
         name: Build Dashboard
-        uses: tars-cloud/actions/composite/run-devenv@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+        uses: tars-cloud/actions/composite/run-devenv@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
         with:
           run: ask dashboard build
 
@@ -49,7 +54,7 @@ jobs:
       - id: report_status
         name: Report Deployment Status
         if: always()
-        uses: tars-cloud/actions/composite/report-status@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+        uses: tars-cloud/actions/composite/report-status@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
         with:
           title: Deployment Results
           results: |

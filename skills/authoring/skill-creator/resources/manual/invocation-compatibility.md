@@ -37,8 +37,8 @@ Every promoted custom skill must record an explicit YAML boolean in `agents/open
 
 For an explicit-only skill, state the same intent near the start of the body:
 
-```text
-Use this skill only when the user explicitly requests its workflow.
+```markdown
+**Invocation:** Start only when the user explicitly requests this workflow.
 ```
 
 That instruction is advisory on hosts without enforcement. A manual skill is not universally absent from model context, and automatic selection is not authorization to perform its actions.

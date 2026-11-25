@@ -14,7 +14,7 @@ mermaid = false
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Consult the `gh pr` manual in `resources/auto/manual-gh_pr.md` for more details.
+Run `gh pr --help` on demand if you need flag details.
 
 Close the loop after reviewing someone else's pull request: turn your findings into a formal GitHub review with the right event, a summary body, and inline comments anchored to the lines they concern.
 
@@ -52,21 +52,15 @@ Before posting, apply these rules to the review summary and every inline comment
 
 ## 4. Submit
 
+Before posting a formal `APPROVE` or `REQUEST_CHANGES` review, show the chosen verdict, summary body, and inline findings and confirm with the user unless they have already approved the drafted review and verdict.
+
 Write scratch files to a temp directory outside the working tree so they never land in a commit:
 
 ```bash
 scratch="$(mktemp -d)"
 ```
 
-**Summary only** (no inline comments) - write the body to `"$scratch/review-body.md"`, then use `gh pr review` directly and capture the printed review URL:
-
-```bash
-gh pr review <pr> --request-changes --body-file "$scratch/review-body.md"
-```
-
-Swap in `--approve` or `--comment` as chosen.
-
-**With inline comments** - build a single JSON payload in `"$scratch/review.json"` and post it to the reviews endpoint so the event, body, and all inline comments land as one review, extracting `html_url` to confirm publication:
+Build a single JSON payload in `"$scratch/review.json"` and post it to the reviews endpoint so the event, body, and any inline comments land as one review and return `html_url` directly:
 
 ```json
 {
@@ -90,15 +84,17 @@ Swap in `--approve` or `--comment` as chosen.
 }
 ```
 
+For a summary-only review (no inline comments), omit the `comments` field from `"$scratch/review.json"` and submit through the same REST call:
+
 ```bash
 gh api "repos/{owner}/{repo}/pulls/<pr>/reviews" --input "$scratch/review.json" --jq '.html_url'
 ```
 
-`event` must be `APPROVE`, `REQUEST_CHANGES`, or `COMMENT`. Omit `event` to leave the review `PENDING` (a draft only you can see) when you want to eyeball it on GitHub before publishing. Use `start_line` with `line` for a multi-line comment.
+`event` must be `APPROVE`, `REQUEST_CHANGES`, or `COMMENT`. Omit `event` to leave the review `PENDING` (a draft only you can see) when you want to eyeball it on GitHub before publishing. Use `start_line` with `line` for a multi-line comment. (If you instead use `gh pr review` for a summary-only review, note that it does not print a URL; fetch the created review's `html_url` from `gh api "repos/{owner}/{repo}/pulls/<pr>/reviews" --jq '.[-1].html_url'` afterward.)
 
 ## 5. Confirm
 
-Verify that GitHub returned the published review URL (`html_url` from the REST response or the URL printed by `gh pr review`). Remove the scratch directory with `rm -rf "$scratch"`. Report the submitted event, the verified review URL, the summary, the count of inline comments, and the PR URL. Done when the published review URL is confirmed and every intended inline comment is attached.
+Verify that GitHub returned the published review URL (`html_url` from the REST response). Remove the scratch directory with `rm -rf "$scratch"`. Report the submitted event, the verified review URL, the summary, the count of inline comments, and the PR URL. Done when the published review URL is confirmed and every intended inline comment is attached.
 
 > Adapted from [t3dotgg/tstack](https://github.com/t3dotgg/tstack) (MIT).
 

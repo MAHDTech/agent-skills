@@ -18,7 +18,7 @@ A loose idea has arrived - too big for one agent session, and wrapped in fog: th
 
 The destination varies per effort, and naming it is the first act of charting - it shapes every ticket. It might be a spec to hand off and iterate on, a decision to lock before planning starts, or a change made in place like a data-structure migration. The map is domain-agnostic - engineering work, course content, whatever fits the shape.
 
-> **Dependencies:** This skill runs its conversations through the `/grilling` skill, invoking it directly (see [Ticket types](#ticket-types) and [Modes](#modes)). Throughout, pin each domain term in a glossary as it is clarified and record hard-to-reverse decisions where the project keeps them.
+> **Dependencies:** This skill runs its conversations through the `/grilling` skill, invoking it directly (see [Ticket types](#ticket-types) and [Modes](#modes), including the standalone fallback under Grilling when `/grilling` is unavailable). Throughout, pin each domain term in a glossary as it is clarified and record hard-to-reverse decisions where the project keeps them.
 
 ## Plan, don't do
 
@@ -34,7 +34,14 @@ The map is a single issue on this repo's issue tracker, labelled `wayfinder:map`
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place - its ticket - so the map never restates it, only gists it and links.
 
-**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** Follow your project's conventions for its issue tracker - GitHub (via the `gh` CLI), Linear, or local markdown files - including how it expresses labels, child issues, and dependency links. If no tracker is configured, default to local markdown files.
+**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** Follow your project's conventions for its issue tracker - GitHub (via the `gh` CLI), Linear, or local markdown files - including how it expresses labels, child issues, and dependency links.
+
+If no tracker is configured, use this local markdown convention under `docs/plans/<map-slug>/`:
+
+- `map.md`: holds the map body (Destination, Notes, Decisions so far, Not yet specified, Out of scope).
+- `tickets/<nn>-<slug>.md`: one file per ticket with YAML frontmatter (`title`, `type`, `status: open|closed`, `assignee`, `blocked_by: [<nn>, ...]`) and a `## Question` body.
+- Claiming sets `assignee`; blocking lists prerequisite ticket numbers in `blocked_by`; the frontier is open, unassigned ticket files whose `blocked_by` entries are all `closed`.
+- Resolving appends a `## Resolution` section to the ticket file, sets `status: closed`, and adds the one-line link to `map.md`'s Decisions so far.
 
 ### The map body
 
@@ -88,7 +95,7 @@ Every ticket is either **HITL** - human in the loop, worked _with_ a human who s
 
 - **Research** (AFK): Reading documentation, third-party APIs, or local resources like knowledge bases. Creates a markdown summary as a linked asset. Use when knowledge outside the current working directory is required.
 - **Prototype** (HITL): Raise the fidelity of the discussion by making a cheap, rough, concrete artifact to react to - an outline, a rough take, a stub, or throwaway UI/logic code - whatever is cheapest to react to. Links the prototype as an asset. Use when "how should it look" or "how should it behave" is the key question.
-- **Grilling** (HITL): Conversation via the `/grilling` skill, one question at a time. The default case.
+- **Grilling** (HITL): Conversation via the `/grilling` skill, one question at a time. The default case. If `/grilling` is not installed, run the interview directly: ask one decision at a time, state the options, trade-offs, and your recommendation, and look up codebase facts yourself instead of asking the user.
 - **Task** (HITL or AFK): Manual work that must happen before a _decision_ can be made - nothing to decide, prototype, or research, but the discussion is blocked until it's done. Signing up for a service so its API can be judged, provisioning access, moving data so its shape can be seen. This is the one type that _does_ rather than decides - and it earns its place by unblocking a decision, not by delivering the destination. The agent drives it alone where it can (AFK); otherwise it hands the human a precise checklist (HITL). Resolved when the work is done; the answer records what was done and any resulting facts (credentials location, new URLs, row counts) later tickets depend on.
 
 ## Fog of war
@@ -134,7 +141,7 @@ User invokes with a map (URL or number). A ticket is **optional** - without one,
 2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it**: assign it to yourself before any work.
 3. Resolve it - **zoom as needed**: fetch the full body of any related or closed ticket on demand; invoke the skills the `## Notes` block names. If in doubt, use `/grilling`.
 4. Record the resolution: post the answer as a **resolution comment**, **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
-5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals a ticket - this one or another - sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
+5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals a ticket - this one or another - sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets. Before ending the session, confirm the worked ticket is closed with its resolution recorded, the map's **Decisions so far** index is updated, and the next unblocked frontier tickets are reported by name.
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.
 

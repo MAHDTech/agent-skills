@@ -26,14 +26,15 @@ Third-party services (payment, messaging, etc.) you do not control. The deepened
 
 ## Seam discipline
 
-- **One adapter means a hypothetical seam. Two adapters means a real one.** Do not introduce a port unless at least two adapters are justified (typically production + test). A single-adapter seam is just indirection.
-- **Internal seams vs external seams.** A deep module can have internal seams (private to its implementation, used by its own tests) as well as the external seam at its interface. Do not expose internal seams through the interface just because tests use them.
+Apply the seam principles in [SKILL.md](../../SKILL.md#principles) when collapsing a cluster:
+
+- Only introduce a port when the dependency category justifies at least two adapters (typically production + test); otherwise merge the modules directly instead of adding single-adapter indirection.
+- Keep test-only internal seams private to the implementation rather than exposing them through the deepened module's external interface.
 
 ## Testing strategy: replace, don't layer
 
-- Old unit tests on shallow modules become waste once tests at the deepened module's interface exist - delete them.
-- Write new tests at the deepened module's interface. The **interface is the test surface**.
-- Tests assert on observable outcomes through the interface, not internal state.
-- Tests should survive internal refactors - they describe behaviour, not implementation. If a test has to change when the implementation changes, it is testing past the interface.
+Follow the interface-as-test-surface principle from [SKILL.md](../../SKILL.md#principles) as you deepen:
 
-Write those interface-level tests one at a time, red before green.
+- Delete obsolete unit tests on collapsed shallow modules once tests at the deepened module's interface cover the same behavior.
+- Assert on observable outcomes through the interface rather than internal state, so tests survive internal refactors.
+- Write the new interface-level tests one at a time, red before green.

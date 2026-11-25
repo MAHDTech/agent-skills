@@ -12,7 +12,7 @@ metadata:
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Take the current conversation context and codebase understanding and produce a spec (you may know this document as a PRD). Synthesize what you already know rather than running a new interview; the only question to put to the user is the seam check in step 2.
+Take the current conversation context and codebase understanding and produce a spec (you may know this document as a PRD). Synthesize what you already know rather than running a new interview; check in with the user only to confirm testing seams (step 2) and review the draft before publishing (step 3).
 
 Work from your project's conventions: its issue tracker (GitHub via `gh`, Linear, or local files), triage label vocabulary, domain glossary, and any ADRs in the area you are touching. If those conventions have not been established, ask the user before publishing.
 
@@ -24,7 +24,7 @@ Work from your project's conventions: its issue tracker (GitHub via `gh`, Linear
 
    Confirm the seams with the user in a single message, then continue.
 
-3. Write the spec using the template below, then publish it to your project's issue tracker. Apply the project's ready-for-agent triage label (or its equivalent) - no need for additional triage.
+3. Draft the spec using the template below and present it to the user for review and confirmation before publishing to the external issue tracker (skip the confirmation pause only if the user already asked to publish directly). Once confirmed, publish it to the project's issue tracker, apply the project's ready-for-agent triage label (or its equivalent) - no need for additional triage - and report the created issue URL or local file path.
 
 Once the spec is approved, slice it into tracer-bullet tickets with `/to-tickets`.
 
@@ -63,7 +63,7 @@ A list of the implementation decisions that were made. This can include:
 - API contracts
 - Specific interactions
 
-Do NOT include specific file paths or code snippets - they go stale quickly.
+Refer to modules, interfaces, and contracts by name rather than specific file paths or code snippets, which go stale quickly.
 
 Exception: if exploratory prototyping produced a snippet that encodes a
 decision more precisely than prose can (a state machine, reducer, schema, or
@@ -87,5 +87,11 @@ A description of the things that are out of scope for this spec.
 
 Any further notes about the feature.
 ```
+
+## Done when
+
+- Every template section (`Problem Statement`, `Solution`, `User Stories`, `Implementation Decisions`, `Testing Decisions`, `Out of Scope`, `Further Notes`) is populated or explicitly noted as none.
+- The user confirmed the testing seams and approved the drafted spec before publishing (unless they already requested direct publication).
+- The spec is published with the project's ready-for-agent triage label (or equivalent) applied, and the created issue URL or local file path has been returned to the user.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

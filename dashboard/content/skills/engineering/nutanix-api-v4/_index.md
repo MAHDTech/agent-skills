@@ -66,3 +66,11 @@ When executing specific API integrations, SDK upgrades, or troubleshooting v4 AP
 | **Troubleshooting & Known Issues** | [`resources/manual/troubleshooting-and-known-issues.md`](@/skills/engineering/nutanix-api-v4/resources/manual/troubleshooting-and-known-issues.md) | Resolved issues, mandatory OData parameter workarounds (`$filter`, `$limit`, `$select`, etc.), RBAC owner permission fixes, service account VM creation workaround, category value deletion cleanup, and discontinued endpoints. |
 | **Master Documentation Index**     | [`resources/manual/master-index.md`](@/skills/engineering/nutanix-api-v4/resources/manual/master-index.md)                                         | Master overview map of all v4 API reference documentation modules.                                                                                                                                                               |
 
+---
+
+## Completion criteria
+
+- Verify v4 API requests target Prism Central port `9440`, authenticate with `x-ntnx-api-key` (or Basic Auth) loaded from environment/secrets, and use valid GA namespace paths and OData parameters.
+- Confirm mutating calls handle ETags where still enforced, asynchronous task polling, and documented version-specific workarounds (see [troubleshooting-and-known-issues.md](@/skills/engineering/nutanix-api-v4/resources/manual/troubleshooting-and-known-issues.md)).
+- Validate live responses or SDK tests against the target Prism Central/AOS release, or cite the matching `resources/manual/` module and release snapshot (March 2026 / pc.7.5.1) when advising offline.
+

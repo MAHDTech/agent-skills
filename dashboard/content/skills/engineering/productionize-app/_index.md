@@ -10,15 +10,15 @@ mermaid = false
 +++
 
 
-# Productionize App
+# Productionize app
 
 **Invocation:** Start only when the user explicitly requests this workflow.
 
-Prepare an application for production deployment across configuration, error handling, security, performance, and platform packaging.
+Prepare an application for production deployment across configuration, reliability, security, performance, observability, packaging, and deployment readiness.
 
 ## Usage patterns
 
-The optional arguments name the framework and the deployment target:
+Optional arguments name the framework and deployment target:
 
 ```text
 /productionize-app                          # Auto-detect framework, general production prep
@@ -27,73 +27,48 @@ The optional arguments name the framework and the deployment target:
 /productionize-app nodejs docker            # Node.js app for Docker deployment
 ```
 
-Framework checklists cover Flutter, React/Next.js, Node.js, and Python; deployment checklists cover TestFlight, Google Play, web hosts (Vercel, Netlify, AWS), and containers. For any other stack or target, run the general audit and say which checklist was unavailable.
+Framework checklists cover Flutter, React/Next.js, Node.js, and Python; deployment checklists cover TestFlight, Google Play, web hosts (Vercel, Netlify, AWS), and containers. For any other stack or target, run the general workflow and state which checklist was unavailable.
 
 ## Workflow
 
-### 1. Initial analysis and planning
+### 1. Detect stack and baseline
 
-- List tasks needed to reach production readiness.
-- Detect the framework from repository files: Flutter (`pubspec.yaml`, `.dart` files); React or Next.js (`package.json` with `react` or `next`); Node.js (`package.json` with a server such as `express`, `fastify`, `koa`, or `hono`); Python (`pyproject.toml`, `requirements.txt`). Identify the build tools and target deployment platform.
-- Review existing configuration files (`package.json`, `pubspec.yaml`, `Dockerfile`, `.env.example`).
-- Map integration points, external dependencies, and failure modes.
+- Detect the framework from repository files: Flutter (`pubspec.yaml`, `.dart`), React/Next.js (`package.json` with `react` or `next`), Node.js (`package.json` with `express`, `fastify`, `koa`, or `hono`), or Python (`pyproject.toml`, `requirements.txt`).
+- Inspect existing packaging, deployment, and config files (`Dockerfile`, CI workflows, `.env.example`, manifest files) and identify build, lint, and test commands.
+- Map external dependencies (databases, queues, third-party APIs) and entry points.
 
-### 2. Codebase audit
+### 2. Audit and fix core production domains
 
-Audit the codebase for production readiness gaps:
+Audit each domain, record concrete gaps with file paths, and apply fixes directly:
 
-- **Configuration:** Hardcoded credentials, URLs, or secrets; missing environment separation (development, staging, production).
-- **Error handling:** Uncaught rejections, missing fallback paths, missing timeouts on network calls.
-- **Performance:** Missing database indexes, unbounded pagination, uncompressed assets, missing cache headers.
-- **Security:** Missing input sanitization, exposed debug endpoints, overly broad CORS headers.
-- **Observability:** Missing request IDs, absence of structured logging, missing health-check endpoints.
-- **Resilience:** Unhandled offline states, missing retry policies on transient network calls.
+- **Configuration and secrets:** Move hardcoded credentials, API keys, and environment-specific URLs to environment variables or a secret store; validate required environment variables at startup so the app exits non-zero when required settings are missing; keep `.env.example` in sync and secrets out of Git.
+- **Reliability and timeouts:** Set explicit connect/read timeouts on all outbound HTTP and database calls; add bounded retries with exponential backoff only for idempotent or safe transient failures; handle unhandled promise rejections / uncaught exceptions; add graceful `SIGTERM`/`SIGINT` shutdown draining in-flight requests.
+- **Security:** Sanitize and schema-validate external inputs; remove or gate debug endpoints and dev flags in production builds; restrict CORS to explicit allowed origins; set security response headers; ensure error responses return safe messages without stack traces or internal paths.
+- **Performance:** Bound pagination and payload limits; eliminate obvious N+1 queries and add missing database indexes for hot lookups; enable asset compression and explicit `Cache-Control` headers for static assets and cacheable responses.
+- **Observability:** Emit structured JSON logs with explicit log levels (`debug`, `info`, `warn`, `error`) and request correlation IDs; expose a liveness/readiness health endpoint (e.g., `/healthz`, `/readyz`) that verifies critical dependencies; remove leftover debug logging and temporary mocks.
+- **User experience (client apps):** Add top-level error boundaries, loading states, empty states, and offline error recovery for network requests.
 
-### 3. Implementation
+### 3. Apply framework-specific optimizations
 
-#### Configuration and environment
+Apply the checklist for the detected framework (Flutter, React/Next.js, Node.js, or Python) from [resources/manual/framework-checklists.md](@/skills/engineering/productionize-app/resources/manual/framework-checklists.md#framework-specific-optimizations).
 
-- Separate runtime config by environment using environment variables.
-- Add configuration validation on startup so invalid settings fail fast.
-- Move API keys and secrets to secret stores or environment variables.
+### 4. Prepare deployment and documentation
 
-#### Performance and reliability
+- Apply the target checklist (TestFlight, Google Play, Web, or Container) from [resources/manual/framework-checklists.md](@/skills/engineering/productionize-app/resources/manual/framework-checklists.md#deployment-preparation).
+- Update `README.md` with required environment variables and secrets, exact build/test/deploy commands for the target platform, health check endpoints, and external service dependencies.
 
-- Add caching headers and in-memory or storage caching where appropriate.
-- Configure request timeouts and retries with backoff for remote dependencies.
-- Add loading states, empty states, and offline fallbacks.
+### 5. Verify production readiness
 
-#### User experience
+Run the stack's concrete verification commands and record exact results:
 
-- Replace stack traces or raw errors with clear, actionable user messages.
-- Test error boundary components and edge-case inputs.
+1. **Production build:** Run the release/production build command with optimization flags enabled (e.g., `npm run build`, `flutter build --release`, `docker build`, or `python -m build`) and confirm exit code `0`.
+2. **Test and lint suite:** Run the automated test, typecheck, and lint suite and add regression tests for any newly added startup validation, health endpoints, or error handlers.
+3. **Secret and config check:** Scan tracked files and build outputs for hardcoded secrets or `.env` leaks, and verify the app fails fast with a clear error when a required environment variable is unset.
+4. **Health and deployment smoke check:** Start the built artifact locally (or run a staging/dry-run deploy) and verify the health endpoint returns HTTP `200` (and `503` when a required dependency is unavailable, if applicable).
 
-#### Code quality and observability
+## Completion criteria
 
-- Add structured logs with log levels (debug, info, warn, error).
-- Write regression and integration tests for critical business paths.
-- Remove debug flags, dead prototypes, and temporary mocks.
-
-### 4. Framework-specific optimizations
-
-Apply the checklist for the detected framework (Flutter, React/Next.js, Node.js, Python) from [resources/manual/framework-checklists.md](@/skills/engineering/productionize-app/resources/manual/framework-checklists.md#framework-specific-optimizations).
-
-### 5. Documentation
-
-Update the README so a new operator can run, configure, and deploy the application: required environment variables and secrets, the build and deployment commands for the target platform, and the key external dependencies.
-
-### 6. Deployment preparation
-
-Apply the checklist for the chosen deployment target (TestFlight, Google Play, Web, or Container) from [resources/manual/framework-checklists.md](@/skills/engineering/productionize-app/resources/manual/framework-checklists.md#deployment-preparation).
-
-### 7. Quality assurance checklist
-
-Before finishing:
-
-- [ ] Configurations load from environment variables and fail fast when missing
-- [ ] Network calls set timeouts and handle failures gracefully
-- [ ] Secrets and credentials stay out of source control
-- [ ] Build artifact produces clean output with optimization flags enabled
-- [ ] Health checks, monitoring, and structured logs report operational status
-- [ ] Target platform deployment succeeds in a staging or dry-run environment
+- Every gap identified in Steps 2 through 4 is fixed or explicitly documented as a follow-up with owner/blocker.
+- Production build, automated tests, secret/config fail-fast check, and health/smoke verification all pass with recorded command output.
+- `README.md` and `.env.example` document all required runtime configuration and deployment steps.
 

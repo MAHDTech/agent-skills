@@ -58,8 +58,9 @@ The upstream catalog grows; when `index.json` lists a sub-skill missing from the
    - In Rust, store upgrade-persistent state in `ic-stable-structures` (`MemoryManager`, `StableBTreeMap`, `StableCell`) rather than heap-only `thread_local!` collections.
 5. **Distinguish Certified State from Uncertified Queries:**
    - Standard query calls execute on a single replica without consensus. Use update calls or certified variables (`ic-http-certification` / `CertTree`) whenever clients require cryptographic proof of response integrity.
-6. **Make HTTPS Outcalls Deterministic:**
-   - Always supply a transform function that strips non-deterministic headers (timestamps, request IDs, rate-limit counters) so all subnet replicas reach consensus on the response byte payload, and compute cycle attachment with `ic0.cost_http_request_v2`.
+6. **Configure HTTPS Outcalls and Cycle Pricing Accurately:**
+   - For **replicated** HTTPS outcalls, always supply a transform function that strips non-deterministic headers (timestamps, request IDs, rate-limit counters) so all subnet replicas reach consensus on the response byte payload. For **non-replicated** (`is_replicated = false`) and **flexible** (`flexible_http_request`) outcalls, a transform is optional: omitting it reserves zero transform instructions, whereas supplying a transform under pricing v2 reserves the full query instruction limit unless you set `with_expected_transform_instructions`.
+   - Match cycle attachment to the pricing version and SDK wrapper: pricing v1 uses `ic0.cost_http_request` (used by Motoko `Call.httpRequest` and legacy Rust `ic-cdk-management-canister` 0.1), while pricing v2 uses `ic0.cost_http_request_v2` (used by Rust `ic-cdk >= 0.20.3` with `ic-cdk-management-canister >= 0.2` via `HttpRequest::send()`).
 
 ## Verification checklist
 

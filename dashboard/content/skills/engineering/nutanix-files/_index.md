@@ -32,14 +32,21 @@ Nutanix Files combines:
 Nutanix Files instances are created and managed via Prism Central or REST APIs. Standard shares run on a single FSVM node, while Distributed shares scale out across all FSVM nodes:
 
 ```bash
-# Connect to CVM to inspect file server status via ncli
+# On a CVM: list file servers and their UUIDs
 ncli file-server list
 
-# List shares on a specific file server instance
-ncli file-server list-shares name="fs-corp-01"
+# On a CVM: list shares for a file server by UUID, or list all shares across file servers
+ncli fs list-shares uuid=<file-server-uuid>
+ncli file-server list-all-fs-shares
 
-# Check FSVM cluster health and status
-afsi file-server show-health
+# On a CVM: run NCC health checks for Nutanix Files
+ncc health_checks fileserver_checks run_all
+
+# On an FSVM: inspect file server info, shares, SMB health, and HA state
+afs fs.info
+afs share.list
+afs smb.health_check
+afs ha.minerva_check_ha_state
 ```
 
 ### 2. SMB & NFS Access Configuration
@@ -66,7 +73,7 @@ Automate tiering of cold files to Nutanix Objects or external S3 stores:
 Deploy Nutanix File Analytics to track file access operations and enforce security policies:
 
 - **Audit Logging**: Logs all create, read, write, delete, and permission change events.
-- **Ransomware detection**: Detects abnormal deletion spikes, mass renames, and known ransomware extension patterns, then raises real-time alerts and, where anomaly rules are configured to act, blocks the offending activity. Confirm the available actions for your File Analytics version in `resources/manual/file-analytics-and-monitoring.md`.
+- **Ransomware detection**: Detects abnormal deletion spikes, mass renames, and known ransomware extension patterns, raising real-time alerts and applying version-dependent anomaly actions (such as blocking offending users or clients where configured). Confirm supported actions for your File Analytics version in [file-analytics-and-monitoring.md](@/skills/engineering/nutanix-files/resources/manual/file-analytics-and-monitoring.md).
 
 ---
 
@@ -74,19 +81,27 @@ Deploy Nutanix File Analytics to track file access operations and enforce securi
 
 When executing specific administration, deployment, network setup, or troubleshooting tasks for Nutanix Files, consult the detailed manual reference guides in `resources/manual/`:
 
-| Topic / Requirement                     | Reference File Pointer                                                                                                     | Key Content Covered                                                                                      |
-| :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- |
-| **Architecture & High Availability**    | [`resources/manual/overview-and-architecture.md`](@/skills/engineering/nutanix-files/resources/manual/overview-and-architecture.md)                           | Nutanix Files architecture, FSVMs, CVMs, Volume Groups, Minerva controller, and HA failover.             |
-| **Prerequisites & Networking**          | [`resources/manual/prerequisites-and-network.md`](@/skills/engineering/nutanix-files/resources/manual/prerequisites-and-network.md)                           | AHV/ESXi prerequisites, FSVM sizing, network segmentation (Client vs Storage VLAN), and port matrix.     |
-| **Deployment & Scale-Out**              | [`resources/manual/deployment-and-scaling.md`](@/skills/engineering/nutanix-files/resources/manual/deployment-and-scaling.md)                                 | Prism file server deployment wizard, non-disruptive upgrades (NDU), scale-up, and scale-out.             |
-| **Shares, SMB & NFS Protocols**         | [`resources/manual/file-server-and-share-management.md`](@/skills/engineering/nutanix-files/resources/manual/file-server-and-share-management.md)             | Standard vs Distributed shares, SMB 2.1/3.0, NFS v3/v4, ABE, symlinks, quotas, and file blocking.        |
-| **Directory Services & Users**          | [`resources/manual/directory-services-and-user-management.md`](@/skills/engineering/nutanix-files/resources/manual/directory-services-and-user-management.md) | Active Directory, LDAP, Kerberos, disjoint domains, NFS-to-SMB user mapping, and RBAC roles.             |
-| **Security, ICAP AV & Compliance**      | [`resources/manual/security-antivirus-and-compliance.md`](@/skills/engineering/nutanix-files/resources/manual/security-antivirus-and-compliance.md)           | ICAP antivirus (Symantec, McAfee, Trend Micro), FIPS encryption, SMB encryption, and audit logs.         |
-| **Data Protection & Disaster Recovery** | [`resources/manual/data-protection-and-disaster-recovery.md`](@/skills/engineering/nutanix-files/resources/manual/data-protection-and-disaster-recovery.md)   | DR replication, Metro Availability, Self-Service Restore (SSR), snapshot schedules, and share migration. |
-| **Smart Tiering & Cloud Storage**       | [`resources/manual/smart-tiering-and-cloud-storage.md`](@/skills/engineering/nutanix-files/resources/manual/smart-tiering-and-cloud-storage.md)               | Smart Tiering to Nutanix Objects/AWS S3/Azure/Wasabi, tiering policies, capacity thresholds, recall.     |
-| **Performance & Workload Optimization** | [`resources/manual/performance-and-workload-optimization.md`](@/skills/engineering/nutanix-files/resources/manual/performance-and-workload-optimization.md)   | Workload profiles (VDI, General, Enterprise), auto-rebalancing guardrails, inline/post compression.      |
-| **File Analytics & Telemetry**          | [`resources/manual/file-analytics-and-monitoring.md`](@/skills/engineering/nutanix-files/resources/manual/file-analytics-and-monitoring.md)                   | File Analytics dashboard, anomaly detection, ransomware alerts, Prometheus exporter, Syslog.             |
-| **Files REST APIs & OData**             | [`resources/manual/files-rest-apis.md`](@/skills/engineering/nutanix-files/resources/manual/files-rest-apis.md)                                               | Files REST APIs v4, OData filtering, ETag concurrency, API Explorer, Python/Curl automation.             |
-| **Troubleshooting & Operations**        | [`resources/manual/troubleshooting-and-operations.md`](@/skills/engineering/nutanix-files/resources/manual/troubleshooting-and-operations.md)                 | FSVM CLI tools (`ncli`, `afsi`, `minerva`, `allssh`), log paths, logbay support bundles, fixes.          |
-| **Master Documentation Index**          | [`resources/manual/master-index.md`](@/skills/engineering/nutanix-files/resources/manual/master-index.md)                                                     | Master overview map of all 12 documentation modules.                                                     |
+| Topic / Requirement                     | Reference File Pointer                                                                                                     | Key Content Covered                                                                                                                                           |
+| :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Architecture & High Availability**    | [`resources/manual/overview-and-architecture.md`](@/skills/engineering/nutanix-files/resources/manual/overview-and-architecture.md)                           | Nutanix Files architecture, FSVMs, CVMs, Volume Groups, Minerva controller, and HA failover.                                                                  |
+| **Prerequisites & Networking**          | [`resources/manual/prerequisites-and-network.md`](@/skills/engineering/nutanix-files/resources/manual/prerequisites-and-network.md)                           | AHV/ESXi prerequisites, FSVM sizing, network segmentation (Client vs Storage VLAN), and port matrix.                                                          |
+| **Deployment & Scale-Out**              | [`resources/manual/deployment-and-scaling.md`](@/skills/engineering/nutanix-files/resources/manual/deployment-and-scaling.md)                                 | Prism file server deployment wizard, non-disruptive upgrades (NDU), scale-up, and scale-out.                                                                  |
+| **Shares, SMB & NFS Protocols**         | [`resources/manual/file-server-and-share-management.md`](@/skills/engineering/nutanix-files/resources/manual/file-server-and-share-management.md)             | Standard vs Distributed shares, SMB 2.1/3.0, NFS v3/v4, ABE, symlinks, quotas, and file blocking.                                                             |
+| **Directory Services & Users**          | [`resources/manual/directory-services-and-user-management.md`](@/skills/engineering/nutanix-files/resources/manual/directory-services-and-user-management.md) | Active Directory, LDAP, Kerberos, disjoint domains, NFS-to-SMB user mapping, and RBAC roles.                                                                  |
+| **Security, ICAP AV & Compliance**      | [`resources/manual/security-antivirus-and-compliance.md`](@/skills/engineering/nutanix-files/resources/manual/security-antivirus-and-compliance.md)           | ICAP antivirus (Symantec, McAfee, Trend Micro), FIPS encryption, SMB encryption, and audit logs.                                                              |
+| **Data Protection & Disaster Recovery** | [`resources/manual/data-protection-and-disaster-recovery.md`](@/skills/engineering/nutanix-files/resources/manual/data-protection-and-disaster-recovery.md)   | DR replication, Metro Availability, Self-Service Restore (SSR), snapshot schedules, and share migration.                                                      |
+| **Smart Tiering & Cloud Storage**       | [`resources/manual/smart-tiering-and-cloud-storage.md`](@/skills/engineering/nutanix-files/resources/manual/smart-tiering-and-cloud-storage.md)               | Smart Tiering to Nutanix Objects/AWS S3/Azure/Wasabi, tiering policies, capacity thresholds, recall.                                                          |
+| **Performance & Workload Optimization** | [`resources/manual/performance-and-workload-optimization.md`](@/skills/engineering/nutanix-files/resources/manual/performance-and-workload-optimization.md)   | Workload profiles (VDI, General, Enterprise), auto-rebalancing guardrails, inline/post compression.                                                           |
+| **File Analytics & Telemetry**          | [`resources/manual/file-analytics-and-monitoring.md`](@/skills/engineering/nutanix-files/resources/manual/file-analytics-and-monitoring.md)                   | File Analytics dashboard, audit trails, version-dependent anomaly/ransomware alerts, Syslog, and event streaming.                                             |
+| **Files REST APIs & OData**             | [`resources/manual/files-rest-apis.md`](@/skills/engineering/nutanix-files/resources/manual/files-rest-apis.md)                                               | Files v4 REST endpoints, OData query options, Prism Central port 9440 auth (Python), and shared v4 patterns via [nutanix-api-v4](@/skills/engineering/nutanix-api-v4/_index.md). |
+| **Troubleshooting & Operations**        | [`resources/manual/troubleshooting-and-operations.md`](@/skills/engineering/nutanix-files/resources/manual/troubleshooting-and-operations.md)                 | CVM and FSVM CLI tools (`ncli`, `afs`, `ncc`, `allssh`), log paths, `logbay` support bundles, and remediation.                                                |
+| **Master Documentation Index**          | [`resources/manual/master-index.md`](@/skills/engineering/nutanix-files/resources/manual/master-index.md)                                                     | Master overview map of all 12 documentation modules.                                                                                                          |
+
+---
+
+## Completion criteria
+
+- Confirm file server, share, and HA health using CVM (`ncli file-server list`, `ncc health_checks fileserver_checks run_all`) and FSVM (`afs fs.info`, `afs smb.health_check`, `afs ha.minerva_check_ha_state`) commands, or verify via Files v4 API responses on Prism Central port `9440`.
+- When advising without live cluster access, cite the matching `resources/manual/` module and note any version-dependent behavior (such as File Analytics anomaly actions or Nutanix Files release differences).
+- Confirm credentials, API keys, and directory service bind passwords stay out of source control and commands.
 

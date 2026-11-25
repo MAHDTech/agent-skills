@@ -155,3 +155,9 @@ jj workspace forget agent-1
 - Pass `-m` to `jj describe`, `jj commit`, and `jj split`; without it they open `$EDITOR` and block a headless session. When both sides of a `jj squash` have descriptions it also opens the editor: pass `-m` or `-u` (keep the destination's description).
 - Split by path without a diff editor: `jj split -m "first part" <filesets>` puts the matching files in the first commit and leaves the rest in a child. Without filesets, `jj split` opens the interactive diff editor, as do `-i` and `--tool` on any command.
 - Script multi-step rewrites with change IDs; commit IDs change on every rewrite.
+
+## Completion criteria
+
+- `jj st` and `jj log` show the expected working copy, commit graph, and bookmark positions.
+- `jj log -r 'conflicts()'` reports no unintended conflicts.
+- Every commit intended for push has a non-empty description (unless the user explicitly requested `--allow-empty-description`).

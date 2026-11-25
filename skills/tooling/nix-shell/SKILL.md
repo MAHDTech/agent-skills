@@ -101,3 +101,9 @@ NIXPKGS_ALLOW_UNFREE=1 nix shell --impure nixpkgs#<package> -c <command> [args..
 ```
 
 Only pass `--impure` and `NIXPKGS_ALLOW_UNFREE=1` when an unfree package is genuinely required for the task.
+
+## Completion criteria
+
+- The requested utility command exited with the expected status and produced the needed output.
+- Repository files and project toolchain configurations remain untouched unless the task explicitly asked to edit them.
+- Any persistent subshell opened with `nix shell ... -c bash` was exited cleanly.

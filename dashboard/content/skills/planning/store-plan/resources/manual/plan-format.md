@@ -106,10 +106,10 @@ _One-line italicized summary of what this phase achieves._
 
 Only include phases that were actually discussed. Don't invent phases.
 
-### Risks Open Questions
+### Risks & Open Questions
 
-- 🔴 **Risk or blocker**: What breaks if unaddressed. **Next step**: Mitigation or next step.
-- 🟡 **Open question**: What it affects. **Owner**: Who needs to answer.
+- 🔴 **Risk or blocker**: What could go wrong or block progress. **Impact**: What breaks if unaddressed. **Next step**: Mitigation or next step.
+- 🟡 **Open question**: What needs a decision. **Impact**: What it affects. **Owner**: Who needs to answer.
 - ⚪ **Nice-to-know**: Low impact context for later.
 
 > 🔴 High risk · 🟡 Medium / open question · ⚪ Low / informational
@@ -158,14 +158,13 @@ Use colored circles consistently as indicators in lists:
 Date: 2026-04-02
 Source: conversation with your coding agent
 
-- [tl;dr](#tldr)
 - [Context](#context)
 - [Decisions Made](#decisions-made)
 - [Plan Overview](#plan-overview)
 - [Action Items](#action-items)
 - [Phase 1: Fingerprint-based invalidation](#phase-1-fingerprint-based-invalidation)
 - [Phase 2: Background refresh](#phase-2-background-refresh)
-- [Risks Open Questions](#risks-open-questions)
+- [Risks & Open Questions](#risks--open-questions)
 
 _tl;dr Replace time-based QC cache with fingerprint-based invalidation to eliminate stale results after migrations._
 
@@ -235,7 +234,7 @@ _Pre-warm QC cache after migration saves so the QC tab loads instantly._
 
 **Verify:** Save a migration, switch to QC tab - results should appear without "Running QC..."
 
-## Risks Open Questions
+## Risks & Open Questions
 
 - 🟡 **Risk**: Large datasets may slow fingerprint computation. **Impact**: QC tab load time. **Next step**: Benchmark with biggest dataset first.
 - 🟡 **Open question**: Should fingerprint include excluded_files.json? **Impact**: Correctness. **Owner**: Decide during implementation.

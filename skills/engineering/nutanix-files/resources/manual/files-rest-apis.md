@@ -32,17 +32,22 @@ Nutanix v4 Files APIs support OData query options:
 
 ---
 
-## Authentication Example (Python)
+## Authentication and shared v4 patterns
+
+Nutanix Files v4 endpoints are served by Prism Central on port `9440` and authenticate with a Service Account API key (`x-ntnx-api-key`) or HTTP Basic Auth. For shared v4 authentication, OData filtering, SDK compatibility, and ETag concurrency patterns, see [nutanix-api-v4](../../../nutanix-api-v4/SKILL.md).
 
 ```python
+import os
 import requests
 
-url = "https://<prism-central-ip>:9444/api/files/v4.0/config/file-servers"
+url = "https://<prism-central-ip>:9440/api/files/v4.0/config/file-servers"
 headers = {
-    "Authorization": "Bearer <api_token>",
-    "Content-Type": "application/json"
+    "x-ntnx-api-key": os.environ["NTNX_API_KEY"],
+    "Content-Type": "application/json",
 }
 
-response = requests.get(url, headers=headers, verify=False)
+# Or authenticate with HTTP Basic Auth via auth=(username, password)
+response = requests.get(url, headers=headers, verify=True)
+response.raise_for_status()
 print(response.json())
 ```
