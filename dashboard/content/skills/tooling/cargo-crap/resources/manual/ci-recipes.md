@@ -66,22 +66,16 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: read
+  contents: write
   actions: read
   pull-requests: write
 
 jobs:
   cargo-crap:
-    uses: tars-cloud/actions/.github/workflows/consumer-cargo-crap.yaml@v3
+    uses: tars-cloud/actions/.github/workflows/cargo-crap.yaml@v4
     with:
-      baseline-branch: main
-      coverage-tool: llvm-cov
       post-comment: true
-      update-records-pr: true
-    secrets:
-      client-id: ${{ secrets.APP_CLIENT_ID }}
-      app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
 ```
 
-In that workflow, `post-comment` maintains a sticky pull request comment and `update-records-pr` opens or refreshes a bot pull request that records the baseline and badge JSON after each default-branch run. The App credentials are only needed for recording.
+In that workflow, `post-comment` maintains a sticky pull request comment and `publish-records` (enabled by default) publishes `baseline.json` and `crap-badge.json` directly to an orphan `crap` branch after each default-branch run using `GITHUB_TOKEN`. App credentials (`client-id` and `app-private-key`) are only needed when repository rules protect the `crap` branch against `GITHUB_TOKEN` pushes.
 

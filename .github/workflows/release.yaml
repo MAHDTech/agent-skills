@@ -6,7 +6,12 @@ on:
     branches:
       - trunk
       - main
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      recover-pending:
+        description: Retry the pending approved release using this workflow revision.
+        type: boolean
+        default: false
 
 concurrency:
   group: rust-release
@@ -20,44 +25,21 @@ permissions:
 jobs:
   candidate:
     name: Resolve Release Candidate
-    uses: tars-cloud/actions/.github/workflows/consumer-rust-release-candidate.yaml@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+    uses: tars-cloud/actions/.github/workflows/rust-release-candidate.yaml@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
     with:
       commit-sha: ${{ github.sha }}
+      recover-pending: ${{ inputs.recover-pending || false }}
 
   prepare:
     name: Prepare Release PR
     needs: candidate
     if: needs.candidate.outputs.prepare-ready == 'true'
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-      pull-requests: write
-      actions: read
-    steps:
-      - id: checkout
-        name: Check Out the Exact Consumer Commit and Release History
-        uses: tars-cloud/actions/composite/setup-consumer/scripts/checkout@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-
-      # An App token, not github.token: PRs opened with github.token do not trigger CI.
-      - id: token
-        name: Create Release Token
-        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
-        with:
-          client-id: ${{ secrets.APP_CLIENT_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          permission-contents: write
-          permission-pull-requests: write
-
-      - id: release
-        name: Prepare the Rust Release
-        uses: tars-cloud/actions/composite/release-rust@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
-        with:
-          command: prepare
-          commit-sha: ${{ github.sha }}
-          github-token: ${{ steps.token.outputs.token }}
+    uses: tars-cloud/actions/.github/workflows/rust-release-prepare.yaml@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
+    with:
+      commit-sha: ${{ github.sha }}
+    secrets:
+      client-id: ${{ secrets.CI_APP_CLIENT_ID }}
+      app-private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
 
   artifacts:
     name: Describe Release Artifacts
@@ -96,8 +78,23 @@ jobs:
       contents: write
       pull-requests: read
       actions: read
-    uses: tars-cloud/actions/.github/workflows/consumer-rust-release-publish.yaml@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+    uses: tars-cloud/actions/.github/workflows/rust-release-publish.yaml@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
     with:
       commit-sha: ${{ needs.candidate.outputs.commit-sha }}
-      artifact-run-id: ${{ github.run_id }}
-      release-manifest-artifact: release-manifest
+      recovery: ${{ needs.candidate.outputs.recovery == 'true' }}
+    secrets:
+      client-id: ${{ secrets.CI_APP_CLIENT_ID }}
+      app-private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+
+  resume:
+    name: Prepare Next Release After Recovery
+    needs:
+      - candidate
+      - publish
+    if: needs.candidate.outputs.recovery == 'true'
+    uses: tars-cloud/actions/.github/workflows/rust-release-prepare.yaml@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
+    with:
+      commit-sha: ${{ github.sha }}
+    secrets:
+      client-id: ${{ secrets.CI_APP_CLIENT_ID }}
+      app-private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
