@@ -1004,7 +1004,7 @@ impl SkillSyncer {
         }
 
         let mut entries = fs::read_dir(skills_dir)
-            .and_then(|entries| entries.collect::<std::io::Result<Vec<_>>>())
+            .and_then(std::iter::Iterator::collect::<std::io::Result<Vec<_>>>)
             .map_err(|source| SyncError::Io {
                 path: skills_dir.to_path_buf(),
                 source,

@@ -1,4 +1,5 @@
 // cspell:words Syncer
+use std::fmt::Write;
 use std::fs;
 use std::path::Path;
 use std::process::Command;
@@ -55,10 +56,11 @@ fn commit(root: &Path) {
 fn manifest(root: &Path, sources: &[(&str, &Path)]) {
     let mut yaml = "version: 1\nsources:\n".to_string();
     for (id, path) in sources {
-        yaml.push_str(&format!(
-            "  - id: {id}\n    repository: '{}'\n    ref: main\n    path: skills\n",
+        let _ = writeln!(
+            yaml,
+            "  - id: {id}\n    repository: '{}'\n    ref: main\n    path: skills",
             path.display()
-        ));
+        );
     }
     fs::write(root.join("vendor-skills.yaml"), yaml).unwrap();
 }
