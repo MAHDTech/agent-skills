@@ -102,7 +102,7 @@ dependencies = [
 
 [[package]]
 name = "ask-cli"
-version = "0.1.59"
+version = "0.1.60"
 dependencies = [
  "assert_cmd",
  "cargo-crap",
@@ -2722,7 +2722,7 @@ checksum = "33f4fe9184a62d842c9ef383018f3306d8ba224fd9d836f56d7288308847c256"
 
 [[package]]
 name = "skills-core"
-version = "0.1.59"
+version = "0.1.60"
 dependencies = [
  "chrono",
  "dirs",
@@ -2741,7 +2741,7 @@ dependencies = [
 
 [[package]]
 name = "skills-tui"
-version = "0.1.59"
+version = "0.1.60"
 dependencies = [
  "crossterm",
  "futures",
