@@ -16,11 +16,12 @@ Edit text to remove AI patterns, restore the author's voice where it belongs, an
 
 ## Process
 
-1. **Scan for patterns.** Audit the input against the detection list below.
-2. **Rewrite cleanly.** Preserve original meaning and facts while matching the intended tone.
-3. **Add soul where voice is wanted.** For posts, READMEs, and other prose that carries the author's voice, apply the section below. For specs, reference docs, and code comments, remove the tells only and keep facts and wording neutral.
-4. **Self-audit.** Check: "What still makes this obviously AI-generated?" Fix remaining tells.
-5. **Proofread.** Make a final pass, described below, before finishing.
+1. **Load prevention principles.** When `/noslop` ([`noslop`](@/skills/tooling/noslop/_index.md)) is available, read and apply its guiding principles first. If running standalone, apply its core bar directly: respect the reader's time, cut anything that costs more effort to read than it took to write, and verify key claims before shipping.
+2. **Scan for patterns.** Audit the input against the detection list below.
+3. **Rewrite cleanly.** Preserve original meaning and facts while matching the intended tone.
+4. **Add soul where voice is wanted.** For posts, READMEs, and other prose that carries the author's voice, apply the section below. For specs, reference docs, and code comments, remove the tells only and keep facts and wording neutral.
+5. **Self-audit.** Check: "What still makes this obviously AI-generated?" Fix remaining tells.
+6. **Proofread.** Make a final pass, described below, before finishing.
 
 ## Adding soul
 

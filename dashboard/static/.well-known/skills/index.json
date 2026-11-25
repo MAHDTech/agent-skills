@@ -281,6 +281,13 @@
       ]
     },
     {
+      "name": "noslop",
+      "description": "Apply the No AI Slop Manifesto principles across code, docs, plans, reviews, and messages. Use when the user says \"no slop\" or asks to prevent AI slop, not for copy-editing existing prose.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "name": "nutanix-api-v4",
       "description": "Integrate or debug Nutanix v4 REST APIs and official SDKs. Use for OData queries, namespaces, version compatibility, or migrating legacy Nutanix API integrations.",
       "files": [

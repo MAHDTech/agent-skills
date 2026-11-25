@@ -201,6 +201,7 @@ nonblock
 nonblocking
 noninfringement
 noreply
+noslop
 npx
 ntnx
 nutanix

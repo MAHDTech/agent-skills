@@ -282,6 +282,13 @@
       "digest": "sha256:a43158910f48cdb56b0138dd4b6c35be7f3c5e5abab5dd61c6cacff9ee860606"
     },
     {
+      "name": "noslop",
+      "type": "skill-md",
+      "description": "Apply the No AI Slop Manifesto principles across code, docs, plans, reviews, and messages. Use when the user says \"no slop\" or asks to prevent AI slop, not for copy-editing existing prose.",
+      "url": "/.well-known/agent-skills/noslop/SKILL.md",
+      "digest": "sha256:d55958409bd0489733ff4a53cd419bb81a882942a3c75941462a088f7c5ffe5c"
+    },
+    {
       "name": "nutanix-api-v4",
       "type": "skill-md",
       "description": "Integrate or debug Nutanix v4 REST APIs and official SDKs. Use for OData queries, namespaces, version compatibility, or migrating legacy Nutanix API integrations.",
@@ -447,14 +454,14 @@
       "type": "skill-md",
       "description": "Create or update custom agent skills with concise discovery descriptions, matching invocation policies, supporting resources, and catalog checks.",
       "url": "/.well-known/agent-skills/skill-creator/SKILL.md",
-      "digest": "sha256:e26f15ac27c28be5550d64efc4db11daf9253298519b72166b768dcfb2202910"
+      "digest": "sha256:0c16f442f95d432ddc3781bafa9cb121138608a873b296a699efda587ea97b22"
     },
     {
       "name": "skill-router",
       "type": "skill-md",
       "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic. Use only when the user explicitly requests routing or browsing the catalog.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:dbbe370c31c9094776ee7e4e6678e218d6bc455ff021a87b0da56bca265abddf"
+      "digest": "sha256:48994a441672f2b1884beb325be792bb97b79c61aa4a7e46a022e041dd768092"
     },
     {
       "name": "store-plan",
@@ -510,7 +517,7 @@
       "type": "skill-md",
       "description": "Edit writing to remove AI cliches, filler, and robotic phrasing, then fix spelling, grammar, and links. Use when a post, README, or doc needs plain language before publication.",
       "url": "/.well-known/agent-skills/unslop/SKILL.md",
-      "digest": "sha256:3f4bcdc06f275af88b150ad584660090f77f633f77ccea7f87ee51fda0211170"
+      "digest": "sha256:ffe622c7c8d95efd617134adb85ef6d0e1f6c903a24e8a2989d86d65f0f0364d"
     },
     {
       "name": "upgrade-dependencies",
