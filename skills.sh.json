@@ -124,6 +124,7 @@
         "install-skills",
         "jj",
         "nix-shell",
+        "noslop",
         "pagefind",
         "prek",
         "scratchpad",

@@ -1,0 +1,7 @@
+interface:
+  display_name: "No Slop"
+  short_description: "Prevent AI slop with the No AI Slop Manifesto"
+  default_prompt: "Use $noslop to apply the No AI Slop Manifesto guiding principles."
+
+policy:
+  allow_implicit_invocation: true

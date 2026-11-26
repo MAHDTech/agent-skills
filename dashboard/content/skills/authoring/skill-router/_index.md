@@ -141,6 +141,7 @@ Beyond `/code-review` on the main flow:
 ## Tooling
 
 - `/agent-guidelines` - reach for this while writing or editing code to apply coding discipline (state assumptions, keep changes minimal and scoped, and verify against concrete criteria), not when reviewing finished work.
+- `/noslop` - reach for this when you say "no slop" or want the No AI Slop Manifesto principles applied across code, docs, plans, reviews, and messages to prevent low-effort AI output.
 - `/antigravity` - reach for this when you need to research or verify Google Antigravity specifications, command-line flags, rules, subagents, or hooks.
 - `/devenv` - reach for this when a repo uses devenv for its shell and dependencies; every project command then runs through it.
 - `/nix-shell` - reach for this on NixOS in a project without devenv, to run ad-hoc CLI utilities in ephemeral Nix shells.

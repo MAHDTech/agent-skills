@@ -101,6 +101,7 @@ description: Single source of truth for agent instructions
 - **install-skills**: Install, update, remove, or troubleshoot agent skill collections with the skills.sh CLI when explicitly requested, including runtime wiring and install verification.
 - **jj**: Use Jujutsu (jj) in repositories with .jj, or for jj-specific tasks. Inspect history, shape changes, write revsets/filesets, resolve conflicts, and manage bookmarks or remotes.
 - **nix-shell**: Run missing ad-hoc CLI utilities in ephemeral nix shell environments when Nix is installed and the project has no devenv or Nix dev shell. Use for one-off diagnostics or conversions.
+- **noslop**: Apply the No AI Slop Manifesto principles across code, docs, plans, reviews, and messages. Use when the user says "no slop" or asks to prevent AI slop, not for copy-editing existing prose.
 - **pagefind**: Configure, build, or troubleshoot Pagefind search for a static website. Use for indexing options, content exclusions or weighting, generated assets, and client integration.
 - **prek**: Run, configure, or troubleshoot Git pre-commit hooks with prek. Use for hook execution, installation, validation, and cache management; distinguish the hook stage from its CLI.
 - **scratchpad**: Manage temporary scripts, experiment files, and debugging artifacts during a task. Use one session scratch directory, keep the source tree clean, and remove temporary files afterward.
@@ -112,7 +113,7 @@ description: Single source of truth for agent instructions
 
 - **guards-debug**: Diagnose and recover stuck or failing agy-guards sessions, hooks, spokes, or factory shifts from outside an active run. Use only when the user explicitly requests GUARDS debugging.
 - **guards-goal**: Set or resume a persistent goal and pursue it until every requirement is verified or blocked. Use only when the user explicitly asks for a goal that persists across turns.
-- **guards-run-factory**: Run the GUARDS factory unattended over a selected repository backlog through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift, with optional automated merging.
+- **guards-run-factory**: Run the GUARDS factory unattended over a single repository backlog, single-repo chores, or a parallel multi-repo chores fleet through headless agy batches, peer review, and rework. Use when explicitly starting a bounded factory shift or fleet chores run.
 
 ## Vendor Skills
 

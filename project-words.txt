@@ -201,6 +201,7 @@ nonblock
 nonblocking
 noninfringement
 noreply
+noslop
 npx
 ntnx
 nutanix
@@ -227,6 +228,7 @@ pkgs
 plistlib
 plutil
 Pocock
+precheck
 prefactoring
 preheader
 prek

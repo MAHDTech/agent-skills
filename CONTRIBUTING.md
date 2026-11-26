@@ -61,7 +61,7 @@ devenv --no-tui test
   - `ask dashboard lint`: verify committed dashboard content matches generated artifacts. Add `--fix` to regenerate it in place first (the commit hook does this).
   - `ask dashboard build`: sync content, compile Tailwind CSS, render the Zola site, and build the Pagefind search index.
   - `ask dashboard serve`: build the dashboard once and serve it locally with live reload.
-- Keep skills self-contained: cross-references between skills are forbidden unless both skills declare membership in the same `metadata.group` (`authoring`, `github`, `planning-pipeline`, `review`, `guards`, or `nutanix`), with `skill-router` and `skills-archive/` exempt only as sources and live skills never referencing archived skills.
+- Keep skills self-contained: cross-references between skills are forbidden unless both skills declare membership in the same `metadata.group` (`authoring`, `github`, `planning-pipeline`, `review`, `guards`, `nutanix`, or `slop`), with `skill-router` and `skills-archive/` exempt only as sources and live skills never referencing archived skills.
 - Declare `policy.allow_implicit_invocation` explicitly in `agents/openai.yaml` for every promoted custom skill so that it matches the inverse of `disable-model-invocation` in `SKILL.md` (where omitting `disable-model-invocation` means `false`).
 - Place skill supporting files under `resources/auto/` (managed by `ask skills download-resources` and `ask skills clean-resources`) or `resources/manual/` (hand-authored), and never place files directly inside `resources/`.
 
