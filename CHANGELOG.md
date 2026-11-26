@@ -1,7 +1,15 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-### [v0.1.60](https://github.com/MAHDTech/agent-skills/compare/v0.1.59...b6fe24a9fc9f4243f8670a7d3d9435231065ff18) (2026-11-25)
+### [v0.1.61](https://github.com/MAHDTech/agent-skills/compare/v0.1.60...0d4f1db212ccd0d8d4916724cba87dc7554286f8) (2026-11-26)
+
+#### Features
+
+* **guards:** document chores-only and parallel fleet factory modes (#351)
+([0d4f1db](https://github.com/MAHDTech/agent-skills/commit/0d4f1db212ccd0d8d4916724cba87dc7554286f8)),
+closes [#351](https://github.com/MAHDTech/agent-skills/issues/351)
+
+### [v0.1.60](https://github.com/MAHDTech/agent-skills/compare/v0.1.59...v0.1.60) (2026-11-25)
 
 #### Fixes
 
