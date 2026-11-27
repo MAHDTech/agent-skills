@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ship It"
+  short_description: "Commit, push, and open a PR when you say ship it"
+  default_prompt: "Use $ship-it to commit changes, push the branch, and open a pull request."
+
+policy:
+  allow_implicit_invocation: true

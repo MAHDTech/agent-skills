@@ -91,12 +91,14 @@ elif
 endcomponent
 endmacro
 endraw
+envrc
 esac
 evals
 evans
 evictable
 evolog
 fastcdc
+fastembed
 feff
 fileset
 filesets
@@ -129,6 +131,7 @@ headlessly
 headRefName
 headRefOid
 healthz
+helixdb
 herdr
 hexdump
 hitl
@@ -156,6 +159,7 @@ kipp
 kommander
 konvoy
 kubeconfig
+lancedb
 lefthook
 leitwort
 lifecycle
@@ -177,6 +181,7 @@ mergeStateStatus
 Merkle
 mgmt
 microbenchmark
+milvus
 minto
 misconfig
 mksquashfs
@@ -186,6 +191,7 @@ mocharc
 mockability
 mops
 motoko
+MSRV
 mtimes
 multiprotocol
 nameWithOwner
@@ -244,6 +250,7 @@ pubspec
 pyproject
 pytest
 qcow
+qdrant
 quickstarts
 radare
 ratatui
@@ -266,6 +273,7 @@ revsets
 rfds
 rgba
 rizin
+rmcp
 rodata
 romilly
 rootfs
@@ -307,6 +315,7 @@ subsubpath
 subthread
 subthreads
 subtyping
+surrealdb
 symlink
 symlinked
 symlinks
@@ -337,6 +346,7 @@ toplevel
 tracestate
 tstack
 typechecks
+typesafeai
 unitless
 unmirrored
 unreachability
@@ -348,10 +358,12 @@ velero
 venv
 vercel
 verdana
+vertexai
 vetkd
 vetkey
 vetkeys
 walkdir
+WASI
 wayfinder
 wayfinding
 webfetch
@@ -362,3 +374,4 @@ worktrees
 Wrust
 WSJF
 xclip
+zstd

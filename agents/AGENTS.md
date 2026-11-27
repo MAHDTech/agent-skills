@@ -26,6 +26,7 @@ description: Single source of truth for agent instructions
 - **productionize-app**: Prepare an entire application for production when explicitly requested. Audit and fix configuration, reliability, security, observability, packaging, and deployment readiness.
 - **research**: Research a technical question against primary sources and save the cited findings as a Markdown note in the repo. Use when the user wants a saved, cited research note, not a quick doc lookup.
 - **reverse-engineer-binary**: Reverse engineer compiled binaries, packaged apps, Electron bundles, or APKs via tiered CLI triage and evidence-backed critique when explicitly requested. Skip for ordinary source repositories.
+- **rig**: Build Rust LLM applications, agents, and Bevy harness plugins with Rig. Use for rig, rig-core, rig-agent, providers, tools, RAG, memory, cassettes, MCP, or extending the rig coding agent.
 - **sculpt-code**: Refactor a scoped diff or selected files for clearer naming, control flow, structure, and less duplication or dead code. Use for cleanup that preserves behavior.
 - **tdd**: Build features or fixes test-first using a red-to-green loop. Use for behavior-focused integration tests, choosing public test seams, and avoiding tests coupled to internals.
 - **understand-codebase**: Analyze a source codebase into an evidence-backed architecture teardown, critique, and transferable learnings report when explicitly requested. Skip for shallow PR briefings or compiled binaries.
@@ -69,6 +70,7 @@ description: Single source of truth for agent instructions
 - **gh-triage**: Triage GitHub issues and external PRs: categorize, verify claims, interview as needed, and post agent-ready briefs. Use when asked to run a maintainer triage session or change issue and PR triage labels or states.
 - **git-resolve-conflicts**: Resolve existing merge, rebase, or cherry-pick conflicts using file context and both sides' intent. Use when conflicts block authorized work; stage confident fixes and escalate ambiguous behavior.
 - **git-update-branch**: Assess stale or diverged PRs for conceptual conflicts and update a branch against its base via rebase or merge. Use when asked to modernize or update a branch or PR.
+- **ship-it**: Commit pending changes, push the branch, and open or update a pull request when the user says "ship it". Trigger only on the phrase "ship it", not general commit or PR requests.
 
 ## Reflection
 

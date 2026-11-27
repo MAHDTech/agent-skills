@@ -25,6 +25,7 @@
         "productionize-app",
         "research",
         "reverse-engineer-binary",
+        "rig",
         "sculpt-code",
         "tdd",
         "understand-codebase",
@@ -79,7 +80,8 @@
         "gh-takeover",
         "gh-triage",
         "git-resolve-conflicts",
-        "git-update-branch"
+        "git-update-branch",
+        "ship-it"
       ]
     },
     {

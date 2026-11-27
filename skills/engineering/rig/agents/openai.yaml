@@ -1,0 +1,7 @@
+interface:
+  display_name: "Rig"
+  short_description: "Build Rust LLM apps, agents, and plugins with Rig"
+  default_prompt: "Use $rig to build or debug Rust LLM apps and coding-agent plugins with Rig."
+
+policy:
+  allow_implicit_invocation: true

@@ -401,6 +401,13 @@
       "digest": "sha256:f4639d3619acf8bfc027546f9d006b24cb4fdeb497a3a299d73d81aa67ae5944"
     },
     {
+      "name": "rig",
+      "type": "skill-md",
+      "description": "Build Rust LLM applications, agents, and Bevy harness plugins with Rig. Use for rig, rig-core, rig-agent, providers, tools, RAG, memory, cassettes, MCP, or extending the rig coding agent.",
+      "url": "/.well-known/agent-skills/rig/SKILL.md",
+      "digest": "sha256:c0d3a82c1506c87ea68d399bbc797fd04751845b81f0768f46fc787be2d42d4e"
+    },
+    {
       "name": "scope-sweep",
       "type": "skill-md",
       "description": "Check finished work for incomplete tasks, missed requirements, unhandled scope, and operational follow-ups. Use before declaring a scope complete, citing evidence for each remaining gap.",
@@ -427,6 +434,13 @@
       "description": "Review your implementation diff for unfinished work, non-idiomatic code, and inconsistency with project conventions. Use after a task to apply focused fixes, with file-and-line evidence for each change.",
       "url": "/.well-known/agent-skills/self-review/SKILL.md",
       "digest": "sha256:3cfd41497d4b6f125d4cfc8492834351619f95cfe873cd3579733c9a54006115"
+    },
+    {
+      "name": "ship-it",
+      "type": "skill-md",
+      "description": "Commit pending changes, push the branch, and open or update a pull request when the user says \"ship it\". Trigger only on the phrase \"ship it\", not general commit or PR requests.",
+      "url": "/.well-known/agent-skills/ship-it/SKILL.md",
+      "digest": "sha256:61300a26b29bae6c150360e2d70eaa9dd33eefaf793ed7b889c0b3c2972d4ae2"
     },
     {
       "name": "simplify-docs",
@@ -461,7 +475,7 @@
       "type": "skill-md",
       "description": "Browse the skill catalog and choose a workflow for a task, with a map of delivery stages and specialist skills grouped by topic. Use only when the user explicitly requests routing or browsing the catalog.",
       "url": "/.well-known/agent-skills/skill-router/SKILL.md",
-      "digest": "sha256:48994a441672f2b1884beb325be792bb97b79c61aa4a7e46a022e041dd768092"
+      "digest": "sha256:e56f71ec045a24da75e0b2a4b421b38217aa3cfc680f991adee542e966ac1752"
     },
     {
       "name": "store-plan",

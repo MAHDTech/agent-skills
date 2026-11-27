@@ -96,6 +96,7 @@ Beyond `/code-review` on the main flow:
 
 - `/gh-create-issue` - reach for this when conversation context should become a structured GitHub issue.
 - `/gh-create-pr` - reach for this to ship: generate a PR title and description, then commit and open the PR on approval.
+- `/ship-it` - shortcut triggered automatically when you say "ship it": commit pending changes on a feature branch, push, and open or update the PR without a separate draft-approval step.
 - `/gh-pr-comments` - reach for this when posting PR or issue comments, inline review notes, or thread replies on a user's behalf; it owns the attribution format and secret preflight scan.
 - `/gh-babysit-pr` - reach for this when you want to monitor an open PR through CI checks, review bots, and base-branch updates with `pr-wait`.
 - `/gh-takeover` - reach for this when adopting an unfinished PR, branch, or agent handoff to completion while preserving contributor credit.
@@ -122,6 +123,7 @@ Beyond `/code-review` on the main flow:
 - `/nutanix-files` - reach for this when managing Nutanix Files, SMB/NFS file shares, Smart Tiering, or file server APIs.
 - `/nutanix-kubernetes-platform` - reach for this when operating, deploying, upgrading, or troubleshooting Nutanix Kubernetes Platform (NKP).
 - `/nutanix-objects` - reach for this when managing Nutanix Objects S3 storage, bucket policies, replication, or REST APIs.
+- `/rig` - reach for this when building Rust LLM apps, agents, or Bevy harness plugins with Rig (`rig`, `rig-core`, `rig-agent`, `rig-harness`).
 - `/xai` - reach for this when building applications with xAI and Grok APIs, SDKs, function calling, vision, or live search.
 
 ## Writing

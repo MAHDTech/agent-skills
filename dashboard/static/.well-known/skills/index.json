@@ -400,6 +400,13 @@
       ]
     },
     {
+      "name": "rig",
+      "description": "Build Rust LLM applications, agents, and Bevy harness plugins with Rig. Use for rig, rig-core, rig-agent, providers, tools, RAG, memory, cassettes, MCP, or extending the rig coding agent.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "name": "scope-sweep",
       "description": "Check finished work for incomplete tasks, missed requirements, unhandled scope, and operational follow-ups. Use before declaring a scope complete, citing evidence for each remaining gap.",
       "files": [
@@ -423,6 +430,13 @@
     {
       "name": "self-review",
       "description": "Review your implementation diff for unfinished work, non-idiomatic code, and inconsistency with project conventions. Use after a task to apply focused fixes, with file-and-line evidence for each change.",
+      "files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "name": "ship-it",
+      "description": "Commit pending changes, push the branch, and open or update a pull request when the user says \"ship it\". Trigger only on the phrase \"ship it\", not general commit or PR requests.",
       "files": [
         "SKILL.md"
       ]
