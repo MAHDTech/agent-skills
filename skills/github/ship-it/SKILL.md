@@ -21,7 +21,7 @@ BASE_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2
 [ -n "$BASE_BRANCH" ] || BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
 ```
 
-If every method fails, stop and ask the user which base branch to target. Fetch the base ref and capture `BASE_REF`:
+If every method fails, stop and ask the user which base branch to target. Fetch the base ref and capture `BASE_REF` (preferring `origin/$BASE_BRANCH`):
 
 ```bash
 git fetch origin "$BASE_BRANCH" 2>/dev/null || true
@@ -32,6 +32,8 @@ elif git rev-parse --verify "$BASE_BRANCH" >/dev/null 2>&1; then
   BASE_REF="$BASE_BRANCH"
 fi
 ```
+
+If `BASE_REF` is still empty (neither `origin/$BASE_BRANCH` nor `$BASE_BRANCH` exists locally), stop and ask the user for a valid base branch or ref before continuing.
 
 Check the current branch with `git branch --show-current`:
 
@@ -49,7 +51,7 @@ git log "$BASE_REF"..HEAD --oneline
 
 - If there are no staged/unstaged changes and zero commits ahead of `BASE_REF`, report that there is nothing to ship and stop.
 - Stage only the intended files for the current work by explicit path. Exclude sensitive or temporary files (`.env`, private keys, tokens, credentials, swap files). If unrelated or suspicious untracked files are present, stop and ask the user before staging them.
-- Scan staged changes, the planned commit message, and the planned PR title/body for secrets, credentials, internal URLs, or private paths (follow `/gh-pr-comments` for the full checklist when installed). If any secret or sensitive detail is found, stop before committing or pushing and report it to the user.
+- Before committing, scan staged changes and the planned commit message for secrets, credentials, internal URLs, or private paths (follow `/gh-pr-comments` for the full checklist when installed). If any secret or sensitive detail is found, stop before committing and report it to the user.
 
 ## 3. Commit pending changes
 
@@ -67,37 +69,53 @@ If the working tree is already clean and the branch has commits ahead of `BASE_R
 
 ## 4. Push and open or update the PR
 
-1. Push the branch and set upstream tracking:
+1. Scan every outgoing commit's diff and commit message (including earlier commits on the branch and any hook-modified commit from step 3) for secrets, credentials, internal URLs, or private paths before pushing:
+
+   ```bash
+   OUTGOING_RANGE="$BASE_REF..HEAD"
+   if git rev-parse --verify '@{u}' >/dev/null 2>&1; then
+     OUTGOING_RANGE='@{u}..HEAD'
+   fi
+   git log -p "$OUTGOING_RANGE"
+   ```
+
+   If any outgoing commit contains a secret or sensitive detail (even if a later commit removes it), stop before pushing and report it to the user.
+
+2. Push the branch and set upstream tracking:
 
    ```bash
    git push -u origin HEAD
    ```
 
-2. Draft the PR title (Conventional Commit format, 70 characters or fewer) and concise PR body from `git diff "$BASE_REF"...HEAD --stat` and `git log "$BASE_REF"..HEAD --oneline`. Follow [pr-format.md](../gh-create-pr/resources/manual/pr-format.md) when installed; otherwise include a one-sentence summary, bulleted key changes, and verification results. Omit comment attribution callouts and `Created with <model>` footers.
+3. Draft the PR title (Conventional Commit format, 70 characters or fewer) and concise PR body from `git diff "$BASE_REF"...HEAD --stat` and `git log "$BASE_REF"..HEAD --oneline`. Follow [pr-format.md](../gh-create-pr/resources/manual/pr-format.md) when installed; otherwise include a one-sentence summary, bulleted key changes, and verification results. Omit comment attribution callouts and `Created with <model>` footers.
 
-3. Write the body to a temporary file outside the repository so it never dirties the working tree:
+4. Write the body to a temporary file outside the repository so it never dirties the working tree:
 
    ```bash
    PR_BODY="$(mktemp -d)/PR_DESCRIPTION.md"
    ```
 
-4. Check for an existing PR on the current branch, then update it or create a ready (non-draft) PR targeting `BASE_BRANCH`:
+   Scan the final PR title and `$PR_BODY` contents for secrets, credentials, internal URLs, or private paths (follow `/gh-pr-comments` for the full checklist when installed). If anything sensitive is present, redact it or stop and ask the user before running `gh pr create` or `gh pr edit`.
+
+5. Check for an existing open PR on the current branch, then update it or create a ready (non-draft) PR targeting `BASE_BRANCH`:
 
    ```bash
-   gh pr view --json number,url 2>/dev/null
+   gh pr view --json number,url,state 2>/dev/null
    ```
 
-   ```bash
-   # If no PR exists yet:
-   gh pr create --base "$BASE_BRANCH" --title "<title>" --body-file "$PR_BODY"
+   Inspect the returned `state`:
 
-   # If a PR already exists for this branch:
-   gh pr edit --title "<title>" --body-file "$PR_BODY"
+   ```bash
+   # If an existing PR is found and state is OPEN:
+   gh pr edit <number> --title "<title>" --body-file "$PR_BODY"
+
+   # If no PR exists, or the returned PR is CLOSED or MERGED:
+   gh pr create --base "$BASE_BRANCH" --title "<title>" --body-file "$PR_BODY"
    ```
 
    If `gh pr create` or `gh pr edit` fails due to a GraphQL rate limit, fall back to the REST API (`gh api "repos/{owner}/{repo}/pulls" ...`).
 
-5. Delete the temporary directory with `rm -rf "$(dirname "$PR_BODY")"`.
+6. Delete the temporary directory with `rm -rf "$(dirname "$PR_BODY")"`.
 
 ## Completion criteria
 
