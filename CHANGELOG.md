@@ -1,7 +1,15 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-### [v0.1.61](https://github.com/MAHDTech/agent-skills/compare/v0.1.60...0d4f1db212ccd0d8d4916724cba87dc7554286f8) (2026-11-26)
+### [v0.1.62](https://github.com/MAHDTech/agent-skills/compare/v0.1.61...6c8abe875e1875e0493de9e6879c61169d9d12ec) (2026-11-28)
+
+#### Features
+
+* **skills:** Add rig and ship-it skills (#353)
+([6c8abe8](https://github.com/MAHDTech/agent-skills/commit/6c8abe875e1875e0493de9e6879c61169d9d12ec)),
+closes [#353](https://github.com/MAHDTech/agent-skills/issues/353)
+
+### [v0.1.61](https://github.com/MAHDTech/agent-skills/compare/v0.1.60...v0.1.61) (2026-11-26)
 
 #### Features
 
