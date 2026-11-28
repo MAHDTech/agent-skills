@@ -440,7 +440,7 @@
       "type": "skill-md",
       "description": "Commit pending changes, push the branch, and open or update a pull request when the user says \"ship it\". Trigger only on the phrase \"ship it\", not general commit or PR requests.",
       "url": "/.well-known/agent-skills/ship-it/SKILL.md",
-      "digest": "sha256:851fc4e0b7f6e98131a2cbadc3c627268b48416af8a4543b173d7fd216545dfd"
+      "digest": "sha256:a6bf02198147f9d218ee013bcdceec3e3c41f81ae8ba0af8bc4b681b27b66f67"
     },
     {
       "name": "simplify-docs",

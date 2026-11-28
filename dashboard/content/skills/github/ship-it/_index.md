@@ -74,14 +74,10 @@ If the working tree is already clean and the branch has commits ahead of `BASE_R
 
 ## 4. Push and open or update the PR
 
-1. Scan every outgoing commit's diff and commit message (including earlier commits on the branch and any hook-modified commit from step 3) for secrets, credentials, internal URLs, or private paths before pushing:
+1. Scan every outgoing commit's diff (including merge-commit diffs via `-m`), earlier commits on the branch, and commit messages (including any hook-modified commit from step 3) for secrets, credentials, internal URLs, or private paths before pushing:
 
    ```bash
-   OUTGOING_RANGE="$BASE_REF..HEAD"
-   if git rev-parse --verify '@{u}' >/dev/null 2>&1; then
-     OUTGOING_RANGE='@{u}..HEAD'
-   fi
-   git log -p "$OUTGOING_RANGE"
+   git log -p -m "$BASE_REF"..HEAD
    ```
 
    If any outgoing commit contains a secret or sensitive detail (even if a later commit removes it), stop before pushing and report it to the user.
@@ -92,26 +88,28 @@ If the working tree is already clean and the branch has commits ahead of `BASE_R
    git push -u origin HEAD
    ```
 
-3. Draft the PR title (Conventional Commit format, 70 characters or fewer) and concise PR body from `git diff "$BASE_REF"...HEAD --stat` and `git log "$BASE_REF"..HEAD --oneline`. Follow [pr-format.md](@/skills/github/gh-create-pr/resources/manual/pr-format.md) when installed; otherwise include a one-sentence summary, bulleted key changes, and verification results. Omit comment attribution callouts and `Created with <model>` footers.
+3. Check for an existing open PR on the current branch so you summarize against its actual base branch when updating an existing PR (for example a release or stacked branch):
 
-4. Write the body to a temporary file outside the repository so it never dirties the working tree:
+   ```bash
+   gh pr view --json number,url,state,baseRefName 2>/dev/null
+   ```
+
+   If an existing PR is returned with `state == "OPEN"` and its `baseRefName` differs from `BASE_BRANCH`, fetch `origin "$baseRefName"` and set `BASE_BRANCH` and `BASE_REF` to that PR's base branch (stopping to ask the user if neither `origin/$BASE_BRANCH` nor `$BASE_BRANCH` exists locally).
+
+4. Draft the PR title (Conventional Commit format, 70 characters or fewer) and concise PR body from `git diff "$BASE_REF"...HEAD --stat` and `git log "$BASE_REF"..HEAD --oneline`. Follow [pr-format.md](@/skills/github/gh-create-pr/resources/manual/pr-format.md) when installed; otherwise include a one-sentence summary, bulleted key changes, and verification results. Omit comment attribution callouts and `Created with <model>` footers.
+
+5. Write the body to a temporary file outside the repository so it never dirties the working tree, then scan the final PR title and `$PR_BODY` contents for secrets, credentials, internal URLs, or private paths (follow `/gh-pr-comments` for the full checklist when installed):
 
    ```bash
    PR_BODY="$(mktemp -d)/PR_DESCRIPTION.md"
    ```
 
-   Scan the final PR title and `$PR_BODY` contents for secrets, credentials, internal URLs, or private paths (follow `/gh-pr-comments` for the full checklist when installed). If anything sensitive is present, redact it or stop and ask the user before running `gh pr create` or `gh pr edit`.
+   If anything sensitive is present, redact it or stop and ask the user before publishing.
 
-5. Check for an existing open PR on the current branch, then update it or create a ready (non-draft) PR targeting `BASE_BRANCH`:
-
-   ```bash
-   gh pr view --json number,url,state 2>/dev/null
-   ```
-
-   Inspect the returned `state`:
+6. Update the existing open PR or create a ready (non-draft) PR targeting `BASE_BRANCH`:
 
    ```bash
-   # If an existing PR is found and state is OPEN:
+   # If step 3 found a PR with state == "OPEN":
    gh pr edit <number> --title "<title>" --body-file "$PR_BODY"
 
    # If no PR exists, or the returned PR is CLOSED or MERGED:
@@ -120,7 +118,7 @@ If the working tree is already clean and the branch has commits ahead of `BASE_R
 
    If `gh pr create` or `gh pr edit` fails due to a GraphQL rate limit, fall back to the REST API (`gh api "repos/{owner}/{repo}/pulls" ...`).
 
-6. Delete the temporary directory with `rm -rf "$(dirname "$PR_BODY")"`.
+7. Delete the temporary directory with `rm -rf "$(dirname "$PR_BODY")"`.
 
 ## Completion criteria
 
